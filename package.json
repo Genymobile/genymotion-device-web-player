@@ -1,8 +1,12 @@
 {
   "name": "@genymotion/device-web-player",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Genymotion Virtual Device Web Player",
   "main": "dist/js/gm-player.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
   "engines": {
     "node": ">=12"
   },

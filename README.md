@@ -29,11 +29,11 @@ For more information about Genymotion devices, please visit [genymotion website]
 ## Requirements
 A Modern, WebRTC compatible, Web browser:
 
-- Chrome (60+)
-- Firefox (58+)
-- Safari (11+)
-- Edge (15+)
-- Opera (22+)
+- Google Chrome 85+
+- Mozilla Firefox 78+
+- Opera 70+
+- Microsoft Edge 20.10240+
+- Safari 11+
 
 ## Getting started
 ### With NPM/Yarn

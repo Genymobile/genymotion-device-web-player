@@ -4,7 +4,6 @@
   "description": "Genymotion Virtual Device Web Player",
   "main": "dist/js/gm-player.min.js",
   "files": [
-    "src",
     "dist"
   ],
   "engines": {

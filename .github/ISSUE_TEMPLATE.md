@@ -1,11 +1,11 @@
 ## Prerequisites
 
 - [ ] I've read & comply with the [contributing guidelines](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CONTRIBUTING.md)
-* [ ] I've searched open issues if my demand is already reported.
+- [ ] I've searched open issues if my demand is already reported.
 
 ## Description
 
-Description of the bug or feature / support request . 
+Description of the bug or feature / support request.
 
 ## Steps to Reproduce
 
@@ -13,11 +13,11 @@ Description of the bug or feature / support request .
 2. [Second Step]
 3. [and so on...]
 
-**Expected behavior:** 
+**Expected behavior:**
 
 What you expected to happen.
 
-**Actual behavior:** 
+**Actual behavior:**
 
 What actually happened.
 

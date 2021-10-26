@@ -98,7 +98,7 @@ gulp.task('app-styles', function() {
         .pipe(base64())
         .pipe(autoprefixer())
         .pipe(gulpif(util.env.production, minifyCss()))
-        .pipe(concat('gm-player.css'))
+        .pipe(concat('gm-player.min.css'))
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
 });
 

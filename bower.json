@@ -2,7 +2,7 @@
   "name": "genymotion-webrtc-client",
   "main": [
     "dist/js/gm-player.min.js",
-    "dist/css/gm-player.css"
+    "dist/css/gm-player.min.css"
   ],
   "moduleType": "globals",
   "version": "1.4.2"

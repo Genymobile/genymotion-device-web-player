@@ -87,12 +87,17 @@ All you need is an HTML element to use as a container. See example below.
     // The URL addresses of your instances
     const webrtcAddress = 'wss://x.x.x.x';
 
-    // Devive player instanciation
+    // Device player instanciation
     const genymotion = new GenymotionManager();
-    genymotion.setupInstance(document.getElementById('genymotion'), // the container element or element ID to use
-                             webrtcAddress,                         // the websocket address of your instance connector
-                             options                                // options object to enable or disable features
+    const instance = genymotion.setupInstance(container,     // the container element or element ID to use
+                                              webrtcAddress, // the websocket address of your instance connector
+                                              options        // options object to enable or disable features
     );
+
+    // Disconnect the device player, closing any open data channels.
+    window.addEventListener('beforeunload', function() {
+        instance.disconnect();
+    });
 </script>
 ```
 
@@ -114,7 +119,7 @@ Defines the layout of the player. Can be one of the following: `bootstrap`, `ful
 - **Default:** `undefined`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Instance access token, the shared secret used to connect to the device.
+Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/latest/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [login api](https://developer.genymotion.com/saas/#section/Authentication).
 
 ### `i18n`
 

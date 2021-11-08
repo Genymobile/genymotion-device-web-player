@@ -40,7 +40,6 @@ module.exports = class GPS extends OverlayPlugin {
         if (typeof google !== 'undefined') {
             this.elevationService = new google.maps.ElevationService();
         } else {
-            log.error('Cant find Google Maps API object, did you forget to embed it?');
             this.elevationService = false;
         }
         this.markers = [];
@@ -260,6 +259,10 @@ module.exports = class GPS extends OverlayPlugin {
         map.className = 'map';
         map.innerHTML = this.i18n.GPS_MAP || 'MAP';
         map.onclick = this.onOpenMapButtonClicked.bind(this);
+
+        if (!this.elevationService) {
+            map.disabled = true;
+        }
 
         this.rightGeolocWrap.className = 'gm-geoloc-wrap';
         this.geolocBtn.className = 'gm-gps-geoloc';

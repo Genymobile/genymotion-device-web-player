@@ -24,8 +24,22 @@ request. It's not mandatory at all, but feel free to open an issue to present yo
 
 To start working on the Genymotion device web player, all you need if an HTML page to instanciate a player from your
 local copy of this repository.
+Build the player in dev mode: 
 
-#### Running the tests
+```sh
+yarn build:dev
+```
+
+And import your local file directly
+
+```html
+<link rel="stylesheet" href="file:///[...]/genymotion-device-web-player/dist/css/gm-player.min.css">
+<script src="file:///[...]/genymotion-device-web-player/dist/js/gm-player.min.js"></script>
+```
+
+Don't forget to re-run the build command each time you make a modification to the code.
+
+#### Running tests
 
 ```sh
 # run tests

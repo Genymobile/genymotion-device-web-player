@@ -75,6 +75,11 @@ Use `GenymotionManager` to instanciate one or more Genymotion device player.
 All you need is an HTML element to use as a container. See example below. 
 
 ```html
+
+<!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature
+<script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
+-->
+
 <div id="genymotion"></div>
 
 <script>
@@ -315,7 +320,14 @@ Enables or disables the battery widget. This widget can be used to set the batte
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device.
+Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device. 
+If you want to use a visual map instead of GPS coordinates number to set the location, you must import google maps 
+library with your API key. 
+
+```html
+<!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature -->
+<script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
+```
 
 ### `gpsSpeedSupport`
 

@@ -53,6 +53,20 @@ describe('GPS Plugin', () => {
             expect(document.getElementsByClassName('gm-gps-speed')).toHaveLength(0);
         });
 
+        test('has an active map button when gmaps lib is setup', () => {
+            window.google = {maps:{ElevationService:jest.fn()}};
+            instance = new Instance();
+            gps = new GPS(instance, {});
+            expect(document.getElementsByClassName('map')[0].disabled).toBeFalsy();
+        });
+
+        test('has a disable map button when gmaps lib not imported', () => {
+            window.google = undefined; // eslint-disable-line no-undefined
+            instance = new Instance();
+            gps = new GPS(instance, {});
+            expect(document.getElementsByClassName('map')[0].disabled).toBeTruthy();
+        });
+
         test('is initialized properly at construct', () => {
             // Widget views
             expect(document.getElementsByClassName('gm-gps-controls')).toHaveLength(1);

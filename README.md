@@ -58,7 +58,7 @@ const GenymotionManager = require('genymotion/device-web-player');
 
 ```html
 <style lang="scss">
-    @import "genymotion-device-web-player/dist/css/Genymotion";
+    @import "genymotion-device-web-player/dist/css/gm-player.min.css";
 </style>
 ```
 
@@ -73,6 +73,8 @@ const GenymotionManager = require('genymotion/device-web-player');
 
 Use `GenymotionManager` to instanciate one or more Genymotion device player.
 All you need is an HTML element to use as a container. See example below. 
+To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
+or check the [PaaS documentation](https://docs.genymotion.com/paas/latest/02_Getting_Started/), based on your device provider.
 
 ```html
 
@@ -83,14 +85,15 @@ All you need is an HTML element to use as a container. See example below.
 <div id="genymotion"></div>
 
 <script>
+    // Instance address
+    const webrtcAddress = 'wss://x.x.x.x';
+    
     // See "Features & options" section for more details about options
     const options = {
         template: "player",    // template defines how player is displayed
-        token: 'i-XXXXXXXXXX'  // token is the shared secret to connect to your VM
+        token: 'i-XXXXXXXXXX', // token is the shared secret to connect to your VM
+        fileUpload: false      // requires fileUploadUrl
     };
-    
-    // The URL addresses of your instances
-    const webrtcAddress = 'wss://x.x.x.x';
 
     // Device player instanciation
     const genymotion = new GenymotionManager();

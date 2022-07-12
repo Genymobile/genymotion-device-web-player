@@ -65,8 +65,8 @@ const GenymotionManager = require('genymotion/device-web-player');
 ### With CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@1.4.4/dist/css/gm-player.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@1.4.4/dist/js/gm-player.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.0.1/dist/css/gm-player.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.0.1/dist/js/gm-player.min.js"></script>
 ```
 
 ## Usage

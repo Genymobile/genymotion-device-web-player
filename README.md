@@ -72,7 +72,7 @@ const GenymotionManager = require('genymotion/device-web-player');
 ## Usage
 
 Use `GenymotionManager` to instanciate one or more Genymotion device player.
-All you need is an HTML element to use as a container. See example below. 
+All you need is an HTML element to use as a container. See example below.
 To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
 or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_Started/), based on your device provider.
 
@@ -88,7 +88,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_St
     // Instance address
     const webrtcAddress = 'wss://x.x.x.x';
     const container = document.getElementById('genymotion');
-    
+
     // See "Features & options" section for more details about options
     const options = {
         template: "player",    // template defines how player is displayed
@@ -144,7 +144,7 @@ Alternative translation for the player UI.
 - **Default:** `{}`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-WebRTC STUN servers configuration. Format: 
+WebRTC STUN servers configuration. Format:
 
 ```js
 {
@@ -324,9 +324,9 @@ Enables or disables the battery widget. This widget can be used to set the batte
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device. 
-If you want to use a visual map instead of GPS coordinates number to set the location, you must import google maps 
-library with your API key. 
+Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device.
+If you want to use a visual map instead of GPS coordinates number to set the location, you must import google maps
+library with your API key.
 
 ```html
 <!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature -->
@@ -339,7 +339,7 @@ library with your API key.
 - **Default:** `false`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables gps speed support. 
+Enables or disables gps speed support.
 
 ### `capture`
 

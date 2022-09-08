@@ -87,6 +87,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_St
 <script>
     // Instance address
     const webrtcAddress = 'wss://x.x.x.x';
+    const container = document.getElementById('genymotion');
     
     // See "Features & options" section for more details about options
     const options = {

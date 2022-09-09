@@ -24,12 +24,24 @@ const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 
 const bootstrapHtml = require('./templates/bootstrap/dom.html');
+const fullscreenHtml = require('./templates/fullscreen/dom.html');
+const fullwindowHtml = require('./templates/fullwindow/dom.html');
+const playerHtml = require('./templates/player/dom.html');
+const playerMinimalHtml = require('./templates/player_minimal/dom.html');
+const playerNoToolbarHtml = require('./templates/player_no_toolbar/dom.html');
+const playerPartialHtml = require('./templates/player_partial/dom.html');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 const GEN_TEMPLATES = {
     bootstrap: {html: bootstrapHtml},
+    fullscreen: {html: fullscreenHtml},
+    fullwindow: {html: fullwindowHtml},
+    player: {html: playerHtml},
+    player_minimal: {html: playerMinimalHtml},
+    player_no_toolbar: {html: playerNoToolbarHtml},
+    player_partial: {html: playerPartialHtml},
 };
 const TEMPLATE_JS = 'genymotion-js';
 const TEMPLATE_CSS = 'genymotion-css';
@@ -73,7 +85,7 @@ const defaultOptions = {
             'stun:stun-na.genymotion.com:80',
             'stun:stun-na.genymotion.com:443',
             'stun:stun-na.genymotion.com:3478',
-            'stun:stun-na.genymotion.com:5349'
+            'stun:stun-na.genymotion.com:5349',
         ],
     },
     connectionFailedURL: '',

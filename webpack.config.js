@@ -8,6 +8,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.html$/,
+                loader: 'html-loader',
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: ['babel-loader'],

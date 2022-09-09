@@ -23,10 +23,14 @@ const Phone = require('./plugins/Phone');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 
+const bootstrapHtml = require('./templates/bootstrap/dom.html');
+
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
-// Templates are loaded dynamically from the `templates` folder
+const GEN_TEMPLATES = {
+    bootstrap: {html: bootstrapHtml},
+};
 const TEMPLATE_JS = 'genymotion-js';
 const TEMPLATE_CSS = 'genymotion-css';
 
@@ -82,7 +86,6 @@ const defaultOptions = {
 module.exports = class GenymotionManager {
     constructor() {
         this.instances = [];
-        /* global GEN_TEMPLATES */
         this.templates = GEN_TEMPLATES;
     }
 

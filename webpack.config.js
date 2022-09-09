@@ -12,6 +12,10 @@ module.exports = {
                 loader: 'html-loader',
             },
             {
+                test: /\.(png|svg|jpg|jpeg|gif)$/,
+                type: 'asset/resource',
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: ['babel-loader'],

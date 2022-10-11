@@ -180,14 +180,10 @@ gulp.task('build', gulp.series(
 ));
 
 // Watch project update
-gulp.task('watch', gulp.series('build', function() {
+gulp.task('watch', gulp.series('build', function(cb) {
     gulp.watch([
         PATHS.SRC.ASSETS.STYLES + '/**/*.scss'
     ], gulp.series('app-styles'));
-
-    gulp.watch([
-        PATHS.TEST.UT + '/**/*.js'
-    ], gulp.series('test'));
 
     gulp.watch([
         PATHS.SRC.BASE + '/*.js',
@@ -196,6 +192,8 @@ gulp.task('watch', gulp.series('build', function() {
         PATHS.SRC.WORKER + '/**/*.js',
         PATHS.SRC.TEMPLATES + '/**/*'
     ], gulp.series('app-js'));
+
+    cb();
 }));
 
 // Serve project
@@ -206,7 +204,5 @@ gulp.task('serve', gulp.series('watch', function(cb) {
             baseDir: PATHS.DEST.BASE
         },
         port: 8000
-    });
-
-    cb();
+    }, cb);
 }));

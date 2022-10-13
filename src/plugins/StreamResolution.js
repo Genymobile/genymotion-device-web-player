@@ -33,7 +33,7 @@ module.exports = class StreamResolution {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');

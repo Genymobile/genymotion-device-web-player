@@ -1,4 +1,4 @@
-.gm-template-player_no_toolbar {
+.gm-template-renderer_no_toolbar {
     position: absolute;
     top: 0;
     left: 0;
@@ -11,7 +11,7 @@
     background-color: black;
 }
 
-.gm-template-player_no_toolbar .gm-video {
+.gm-template-renderer_no_toolbar .gm-video {
     position: fixed;
     top: 0;
     left: 0;

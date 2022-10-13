@@ -200,7 +200,7 @@ module.exports = class ButtonsEvents {
     }
 
     /**
-     * Add a device button to the player toolbar.
+     * Add a device button to the renderer toolbar.
      *
      * @param {string}  androidKeycode Button keycode.
      * @param {string}  htmlClass      Button CSS class.

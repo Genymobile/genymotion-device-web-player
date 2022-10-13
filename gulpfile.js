@@ -33,7 +33,7 @@ const util = require('gulp-util');
 
 const PATHS = {
     SRC: {
-        APP: 'GenymotionManager.js',
+        APP: 'DeviceRendererFactory.js',
         BASE: './src',
         WORKER: './src/worker',
         TEMPLATES: './src/templates',
@@ -98,7 +98,7 @@ gulp.task('app-styles', function() {
         .pipe(base64())
         .pipe(autoprefixer())
         .pipe(gulpif(util.env.production, minifyCss()))
-        .pipe(concat('gm-player.min.css'))
+        .pipe(concat('device-renderer.min.css'))
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
 });
 
@@ -118,7 +118,7 @@ gulp.task('app-templates', function() {
 function getBundler() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
-        standalone: 'GenymotionManager',
+        standalone: 'DeviceRendererFactory',
         debug: true
     }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }
@@ -137,7 +137,7 @@ gulp.task('app-js', function() {
                 ]
             ]
         }))))
-        .pipe(streamify(concat('gm-player.min.js')))
+        .pipe(streamify(concat('device-renderer.min.js')))
         .pipe(gulpif(util.env.production, streamify(uglify())))
         .pipe(gulp.dest(PATHS.DEST.LIB.JS));
 });

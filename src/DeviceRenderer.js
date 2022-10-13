@@ -7,14 +7,14 @@ const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
- * Genymotion player instance.
- * Initialize a player for a specific instance
+ * Device renderer instance.
+ * Initialize a renderer for a specific VM instance
  */
-module.exports = class GenymotionInstance {
+module.exports = class DeviceRenderer {
     /**
-     * Player instance initialization.
+     * Renderer instance initialization.
      *
-     * @param {HTMLElement} domRoot DOM element to attach the player to.
+     * @param {HTMLElement} domRoot DOM element to attach the renderer to.
      * @param {Object}      options Instance configuration options.
      */
     constructor(domRoot, options) {

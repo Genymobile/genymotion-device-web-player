@@ -1,4 +1,4 @@
-.gm-template-player .gm-player {
+.gm-template-renderer .device-renderer {
     position: relative;
     border-collapse: separate;
     border-radius: 3px;
@@ -8,14 +8,14 @@
     background-color: black;
 }
 
-.gm-template-player .gm-video {
+.gm-template-renderer .gm-video {
     background: transparent url("../../assets/images/spinner-material.svg") no-repeat center;
     width: 1024px;
     height: 600px;
     margin-right: 60px;
 }
 
-.gm-template-player .gm-toolbars {
+.gm-template-renderer .gm-toolbars {
     position: absolute;
     top: 0;
     right: 0;

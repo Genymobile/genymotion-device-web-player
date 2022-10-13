@@ -1,11 +1,11 @@
-# Genymotion device web player
+# Genymotion device web renderer
 
 ![npm](https://img.shields.io/npm/v/@genymotion/device-web-player)
 ![GitHub](https://img.shields.io/github/license/Genymobile/genymotion-device-web-player)
 
 <img align="right" src="./doc/assets/screenshot.png" height="500"></img>
 
-This repository contains the Genymotion device web player JavaScript SDK.
+This repository contains the Genymotion device web renderer JavaScript SDK.
 It provides an easy way to integrate **Genymotion devices** running in the cloud into any web application. You will be able to display an emulator screen and interact with the device.
 
 It focuses on:
@@ -53,25 +53,25 @@ npm install @genymotion/device-web-player
 Package import (commonJS):
 
 ```js
-const GenymotionManager = require('genymotion/device-web-player');
+const DeviceRendererFactory = require('genymotion/device-web-player');
 ```
 
 ```html
 <style lang="scss">
-    @import "genymotion-device-web-player/dist/css/gm-player.min.css";
+    @import "genymotion-device-web-renderer/dist/css/device-renderer.min.css";
 </style>
 ```
 
 ### With CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/css/gm-player.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/js/gm-player.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/css/device-renderer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/js/device-renderer.min.js"></script>
 ```
 
 ## Usage
 
-Use `GenymotionManager` to instanciate one or more Genymotion device player.
+Use `DeviceRendererFactory` to instanciate one or more device renderer.
 All you need is an HTML element to use as a container. See example below.
 To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
 or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_Started/), based on your device provider.
@@ -91,36 +91,36 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_St
 
     // See "Features & options" section for more details about options
     const options = {
-        template: "player",    // template defines how player is displayed
+        template: "renderer",    // template defines how renderer is displayed
         token: 'i-XXXXXXXXXX', // token is the shared secret to connect to your VM
         fileUpload: false      // requires fileUploadUrl
     };
 
-    // Device player instanciation
-    const genymotion = new GenymotionManager();
-    const instance = genymotion.setupInstance(container,     // the container element or element ID to use
+    // Device renderer instanciation
+    const deviceRendererFactory = new DeviceRendererFactory();
+    const renderer = deviceRendererFactory.setupRenderer(container,     // the container element or element ID to use
                                               webrtcAddress, // the websocket address of your instance connector
                                               options        // options object to enable or disable features
     );
 
-    // Disconnect the device player, closing any open data channels.
+    // Disconnect the device renderer, closing any open data channels.
     window.addEventListener('beforeunload', function() {
-        instance.disconnect();
+        renderer.disconnect();
     });
 </script>
 ```
 
 ## Features & options
 
-A device player instance can be configured using the `options` argument (object). Possible configuration key / value are described below.
+A device renderer instance can be configured using the `options` argument (object). Possible configuration key / value are described below.
 
 ### `template`
 
 - **Type:** `String`
-- **Default:** `player`
+- **Default:** `renderer`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Defines the layout of the player. Can be one of the following: `bootstrap`, `fullscreen`, `fullwindow`, `player`, `player_minimal`, `player_no_toolbar`, `player_partial`.
+Defines the layout of the renderer. Can be one of the following: `bootstrap`, `fullscreen`, `fullwindow`, `renderer`, `renderer_minimal`, `renderer_no_toolbar`, `renderer_partial`.
 
 ### `token`
 
@@ -136,7 +136,7 @@ Instance access token, the shared secret used to connect to the device. For Geny
 - **Default:** `{}`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Alternative translation for the player UI.
+Alternative translation for the renderer UI.
 
 ### `stun`
 
@@ -266,7 +266,7 @@ Enables or disables the power widget. This widget can be used to poweroff or reb
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the fullscreen widget. This widget can be used to make the player go fullscreen.
+Enables or disables the fullscreen widget. This widget can be used to make the renderer go fullscreen.
 
 ### `camera`
 

@@ -1,4 +1,4 @@
-.gm-template-player_minimal {
+.gm-template-renderer_minimal {
     position: absolute;
     top: 0;
     left: 0;
@@ -11,7 +11,7 @@
     background-color: black;
 }
 
-.gm-template-player_minimal .gm-video {
+.gm-template-renderer_minimal .gm-video {
     position: fixed;
     top: 0;
     left: 0;
@@ -23,7 +23,7 @@
     background-size: 40%;
 }
 
-.gm-template-player_minimal .gm-toolbar {
+.gm-template-renderer_minimal .gm-toolbar {
     position: absolute;
     top: 10px;
     right: 0;
@@ -32,7 +32,7 @@
     width: 50px;
 }
 
-.gm-template-player_minimal .gm-version-number {
+.gm-template-renderer_minimal .gm-version-number {
     position: fixed;
     right: 5px;
     bottom: 5px;

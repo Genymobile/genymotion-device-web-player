@@ -39,9 +39,9 @@ module.exports = class CoordinateUtils {
     }
 
     /**
-     * Determine if the instance and the player video share the same orientation.
+     * Determine if the instance and the renderer video share the same orientation.
      *
-     * @return {boolean} True if the instance and the player video are in the same orientation.
+     * @return {boolean} True if the instance and the renderer video are in the same orientation.
      */
     hasSameOrientation() {
         return this.video.videoWidth / this.video.videoHeight > 1 &&

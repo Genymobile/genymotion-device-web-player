@@ -88,7 +88,7 @@ module.exports = class Screencast extends OverlayPlugin {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'genymotion' + this.getExtensionFromMimeType(this.mediaRecorder.mimeType);
+        a.download = 'device' + this.getExtensionFromMimeType(this.mediaRecorder.mimeType);
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {
@@ -202,7 +202,7 @@ module.exports = class Screencast extends OverlayPlugin {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
@@ -344,7 +344,7 @@ module.exports = class Screencast extends OverlayPlugin {
 
         // configure download link
         const downloadLink = document.createElement('a');
-        downloadLink.download = 'genymotion-screenshot.png';
+        downloadLink.download = 'device-screenshot.png';
         document.body.appendChild(downloadLink);
 
         // Get canvas data / force download

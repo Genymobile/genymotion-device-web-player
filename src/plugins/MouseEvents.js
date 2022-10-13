@@ -84,7 +84,7 @@ module.exports = class MouseEvents {
 
     /**
      * External mouse release event classback.
-     * Called when onmouseup event occurs outside of the player.
+     * Called when onmouseup event occurs outside of the renderer.
      *
      * @param {Event} event Event.
      */

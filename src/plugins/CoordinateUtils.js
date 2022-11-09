@@ -108,58 +108,92 @@ module.exports = class CoordinateUtils {
      * Get the final emulated x coordinate. Video ratio & orientation taken into account.
      *
      * @param  {Event}   event Raw mouse/touch event.
-     * @return {number}       Relative x coordinate.
+     * @return {number}       Relative x coordinate (in VM coordinates, rounded to nearest integer).
      */
     getXCoordinate(event) {
         this.instance.root.focus(); // not on the Y function because we need to focus element only once
         this.setVideoElement();
-        const x = this.getRawXCoordinateFromEvent(event);
-        let videoRealSizeX, ratio;
-        if (this.hasSameOrientation()) {
-            if (this.hasLeftAndRightBorders()) {
-                videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
-                const xRatio = this.video.videoWidth / videoRealSizeX;
-                const blackBorderSize = (this.video.offsetWidth - videoRealSizeX) / 2;
-                return (x - blackBorderSize) * xRatio;
-            }
-            return this.video.videoWidth / this.video.offsetWidth * x;
-        }
-        if (this.hasLeftAndRightBorders()) {
-            videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
-            ratio = this.video.videoWidth / videoRealSizeX;
-            return (x - (this.video.offsetWidth - videoRealSizeX) / 2) * ratio;
-        }
-        const videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
-        ratio = this.video.videoHeight / videoRealSizeY;
-        return x * ratio;
+        const x = this.getRawXCoordinateFromEvent(event) - this.getLeftBorder();
+        return Math.round(x * this.getXRatio());
     }
 
     /**
      * Get the final emulated y coordinate. Video ratio & orientation taken into account.
      *
      * @param  {Event}   event Raw mouse/touch event.
-     * @return {number}       Relative y coordinate.
+     * @return {number}       Relative y coordinate (in VM coordinates, rounded to nearest integer).
      */
     getYCoordinate(event) {
         this.setVideoElement();
-        const y = this.getRawYCoordinateFromEvent(event);
-        let videoRealSizeX, videoRealSizeY, ratio;
+        const y = this.getRawYCoordinateFromEvent(event) - this.getTopBorder();
+        return Math.round(y * this.getYRatio());
+    }
+
+    /**
+     * Get the x ratio between screen & emulated size, orientation taken into account.
+     * @returns {number} Ratio on X axis.
+     */
+    getXRatio() {
+        let videoRealSizeX;
         if (this.hasSameOrientation()) {
             if (this.hasLeftAndRightBorders()) {
-                return this.video.videoHeight / this.video.offsetHeight * y;
+                videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+                return this.video.videoWidth / videoRealSizeX;
             }
-            videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
-            const yRatio = this.video.videoHeight / videoRealSizeY;
-            const blackBorderTopSize = (this.video.offsetHeight - videoRealSizeY) / 2;
-            return (y - blackBorderTopSize) * yRatio;
+            return this.video.videoWidth / this.video.offsetWidth;
         }
         if (this.hasLeftAndRightBorders()) {
             videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
-            ratio = this.video.videoWidth / videoRealSizeX;
-            return y * ratio;
+            return this.video.videoWidth / videoRealSizeX;
+        }
+        const videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+        return this.video.videoHeight / videoRealSizeY;
+    }
+
+    /**
+     * Get the y ratio between screen & emulated size, orientation taken into account.
+     * @returns {number} Ratio on Y axis.
+     */
+    getYRatio() {
+        let videoRealSizeX, videoRealSizeY;
+        if (this.hasSameOrientation()) {
+            if (this.hasLeftAndRightBorders()) {
+                return this.video.videoHeight / this.video.offsetHeight;
+            }
+            videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+            return this.video.videoHeight / videoRealSizeY;
+        }
+        if (this.hasLeftAndRightBorders()) {
+            videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+            return this.video.videoWidth / videoRealSizeX;
         }
         videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
-        ratio = this.video.videoHeight / videoRealSizeY;
-        return (y - (this.video.offsetHeight - videoRealSizeY) / 2) * ratio;
+        return this.video.videoHeight / videoRealSizeY;
+    }
+
+    /**
+     * Computes and return the height of the horizontal borders, if there is no horizontal border returns 0.
+     * @returns {number} Height of the horizontal borders.
+     */
+    getTopBorder() {
+        this.setVideoElement();
+        if (this.hasLeftAndRightBorders()) {
+            return 0;
+        }
+        const videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+        return (this.video.offsetHeight - videoRealSizeY) / 2;
+    }
+
+    /**
+     * Computes and return the height of the vertical borders, if there is no vertical border returns 0.
+     * @returns {number} Height of the vertical borders.
+     */
+    getLeftBorder() {
+        this.setVideoElement();
+        if (!this.hasLeftAndRightBorders()) {
+            return 0;
+        }
+        const videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+        return (this.video.offsetWidth - videoRealSizeX) / 2;
     }
 };

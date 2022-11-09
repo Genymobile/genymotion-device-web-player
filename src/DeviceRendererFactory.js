@@ -5,7 +5,6 @@ const defaultsDeep = require('lodash/defaultsDeep');
 
 // Plugins
 const GPS = require('./plugins/GPS');
-const CoordinateUtils = require('./plugins/CoordinateUtils');
 const MultiTouchEvents = require('./plugins/MultiTouchEvents');
 const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
@@ -201,7 +200,6 @@ module.exports = class DeviceRendererFactory {
      */
     addPlugins(instance, options) {
         const pluginInitMap = [
-            {enabled: options.touch || options.mouse, class: CoordinateUtils},
             {enabled: options.touch, class: MultiTouchEvents},
             {enabled: options.fullscreen, class: Fullscreen},
             {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},

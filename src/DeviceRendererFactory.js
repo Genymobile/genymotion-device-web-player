@@ -151,7 +151,16 @@ module.exports = class DeviceRendererFactory {
         dom.classList.add('gm-template-' + options.template);
         document.body.classList.add('gm-template-' + options.template + '-body');
 
-        return this.loadTemplate(dom, this.templates[options.template], options);
+        // Load template before creating the Device Renderer that is using HTML elements
+        this.loadTemplate(dom, this.templates[options.template], options);
+
+        const instance = new DeviceRenderer(dom, options);
+        this.instances.push(instance);
+
+        this.addPlugins(dom, instance, instance.options);
+        instance.onWebRTCReady();
+
+        return instance;
     }
 
     /**
@@ -160,7 +169,6 @@ module.exports = class DeviceRendererFactory {
      * @param  {HTMLElement}        dom       The DOM element to setup the device renderer into.
      * @param  {string}             template  Template to use.
      * @param  {Object}             options   Various configuration options.
-     * @return {DeviceRenderer}               The device renderer instance.
      */
     loadTemplate(dom, template, options) {
         const head = document.getElementsByTagName('head')[0];
@@ -185,22 +193,16 @@ module.exports = class DeviceRendererFactory {
 
         // Handle template dom
         dom.innerHTML = template.html;
-
-        // Kick off next phase of setup
-        return this.addPlugins(dom, options);
     }
 
     /**
      * Initialize all the needed plugins.
      *
      * @param  {HTMLElement}        dom      The DOM element to setup the device renderer into.
+     * @param  {DeviceRenderer}     instance The DeviceRenderer instance reference to link into each plugin.
      * @param  {Object}             options  Various configuration options.
-     * @return {DeviceRenderer}              The device renderer instance.
      */
-    addPlugins(dom, options) {
-        const instance = new DeviceRenderer(dom, options);
-        this.instances.push(instance);
-
+    addPlugins(dom, instance, options) {
         const pluginInitMap = [
             {enabled: options.touch || options.mouse, class: CoordinateUtils},
             {enabled: options.mouse, class: MouseEvents},
@@ -230,9 +232,5 @@ module.exports = class DeviceRendererFactory {
                 new plugin.class(instance, ...args);
             }
         });
-
-        instance.onWebRTCReady();
-
-        return instance;
     }
 };

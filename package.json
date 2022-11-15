@@ -15,7 +15,8 @@
     "checkstyle": "eslint -f checkstyle -o ./tests/reports/lint/report.xml src tests gulp",
     "validate": "yarn lint; yarn checkstyle",
     "build:dev": "gulp build",
-    "build": "gulp build --production"
+    "build": "gulp build --production",
+    "start": "gulp serve"
   },
   "repository": {
     "type": "git",

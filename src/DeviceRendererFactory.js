@@ -157,7 +157,7 @@ module.exports = class DeviceRendererFactory {
         const instance = new DeviceRenderer(dom, options);
         this.instances.push(instance);
 
-        this.addPlugins(dom, instance, instance.options);
+        this.addPlugins(instance, instance.options);
         instance.onWebRTCReady();
 
         return instance;
@@ -198,11 +198,10 @@ module.exports = class DeviceRendererFactory {
     /**
      * Initialize all the needed plugins.
      *
-     * @param  {HTMLElement}        dom      The DOM element to setup the device renderer into.
      * @param  {DeviceRenderer}     instance The DeviceRenderer instance reference to link into each plugin.
      * @param  {Object}             options  Various configuration options.
      */
-    addPlugins(dom, instance, options) {
+    addPlugins(instance, options) {
         const pluginInitMap = [
             {enabled: options.touch || options.mouse, class: CoordinateUtils},
             {enabled: options.mouse, class: MouseEvents},

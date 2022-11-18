@@ -231,5 +231,10 @@ module.exports = class DeviceRendererFactory {
                 new plugin.class(instance, ...args);
             }
         });
+
+        // Load instance dedicated plugins
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
     }
 };

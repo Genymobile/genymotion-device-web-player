@@ -461,31 +461,7 @@ module.exports = class DeviceRenderer {
         }
 
         if (typeof this.peerConnection.createDataChannel !== 'undefined') {
-            const dataChannelOptions = {
-                ordered: true,
-            };
-
-            this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
-
-            this.signalingDataChannel.onerror = (error) => {
-                log.warn('Data Channel Error:', error);
-            };
-
-            this.signalingDataChannel.onmessage = (event) => {
-                log.debug('Got Data Channel Message:', event.data);
-            };
-            this.signalingDataChannel.onopen = () => {
-                log.debug('Data Channel opened');
-            };
-
-            this.signalingDataChannel.onclose = () => {
-                log.debug('The Data Channel is Closed');
-            };
-
-            this.peerConnection.ondatachannel = (event) => {
-                const answererDataChannel = event.channel;
-                answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
-            };
+            this.createDataChannels();
         } else {
             this.useWebsocketAsDataChannel = true;
         }
@@ -630,6 +606,37 @@ module.exports = class DeviceRenderer {
         };
 
         this.renegotiateWebRTCConnection();
+    }
+
+    /**
+     * Create datachannel(s)
+     */
+    createDataChannels() {
+        const dataChannelOptions = {
+            ordered: true,
+        };
+
+        this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
+
+        this.signalingDataChannel.onerror = (error) => {
+            log.warn('Data Channel Error:', error);
+        };
+
+        this.signalingDataChannel.onmessage = (event) => {
+            log.debug('Got Data Channel Message:', event.data);
+        };
+        this.signalingDataChannel.onopen = () => {
+            log.debug('Data Channel opened');
+        };
+
+        this.signalingDataChannel.onclose = () => {
+            log.debug('The Data Channel is Closed');
+        };
+
+        this.peerConnection.ondatachannel = (event) => {
+            const answererDataChannel = event.channel;
+            answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
+        };
     }
 
     /**

@@ -1,6 +1,7 @@
 'use strict';
 
 // Plugins
+const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 
 const log = require('loglevel');
@@ -67,6 +68,23 @@ module.exports = class DeviceRenderer {
                 && !event.target.classList.contains('gm-icon-button')
                 && !event.target.classList.contains('gm-dont-close')) {
                 this.emit('close-overlays');
+            }
+        });
+    }
+
+    /**
+     * Initialize custom plugins.
+     */
+    addCustomPlugins() {
+        const pluginInitMap = [
+            {enabled: this.options.mouse, class: MouseEvents},
+        ];
+
+        pluginInitMap.forEach((plugin) => {
+            const args = plugin.params || [];
+
+            if (plugin.enabled) {
+                new plugin.class(this, ...args);
             }
         });
     }

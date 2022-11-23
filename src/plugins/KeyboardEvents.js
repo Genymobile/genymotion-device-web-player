@@ -71,18 +71,25 @@ module.exports = class KeyboardEvents {
         });
 
         // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-        window.addEventListener('blur', () => {
-            this.currentlyPressedKeys.forEach((value) => {
-                const text = '';
-                const json = {
-                    type: 'KEYBOARD_RELEASE',
-                    keychar: text,
-                    keycode: value,
-                };
-                this.instance.sendEvent(json);
-            });
-            this.currentlyPressedKeys.clear();
+        window.addEventListener('blur', this.cancelAllPressedKeys.bind(this));
+    }
+
+    /**
+     * Cancel all pressed keys.
+     * This is mainly used to avoid continuously pressed keys because of alt+tab
+     * or any other command that remove focus (blur) the page.
+     */
+    cancelAllPressedKeys() {
+        this.currentlyPressedKeys.forEach((value) => {
+            const text = '';
+            const json = {
+                type: 'KEYBOARD_RELEASE',
+                keychar: text,
+                keycode: value,
+            };
+            this.instance.sendEvent(json);
         });
+        this.currentlyPressedKeys.clear();
     }
 
     /**

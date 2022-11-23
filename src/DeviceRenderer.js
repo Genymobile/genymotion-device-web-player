@@ -1,6 +1,7 @@
 'use strict';
 
 // Plugins
+const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 
@@ -77,6 +78,7 @@ module.exports = class DeviceRenderer {
      */
     addCustomPlugins() {
         const pluginInitMap = [
+            {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
         ];
 

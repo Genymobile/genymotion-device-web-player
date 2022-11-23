@@ -9,7 +9,6 @@ const CoordinateUtils = require('./plugins/CoordinateUtils');
 const MultiTouchEvents = require('./plugins/MultiTouchEvents');
 const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
-const KeyboardEvents = require('./plugins/KeyboardEvents');
 const Clipboard = require('./plugins/Clipboard');
 const FileUpload = require('./plugins/FileUpload');
 const Camera = require('./plugins/Camera');
@@ -205,7 +204,6 @@ module.exports = class DeviceRendererFactory {
             {enabled: options.touch || options.mouse, class: CoordinateUtils},
             {enabled: options.touch, class: MultiTouchEvents},
             {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.keyboard, class: KeyboardEvents},
             {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
             {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
             {enabled: options.camera, class: Camera, params: [options.i18n]},

@@ -714,6 +714,10 @@ module.exports = class DeviceRenderer {
                 log.warn('Failed to create SDP ', error.message);
             }
         } else if (data.candidate) {
+            if (data.candidate === 'end-of-candidates') {
+                log.debug('End of ICE candidates received');
+                return;
+            }
             try {
                 const candidate = new RTCIceCandidate(data);
                 this.peerConnection.addIceCandidate(candidate);

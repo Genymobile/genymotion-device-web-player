@@ -35,8 +35,9 @@ module.exports = class Network extends OverlayPlugin {
         // Render components
         this.renderToolbarButton();
 
-        this.androidVersion = ""
+        this.androidVersion = "";
 
+        this.widgedRendered = false;
         // Listen for settings messages: "parameter <android_version:<version>"
         this.callbackIndex = this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
@@ -60,8 +61,25 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     handleSettings(message) {
-        this.instance.unregisterEventCallback('settings', this.callbackIndex)
         const values = message.split(' ');
+
+        if (values[0] === 'if' ) {
+            if(values.length !== 3) {
+                return;
+            }
+
+            const wifiOn = values[1].match(/(wifi:)(\w+)/);
+            if (wifiOn) {
+                this.wifiInput.checked = wifiOn[2] === 'on';
+            }
+            const mobileOn = values[2].match(/(mobile:)(\w+)/);
+            if (mobileOn) {
+                this.mobileInput.checked = mobileOn[2] === 'on';
+            }
+
+            return;
+        }
+
         if (values[0] !== 'parameter' || values.length < 2) {
             return;
         }
@@ -73,7 +91,10 @@ module.exports = class Network extends OverlayPlugin {
             }
         }
 
-        this.renderWidget();
+        if(!this.widgedRendered) {
+            this.renderWidget();
+            this.widgedRendered = true;
+        }
     }
 
     handleNetworkProfile(message) {

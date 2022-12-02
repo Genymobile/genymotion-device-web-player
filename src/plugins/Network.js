@@ -41,7 +41,6 @@ module.exports = class Network extends OverlayPlugin {
         this.callbackIndex = this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network
-        console.log("!!!!!!!!! Register to SET ACTIVE !!!!!!!!!")
         this.instance.registerEventCallback('NETWORK', this.setActive.bind(this));
 
         /*
@@ -543,11 +542,29 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     toggleWifiState() {
-        // TODO Wifi state changed
+        // Wifi state changed
+        const msgs = [];
+        if (this.wifiInput.checked === true) {
+            msgs.push('enableif wifi'); 
+        } else {
+            msgs.push('disableif wifi'); 
+        }
+
+        const json = {channel: 'settings', messages: msgs};
+        this.instance.sendEvent(json);
     }
 
     toggleMobileState() {
         // TODO Mobile state changed
+        const msgs = [];
+        if (this.mobileInput.checked === true) {
+            msgs.push('enableif mobile'); 
+        } else {
+            msgs.push('disableif mobile'); 
+        }
+
+        const json = {channel: 'settings', messages: msgs};
+        this.instance.sendEvent(json);
     }
 
     /**

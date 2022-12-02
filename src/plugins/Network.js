@@ -91,30 +91,37 @@ module.exports = class Network extends OverlayPlugin {
         const downPacketLoss = values[7].split(':');
         const dnsDelay = values[8].split(':');
 
-        const isThrottlingEnabled = upSpeed[1] === 'enabled'
-            && downSpeed[1] === 'enabled'
-            && upDelay[1] === 'enabled'
-            && downDelay[1] === 'enabled'
-            && upPacketLoss[1] === 'enabled'
-            && downPacketLoss[1] === 'enabled'
-            && dnsDelay[1] === 'enabled';
+        if (this.androidVersion < 8) {
+            const isThrottlingEnabled = upSpeed[1] === 'enabled'
+                && downSpeed[1] === 'enabled'
+                && upDelay[1] === 'enabled'
+                && downDelay[1] === 'enabled'
+                && upPacketLoss[1] === 'enabled'
+                && downPacketLoss[1] === 'enabled'
+                && dnsDelay[1] === 'enabled';
 
-        const profile = PROFILES.find((elem) => {
-            return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
-                elem.downDelay.value === parseFloat(downDelay[2]) &&
-                elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
-                elem.upSpeed.value === parseFloat(upSpeed[2]) &&
-                elem.upDelay.value === parseFloat(upDelay[2]) &&
-                elem.upPacketLoss.value === parseFloat(upPacketLoss[2]) &&
-                elem.dnsDelay.value === parseFloat(dnsDelay[2]);
-        });
+            const profile = PROFILES.find((elem) => {
+                return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
+                    elem.downDelay.value === parseFloat(downDelay[2]) &&
+                    elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
+                    elem.upSpeed.value === parseFloat(upSpeed[2]) &&
+                    elem.upDelay.value === parseFloat(upDelay[2]) &&
+                    elem.upPacketLoss.value === parseFloat(upPacketLoss[2]) &&
+                    elem.dnsDelay.value === parseFloat(dnsDelay[2]);
+            });
 
-        if (profile && isThrottlingEnabled) {
-            this.select.value = profile.name;
+            if (profile && isThrottlingEnabled) {
+                this.select.value = profile.name;
+            } else {
+                this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
+            }
+            this.changeProfile();
         } else {
-            this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
+            const mobileProfile = values[9].split(':');
+            const signalStrength = values[10].split(':');
+
+            this.setActiveMobileProfile(mobileProfile[1]);
         }
-        this.changeProfile();
     }
 
     handlebaseband(message) {
@@ -617,5 +624,29 @@ module.exports = class Network extends OverlayPlugin {
             }
         }
         this.changeProfile();
+    }
+
+    /**
+     * Update mobile profile list UI according to the current active profile.
+     *
+     * @param {string} name Profile name.
+     */
+    setActiveMobileProfile(profile) {
+        if(!profile) {
+            console.log("setActiveMobileProfile: Error : provided profile is empty")
+            return;
+        }
+        const mobileProfile = MOBILE_PROFILES.find((elem) => elem.name === profile);
+        if (!mobileProfile) {
+            return;
+        }
+
+        const options = this.select.getElementsByTagName('option');
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.value === mobileProfile.name) {
+                option.selected = 'selected';
+            }
+        }
     }
 };

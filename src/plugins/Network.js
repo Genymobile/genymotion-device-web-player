@@ -32,7 +32,11 @@ module.exports = class Network extends OverlayPlugin {
 
         // Render components
         this.renderToolbarButton();
-        this.renderWidget();
+
+        this.androidVersion = ""
+
+        // Listen for settings messages: "parameter <android_version:<version>"
+        this.callbackIndex = this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network
         this.instance.registerEventCallback('NETWORK', this.setActive.bind(this));
@@ -112,6 +116,23 @@ module.exports = class Network extends OverlayPlugin {
                 this.simOperatorPhoneNumber.value = values[2];
             }
         });
+    }
+
+    handleSettings(message) {
+        this.instance.unregisterEventCallback('settings', this.callbackIndex)
+        const values = message.split(' ');
+        if (values[0] !== 'parameter' || values.length < 2) {
+            return;
+        }
+
+        for (var i = 0; i < values.length; i++) {
+            const version = values[i].match(/(android_version:)(\w+)/);
+            if (version) {
+                this.androidVersion = version[2];
+            }
+        }
+
+        this.renderWidget();
     }
 
     /**

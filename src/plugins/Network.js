@@ -453,23 +453,25 @@ module.exports = class Network extends OverlayPlugin {
             return;
         }
 
-        const profile = PROFILES.find((elem) => elem.name === this.select.value);
-        if (profile) {
-            const msgs = [];
-            if (profile.id === 0) {
-                msgs.push('disable wifi all');
-            } else {
-                msgs.push('enable wifi all');
-                msgs.push('set wifi up_rate ' + profile.upSpeed.value);
-                msgs.push('set wifi down_rate ' + profile.downSpeed.value);
-                msgs.push('set wifi up_delay ' + profile.upDelay.value);
-                msgs.push('set wifi down_delay ' + profile.downDelay.value);
-                msgs.push('set wifi up_pkt_loss ' + profile.upPacketLoss.value);
-                msgs.push('set wifi down_pkt_loss ' + profile.downPacketLoss.value);
-                msgs.push('set wifi dns_delay ' + profile.dnsDelay.value);
+        if (this.androidVersion < 8) {
+            const profile = PROFILES.find((elem) => elem.name === this.select.value);
+            if (profile) {
+                const msgs = [];
+                if (profile.id === 0) {
+                    msgs.push('disable wifi all');
+                } else {
+                    msgs.push('enable wifi all');
+                    msgs.push('set wifi up_rate ' + profile.upSpeed.value);
+                    msgs.push('set wifi down_rate ' + profile.downSpeed.value);
+                    msgs.push('set wifi up_delay ' + profile.upDelay.value);
+                    msgs.push('set wifi down_delay ' + profile.downDelay.value);
+                    msgs.push('set wifi up_pkt_loss ' + profile.upPacketLoss.value);
+                    msgs.push('set wifi down_pkt_loss ' + profile.downPacketLoss.value);
+                    msgs.push('set wifi dns_delay ' + profile.dnsDelay.value);
+                }
+                const json = {channel: 'network_profile', messages: msgs};
+                this.instance.sendEvent(json);
             }
-            const json = {channel: 'network_profile', messages: msgs};
-            this.instance.sendEvent(json);
         }
 
         const msgs = [];

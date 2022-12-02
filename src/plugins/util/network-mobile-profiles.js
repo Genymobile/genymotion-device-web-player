@@ -5,12 +5,8 @@
  * for android versions greater or equal to 8
  */
 module.exports = [{
-    id: 8,
-    name: 'unlimited',
-    label: 'Unlimited',
-}, {
     id: 7,
-    name: '5G',
+    name: '5g',
     label: '5G',
 }, {
     id: 6,
@@ -39,5 +35,5 @@ module.exports = [{
 }, {
     id: 0,
     name: 'none',
-    label: 'None',
+    label: 'Unlimited',
 }];

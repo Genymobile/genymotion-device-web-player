@@ -79,7 +79,9 @@ module.exports = class Network extends OverlayPlugin {
 
     handleNetworkProfile(message) {
         const values = message.split(' ');
-        if (values.length < 9) {
+        if (this.androidVersion < 8 && (values.length < 9 || values[1] === "phone")) {
+            return;
+        } else if (this.androidVersion >= 8 && (values.length < 11 || values[1] === "wifi")) {
             return;
         }
         const upSpeed = values[2].split(':');
@@ -493,9 +495,14 @@ module.exports = class Network extends OverlayPlugin {
         const profile = MOBILE_PROFILES.find((elem) => elem.name === this.select.value);
         if (profile) {
             // TODO update profile founded 
-            console.log("Selected profile:" + profile.label)
+            console.log("Selected profile label:" + profile.label + "  name: " + profile.name)
+            const msgs = [];
+            msgs.push('setprofile mobile ' + profile.name);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         } else {
-            // TODO update profile not founded 
+            // TODO update profile not found
+            console.log("Selected profile not found")
         }
     }
     

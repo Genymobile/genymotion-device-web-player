@@ -54,71 +54,10 @@ module.exports = class Network extends OverlayPlugin {
          *            down_pkt_loss:<enabled/disabled>:<value>
          *            dns_delay:<enabled/disabled>:<value>
          */
-        this.instance.registerEventCallback('network_profile', (message) => {
-            const values = message.split(' ');
-            if (values.length < 9) {
-                return;
-            }
-            const upSpeed = values[2].split(':');
-            const downSpeed = values[3].split(':');
-            const upDelay = values[4].split(':');
-            const downDelay = values[5].split(':');
-            const upPacketLoss = values[6].split(':');
-            const downPacketLoss = values[7].split(':');
-            const dnsDelay = values[8].split(':');
-
-            const isThrottlingEnabled = upSpeed[1] === 'enabled'
-                && downSpeed[1] === 'enabled'
-                && upDelay[1] === 'enabled'
-                && downDelay[1] === 'enabled'
-                && upPacketLoss[1] === 'enabled'
-                && downPacketLoss[1] === 'enabled'
-                && dnsDelay[1] === 'enabled';
-
-            const profile = PROFILES.find((elem) => {
-                return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
-                    elem.downDelay.value === parseFloat(downDelay[2]) &&
-                    elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
-                    elem.upSpeed.value === parseFloat(upSpeed[2]) &&
-                    elem.upDelay.value === parseFloat(upDelay[2]) &&
-                    elem.upPacketLoss.value === parseFloat(upPacketLoss[2]) &&
-                    elem.dnsDelay.value === parseFloat(dnsDelay[2]);
-            });
-
-            if (profile && isThrottlingEnabled) {
-                this.select.value = profile.name;
-            } else {
-                this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
-            }
-            this.changeProfile();
-        });
+        this.instance.registerEventCallback('network_profile', this.handleNetworkProfile.bind(this));
 
         // Listen for baseband messages: "<sim/network> <operator/operator_name/imsi_id/phone_number> <value>"
-        this.instance.registerEventCallback('baseband', (message) => {
-            const values = message.split(' ');
-            if (values.length < 3) {
-                return;
-            }
-
-            if (values[0] === 'network' && values[1] === 'operator') {
-                this.networkOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'network' && values[1] === 'operator_name') {
-                this.networkOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'operator') {
-                this.simOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'operator_name') {
-                this.simOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'imsi_id') {
-                this.simMSIN.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'phone_number') {
-                this.simOperatorPhoneNumber.value = values[2];
-            }
-        });
+        this.instance.registerEventCallback('baseband', this.handlebaseband.bind(this));
     }
 
     handleSettings(message) {
@@ -136,6 +75,71 @@ module.exports = class Network extends OverlayPlugin {
         }
 
         this.renderWidget();
+    }
+
+    handleNetworkProfile(message) {
+        const values = message.split(' ');
+        if (values.length < 9) {
+            return;
+        }
+        const upSpeed = values[2].split(':');
+        const downSpeed = values[3].split(':');
+        const upDelay = values[4].split(':');
+        const downDelay = values[5].split(':');
+        const upPacketLoss = values[6].split(':');
+        const downPacketLoss = values[7].split(':');
+        const dnsDelay = values[8].split(':');
+
+        const isThrottlingEnabled = upSpeed[1] === 'enabled'
+            && downSpeed[1] === 'enabled'
+            && upDelay[1] === 'enabled'
+            && downDelay[1] === 'enabled'
+            && upPacketLoss[1] === 'enabled'
+            && downPacketLoss[1] === 'enabled'
+            && dnsDelay[1] === 'enabled';
+
+        const profile = PROFILES.find((elem) => {
+            return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
+                elem.downDelay.value === parseFloat(downDelay[2]) &&
+                elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
+                elem.upSpeed.value === parseFloat(upSpeed[2]) &&
+                elem.upDelay.value === parseFloat(upDelay[2]) &&
+                elem.upPacketLoss.value === parseFloat(upPacketLoss[2]) &&
+                elem.dnsDelay.value === parseFloat(dnsDelay[2]);
+        });
+
+        if (profile && isThrottlingEnabled) {
+            this.select.value = profile.name;
+        } else {
+            this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
+        }
+        this.changeProfile();
+    }
+
+    handlebaseband(message) {
+        const values = message.split(' ');
+        if (values.length < 3) {
+            return;
+        }
+
+        if (values[0] === 'network' && values[1] === 'operator') {
+            this.networkOperatorMMC.value = values[2];
+        }
+        if (values[0] === 'network' && values[1] === 'operator_name') {
+            this.networkOperatorName.value = values.slice(2).join(' ');
+        }
+        if (values[0] === 'sim' && values[1] === 'operator') {
+            this.simOperatorMMC.value = values[2];
+        }
+        if (values[0] === 'sim' && values[1] === 'operator_name') {
+            this.simOperatorName.value = values.slice(2).join(' ');
+        }
+        if (values[0] === 'sim' && values[1] === 'imsi_id') {
+            this.simMSIN.value = values[2];
+        }
+        if (values[0] === 'sim' && values[1] === 'phone_number') {
+            this.simOperatorPhoneNumber.value = values[2];
+        }
     }
 
     /**

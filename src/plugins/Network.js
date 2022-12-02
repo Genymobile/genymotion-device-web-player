@@ -260,6 +260,10 @@ module.exports = class Network extends OverlayPlugin {
             this.select.onchange = this.changeMobileProfile.bind(this);
             MOBILE_PROFILES.slice().reverse()
                 .forEach((profile) => {
+                    // 5g is available only for version >= 10
+                    if (this.androidVersion < 10 && profile.name === "5g") {
+                        return;
+                    }
                     const option = new Option(profile.label, profile.name);
                     this.select.add(option);
                 });

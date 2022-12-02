@@ -3,10 +3,20 @@
  */
 .gm-player-instance .gm-network-plugin {
   .gm {
-    &-charging-checkbox {
-      width: 15px;
-      float: left;
-      margin: 0;
+    &-checkbox-group {
+      margin-bottom: 15px;
+
+      .gm-checkbox {
+        width: 15px;
+        float: left;
+        margin: 0;
+      }
+
+      .gm-checkbox-label {
+        height: 32px;
+        line-height: 32px;
+        margin-left: 30px;
+      }
     }
 
     &-inputs {

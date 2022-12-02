@@ -178,12 +178,38 @@ module.exports = class Network extends OverlayPlugin {
         this.form.appendChild(title);
 
         //generate wifi checkbox
-        const wifiInput = document.createElement('input');
-        wifiInput.type = 'checkbox';
-        wifiInput.className = 'gm-charging-checkbox';
-        //wifiInput.onchange = this.toggleChargingState.bind(this);
-        wifiInput.checked = true;
+        const wifiGroupSection = document.createElement('div');
+        wifiGroupSection.className = 'gm-section';
+        const wifiGroup = document.createElement('div');
+        this.wifiInput = document.createElement('input');
+        this.wifiStatus = document.createElement('div');
+        wifiGroup.className = 'gm-checkbox-group';
+        this.wifiInput.type = 'checkbox';
+        this.wifiInput.className = 'gm-checkbox';
+        this.wifiInput.onchange = this.toggleWifiState.bind(this);
+        this.wifiInput.checked = true;
+        this.wifiStatus.className = 'gm-checkbox-label';
+        this.wifiStatus.innerHTML = 'Wifi';
+        wifiGroup.appendChild(this.wifiInput);
+        wifiGroup.appendChild(this.wifiStatus);
+        wifiGroupSection.appendChild(wifiGroup);
+        this.form.appendChild(wifiGroupSection);
 
+        //generate mobile checkbox
+        const mobileGroup = document.createElement('div');
+        this.mobileInput = document.createElement('input');
+        this.mobileStatus = document.createElement('div');
+        mobileGroup.className = 'gm-checkbox-group';
+        this.mobileInput.type = 'checkbox';
+        this.mobileInput.className = 'gm-checkbox';
+        this.mobileInput.onchange = this.toggleMobileState.bind(this);
+        this.mobileInput.checked = true;
+        this.mobileStatus.className = 'gm-checkbox-label';
+        this.mobileStatus.innerHTML = 'Mobile';
+        mobileGroup.appendChild(this.mobileInput);
+        mobileGroup.appendChild(this.mobileStatus);
+        this.form.appendChild(mobileGroup);
+        
         // Generate input rows
         const inputs = document.createElement('div');
         inputs.className = 'gm-inputs';
@@ -332,7 +358,6 @@ module.exports = class Network extends OverlayPlugin {
         this.submitBtn.onclick = this.sendDataToInstance.bind(this);
 
         // Setup
-        this.form.appendChild(wifiInput);
         this.form.appendChild(inputs);
         if (this.androidVersion >= 8) {
             // Mobile Signal Strength
@@ -515,6 +540,14 @@ module.exports = class Network extends OverlayPlugin {
             // hide profile details
             this.profileDetails.classList.add('gm-hidden');
         }
+    }
+
+    toggleWifiState() {
+        // TODO Wifi state changed
+    }
+
+    toggleMobileState() {
+        // TODO Mobile state changed
     }
 
     /**

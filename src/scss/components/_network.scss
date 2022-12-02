@@ -3,6 +3,12 @@
  */
 .gm-player-instance .gm-network-plugin {
   .gm {
+    &-charging-checkbox {
+      width: 15px;
+      float: left;
+      margin: 0;
+    }
+
     &-inputs {
       margin-bottom: 15px;
 

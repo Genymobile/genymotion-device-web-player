@@ -3,6 +3,8 @@
 const OverlayPlugin = require('./util/OverlayPlugin');
 
 const PROFILES = require('./util/network-profiles');
+const MOBILE_PROFILES = require('./util/network-mobile-profiles');
+const MOBILE_SIGNAL_STRENGTH = require('./util/mobile-signal-strength');
 
 /**
  * Instance network plugin.
@@ -39,6 +41,7 @@ module.exports = class Network extends OverlayPlugin {
         this.callbackIndex = this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network
+        console.log("!!!!!!!!! Register to SET ACTIVE !!!!!!!!!")
         this.instance.registerEventCallback('NETWORK', this.setActive.bind(this));
 
         /*
@@ -168,6 +171,13 @@ module.exports = class Network extends OverlayPlugin {
         title.innerHTML = this.i18n.NETWORK_TITLE || 'Network & Baseband';
         this.form.appendChild(title);
 
+        //generate wifi checkbox
+        const wifiInput = document.createElement('input');
+        wifiInput.type = 'checkbox';
+        wifiInput.className = 'gm-charging-checkbox';
+        //wifiInput.onchange = this.toggleChargingState.bind(this);
+        wifiInput.checked = true;
+
         // Generate input rows
         const inputs = document.createElement('div');
         inputs.className = 'gm-inputs';
@@ -176,16 +186,26 @@ module.exports = class Network extends OverlayPlugin {
         this.select = document.createElement('select');
         const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
         this.select.add(defaultOption);
-        this.select.onchange = this.changeProfile.bind(this);
         inputs.appendChild(this.select);
 
-        // Add option for each child
-        PROFILES.slice().reverse()
-            .forEach((profile) => {
-                const option = new Option(profile.label, profile.name);
-                this.select.add(option);
-            });
+        if (this.androidVersion < 8) {
+            this.select.onchange = this.changeProfile.bind(this);
+            // Add option for each child
+            PROFILES.slice().reverse()
+                .forEach((profile) => {
+                    const option = new Option(profile.label, profile.name);
+                    this.select.add(option);
+                });
+        } else {
+            this.select.onchange = this.changeMobileProfile.bind(this);
+            MOBILE_PROFILES.slice().reverse()
+                .forEach((profile) => {
+                    const option = new Option(profile.label, profile.name);
+                    this.select.add(option);
+                });
+        }
 
+        
         // Create detail section
         this.profileDetails = document.createElement('div');
         this.profileDetails.className = 'gm-profile-details gm-hidden';
@@ -306,7 +326,26 @@ module.exports = class Network extends OverlayPlugin {
         this.submitBtn.onclick = this.sendDataToInstance.bind(this);
 
         // Setup
+        this.form.appendChild(wifiInput);
         this.form.appendChild(inputs);
+        if (this.androidVersion >= 8) {
+            // Mobile Signal Strength
+            const inputMobileSignalStrength = document.createElement('div');
+            inputMobileSignalStrength.className = 'gm-inputs';
+
+            this.selectMobileSignalStrength = document.createElement('select');
+            const defaultSignalStrengthOption = new Option('Select signal strength');
+            this.selectMobileSignalStrength.add(defaultSignalStrengthOption);
+            this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
+            inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
+
+            MOBILE_SIGNAL_STRENGTH.slice().reverse()
+                .forEach((strength) => {
+                    const option = new Option(strength.label, strength.name);
+                    this.selectMobileSignalStrength.add(option);
+                });
+            this.form.appendChild(inputMobileSignalStrength);
+        }
         this.form.appendChild(this.profileDetails);
         if (this.basebandEnabled) {
             this.form.appendChild(this.networkOperator);
@@ -444,6 +483,30 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     /**
+     * Update form according to the selected profile.
+     */
+    changeMobileProfile() {
+        const profile = MOBILE_PROFILES.find((elem) => elem.name === this.select.value);
+        if (profile) {
+            // TODO update profile founded 
+            console.log("Selected profile:" + profile.label)
+        } else {
+            // TODO update profile not founded 
+        }
+    }
+    
+    changeMobileSignalStrength() {
+        const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === this.select.value);
+        if (signalStrength) {
+            // TODO update profile details 
+            console.log("Selected signalStrength:" + signalStrength.label)
+        } else {
+            // hide profile details
+            this.profileDetails.classList.add('gm-hidden');
+        }
+    }
+
+    /**
      * Creates and return the widget "details" section.
      *
      * @param  {string}      label Section label.
@@ -479,6 +542,7 @@ module.exports = class Network extends OverlayPlugin {
      * @param {string} id Profile id.
      */
     setActive(id) {
+        console.log("!!!!!!!!! SET ACTIVE !!!!!!!!!")
         const profile = PROFILES.find((elem) => elem.id === Number(id));
         if (!profile || !String(id).length) {
             return;

@@ -6,8 +6,8 @@
  */
 module.exports = [{
     id: 8,
-    name: 'wifi',
-    label: 'Wifi',
+    name: 'unlimited',
+    label: 'Unlimited',
 }, {
     id: 7,
     name: '5G',

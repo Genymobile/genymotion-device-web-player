@@ -121,6 +121,7 @@ module.exports = class Network extends OverlayPlugin {
             const signalStrength = values[10].split(':');
 
             this.setActiveMobileProfile(mobileProfile[1]);
+            this.setActiveSignalStrength(signalStrength[1]);
         }
     }
 
@@ -527,7 +528,6 @@ module.exports = class Network extends OverlayPlugin {
     changeMobileProfile() {
         const profile = MOBILE_PROFILES.find((elem) => elem.name === this.select.value);
         if (profile) {
-            // TODO update profile founded 
             console.log("Selected profile label:" + profile.label + "  name: " + profile.name)
             const msgs = [];
             msgs.push('setprofile mobile ' + profile.name);
@@ -540,13 +540,15 @@ module.exports = class Network extends OverlayPlugin {
     }
     
     changeMobileSignalStrength() {
-        const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === this.select.value);
+        const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === this.selectMobileSignalStrength.value);
         if (signalStrength) {
-            // TODO update profile details 
-            console.log("Selected signalStrength:" + signalStrength.label)
+            const msgs = [];
+            msgs.push('setsignalstrength mobile ' + signalStrength.name);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         } else {
-            // hide profile details
-            this.profileDetails.classList.add('gm-hidden');
+            // TODO hide or do something?
+            console.log("Selected signalStrength not found")
         }
     }
 
@@ -631,7 +633,7 @@ module.exports = class Network extends OverlayPlugin {
     /**
      * Update mobile profile list UI according to the current active profile.
      *
-     * @param {string} name Profile name.
+     * @param {string} profile Profile name.
      */
     setActiveMobileProfile(profile) {
         if(!profile) {
@@ -647,6 +649,29 @@ module.exports = class Network extends OverlayPlugin {
         for (let i = 0; i < options.length; i++) {
             const option = options[i];
             if (option.value === mobileProfile.name) {
+                option.selected = 'selected';
+            }
+        }
+    }
+
+    /**
+     * Update mobile signal strength list UI according to the current active strength.
+     *
+     * @param {string} strength Signal strength name.
+     */
+    setActiveSignalStrength(strength) {
+        if(!strength) {
+            return;
+        }
+        const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === strength);
+        if (!signalStrength) {
+            return;
+        }
+
+        const options = this.selectMobileSignalStrength.getElementsByTagName('option');
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.value === signalStrength.name) {
                 option.selected = 'selected';
             }
         }

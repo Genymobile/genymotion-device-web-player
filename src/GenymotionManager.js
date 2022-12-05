@@ -212,7 +212,7 @@ module.exports = class GenymotionManager {
             {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
             {enabled: options.capture, class: Screencast, params: [options.i18n]},
             {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n, options.baseband]},
+            {enabled: options.network, class: Network, params: [options.i18n]},
             {enabled: options.phone, class: Phone, params: [options.i18n]},
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},

@@ -37,6 +37,9 @@ module.exports = class Network extends OverlayPlugin {
 
         this.androidVersion = "";
 
+        this.wifiInputStatus = true;
+        this.mobileInputStatus = true;
+
         this.widgedRendered = false;
         // Listen for settings messages: "parameter <android_version:<version>"
         this.callbackIndex = this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
@@ -70,30 +73,23 @@ module.exports = class Network extends OverlayPlugin {
 
             const wifiOn = values[1].match(/(wifi:)(\w+)/);
             if (wifiOn) {
-                this.wifiInput.checked = wifiOn[2] === 'on';
+                this.wifiInputStatus = wifiOn[2] === 'on';
             }
             const mobileOn = values[2].match(/(mobile:)(\w+)/);
             if (mobileOn) {
-                this.mobileInput.checked = mobileOn[2] === 'on';
+                this.mobileInputStatus = mobileOn[2] === 'on';
             }
 
-            return;
-        }
-
-        if (values[0] !== 'parameter' || values.length < 2) {
-            return;
-        }
-
-        for (var i = 0; i < values.length; i++) {
-            const version = values[i].match(/(android_version:)(\w+)/);
-            if (version) {
-                this.androidVersion = version[2];
+            if(this.widgedRendered) {
+                this.wifiInput.checked = this.wifiInputStatus;
+                this.mobileInput.checked= this.mobileInputStatus;
             }
-        }
-
-        if(!this.widgedRendered) {
-            this.renderWidget();
-            this.widgedRendered = true;
+        } else if (values[0] === 'parameter' && values.length > 2 && values[2].includes("android_version")) {
+            const version = values[2].match(/(android_version:)(\w+)/);
+            this.androidVersion = version[2];
+            if (!this.widgedRendered) {
+                this.renderWidget();
+            }
         }
     }
 
@@ -215,7 +211,7 @@ module.exports = class Network extends OverlayPlugin {
         this.wifiInput.type = 'checkbox';
         this.wifiInput.className = 'gm-checkbox';
         this.wifiInput.onchange = this.toggleWifiState.bind(this);
-        this.wifiInput.checked = true;
+        this.wifiInput.checked = this.wifiInputStatus;
         this.wifiStatus.className = 'gm-checkbox-label';
         this.wifiStatus.innerHTML = 'Wifi';
         wifiGroup.appendChild(this.wifiInput);
@@ -231,7 +227,7 @@ module.exports = class Network extends OverlayPlugin {
         this.mobileInput.type = 'checkbox';
         this.mobileInput.className = 'gm-checkbox';
         this.mobileInput.onchange = this.toggleMobileState.bind(this);
-        this.mobileInput.checked = true;
+        this.mobileInput.checked = this.mobileInputStatus;
         this.mobileStatus.className = 'gm-checkbox-label';
         this.mobileStatus.innerHTML = 'Mobile';
         mobileGroup.appendChild(this.mobileInput);
@@ -381,6 +377,8 @@ module.exports = class Network extends OverlayPlugin {
             this.simOperator.appendChild(simMSINDiv);
             this.simOperator.appendChild(simOperatorNameDiv);
             this.simOperator.appendChild(simOperatorPhoneDiv);
+
+            this.widgedRendered = true;
         }
 
         // Add submit button
@@ -553,7 +551,6 @@ module.exports = class Network extends OverlayPlugin {
     changeMobileProfile() {
         const profile = MOBILE_PROFILES.find((elem) => elem.name === this.select.value);
         if (profile) {
-            console.log("Selected profile label:" + profile.label + "  name: " + profile.name)
             const msgs = [];
             msgs.push('setprofile mobile ' + profile.name);
             const json = {channel: 'network_profile', messages: msgs};
@@ -639,7 +636,6 @@ module.exports = class Network extends OverlayPlugin {
      * @param {string} id Profile id.
      */
     setActive(id) {
-        console.log("!!!!!!!!! SET ACTIVE !!!!!!!!!")
         const profile = PROFILES.find((elem) => elem.id === Number(id));
         if (!profile || !String(id).length) {
             return;

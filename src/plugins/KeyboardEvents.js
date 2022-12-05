@@ -225,11 +225,31 @@ module.exports = class KeyboardEvents {
         this.instance.root.tabIndex = 0;
 
         if (!this.isListenerAdded) {
-            this.instance.root.addEventListener('keypress', this.onKeyPress.bind(this));
-            this.instance.root.addEventListener('keydown', this.onKeyDown.bind(this));
-            this.instance.root.addEventListener('keyup', this.onKeyUp.bind(this));
+            if (!this.keyboardCallbacks) {
+                this.keyboardCallbacks = new Map([
+                    ['keypress', this.onKeyPress.bind(this)],
+                    ['keydown', this.onKeyDown.bind(this)],
+                    ['keyup', this.onKeyUp.bind(this)]
+                ]);
+            }
             this.instance.root.focus();
+            this.keyboardCallbacks.forEach((value, key) => {
+                window.addEventListener(key, value);
+            });
             this.isListenerAdded = true;
         }
+    }
+
+    /**
+     * Remove the event handlers callbacks (if they were created)
+     */
+    removeKeyboardCallbacks() {
+        if (!this.keyboardCallbacks || !this.isListenerAdded) {
+            return;
+        }
+        this.keyboardCallbacks.forEach((value, key) => {
+            window.removeEventListener(key, value);
+        });
+        this.isListenerAdded = false;
     }
 };

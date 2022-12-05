@@ -158,6 +158,13 @@
       }
     }
 
+    &-sim-button {
+      background-image: url("../assets/images/ic_baseband_inactive.svg");
+      &:hover, &.gm-active {
+        background-image: url("../assets/images/ic_baseband_active.svg");
+      }
+    }
+
     &-uploader-button {
       background-image: url("../assets/images/ic_installation_inactive.svg");
       &:hover, &.gm-active {

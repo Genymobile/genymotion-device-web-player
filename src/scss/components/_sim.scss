@@ -1,0 +1,27 @@
+/**
+ * Network plugin styles
+ */
+.gm-player-instance .gm-network-plugin {
+  label {
+    margin-top: 20px;
+    display: block;
+    float: left;
+  }
+
+  input {
+    margin-top: 10px;
+    width: 60%;
+    float: right;
+    text-align: right;
+    font-size: medium;
+    font-family: Helvetica, sans-serif;
+
+    &:invalid, &:focus:invalid {
+      border-bottom: 1px solid $btn-background-color;
+    }
+  }
+
+  button {
+    margin-top: 20px;
+  }
+}

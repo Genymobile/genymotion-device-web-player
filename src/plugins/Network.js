@@ -161,7 +161,7 @@ module.exports = class Network extends OverlayPlugin {
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-network-button';
-        this.toolbarBtnImage.title = this.i18n.NETWORK_TITLE || 'Network & Baseband';
+        this.toolbarBtnImage.title = this.i18n.NETWORK_TITLE || 'Network';
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         this.toolbarBtn.onclick = this.toggleWidget.bind(this);
         toolbar.appendChild(this.toolbarBtn);
@@ -178,7 +178,7 @@ module.exports = class Network extends OverlayPlugin {
         // Generate title
         const title = document.createElement('div');
         title.className = 'gm-title';
-        title.innerHTML = this.i18n.NETWORK_TITLE || 'Network & Baseband';
+        title.innerHTML = this.i18n.NETWORK_TITLE || 'Network';
         this.form.appendChild(title);
 
         //generate wifi checkbox

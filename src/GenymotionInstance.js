@@ -799,6 +799,9 @@ module.exports = class GenymotionInstance {
                 widget: this.phone,
                 capability: data.message.phone,
             }, {
+                widget: this.sim,
+                capability: data.message.sim,
+            }, {
                 widget: this.diskIO,
                 capability: data.message.diskIO,
             }, {

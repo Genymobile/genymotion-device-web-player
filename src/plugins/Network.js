@@ -61,6 +61,9 @@ module.exports = class Network extends OverlayPlugin {
         const values = message.split(' ');
 
         if (values[0] === 'if' ) {
+            this.wifiInput.disabled = false;
+            this.mobileInput.disabled = false;
+
             if(values.length !== 3) {
                 return;
             }
@@ -76,7 +79,8 @@ module.exports = class Network extends OverlayPlugin {
 
             if(this.widgedRendered) {
                 this.wifiInput.checked = this.wifiInputStatus;
-                this.mobileInput.checked= this.mobileInputStatus;
+                this.mobileInput.checked = this.mobileInputStatus;
+                this.updateMobileSectionStatus();
             }
         } else if (values[0] === 'parameter' && values.length > 2 && values[2].includes("android_version")) {
             const version = values[2].match(/(android_version:)(\w+)/);
@@ -134,13 +138,13 @@ module.exports = class Network extends OverlayPlugin {
 
             this.setActiveMobileProfile(mobileProfile[1]);
             this.setActiveSignalStrength(signalStrength[1]);
-            this.updateDetail('downSpeed', downSpeed[2], downSpeed[1] === "disabled");
-            this.updateDetail('upSpeed', upSpeed[2], upSpeed[1] === "disabled");
-            this.updateDetail('downDelay', downDelay[2], downDelay[1] === "disabled");
-            this.updateDetail('upDelay', upDelay[2], upDelay[1] === "disabled");
-            this.updateDetail('downPacketLoss', downPacketLoss[2], downPacketLoss[1] === "disabled");
-            this.updateDetail('upPacketLoss', upPacketLoss[2], upPacketLoss[1] === "disabled");
-            this.updateDetail('dnsDelay', dnsDelay[2], dnsDelay[1] === "disabled");
+            this.updateDetail('downSpeed', downSpeed[2], downSpeed[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upSpeed', upSpeed[2], upSpeed[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('downDelay', downDelay[2], downDelay[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upDelay', upDelay[2], upDelay[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('downPacketLoss', downPacketLoss[2], downPacketLoss[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upPacketLoss', upPacketLoss[2], upPacketLoss[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('dnsDelay', dnsDelay[2], dnsDelay[1] === "disabled" || !this.mobileInput.checked);
         }
     }
 
@@ -391,6 +395,7 @@ module.exports = class Network extends OverlayPlugin {
 
     toggleWifiState() {
         // Wifi state changed
+        this.wifiInput.disabled = true;
         const msgs = [];
         if (this.wifiInput.checked === true) {
             msgs.push('enableif wifi'); 
@@ -404,15 +409,26 @@ module.exports = class Network extends OverlayPlugin {
 
     toggleMobileState() {
         // TODO Mobile state changed
+        this.mobileInput.disabled = true;
+        this.updateMobileSectionStatus();
+
         const msgs = [];
         if (this.mobileInput.checked === true) {
             msgs.push('enableif mobile'); 
         } else {
-            msgs.push('disableif mobile'); 
+            msgs.push('disableif mobile');
         }
 
-        const json = {channel: 'settings', messages: msgs};
-        this.instance.sendEvent(json);
+        const json1 = {channel: 'settings', messages: msgs};
+        this.instance.sendEvent(json1);
+
+        const json2 = {channel: 'network_profile', messages: ['notify phone']};
+        this.instance.sendEvent(json2);
+    }
+
+    updateMobileSectionStatus() {
+        this.select.disabled = !this.mobileInput.checked;
+        this.selectMobileSignalStrength.disabled = !this.mobileInput.checked;
     }
 
     /**

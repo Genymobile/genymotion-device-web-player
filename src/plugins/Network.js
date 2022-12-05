@@ -109,15 +109,16 @@ module.exports = class Network extends OverlayPlugin {
         const dnsDelay = values[8].split(':');
 
         if (this.androidVersion < 8) {
-            const isThrottlingEnabled = upSpeed[1] === 'enabled'
-                && downSpeed[1] === 'enabled'
-                && upDelay[1] === 'enabled'
-                && downDelay[1] === 'enabled'
-                && upPacketLoss[1] === 'enabled'
-                && downPacketLoss[1] === 'enabled'
-                && dnsDelay[1] === 'enabled';
+            const isThrottlingEnabled =
+            upSpeed[1] === 'enabled'
+            && downSpeed[1] === 'enabled'
+            && upDelay[1] === 'enabled'
+            && downDelay[1] === 'enabled'
+            && upPacketLoss[1] === 'enabled'
+            && downPacketLoss[1] === 'enabled'
+            && dnsDelay[1] === 'enabled';
 
-            const profile = PROFILES.find((elem) => {
+                const profile = PROFILES.find((elem) => {
                 return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
                     elem.downDelay.value === parseFloat(downDelay[2]) &&
                     elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
@@ -139,6 +140,13 @@ module.exports = class Network extends OverlayPlugin {
 
             this.setActiveMobileProfile(mobileProfile[1]);
             this.setActiveSignalStrength(signalStrength[1]);
+            this.updateDetail('downSpeed', downSpeed[2], downSpeed[1] === "disabled");
+            this.updateDetail('upSpeed', upSpeed[2], upSpeed[1] === "disabled");
+            this.updateDetail('downDelay', downDelay[2], downDelay[1] === "disabled");
+            this.updateDetail('upDelay', upDelay[2], upDelay[1] === "disabled");
+            this.updateDetail('downPacketLoss', downPacketLoss[2], downPacketLoss[1] === "disabled");
+            this.updateDetail('upPacketLoss', upPacketLoss[2], upPacketLoss[1] === "disabled");
+            this.updateDetail('dnsDelay', dnsDelay[2], dnsDelay[1] === "disabled");
         }
     }
 
@@ -695,6 +703,24 @@ module.exports = class Network extends OverlayPlugin {
             if (option.value === signalStrength.name) {
                 option.selected = 'selected';
             }
+        }
+    }
+
+    /**
+     * Update mobile signal Detail information.
+     *
+     * @param {string} detail Signal detail to update.
+     * @param {string} value  New signal detail value.
+     * @param {string} reset  If true ignore value and set "".
+     */
+     updateDetail(detail, value, reset) {
+        if(! detail) {
+            return;
+        }
+        if (reset) {
+            this.fields[detail].innerHTML = "";
+        } else {
+            this.fields[detail].innerHTML = value;
         }
     }
 };

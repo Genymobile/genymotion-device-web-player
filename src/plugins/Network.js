@@ -181,38 +181,40 @@ module.exports = class Network extends OverlayPlugin {
         title.innerHTML = this.i18n.NETWORK_TITLE || 'Network';
         this.form.appendChild(title);
 
-        //generate wifi checkbox
-        const wifiGroupSection = document.createElement('div');
-        wifiGroupSection.className = 'gm-section';
-        const wifiGroup = document.createElement('div');
-        this.wifiInput = document.createElement('input');
-        this.wifiStatus = document.createElement('div');
-        wifiGroup.className = 'gm-checkbox-group';
-        this.wifiInput.type = 'checkbox';
-        this.wifiInput.className = 'gm-checkbox';
-        this.wifiInput.onchange = this.toggleWifiState.bind(this);
-        this.wifiInput.checked = this.wifiInputStatus;
-        this.wifiStatus.className = 'gm-checkbox-label';
-        this.wifiStatus.innerHTML = 'Wifi';
-        wifiGroup.appendChild(this.wifiInput);
-        wifiGroup.appendChild(this.wifiStatus);
-        wifiGroupSection.appendChild(wifiGroup);
-        this.form.appendChild(wifiGroupSection);
+        if (this.androidVersion >= 8) {
+            //generate wifi checkbox
+            const wifiGroupSection = document.createElement('div');
+            wifiGroupSection.className = 'gm-section';
+            const wifiGroup = document.createElement('div');
+            this.wifiInput = document.createElement('input');
+            this.wifiStatus = document.createElement('div');
+            wifiGroup.className = 'gm-checkbox-group';
+            this.wifiInput.type = 'checkbox';
+            this.wifiInput.className = 'gm-checkbox';
+            this.wifiInput.onchange = this.toggleWifiState.bind(this);
+            this.wifiInput.checked = this.wifiInputStatus;
+            this.wifiStatus.className = 'gm-checkbox-label';
+            this.wifiStatus.innerHTML = 'Wifi';
+            wifiGroup.appendChild(this.wifiInput);
+            wifiGroup.appendChild(this.wifiStatus);
+            wifiGroupSection.appendChild(wifiGroup);
+            this.form.appendChild(wifiGroupSection);
 
-        //generate mobile checkbox
-        const mobileGroup = document.createElement('div');
-        this.mobileInput = document.createElement('input');
-        this.mobileStatus = document.createElement('div');
-        mobileGroup.className = 'gm-checkbox-group';
-        this.mobileInput.type = 'checkbox';
-        this.mobileInput.className = 'gm-checkbox';
-        this.mobileInput.onchange = this.toggleMobileState.bind(this);
-        this.mobileInput.checked = this.mobileInputStatus;
-        this.mobileStatus.className = 'gm-checkbox-label';
-        this.mobileStatus.innerHTML = 'Mobile';
-        mobileGroup.appendChild(this.mobileInput);
-        mobileGroup.appendChild(this.mobileStatus);
-        this.form.appendChild(mobileGroup);
+            //generate mobile checkbox
+            const mobileGroup = document.createElement('div');
+            this.mobileInput = document.createElement('input');
+            this.mobileStatus = document.createElement('div');
+            mobileGroup.className = 'gm-checkbox-group';
+            this.mobileInput.type = 'checkbox';
+            this.mobileInput.className = 'gm-checkbox';
+            this.mobileInput.onchange = this.toggleMobileState.bind(this);
+            this.mobileInput.checked = this.mobileInputStatus;
+            this.mobileStatus.className = 'gm-checkbox-label';
+            this.mobileStatus.innerHTML = 'Mobile';
+            mobileGroup.appendChild(this.mobileInput);
+            mobileGroup.appendChild(this.mobileStatus);
+            this.form.appendChild(mobileGroup);
+        }
         
         // Generate input rows
         const inputs = document.createElement('div');

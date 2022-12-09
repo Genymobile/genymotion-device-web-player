@@ -131,7 +131,6 @@ module.exports = class Network extends OverlayPlugin {
             } else {
                 this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
             }
-            this.changeProfile();
         } else {
             const mobileProfile = values[9].split(':');
             const signalStrength = values[10].split(':');
@@ -222,11 +221,10 @@ module.exports = class Network extends OverlayPlugin {
 
         // Create select
         this.select = document.createElement('select');
-        const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
-        this.select.add(defaultOption);
-        inputs.appendChild(this.select);
 
         if (this.androidVersion < 8) {
+            const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
+            this.select.add(defaultOption);
             this.select.onchange = this.changeProfile.bind(this);
             // Add option for each child
             PROFILES.slice().reverse()
@@ -247,6 +245,7 @@ module.exports = class Network extends OverlayPlugin {
                 });
         }
 
+        inputs.appendChild(this.select);
         
         // Create detail section
         this.profileDetails = document.createElement('div');
@@ -269,8 +268,6 @@ module.exports = class Network extends OverlayPlugin {
             inputMobileSignalStrength.className = 'gm-inputs';
 
             this.selectMobileSignalStrength = document.createElement('select');
-            const defaultSignalStrengthOption = new Option('Select signal strength');
-            this.selectMobileSignalStrength.add(defaultSignalStrengthOption);
             this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
             inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
 
@@ -318,42 +315,6 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     /**
-     * Send information to instance.
-     *
-     * @param {Event} event Event.
-     */
-    sendDataToInstance(event) {
-        event.preventDefault();
-
-        if (!this.form.checkValidity()) {
-            return;
-        }
-
-        if (this.androidVersion < 8) {
-            const profile = PROFILES.find((elem) => elem.name === this.select.value);
-            if (profile) {
-                const msgs = [];
-                if (profile.id === 0) {
-                    msgs.push('disable wifi all');
-                } else {
-                    msgs.push('enable wifi all');
-                    msgs.push('set wifi up_rate ' + profile.upSpeed.value);
-                    msgs.push('set wifi down_rate ' + profile.downSpeed.value);
-                    msgs.push('set wifi up_delay ' + profile.upDelay.value);
-                    msgs.push('set wifi down_delay ' + profile.downDelay.value);
-                    msgs.push('set wifi up_pkt_loss ' + profile.upPacketLoss.value);
-                    msgs.push('set wifi down_pkt_loss ' + profile.downPacketLoss.value);
-                    msgs.push('set wifi dns_delay ' + profile.dnsDelay.value);
-                }
-                const json = {channel: 'network_profile', messages: msgs};
-                this.instance.sendEvent(json);
-            }
-        }
-
-        this.toggleWidget();
-    }
-
-    /**
      * Update form according to the selected profile.
      */
     changeProfile() {
@@ -361,8 +322,33 @@ module.exports = class Network extends OverlayPlugin {
         if (profile) {
             this.loadDetails(profile);
             this.profileDetails.classList.remove('gm-hidden');
+            this.sendDataToInstance();
         } else {
             this.profileDetails.classList.add('gm-hidden');
+        }
+    }
+
+    /**
+     * Send information to instance.
+     */
+    sendDataToInstance() {
+        const profile = PROFILES.find((elem) => elem.name === this.select.value);
+        if (profile) {
+            const msgs = [];
+            if (profile.id === 0) {
+                msgs.push('disable wifi all');
+            } else {
+                msgs.push('enable wifi all');
+                msgs.push('set wifi up_rate ' + profile.upSpeed.value);
+                msgs.push('set wifi down_rate ' + profile.downSpeed.value);
+                msgs.push('set wifi up_delay ' + profile.upDelay.value);
+                msgs.push('set wifi down_delay ' + profile.downDelay.value);
+                msgs.push('set wifi up_pkt_loss ' + profile.upPacketLoss.value);
+                msgs.push('set wifi down_pkt_loss ' + profile.downPacketLoss.value);
+                msgs.push('set wifi dns_delay ' + profile.dnsDelay.value);
+            }
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         }
     }
 
@@ -481,7 +467,6 @@ module.exports = class Network extends OverlayPlugin {
                 option.selected = 'selected';
             }
         }
-        this.changeProfile();
     }
 
     /**

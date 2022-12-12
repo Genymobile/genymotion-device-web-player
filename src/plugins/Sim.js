@@ -206,7 +206,7 @@ module.exports = class Sim extends OverlayPlugin {
         }
         this.form.appendChild(this.submitBtn);
 
-        this.widget.className = 'gm-overlay gm-network-plugin gm-hidden';
+        this.widget.className = 'gm-overlay gm-sim-plugin gm-hidden';
 
         // Add close button
         const close = document.createElement('div');

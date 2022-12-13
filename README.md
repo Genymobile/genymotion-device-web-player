@@ -383,6 +383,16 @@ Enables or disables the network widget. This widget can be used to set the netwo
 
 Enables or disables the phone widget. This widget can be used to send SMS or phone call the Android virtual device.
 
+### `Baseband`
+
+<img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
+
+- **Type:** `Boolean`
+- **Default:** `true`
+- **Compatibility:** `PaaS`, `SaaS`
+- **Details:**
+Enables or disables the baseband widget. This widget can be used to set some baseband properties.
+
 ### `diskIO`
 
 <img align="right" src="./doc/assets/ic_diskIO_active_black.svg" alt="..."></img>

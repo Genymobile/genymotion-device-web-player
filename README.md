@@ -370,7 +370,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the network widget. This widget can be used to enable or disable the wifi or mobile network. And also set the network throttling (mobile network type and signal strength) of the Android virtual device.
+Enables or disables the network widget. This widget can be used to enable or disable the wifi or mobile network, and to set the network throttling (mobile network type and signal strength) of the Android virtual device.
 
 ### `phone`
 

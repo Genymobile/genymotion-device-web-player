@@ -113,22 +113,6 @@ module.exports = class GenymotionInstance {
             this.callbacks[eventTag] = [];
         }
         this.callbacks[eventTag].push(callback);
-        return this.callbacks[eventTag].length - 1;
-    }
-
-    /**
-     * Unregister a callback.
-     *
-     * @param {string}   eventTag Tag of event to react to.
-     * @param {Function} callback Action to execute to handle the event.
-     */
-    unregisterEventCallback(eventTag, callbackIndex) {
-        if (!this.callbacks[eventTag]) {
-            return;
-        }
-        if (callbackIndex > -1) { // only splice array when item is found
-            this.callbacks[eventTag].splice(callbackIndex, 1); // 2nd parameter means remove one item only
-        }
     }
 
     /**

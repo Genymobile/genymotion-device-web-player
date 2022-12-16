@@ -24,8 +24,6 @@ module.exports = class Sim extends OverlayPlugin {
         this.instance.sim = this;
         this.i18n = i18n || {};
 
-        this.fields = {};
-
         this.basebandEnabled = basebandEnabled;
 
         // Render components

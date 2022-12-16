@@ -137,13 +137,13 @@ module.exports = class Network extends OverlayPlugin {
 
             this.setActiveMobileProfile(mobileProfile[1]);
             this.setActiveSignalStrength(signalStrength[1]);
-            this.updateDetail('downSpeed', downSpeed[2], downSpeed[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('upSpeed', upSpeed[2], upSpeed[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('downDelay', downDelay[2], downDelay[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('upDelay', upDelay[2], upDelay[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('downPacketLoss', downPacketLoss[2], downPacketLoss[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('upPacketLoss', upPacketLoss[2], upPacketLoss[1] === "disabled" || !this.mobileInput.checked);
-            this.updateDetail('dnsDelay', dnsDelay[2], dnsDelay[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('downSpeed', downSpeed[2] + " b/s", downSpeed[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upSpeed', upSpeed[2] + "b/s", upSpeed[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('downDelay', downDelay[2] + " s", downDelay[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upDelay', upDelay[2] + " s", upDelay[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('downPacketLoss', downPacketLoss[2] + " %", downPacketLoss[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('upPacketLoss', upPacketLoss[2] + " %", upPacketLoss[1] === "disabled" || !this.mobileInput.checked);
+            this.updateDetail('dnsDelay', dnsDelay[2] + " s", dnsDelay[1] === "disabled" || !this.mobileInput.checked);
         }
     }
 
@@ -209,7 +209,7 @@ module.exports = class Network extends OverlayPlugin {
             this.mobileInput.onchange = this.toggleMobileState.bind(this);
             this.mobileInput.checked = this.mobileInputStatus;
             this.mobileStatus.className = 'gm-checkbox-label';
-            this.mobileStatus.innerHTML = 'Mobile';
+            this.mobileStatus.innerHTML = 'Mobile data';
             mobileGroup.appendChild(this.mobileInput);
             mobileGroup.appendChild(this.mobileStatus);
             this.form.appendChild(mobileGroup);
@@ -233,6 +233,10 @@ module.exports = class Network extends OverlayPlugin {
                     this.select.add(option);
                 });
         } else {
+		const inputLabel = document.createElement('div');
+		inputLabel.className = 'input_label';
+		inputLabel.innerHTML = 'Network type:';
+		inputs.appendChild(inputLabel);
             this.select.onchange = this.changeMobileProfile.bind(this);
             MOBILE_PROFILES.slice().reverse()
                 .forEach((profile) => {
@@ -266,6 +270,11 @@ module.exports = class Network extends OverlayPlugin {
             // Mobile Signal Strength
             const inputMobileSignalStrength = document.createElement('div');
             inputMobileSignalStrength.className = 'gm-inputs';
+
+		const inputLabel = document.createElement('div');
+                inputLabel.className = 'input_label';
+                inputLabel.innerHTML = 'Signal strength:';
+                inputMobileSignalStrength.appendChild(inputLabel);
 
             this.selectMobileSignalStrength = document.createElement('select');
             this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);

@@ -22,6 +22,12 @@
     &-inputs {
       margin-bottom: 15px;
 
+      input-label {
+        height: 32px;
+        line-height: 32px;
+        margin-left: 30px;
+      }
+
       select {
         width: 100%;
         margin-top: 10px;
@@ -68,9 +74,5 @@
     &:invalid, &:focus:invalid {
       border-bottom: 1px solid $btn-background-color;
     }
-  }
-
-  button {
-    margin-top: 20px;
   }
 }

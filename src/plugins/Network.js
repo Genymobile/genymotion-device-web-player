@@ -38,7 +38,7 @@ module.exports = class Network extends OverlayPlugin {
         // Render components
         this.renderToolbarButton();
 
-        this.androidVersion = -1;
+        this.androidVersion = '';
 
         this.wifiInputChecked = true;
         this.mobileInputChecked = true;

@@ -1,9 +1,7 @@
 'use strict';
 
 const Network = require('../../src/plugins/Network');
-//const NetworkProfiles = require('../../src/plugins/util/network-profiles');
 const NetworkProfiles = require('../../src/plugins/util/network-profiles');
-//const NetworkMobileProfiles = require('../../src/plugins/util/network-mobile-profiles');
 const Instance = require('../mocks/GenymotionInstance');
 
 let network;
@@ -20,7 +18,7 @@ describe('Network Plugin', () => {
             network = new Network(instance, {}, true);
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
-    
+
         test('exposes a high level constructor', () => {
             expect(typeof Network).toBe('function');
         });
@@ -57,7 +55,6 @@ describe('Network Plugin', () => {
             network.renderWidget();
         });
         test('NETWORK', () => {
-
             const loadDetails = jest.spyOn(network, 'loadDetails');
 
             ['jean-michel', '-123', '', '9'].forEach((invalidValue) => {
@@ -66,7 +63,7 @@ describe('Network Plugin', () => {
             });
 
             NetworkProfiles.forEach((profile) => {
-                expect(async () => {
+                expect(async() => {
                     instance.emit('NETWORK', profile.id);
                     expect(loadDetails).toHaveBeenCalledWith(NetworkProfiles[NetworkProfiles.length - 1 - profile.id]);
                 });
@@ -91,7 +88,7 @@ describe('Network Plugin', () => {
                 message += `up_pkt_loss:enabled:${profile.upPacketLoss.value} `;
                 message += `down_pkt_loss:enabled:${profile.downPacketLoss.value} `;
                 message += `dns_delay:enabled:${profile.dnsDelay.value}`;
-                expect(async () => {
+                expect(async() => {
                     instance.emit('network_profile', message);
                     expect(loadDetails).toHaveBeenCalledWith(NetworkProfiles[NetworkProfiles.length - 1 - profile.id]);
                 });
@@ -151,18 +148,17 @@ describe('Network Plugin', () => {
                     messages.push(`set wifi dns_delay ${profile.dnsDelay.value}`);
                 }
 
-                expect(async () => {
+                expect(async() => {
                     network.setActive(profile.id);
-                    await waitFor(() => expect(sendEventSpy).toHaveBeenCalledTimes(1));
+                    await expect(sendEventSpy).toHaveBeenCalledTimes(1);
                     expect(instance.outgoingMessages[0]).toEqual({channel: 'network_profile', messages: messages});
                 });
-                
             });
 
             sendEventSpy.mockClear();
-            expect(async () => {
+            expect(async() => {
                 network.select.value = 'Select a profile';
-                await waitFor(() => expect(sendEventSpy).toHaveBeenCalledTimes(0));
+                await expect(sendEventSpy).toHaveBeenCalledTimes(0);
             });
         });
     });

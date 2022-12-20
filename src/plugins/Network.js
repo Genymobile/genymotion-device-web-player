@@ -8,8 +8,6 @@ const OverlayPlugin = require('./util/OverlayPlugin');
 const PROFILES = require('./util/network-profiles');
 const MOBILE_PROFILES = require('./util/network-mobile-profiles');
 const MOBILE_SIGNAL_STRENGTH = require('./util/mobile-signal-strength');
-// Since android version 8 redis message changes
-const ANDROID_8 = 8;
 // 5G is available only for android version greater or equal to 10
 const ANDROID_10 = 10;
 /**
@@ -20,10 +18,11 @@ module.exports = class Network extends OverlayPlugin {
     /**
      * Plugin initialization.
      *
-     * @param {Object}  instance        Associated instance.
-     * @param {Object}  i18n            Translations keys for the UI.
+     * @param {Object}  instance          Associated instance.
+     * @param {Object}  i18n              Translations keys for the UI.
+     * @param {Boolean} mobilethrottling  True if mobile throttling is enabled, False otherwise.
      */
-    constructor(instance, i18n) {
+    constructor(instance, i18n, mobilethrottling) {
         super(instance);
 
         // Reference instance
@@ -32,6 +31,7 @@ module.exports = class Network extends OverlayPlugin {
         // Register plugin
         this.instance.network = this;
         this.i18n = i18n || {};
+        this.mobilethrottling = mobilethrottling;
 
         this.fields = {};
 
@@ -101,9 +101,9 @@ module.exports = class Network extends OverlayPlugin {
     // Update network details (downSpeed, downDelay...) according to the selected network type.
     handleNetworkProfile(message) {
         const values = message.split(' ');
-        if (this.androidVersion < ANDROID_8 && (values.length < 9 || values[1] === 'phone')) {
+        if (!this.mobilethrottling && (values.length < 9 || values[1] === 'phone')) {
             return;
-        } else if (this.androidVersion >= ANDROID_8 && (values.length < 11 || values[1] === 'wifi')) {
+        } else if (this.mobilethrottling && (values.length < 11 || values[1] === 'wifi')) {
             return;
         }
         const upSpeed = values[2].split(':');
@@ -114,7 +114,24 @@ module.exports = class Network extends OverlayPlugin {
         const downPacketLoss = values[7].split(':');
         const dnsDelay = values[8].split(':');
 
-        if (this.androidVersion < ANDROID_8) {
+        if (this.mobilethrottling) {
+            const mobileProfile = values[9].split(':');
+            const signalStrength = values[10].split(':');
+
+            this.setActiveMobileProfile(mobileProfile[1]);
+            this.setActiveSignalStrength(signalStrength[1]);
+            this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upSpeed', upSpeed[2] + 'b/s', upSpeed[1] === 'disabled' || !this.mobileInput.checked);
+            this.updateDetail('downDelay', downDelay[2] + ' s', downDelay[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || !this.mobileInput.checked);
+            this.updateDetail('downPacketLoss', downPacketLoss[2] + ' %', downPacketLoss[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upPacketLoss', upPacketLoss[2] + ' %', upPacketLoss[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('dnsDelay', dnsDelay[2] + ' s', dnsDelay[1] === 'disabled' || !this.mobileInput.checked);
+        } else {
             const isThrottlingEnabled =
             upSpeed[1] === 'enabled'
             && downSpeed[1] === 'enabled'
@@ -139,23 +156,6 @@ module.exports = class Network extends OverlayPlugin {
             } else {
                 this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
             }
-        } else {
-            const mobileProfile = values[9].split(':');
-            const signalStrength = values[10].split(':');
-
-            this.setActiveMobileProfile(mobileProfile[1]);
-            this.setActiveSignalStrength(signalStrength[1]);
-            this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled'
-                || !this.mobileInput.checked);
-            this.updateDetail('upSpeed', upSpeed[2] + 'b/s', upSpeed[1] === 'disabled' || !this.mobileInput.checked);
-            this.updateDetail('downDelay', downDelay[2] + ' s', downDelay[1] === 'disabled'
-                || !this.mobileInput.checked);
-            this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || !this.mobileInput.checked);
-            this.updateDetail('downPacketLoss', downPacketLoss[2] + ' %', downPacketLoss[1] === 'disabled'
-                || !this.mobileInput.checked);
-            this.updateDetail('upPacketLoss', upPacketLoss[2] + ' %', upPacketLoss[1] === 'disabled'
-                || !this.mobileInput.checked);
-            this.updateDetail('dnsDelay', dnsDelay[2] + ' s', dnsDelay[1] === 'disabled' || !this.mobileInput.checked);
         }
     }
 
@@ -192,7 +192,7 @@ module.exports = class Network extends OverlayPlugin {
         title.innerHTML = this.i18n.NETWORK_TITLE || 'Network';
         this.form.appendChild(title);
 
-        if (this.androidVersion >= ANDROID_8) {
+        if (this.mobilethrottling) {
             // generate wifi checkbox
             const wifiGroupSection = document.createElement('div');
             wifiGroupSection.className = 'gm-section';
@@ -234,17 +234,7 @@ module.exports = class Network extends OverlayPlugin {
         // Create select
         this.select = document.createElement('select');
 
-        if (this.androidVersion < ANDROID_8) {
-            const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
-            this.select.add(defaultOption);
-            this.select.onchange = this.changeProfile.bind(this);
-            // Add option for each child
-            PROFILES.slice().reverse()
-                .forEach((profile) => {
-                    const option = new Option(profile.label, profile.name);
-                    this.select.add(option);
-                });
-        } else {
+        if (this.mobilethrottling) {
             const inputLabel = document.createElement('div');
             inputLabel.className = 'input_label';
             inputLabel.innerHTML = 'Network type:';
@@ -253,9 +243,19 @@ module.exports = class Network extends OverlayPlugin {
             MOBILE_PROFILES.slice().reverse()
                 .forEach((profile) => {
                     // 5g is available only for version >= 10
-                    if (this.androidVersion < ANDROID_10 && profile.name === '5g') {
+                    if (Number(this.androidVersion) < ANDROID_10 && profile.name === '5g') {
                         return;
                     }
+                    const option = new Option(profile.label, profile.name);
+                    this.select.add(option);
+                });
+        } else {
+            const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
+            this.select.add(defaultOption);
+            this.select.onchange = this.changeProfile.bind(this);
+            // Add option for each child
+            PROFILES.slice().reverse()
+                .forEach((profile) => {
                     const option = new Option(profile.label, profile.name);
                     this.select.add(option);
                 });
@@ -278,7 +278,7 @@ module.exports = class Network extends OverlayPlugin {
 
         // Setup
         this.form.appendChild(inputs);
-        if (this.androidVersion >= ANDROID_8) {
+        if (this.mobilethrottling) {
             // Mobile Signal Strength
             const inputMobileSignalStrength = document.createElement('div');
             inputMobileSignalStrength.className = 'gm-inputs';

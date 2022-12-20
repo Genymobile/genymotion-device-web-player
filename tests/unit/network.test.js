@@ -15,7 +15,7 @@ describe('Network Plugin', () => {
 
     describe('api', () => {
         beforeEach(() => {
-            network = new Network(instance, {}, true);
+            network = new Network(instance, {}, false);
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
 
@@ -30,8 +30,7 @@ describe('Network Plugin', () => {
             network = new Network(instance, {
                 NETWORK_TITLE: 'TEST NETWORK PLUGIN TITLE',
                 NETWORK_DELECT_PROFILE: 'TEST NETWORK PLUGIN DETECT PROFILE',
-            }, true);
-            network.androidVersion = 7;
+            }, false);
             network.renderWidget();
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
@@ -124,7 +123,6 @@ describe('Network Plugin', () => {
     describe('outgoing events', () => {
         beforeEach(() => {
             network = new Network(instance, {}, false);
-            network.androidVersion = 7;
             network.renderWidget();
         });
         test('wifi', () => {

@@ -1,40 +1,40 @@
 'use strict';
 
-const Sim = require('../../src/plugins/Sim');
+const BasebandRIL = require('../../src/plugins/BasebandRIL');
 const Instance = require('../mocks/GenymotionInstance');
 
 let instance;
-let sim;
+let baseband;
 let plugin;
 
-describe('Sim Plugin', () => {
+describe('BasebandRIL Plugin', () => {
     beforeEach(() => {
         instance = new Instance();
-        sim = new Sim(instance, {}, true);
-        plugin = document.getElementsByClassName('gm-sim-plugin')[0];
+        baseband = new BasebandRIL(instance, {}, true);
+        plugin = document.getElementsByClassName('gm-baseband-plugin')[0];
     });
 
     describe('api', () => {
         test('exposes a high level constructor', () => {
-            expect(typeof Sim).toBe('function');
+            expect(typeof BasebandRIL).toBe('function');
         });
     });
 
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
-            new Sim(instance, {
+            new BasebandRIL(instance, {
                 NETWORK_TITLE: 'TEST NETWORK PLUGIN TITLE',
                 NETWORK_OPERATOR: 'TEST NETWORK PLUGIN NETWORK OPERATOR',
                 NETWORK_SIM_OPERATOR: 'TEST NETWORK PLUGIN SIM OPERATOR',
                 NETWORK_UPDATE: 'TEST NETWORK PLUGIN UPDATE'
             }, true);
-            plugin = document.getElementsByClassName('gm-sim-plugin')[0];
+            plugin = document.getElementsByClassName('gm-baseband-plugin')[0];
         });
 
         test('is initialized properly at construct', () => {
             // Widget
-            expect(document.getElementsByClassName('gm-sim-plugin')).toHaveLength(1);
+            expect(document.getElementsByClassName('gm-baseband-plugin')).toHaveLength(1);
             // Toolbar button
             expect(document.getElementsByClassName('gm-sim-button')).toHaveLength(1);
         });
@@ -52,44 +52,44 @@ describe('Sim Plugin', () => {
             test('operator', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `network operator ${value}`);
-                    expect(sim.networkOperatorMMC.value).toBe(value);
+                    expect(baseband.networkOperatorMMC.value).toBe(value);
                 });
             });
 
             test('operator_name', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `network operator_name ${value}`);
-                    expect(sim.networkOperatorName.value).toBe(value);
+                    expect(baseband.networkOperatorName.value).toBe(value);
                 });
             });
         });
 
-        describe('sim', () => {
+        describe('baseband', () => {
             test('operator', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim operator ${value}`);
-                    expect(sim.simOperatorMMC.value).toBe(value);
+                    expect(baseband.simOperatorMMC.value).toBe(value);
                 });
             });
 
             test('operator_name', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim operator_name ${value}`);
-                    expect(sim.simOperatorName.value).toBe(value);
+                    expect(baseband.simOperatorName.value).toBe(value);
                 });
             });
 
             test('imsi_id', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim imsi_id ${value}`);
-                    expect(sim.simMSIN.value).toBe(value);
+                    expect(baseband.simMSIN.value).toBe(value);
                 });
             });
 
             test('phone_number', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim phone_number ${value}`);
-                    expect(sim.simOperatorPhoneNumber.value).toBe(value);
+                    expect(baseband.simOperatorPhoneNumber.value).toBe(value);
                 });
             });
         });
@@ -98,13 +98,13 @@ describe('Sim Plugin', () => {
     describe('outgoing events', () => {
         test('baseband', () => {
             instance = new Instance();
-            sim = new Sim(instance, {}, true);
+            baseband = new BasebandRIL(instance, {}, true);
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
-            sim.networkOperatorMMC.value = '123456';
-            sim.networkOperatorName.value = 'value';
-            sim.simOperatorMMC.value = '123456';
-            sim.submitBtn.click();
+            baseband.networkOperatorMMC.value = '123456';
+            baseband.networkOperatorName.value = 'value';
+            baseband.simOperatorMMC.value = '123456';
+            baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: [
                 'network operator 123456',
@@ -112,10 +112,10 @@ describe('Sim Plugin', () => {
                 'sim operator 123456',
             ]});
 
-            sim.simOperatorName.value = 'value';
-            sim.simMSIN.value = '0123456789';
-            sim.simOperatorPhoneNumber.value = '0011223344';
-            sim.submitBtn.click();
+            baseband.simOperatorName.value = 'value';
+            baseband.simMSIN.value = '0123456789';
+            baseband.simOperatorPhoneNumber.value = '0011223344';
+            baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({channel: 'baseband', messages: [
                 'network operator 123456',

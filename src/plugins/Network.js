@@ -500,6 +500,7 @@ module.exports = class Network extends OverlayPlugin {
         }
         const mobileProfile = MOBILE_PROFILES.find((elem) => elem.name === profile);
         if (!mobileProfile) {
+            log.error('setActiveMobileProfile: Error : unknown provided profile');
             return;
         }
 
@@ -508,6 +509,7 @@ module.exports = class Network extends OverlayPlugin {
             const option = options[i];
             if (option.value === mobileProfile.name) {
                 option.selected = 'selected';
+                break;
             }
         }
     }
@@ -519,10 +521,12 @@ module.exports = class Network extends OverlayPlugin {
      */
     setActiveSignalStrength(strength) {
         if (!strength) {
+            log.error('setActiveSignalStrength: Error : provided strength is empty');
             return;
         }
         const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === strength);
         if (!signalStrength) {
+            log.error('setActiveSignalStrength: Error : unknown provided strength');
             return;
         }
 
@@ -531,6 +535,7 @@ module.exports = class Network extends OverlayPlugin {
             const option = options[i];
             if (option.value === signalStrength.name) {
                 option.selected = 'selected';
+                break;
             }
         }
     }

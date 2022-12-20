@@ -3,10 +3,10 @@
 const OverlayPlugin = require('./util/OverlayPlugin');
 
 /**
- * Instance sim plugin.
- * Provides Sim and operator informations control.
+ * Instance Baseband/RIL plugin.
+ * Provides Baseband and RIL informations control.
  */
-module.exports = class Sim extends OverlayPlugin {
+module.exports = class BasebandRIL extends OverlayPlugin {
     /**
      * Plugin initialization.
      *
@@ -21,7 +21,7 @@ module.exports = class Sim extends OverlayPlugin {
         this.instance = instance;
 
         // Register plugin
-        this.instance.sim = this;
+        this.instance.baseband = this;
         this.i18n = i18n || {};
 
         this.basebandEnabled = basebandEnabled;
@@ -32,30 +32,39 @@ module.exports = class Sim extends OverlayPlugin {
 
         // Listen for baseband messages: "<sim/network> <operator/operator_name/imsi_id/phone_number> <value>"
         this.instance.registerEventCallback('baseband', (message) => {
-            const values = message.split(' ');
-            if (values.length < 3) {
-                return;
-            }
-
-            if (values[0] === 'network' && values[1] === 'operator') {
-                this.networkOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'network' && values[1] === 'operator_name') {
-                this.networkOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'operator') {
-                this.simOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'operator_name') {
-                this.simOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'imsi_id') {
-                this.simMSIN.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'phone_number') {
-                this.simOperatorPhoneNumber.value = values[2];
-            }
+            this.HandleBasebandEvent(message);
         });
+    }
+
+    /**
+     * Handle the baseband channel events.
+     *
+     * @param {String} message the received message.
+     */
+    HandleBasebandEvent(message) {
+        const values = message.split(' ');
+        if (values.length < 3) {
+            return;
+        }
+
+        if (values[0] === 'network' && values[1] === 'operator') {
+            this.networkOperatorMMC.value = values[2];
+        }
+        if (values[0] === 'network' && values[1] === 'operator_name') {
+            this.networkOperatorName.value = values.slice(2).join(' ');
+        }
+        if (values[0] === 'sim' && values[1] === 'operator') {
+            this.simOperatorMMC.value = values[2];
+        }
+        if (values[0] === 'sim' && values[1] === 'operator_name') {
+            this.simOperatorName.value = values.slice(2).join(' ');
+        }
+        if (values[0] === 'sim' && values[1] === 'imsi_id') {
+            this.simMSIN.value = values[2];
+        }
+        if (values[0] === 'sim' && values[1] === 'phone_number') {
+            this.simOperatorPhoneNumber.value = values[2];
+        }
     }
 
     /**
@@ -204,7 +213,7 @@ module.exports = class Sim extends OverlayPlugin {
         }
         this.form.appendChild(this.submitBtn);
 
-        this.widget.className = 'gm-overlay gm-sim-plugin gm-hidden';
+        this.widget.className = 'gm-overlay gm-baseband-plugin gm-hidden';
 
         // Add close button
         const close = document.createElement('div');

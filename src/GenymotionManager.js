@@ -20,7 +20,7 @@ const Screencast = require('./plugins/Screencast');
 const Identifiers = require('./plugins/Identifiers');
 const Network = require('./plugins/Network');
 const Phone = require('./plugins/Phone');
-const Sim = require('./plugins/Sim');
+const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 
@@ -55,7 +55,6 @@ const defaultOptions = {
     network: true,
     baseband: false,
     phone: true,
-    sim: true,
     streamResolution: true,
     diskIO: true,
     translateHomeKey: false,
@@ -117,7 +116,6 @@ module.exports = class GenymotionManager {
      * @param  {boolean}            options.network                Network throttling support activated. Default: true.
      * @param  {boolean}            options.baseband               Baseband controll support activated. Default: false.
      * @param  {boolean}            options.phone                  Baseband support activated. Default: true.
-     * @param  {boolean}            options.sim                    Sim throttling support activated. Default: true.
      * @param  {boolean}            options.streamResolution       Stream resolution control support activated. Default: true.
      * @param  {boolean}            options.diskIO                 Disk I/O throttling support activated. Default: true.
      * @param  {boolean}            options.translateHomeKey       Whether or not the HOME key button should be decompose to META + ENTER. Default: false.
@@ -217,7 +215,7 @@ module.exports = class GenymotionManager {
             {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
             {enabled: options.network, class: Network, params: [options.i18n]},
             {enabled: options.phone, class: Phone, params: [options.i18n]},
-            {enabled: options.sim, class: Sim, params: [options.i18n, options.baseband]},
+            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},

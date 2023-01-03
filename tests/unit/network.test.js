@@ -15,7 +15,7 @@ describe('Network Plugin', () => {
 
     describe('api', () => {
         beforeEach(() => {
-            network = new Network(instance, {}, false);
+            network = new Network(instance, {});
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
 
@@ -30,8 +30,7 @@ describe('Network Plugin', () => {
             network = new Network(instance, {
                 NETWORK_TITLE: 'TEST NETWORK PLUGIN TITLE',
                 NETWORK_DELECT_PROFILE: 'TEST NETWORK PLUGIN DETECT PROFILE',
-            }, false);
-            network.renderWidget();
+            });
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
 
@@ -122,8 +121,7 @@ describe('Network Plugin', () => {
 
     describe('outgoing events', () => {
         beforeEach(() => {
-            network = new Network(instance, {}, false);
-            network.renderWidget();
+            network = new Network(instance, {});
         });
         test('wifi', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');

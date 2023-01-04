@@ -30,7 +30,6 @@ module.exports = class Network extends OverlayPlugin {
         this.instance.network = this;
         this.i18n = i18n || {};
         this.mobilethrottling = false;
-        this.support5G = false;
 
         this.fields = {};
 
@@ -61,39 +60,100 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     enableMobileThrottling() {
-        if (!this.mobilethrottling) {
-            this.mobilethrottling = true;
-            this.wifiGroupSection.classList.remove('hidden');
-            this.mobileGroup.classList.remove('hidden');
-            this.inputMobileSignalStrength.classList.remove('hidden');
-            this.newInputs.classList.remove('hidden');
-            this.inputs.classList.add('hidden');
-        }
+        this.mobilethrottling = true;
+        // Add wifi checkbox
+        const wifiGroup = document.createElement('div');
+        this.wifiInput = document.createElement('input');
+        this.wifiStatus = document.createElement('div');
+        wifiGroup.className = 'gm-checkbox-group';
+        this.wifiInput.type = 'checkbox';
+        this.wifiInput.className = 'gm-checkbox';
+        this.wifiInput.onchange = this.toggleWifiState.bind(this);
+        this.wifiInput.checked = this.wifiInputChecked;
+        this.wifiStatus.className = 'gm-checkbox-label';
+        this.wifiStatus.innerHTML = 'Wifi';
+        wifiGroup.appendChild(this.wifiInput);
+        wifiGroup.appendChild(this.wifiStatus);
+        this.wifiGroupSection.className = 'gm-section';
+        this.wifiGroupSection.appendChild(wifiGroup);
+
+        // Add mobile checkbox
+        const mobileGroup = document.createElement('div');
+        this.mobileInput = document.createElement('input');
+        this.mobileStatus = document.createElement('div');
+        mobileGroup.className = 'gm-checkbox-group';
+        this.mobileInput.type = 'checkbox';
+        this.mobileInput.className = 'gm-checkbox';
+        this.mobileInput.onchange = this.toggleMobileState.bind(this);
+        this.mobileInput.checked = this.mobileInputChecked;
+        this.mobileStatus.className = 'gm-checkbox-label';
+        this.mobileStatus.innerHTML = 'Mobile data';
+        mobileGroup.appendChild(this.mobileInput);
+        mobileGroup.appendChild(this.mobileStatus);
+        this.mobileGroupSection.appendChild(mobileGroup);
+
+        // Generate input rows for network mobile profiles
+        const networkTypeInputLabel = document.createElement('div');
+        networkTypeInputLabel.className = 'input_label';
+        networkTypeInputLabel.innerHTML = 'Network type:';
+
+        this.profileInputs.appendChild(networkTypeInputLabel);
+        this.selectMobileProfile = document.createElement('select');
+        this.selectMobileProfile.onchange = this.changeMobileProfile.bind(this);
+        // Add option for each child
+        MOBILE_PROFILES.slice().reverse()
+            .forEach((profile) => {
+                // 5g is available only for version >= 10
+                if (profile.name === '5g') {
+                    return;
+                }
+                const option = new Option(profile.label, profile.name);
+                this.selectMobileProfile.add(option);
+            });
+        this.profileInputs.appendChild(this.selectMobileProfile);
+
+        // Generate input rows for signal strength
+        const signalStrengthInputLabel = document.createElement('div');
+        signalStrengthInputLabel.className = 'input_label';
+        signalStrengthInputLabel.innerHTML = 'Signal strength:';
+        this.inputMobileSignalStrength.appendChild(signalStrengthInputLabel);
+
+        this.selectMobileSignalStrength = document.createElement('select');
+        this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
+        this.inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
+        // Add option for each child
+        MOBILE_SIGNAL_STRENGTH.slice().reverse()
+            .forEach((strength) => {
+                const option = new Option(strength.label, strength.name);
+                this.selectMobileSignalStrength.add(option);
+            });
     }
 
     disableMobileThrottling() {
-        if (this.mobilethrottling) {
-            this.mobilethrottling = false;
-            this.wifiGroupSection.classList.add('hidden');
-            this.mobileGroup.classList.add('hidden');
-            this.inputMobileSignalStrength.classList.add('hidden');
-            this.newInputs.classList.add('hidden');
-            this.inputs.classList.remove('hidden');
-        }
+        this.mobilethrottling = false;
+
+        // Generate input rows for network profiles
+        this.selectProfile = document.createElement('select');
+        const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
+        this.selectProfile.add(defaultOption);
+        this.selectProfile.onchange = this.changeProfile.bind(this);
+        // Add option for each child
+        PROFILES.slice().reverse()
+            .forEach((profile) => {
+                const option = new Option(profile.label, profile.name);
+                this.selectProfile.add(option);
+            });
+        this.profileInputs.appendChild(this.selectProfile);
     }
 
     enable5G() {
-        if (!this.support5G) {
-            this.support5G= true;
-            const profile = MOBILE_PROFILES.at(0);
-            const option = new Option(profile.label, profile.name);
-            this.selectMobileProfile.add(option);
-        }
+        const profile = MOBILE_PROFILES.at(0);
+        const option = new Option(profile.label, profile.name);
+        this.selectMobileProfile.add(option);
     }
 
     disable5G() {
-        if (this.support5G) {
-            this.support5G = false;
+        if (this.mobilethrottling === true) {
             const profile = MOBILE_PROFILES.at(0);
             const option = new Option(profile.label, profile.name);
             this.selectMobileProfile.remove(option);
@@ -181,7 +241,7 @@ module.exports = class Network extends OverlayPlugin {
             });
 
             if (profile && isThrottlingEnabled) {
-                this.selectMobileProfile.value = profile.name;
+                this.selectProfile.value = profile.name;
             } else {
                 this.selectProfile.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
             }
@@ -223,79 +283,21 @@ module.exports = class Network extends OverlayPlugin {
 
         // generate wifi checkbox
         this.wifiGroupSection = document.createElement('div');
-        this.wifiGroupSection.className = 'gm-section';
-        const wifiGroup = document.createElement('div');
-        this.wifiInput = document.createElement('input');
-        this.wifiStatus = document.createElement('div');
-        wifiGroup.className = 'gm-checkbox-group';
-        this.wifiInput.type = 'checkbox';
-        this.wifiInput.className = 'gm-checkbox';
-        this.wifiInput.onchange = this.toggleWifiState.bind(this);
-        this.wifiInput.checked = this.wifiInputChecked;
-        this.wifiStatus.className = 'gm-checkbox-label';
-        this.wifiStatus.innerHTML = 'Wifi';
-        wifiGroup.appendChild(this.wifiInput);
-        wifiGroup.appendChild(this.wifiStatus);
-        this.wifiGroupSection.appendChild(wifiGroup);
         this.form.appendChild(this.wifiGroupSection);
-        this.wifiGroupSection.classList.add('hidden');
 
         // generate mobile checkbox
-        this.mobileGroup = document.createElement('div');
-        this.mobileInput = document.createElement('input');
-        this.mobileStatus = document.createElement('div');
-        this.mobileGroup.className = 'gm-checkbox-group';
-        this.mobileInput.type = 'checkbox';
-        this.mobileInput.className = 'gm-checkbox';
-        this.mobileInput.onchange = this.toggleMobileState.bind(this);
-        this.mobileInput.checked = this.mobileInputChecked;
-        this.mobileStatus.className = 'gm-checkbox-label';
-        this.mobileStatus.innerHTML = 'Mobile data';
-        this.mobileGroup.appendChild(this.mobileInput);
-        this.mobileGroup.appendChild(this.mobileStatus);
-        this.form.appendChild(this.mobileGroup);
-        this.mobileGroup.classList.add('hidden');
+        this.mobileGroupSection = document.createElement('div');
+        this.form.appendChild(this.mobileGroupSection);
 
         // Generate input rows for network profiles
-        this.inputs = document.createElement('div');
-        this.inputs.className = 'gm-inputs';
-        // Create select
-        this.selectProfile = document.createElement('select');
-        const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
-        this.selectProfile.add(defaultOption);
-        this.selectProfile.onchange = this.changeProfile.bind(this);
-        // Add option for each child
-        PROFILES.slice().reverse()
-            .forEach((profile) => {
-                const option = new Option(profile.label, profile.name);
-                this.selectProfile.add(option);
-            });
-        this.inputs.appendChild(this.selectProfile);
-        this.form.appendChild(this.inputs);
+        this.profileInputs = document.createElement('div');
+        this.profileInputs.className = 'gm-inputs';
+        this.form.appendChild(this.profileInputs);
 
-        // Generate input rows for network mobile profiles
-        this.newInputs = document.createElement('div');
-        this.newInputs.className = 'gm-inputs';
-        const networkTypeInputLabel = document.createElement('div');
-        networkTypeInputLabel.className = 'input_label';
-        networkTypeInputLabel.innerHTML = 'Network type:';
-        this.newInputs.appendChild(networkTypeInputLabel);
-        // Create select
-        this.selectMobileProfile = document.createElement('select');
-        this.selectMobileProfile.onchange = this.changeMobileProfile.bind(this);
-        // Add option for each child
-        MOBILE_PROFILES.slice().reverse()
-            .forEach((profile) => {
-                // 5g is available only for version >= 10
-                if (profile.name === '5g' && !this.support5G) {
-                    return;
-                }
-                const option = new Option(profile.label, profile.name);
-                this.selectMobileProfile.add(option);
-            });
-        this.newInputs.appendChild(this.selectMobileProfile);
-        this.form.appendChild(this.newInputs);
-        this.newInputs.classList.add('hidden');
+        // Mobile Signal Strength
+        this.inputMobileSignalStrength = document.createElement('div');
+        this.inputMobileSignalStrength.className = 'gm-inputs';
+        this.form.appendChild(this.inputMobileSignalStrength);
 
         // Create detail section
         this.profileDetails = document.createElement('div');
@@ -310,26 +312,6 @@ module.exports = class Network extends OverlayPlugin {
         this.profileDetails.appendChild(this.createDetailsSection('Upload packet loss', 'upPacketLoss'));
         this.profileDetails.appendChild(this.createDetailsSection('DNS Delay', 'dnsDelay'));
 
-        // Mobile Signal Strength
-        this.inputMobileSignalStrength = document.createElement('div');
-        this.inputMobileSignalStrength.className = 'gm-inputs';
-
-        const signalStrengthInputLabel = document.createElement('div');
-        signalStrengthInputLabel.className = 'input_label';
-        signalStrengthInputLabel.innerHTML = 'Signal strength:';
-        this.inputMobileSignalStrength.appendChild(signalStrengthInputLabel);
-
-        this.selectMobileSignalStrength = document.createElement('select');
-        this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
-        this.inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
-
-        MOBILE_SIGNAL_STRENGTH.slice().reverse()
-            .forEach((strength) => {
-                const option = new Option(strength.label, strength.name);
-                this.selectMobileSignalStrength.add(option);
-            });
-        this.form.appendChild(this.inputMobileSignalStrength);
-        this.inputMobileSignalStrength.classList.add('hidden');
         this.form.appendChild(this.profileDetails);
 
         this.widget.className = 'gm-overlay gm-network-plugin gm-hidden';

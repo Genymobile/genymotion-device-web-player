@@ -31,6 +31,7 @@ describe('Network Plugin', () => {
                 NETWORK_TITLE: 'TEST NETWORK PLUGIN TITLE',
                 NETWORK_DELECT_PROFILE: 'TEST NETWORK PLUGIN DETECT PROFILE',
             });
+            network.disableMobileThrottling();
             plugin = document.getElementsByClassName('gm-network-plugin')[0];
         });
 

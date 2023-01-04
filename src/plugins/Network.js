@@ -127,6 +127,8 @@ module.exports = class Network extends OverlayPlugin {
                 const option = new Option(strength.label, strength.name);
                 this.selectMobileSignalStrength.add(option);
             });
+
+        this.updateMobileSectionStatus();
     }
 
     disableMobileThrottling() {
@@ -161,8 +163,13 @@ module.exports = class Network extends OverlayPlugin {
         const values = message.split(' ');
 
         if (values[0] === 'if') {
-            this.wifiInput.disabled = false;
-            this.mobileInput.disabled = false;
+            if (this.wifiInput) {
+                this.wifiInput.disabled = false;
+            }
+
+            if (this.mobileInput) {
+                this.mobileInput.disabled = false;
+            }
 
             if (values.length !== 3) {
                 return;
@@ -177,8 +184,14 @@ module.exports = class Network extends OverlayPlugin {
                 this.mobileInputChecked = mobileOn[2] === 'on';
             }
 
-            this.wifiInput.checked = this.wifiInputChecked;
-            this.mobileInput.checked = this.mobileInputChecked;
+            if (this.wifiInput) {
+                this.wifiInput.checked = this.wifiInputChecked;
+            }
+
+            if (this.mobileInput) {
+                this.mobileInput.checked = this.mobileInputChecked;
+            }
+
             this.updateMobileSectionStatus();
         }
     }
@@ -441,8 +454,13 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     updateMobileSectionStatus() {
-        this.selectMobileProfile.disabled = !this.mobileInput.checked;
-        this.selectMobileSignalStrength.disabled = !this.mobileInput.checked;
+        if (this.selectMobileProfile) {
+            this.selectMobileProfile.disabled = !this.mobileInput.checked;
+        }
+
+        if (this.selectMobileSignalStrength) {
+            this.selectMobileSignalStrength.disabled = !this.mobileInput.checked;
+        }
     }
 
     /**

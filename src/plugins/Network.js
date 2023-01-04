@@ -153,11 +153,7 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     disable5G() {
-        if (this.mobilethrottling === true) {
-            const profile = MOBILE_PROFILES.at(0);
-            const option = new Option(profile.label, profile.name);
-            this.selectMobileProfile.remove(option);
-        }
+        // Nothing to do!
     }
 
     // Handle settings event to enable/disable wifi|mobile data

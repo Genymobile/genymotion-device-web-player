@@ -573,9 +573,6 @@ module.exports = class Network extends OverlayPlugin {
      * @param {string} reset  If true ignore value and set "".
      */
     updateDetail(detail, value, reset) {
-        if (!detail) {
-            return;
-        }
         if (reset) {
             this.fields[detail].innerHTML = '';
         } else {

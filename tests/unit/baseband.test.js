@@ -24,10 +24,10 @@ describe('BasebandRIL Plugin', () => {
         beforeEach(() => {
             instance = new Instance();
             new BasebandRIL(instance, {
-                NETWORK_TITLE: 'TEST NETWORK PLUGIN TITLE',
-                NETWORK_OPERATOR: 'TEST NETWORK PLUGIN NETWORK OPERATOR',
-                NETWORK_SIM_OPERATOR: 'TEST NETWORK PLUGIN SIM OPERATOR',
-                NETWORK_UPDATE: 'TEST NETWORK PLUGIN UPDATE'
+                BASEBAND_TITLE: 'TEST BASEBAND PLUGIN TITLE',
+                NETWORK_OPERATOR: 'TEST BASEBAND PLUGIN NETWORK OPERATOR',
+                NETWORK_SIM_OPERATOR: 'TEST BASEBAND PLUGIN SIM OPERATOR',
+                NETWORK_UPDATE: 'TEST BASEBAND PLUGIN UPDATE'
             }, true);
             plugin = document.getElementsByClassName('gm-baseband-plugin')[0];
         });
@@ -40,10 +40,10 @@ describe('BasebandRIL Plugin', () => {
         });
 
         test('has translations', () => {
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST NETWORK PLUGIN TITLE'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST NETWORK PLUGIN NETWORK OPERATOR'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST NETWORK PLUGIN SIM OPERATOR'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST NETWORK PLUGIN UPDATE'));
+            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BASEBAND PLUGIN TITLE'));
+            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BASEBAND PLUGIN NETWORK OPERATOR'));
+            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BASEBAND PLUGIN SIM OPERATOR'));
+            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BASEBAND PLUGIN UPDATE'));
         });
     });
 

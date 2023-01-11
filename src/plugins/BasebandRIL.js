@@ -32,7 +32,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
 
         // Listen for baseband messages: "<sim/network> <operator/operator_name/imsi_id/phone_number> <value>"
         this.instance.registerEventCallback('baseband', (message) => {
-            this.HandleBasebandEvent(message);
+            this.handleBasebandEvent(message);
         });
     }
 
@@ -41,7 +41,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
      *
      * @param {String} message the received message.
      */
-    HandleBasebandEvent(message) {
+    handleBasebandEvent(message) {
         const values = message.split(' ');
         if (values.length < 3) {
             return;
@@ -80,7 +80,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-sim-button';
-        this.toolbarBtnImage.title = this.i18n.NETWORK_TITLE || 'Baseband';
+        this.toolbarBtnImage.title = this.i18n.BASEBAND_TITLE || 'Baseband';
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         this.toolbarBtn.onclick = this.toggleWidget.bind(this);
         toolbar.appendChild(this.toolbarBtn);
@@ -97,7 +97,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         // Generate title
         const title = document.createElement('div');
         title.className = 'gm-title';
-        title.innerHTML = this.i18n.NETWORK_TITLE || 'Baseband';
+        title.innerHTML = this.i18n.BASEBAND_TITLE || 'Baseband';
         this.form.appendChild(title);
 
         if (this.basebandEnabled) {

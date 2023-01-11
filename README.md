@@ -388,10 +388,10 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 <img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
 
 - **Type:** `Boolean`
-- **Default:** `true`
-- **Compatibility:** `PaaS`, `SaaS`
+- **Default:** `false`
+- **Compatibility:** `PaaS`
 - **Details:**
-Enables or disables the baseband widget. This widget can be used to set some baseband properties.
+Enable or disable baseband (MMC/MNC) widget.
 
 ### `diskIO`
 
@@ -412,16 +412,6 @@ Enables or disables the diskIO widget. This widget can be used to modify Disk IO
 - **Details:**
 Translate home key to `META` + `ENTER`
 
-
-### `baseband`
-
-<img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
-
-- **Type:** `Boolean`
-- **Default:** `false`
-- **Compatibility:** `PaaS`
-- **Details:**
-Enable or disable baseband (MMC/MNC) widget
 
 ### `connectionFailedURL`
 

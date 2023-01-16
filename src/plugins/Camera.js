@@ -46,7 +46,7 @@ module.exports = class Camera extends OverlayPlugin {
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-camera-button';
-        this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Use webcam as camera';
+        this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera and microphone injection';
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         toolbar.appendChild(this.toolbarBtn);
 

@@ -276,7 +276,7 @@ Enables or disables the fullscreen widget. This widget can be used to make the p
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the camera widget. This widget can be used to forward local webcam to the Android virtual device.
+Enables or disables the camera widget. This widget can be used to forward local webcam and microphone to the Android virtual device.
 
 ### `fileUpload`
 

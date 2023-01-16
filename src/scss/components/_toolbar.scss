@@ -80,6 +80,13 @@
       }
     }
 
+    &-camera-mic-button {
+      background-image: url("../assets/images/ic_camera_mic_inactive.svg");
+      &:hover {
+        background-image: url("../assets/images/ic_camera_mic_active.svg");
+      }
+    }
+
     &-streamres-button {
       background-image: url("../assets/images/ic-resolution_inactive.svg");
       background-color: transparent;

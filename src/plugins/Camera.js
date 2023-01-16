@@ -45,8 +45,13 @@ module.exports = class Camera extends OverlayPlugin {
         const toolbar = toolbars.children[0];
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-camera-button';
-        this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera and microphone injection';
+        if (this.instance.options.microphone) {
+            this.toolbarBtnImage.className = 'gm-icon-button gm-camera-mic-button';
+            this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera and microphone injection';
+        } else {
+            this.toolbarBtnImage.className = 'gm-icon-button gm-camera-button';
+            this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera injection';
+        }
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         toolbar.appendChild(this.toolbarBtn);
 

@@ -278,6 +278,18 @@ Enables or disables the fullscreen widget. This widget can be used to make the p
 - **Details:**
 Enables or disables the camera widget. This widget can be used to forward local webcam to the Android virtual device.
 
+### `microphone`
+
+<img align="right" src="./doc/assets/ic_camera_mic_active_black.svg" alt="..."></img>
+
+- **Type:** `Boolean`
+- **Default:** `false`
+- **Compatibility:** `PaaS`
+- **Details:**
+Enables or disables microphone injection. This can be used to forward local microphone to the Android virtual device.
+This option is only taken into account when `options.camera` is `true`. In this case, the camera widget enables
+both camera and microphone injection.
+
 ### `fileUpload`
 
 <img align="right" src="./doc/assets/ic_cloud_upload_active_black.svg" alt="..."></img>

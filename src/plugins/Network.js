@@ -68,6 +68,7 @@ module.exports = class Network extends OverlayPlugin {
         wifiGroup.className = 'gm-checkbox-group';
         this.wifiInput.type = 'checkbox';
         this.wifiInput.className = 'gm-checkbox';
+        this.wifiInput.name = 'wifi-checkbox';
         this.wifiInput.onchange = this.toggleWifiState.bind(this);
         this.wifiInput.checked = this.wifiInputChecked;
         this.wifiStatus.className = 'gm-checkbox-label';
@@ -84,6 +85,7 @@ module.exports = class Network extends OverlayPlugin {
         mobileGroup.className = 'gm-checkbox-group';
         this.mobileInput.type = 'checkbox';
         this.mobileInput.className = 'gm-checkbox';
+        this.mobileInput.name = 'mobile-checkbox';
         this.mobileInput.onchange = this.toggleMobileState.bind(this);
         this.mobileInput.checked = this.mobileInputChecked;
         this.mobileStatus.className = 'gm-checkbox-label';
@@ -99,6 +101,7 @@ module.exports = class Network extends OverlayPlugin {
 
         this.profileInputs.appendChild(networkTypeInputLabel);
         this.selectMobileProfile = document.createElement('select');
+        this.selectMobileProfile.name = 'select-mobile-profile';
         this.selectMobileProfile.onchange = this.changeMobileProfile.bind(this);
         // Add option for each child
         MOBILE_PROFILES.slice().reverse()
@@ -119,6 +122,7 @@ module.exports = class Network extends OverlayPlugin {
         this.inputMobileSignalStrength.appendChild(signalStrengthInputLabel);
 
         this.selectMobileSignalStrength = document.createElement('select');
+        this.selectMobileSignalStrength.name = 'select-mobile-signal-strength';
         this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
         this.inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
         // Add option for each child
@@ -136,6 +140,7 @@ module.exports = class Network extends OverlayPlugin {
 
         // Generate input rows for network profiles
         this.selectProfile = document.createElement('select');
+        this.selectProfile.name = 'select-profile';
         const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
         this.selectProfile.add(defaultOption);
         this.selectProfile.onchange = this.changeProfile.bind(this);

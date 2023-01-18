@@ -370,7 +370,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the network widget. This widget can be used to set the network (throttling and baseband) of the Android virtual device.
+Enables or disables the network widget. This widget can be used to enable or disable the wifi or mobile network, and to set the network throttling (mobile network type and signal strength) of the Android virtual device.
 
 ### `phone`
 
@@ -382,6 +382,16 @@ Enables or disables the network widget. This widget can be used to set the netwo
 - **Details:**
 
 Enables or disables the phone widget. This widget can be used to send SMS or phone call the Android virtual device.
+
+### `Baseband`
+
+<img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
+
+- **Type:** `Boolean`
+- **Default:** `false`
+- **Compatibility:** `PaaS`
+- **Details:**
+Enable or disable baseband (MMC/MNC) widget.
 
 ### `diskIO`
 
@@ -402,16 +412,6 @@ Enables or disables the diskIO widget. This widget can be used to modify Disk IO
 - **Details:**
 Translate home key to `META` + `ENTER`
 
-
-### `baseband`
-
-<img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
-
-- **Type:** `Boolean`
-- **Default:** `false`
-- **Compatibility:** `PaaS`
-- **Details:**
-Enable or disable baseband (MMC/MNC) widget
 
 ### `connectionFailedURL`
 

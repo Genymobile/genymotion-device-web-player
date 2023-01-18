@@ -7,7 +7,7 @@
         "jest": true
     },
     "parserOptions": {
-        "ecmaVersion": 6
+        "ecmaVersion": 2020
     },
     "rules": {
         // Possible errors

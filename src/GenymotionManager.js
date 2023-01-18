@@ -20,6 +20,7 @@ const Screencast = require('./plugins/Screencast');
 const Identifiers = require('./plugins/Identifiers');
 const Network = require('./plugins/Network');
 const Phone = require('./plugins/Phone');
+const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 
@@ -52,6 +53,7 @@ const defaultOptions = {
     capture: true,
     identifiers: true,
     network: true,
+    mobilethrottling: false,
     baseband: false,
     phone: true,
     streamResolution: true,
@@ -113,6 +115,7 @@ module.exports = class GenymotionManager {
      * @param  {boolean}            options.capture                Screen capture support activated. Default: true.
      * @param  {boolean}            options.identifiers            Identifiers (IMEI, etc...) support activated. Default: true.
      * @param  {boolean}            options.network                Network throttling support activated. Default: true.
+     * @param  {boolean}            options.mobilethrottling       Mobile throttling support activated. Default: false.
      * @param  {boolean}            options.baseband               Baseband controll support activated. Default: false.
      * @param  {boolean}            options.phone                  Baseband support activated. Default: true.
      * @param  {boolean}            options.streamResolution       Stream resolution control support activated. Default: true.
@@ -212,8 +215,9 @@ module.exports = class GenymotionManager {
             {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
             {enabled: options.capture, class: Screencast, params: [options.i18n]},
             {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n, options.baseband]},
+            {enabled: options.network, class: Network, params: [options.i18n]},
             {enabled: options.phone, class: Phone, params: [options.i18n]},
+            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},

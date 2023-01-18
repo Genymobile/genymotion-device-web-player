@@ -1,8 +1,13 @@
 'use strict';
 
+const log = require('loglevel');
+log.setDefaultLevel('debug');
+
 const OverlayPlugin = require('./util/OverlayPlugin');
 
 const PROFILES = require('./util/network-profiles');
+const MOBILE_PROFILES = require('./util/network-mobile-profiles');
+const MOBILE_SIGNAL_STRENGTH = require('./util/mobile-signal-strength');
 
 /**
  * Instance network plugin.
@@ -12,11 +17,10 @@ module.exports = class Network extends OverlayPlugin {
     /**
      * Plugin initialization.
      *
-     * @param {Object}  instance        Associated instance.
-     * @param {Object}  i18n            Translations keys for the UI.
-     * @param {boolean} basebandEnabled Whether or not baseband control is enabled.
+     * @param {Object}  instance          Associated instance.
+     * @param {Object}  i18n              Translations keys for the UI.
      */
-    constructor(instance, i18n, basebandEnabled) {
+    constructor(instance, i18n) {
         super(instance);
 
         // Reference instance
@@ -25,14 +29,19 @@ module.exports = class Network extends OverlayPlugin {
         // Register plugin
         this.instance.network = this;
         this.i18n = i18n || {};
+        this.mobilethrottling = false;
 
         this.fields = {};
-
-        this.basebandEnabled = basebandEnabled;
 
         // Render components
         this.renderToolbarButton();
         this.renderWidget();
+
+        this.wifiInputChecked = true;
+        this.mobileInputChecked = true;
+
+        // Listen for settings messages: "parameter <android_version:<version>"
+        this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network
         this.instance.registerEventCallback('NETWORK', this.setActive.bind(this));
@@ -47,26 +56,193 @@ module.exports = class Network extends OverlayPlugin {
          *            down_pkt_loss:<enabled/disabled>:<value>
          *            dns_delay:<enabled/disabled>:<value>
          */
-        this.instance.registerEventCallback('network_profile', (message) => {
-            const values = message.split(' ');
-            if (values.length < 9) {
+        this.instance.registerEventCallback('network_profile', this.handleNetworkProfile.bind(this));
+    }
+
+    enableMobileThrottling() {
+        this.mobilethrottling = true;
+        // Add wifi checkbox
+        const wifiGroup = document.createElement('div');
+        this.wifiInput = document.createElement('input');
+        this.wifiStatus = document.createElement('div');
+        wifiGroup.className = 'gm-checkbox-group';
+        this.wifiInput.type = 'checkbox';
+        this.wifiInput.className = 'gm-checkbox';
+        this.wifiInput.name = 'wifi-checkbox';
+        this.wifiInput.onchange = this.toggleWifiState.bind(this);
+        this.wifiInput.checked = this.wifiInputChecked;
+        this.wifiStatus.className = 'gm-checkbox-label';
+        this.wifiStatus.innerHTML = 'Wifi';
+        wifiGroup.appendChild(this.wifiInput);
+        wifiGroup.appendChild(this.wifiStatus);
+        this.wifiGroupSection.className = 'gm-section';
+        this.wifiGroupSection.appendChild(wifiGroup);
+
+        // Add mobile checkbox
+        const mobileGroup = document.createElement('div');
+        this.mobileInput = document.createElement('input');
+        this.mobileStatus = document.createElement('div');
+        mobileGroup.className = 'gm-checkbox-group';
+        this.mobileInput.type = 'checkbox';
+        this.mobileInput.className = 'gm-checkbox';
+        this.mobileInput.name = 'mobile-checkbox';
+        this.mobileInput.onchange = this.toggleMobileState.bind(this);
+        this.mobileInput.checked = this.mobileInputChecked;
+        this.mobileStatus.className = 'gm-checkbox-label';
+        this.mobileStatus.innerHTML = 'Mobile data';
+        mobileGroup.appendChild(this.mobileInput);
+        mobileGroup.appendChild(this.mobileStatus);
+        this.mobileGroupSection.appendChild(mobileGroup);
+
+        // Generate input rows for network mobile profiles
+        const networkTypeInputLabel = document.createElement('div');
+        networkTypeInputLabel.className = 'input_label';
+        networkTypeInputLabel.innerHTML = 'Network type:';
+
+        this.profileInputs.appendChild(networkTypeInputLabel);
+        this.selectMobileProfile = document.createElement('select');
+        this.selectMobileProfile.name = 'select-mobile-profile';
+        this.selectMobileProfile.onchange = this.changeMobileProfile.bind(this);
+        // Add option for each child
+        MOBILE_PROFILES.slice().reverse()
+            .forEach((profile) => {
+                // 5g is available only for version >= 10
+                if (profile.name === '5g') {
+                    return;
+                }
+                const option = new Option(profile.label, profile.name);
+                this.selectMobileProfile.add(option);
+            });
+        this.profileInputs.appendChild(this.selectMobileProfile);
+
+        // Generate input rows for signal strength
+        const signalStrengthInputLabel = document.createElement('div');
+        signalStrengthInputLabel.className = 'input_label';
+        signalStrengthInputLabel.innerHTML = 'Signal strength:';
+        this.inputMobileSignalStrength.appendChild(signalStrengthInputLabel);
+
+        this.selectMobileSignalStrength = document.createElement('select');
+        this.selectMobileSignalStrength.name = 'select-mobile-signal-strength';
+        this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
+        this.inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
+        // Add option for each child
+        MOBILE_SIGNAL_STRENGTH.slice().reverse()
+            .forEach((strength) => {
+                const option = new Option(strength.label, strength.name);
+                this.selectMobileSignalStrength.add(option);
+            });
+
+        this.updateMobileSectionStatus();
+    }
+
+    disableMobileThrottling() {
+        this.mobilethrottling = false;
+
+        // Generate input rows for network profiles
+        this.selectProfile = document.createElement('select');
+        this.selectProfile.name = 'select-profile';
+        const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
+        this.selectProfile.add(defaultOption);
+        this.selectProfile.onchange = this.changeProfile.bind(this);
+        // Add option for each child
+        PROFILES.slice().reverse()
+            .forEach((profile) => {
+                const option = new Option(profile.label, profile.name);
+                this.selectProfile.add(option);
+            });
+        this.profileInputs.appendChild(this.selectProfile);
+    }
+
+    enable5G() {
+        const profile = MOBILE_PROFILES.at(0);
+        const option = new Option(profile.label, profile.name);
+        this.selectMobileProfile.add(option);
+    }
+
+    disable5G() {
+        // Nothing to do!
+    }
+
+    // Handle settings event to enable/disable wifi|mobile data
+    handleSettings(message) {
+        const values = message.split(' ');
+
+        if (values[0] === 'if') {
+            if (this.wifiInput) {
+                this.wifiInput.disabled = false;
+            }
+
+            if (this.mobileInput) {
+                this.mobileInput.disabled = false;
+            }
+
+            if (values.length !== 3) {
                 return;
             }
-            const upSpeed = values[2].split(':');
-            const downSpeed = values[3].split(':');
-            const upDelay = values[4].split(':');
-            const downDelay = values[5].split(':');
-            const upPacketLoss = values[6].split(':');
-            const downPacketLoss = values[7].split(':');
-            const dnsDelay = values[8].split(':');
 
-            const isThrottlingEnabled = upSpeed[1] === 'enabled'
-                && downSpeed[1] === 'enabled'
-                && upDelay[1] === 'enabled'
-                && downDelay[1] === 'enabled'
-                && upPacketLoss[1] === 'enabled'
-                && downPacketLoss[1] === 'enabled'
-                && dnsDelay[1] === 'enabled';
+            const wifiOn = values[1].match(/(wifi:)(\w+)/);
+            if (wifiOn) {
+                this.wifiInputChecked = wifiOn[2] === 'on';
+            }
+            const mobileOn = values[2].match(/(mobile:)(\w+)/);
+            if (mobileOn) {
+                this.mobileInputChecked = mobileOn[2] === 'on';
+            }
+
+            if (this.wifiInput) {
+                this.wifiInput.checked = this.wifiInputChecked;
+            }
+
+            if (this.mobileInput) {
+                this.mobileInput.checked = this.mobileInputChecked;
+            }
+
+            this.updateMobileSectionStatus();
+        }
+    }
+
+    // Update network details (downSpeed, downDelay...) according to the selected network type.
+    handleNetworkProfile(message) {
+        const values = message.split(' ');
+        if (!this.mobilethrottling && (values.length < 9 || values[1] === 'phone')) {
+            return;
+        } else if (this.mobilethrottling && (values.length < 11 || values[1] === 'wifi')) {
+            return;
+        }
+        const upSpeed = values[2].split(':');
+        const downSpeed = values[3].split(':');
+        const upDelay = values[4].split(':');
+        const downDelay = values[5].split(':');
+        const upPacketLoss = values[6].split(':');
+        const downPacketLoss = values[7].split(':');
+        const dnsDelay = values[8].split(':');
+
+        if (this.mobilethrottling) {
+            const mobileProfile = values[9].split(':');
+            const signalStrength = values[10].split(':');
+
+            this.setActiveMobileProfile(mobileProfile[1]);
+            this.setActiveSignalStrength(signalStrength[1]);
+            this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upSpeed', upSpeed[2] + 'b/s', upSpeed[1] === 'disabled' || !this.mobileInput.checked);
+            this.updateDetail('downDelay', downDelay[2] + ' s', downDelay[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || !this.mobileInput.checked);
+            this.updateDetail('downPacketLoss', downPacketLoss[2] + ' %', downPacketLoss[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('upPacketLoss', upPacketLoss[2] + ' %', upPacketLoss[1] === 'disabled'
+                || !this.mobileInput.checked);
+            this.updateDetail('dnsDelay', dnsDelay[2] + ' s', dnsDelay[1] === 'disabled' || !this.mobileInput.checked);
+        } else {
+            const isThrottlingEnabled =
+            upSpeed[1] === 'enabled'
+            && downSpeed[1] === 'enabled'
+            && upDelay[1] === 'enabled'
+            && downDelay[1] === 'enabled'
+            && upPacketLoss[1] === 'enabled'
+            && downPacketLoss[1] === 'enabled'
+            && dnsDelay[1] === 'enabled';
 
             const profile = PROFILES.find((elem) => {
                 return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
@@ -79,39 +255,11 @@ module.exports = class Network extends OverlayPlugin {
             });
 
             if (profile && isThrottlingEnabled) {
-                this.select.value = profile.name;
+                this.selectProfile.value = profile.name;
             } else {
-                this.select.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
+                this.selectProfile.value = this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile';
             }
-            this.changeProfile();
-        });
-
-        // Listen for baseband messages: "<sim/network> <operator/operator_name/imsi_id/phone_number> <value>"
-        this.instance.registerEventCallback('baseband', (message) => {
-            const values = message.split(' ');
-            if (values.length < 3) {
-                return;
-            }
-
-            if (values[0] === 'network' && values[1] === 'operator') {
-                this.networkOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'network' && values[1] === 'operator_name') {
-                this.networkOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'operator') {
-                this.simOperatorMMC.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'operator_name') {
-                this.simOperatorName.value = values.slice(2).join(' ');
-            }
-            if (values[0] === 'sim' && values[1] === 'imsi_id') {
-                this.simMSIN.value = values[2];
-            }
-            if (values[0] === 'sim' && values[1] === 'phone_number') {
-                this.simOperatorPhoneNumber.value = values[2];
-            }
-        });
+        }
     }
 
     /**
@@ -127,7 +275,7 @@ module.exports = class Network extends OverlayPlugin {
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-network-button';
-        this.toolbarBtnImage.title = this.i18n.NETWORK_TITLE || 'Network & Baseband';
+        this.toolbarBtnImage.title = this.i18n.NETWORK_TITLE || 'Network';
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         this.toolbarBtn.onclick = this.toggleWidget.bind(this);
         toolbar.appendChild(this.toolbarBtn);
@@ -144,26 +292,26 @@ module.exports = class Network extends OverlayPlugin {
         // Generate title
         const title = document.createElement('div');
         title.className = 'gm-title';
-        title.innerHTML = this.i18n.NETWORK_TITLE || 'Network & Baseband';
+        title.innerHTML = this.i18n.NETWORK_TITLE || 'Network';
         this.form.appendChild(title);
 
-        // Generate input rows
-        const inputs = document.createElement('div');
-        inputs.className = 'gm-inputs';
+        // generate wifi checkbox
+        this.wifiGroupSection = document.createElement('div');
+        this.form.appendChild(this.wifiGroupSection);
 
-        // Create select
-        this.select = document.createElement('select');
-        const defaultOption = new Option(this.i18n.NETWORK_DELECT_PROFILE || 'Select a profile');
-        this.select.add(defaultOption);
-        this.select.onchange = this.changeProfile.bind(this);
-        inputs.appendChild(this.select);
+        // generate mobile checkbox
+        this.mobileGroupSection = document.createElement('div');
+        this.form.appendChild(this.mobileGroupSection);
 
-        // Add option for each child
-        PROFILES.slice().reverse()
-            .forEach((profile) => {
-                const option = new Option(profile.label, profile.name);
-                this.select.add(option);
-            });
+        // Generate input rows for network profiles
+        this.profileInputs = document.createElement('div');
+        this.profileInputs.className = 'gm-inputs';
+        this.form.appendChild(this.profileInputs);
+
+        // Mobile Signal Strength
+        this.inputMobileSignalStrength = document.createElement('div');
+        this.inputMobileSignalStrength.className = 'gm-inputs';
+        this.form.appendChild(this.inputMobileSignalStrength);
 
         // Create detail section
         this.profileDetails = document.createElement('div');
@@ -178,120 +326,7 @@ module.exports = class Network extends OverlayPlugin {
         this.profileDetails.appendChild(this.createDetailsSection('Upload packet loss', 'upPacketLoss'));
         this.profileDetails.appendChild(this.createDetailsSection('DNS Delay', 'dnsDelay'));
 
-        if (this.basebandEnabled) {
-            this.networkOperator = document.createElement('div');
-
-            const networkOperatorLabelDiv = document.createElement('div');
-            networkOperatorLabelDiv.className = 'gm-section';
-            const networkOperatorLabel = document.createElement('label');
-            networkOperatorLabel.innerHTML = this.i18n.NETWORK_OPERATOR || 'Network Operator';
-            networkOperatorLabelDiv.appendChild(networkOperatorLabel);
-
-            const networkOperatorMMCDiv = document.createElement('div');
-            networkOperatorMMCDiv.className = 'gm-fields';
-            const networkOperatorMMCLabel = document.createElement('label');
-            networkOperatorMMCLabel.innerHTML = 'MCC/MNC';
-            this.networkOperatorMMC = document.createElement('input');
-            this.networkOperatorMMC.className = 'gm-network-network-mmc';
-            this.networkOperatorMMC.placeholder = 'eg: 20814';
-            this.networkOperatorMMC.pattern = '[0-9]{5,6}';
-            this.networkOperatorMMC.title = 'Operator MCC/MNC';
-            networkOperatorMMCDiv.appendChild(networkOperatorMMCLabel);
-            networkOperatorMMCDiv.appendChild(this.networkOperatorMMC);
-
-            const networkOperatorNameDiv = document.createElement('div');
-            networkOperatorNameDiv.className = 'gm-fields';
-            const networkOperatorNameLabel = document.createElement('label');
-            networkOperatorNameLabel.innerHTML = 'Name';
-            this.networkOperatorName = document.createElement('input');
-            this.networkOperatorName.className = 'gm-network-network-name';
-            this.networkOperatorName.placeholder = 'eg: Verizon';
-            this.networkOperatorName.title = 'Operator Name';
-            networkOperatorNameDiv.appendChild(networkOperatorNameLabel);
-            networkOperatorNameDiv.appendChild(this.networkOperatorName);
-
-            this.networkOperator.appendChild(networkOperatorLabelDiv);
-            this.networkOperator.appendChild(networkOperatorMMCDiv);
-            this.networkOperator.appendChild(networkOperatorNameDiv);
-
-            this.simOperator = document.createElement('div');
-
-            const simperatorLabelDiv = document.createElement('div');
-            simperatorLabelDiv.className = 'gm-section';
-            const simperatorLabel = document.createElement('label');
-            simperatorLabel.innerHTML = this.i18n.NETWORK_SIM_OPERATOR || 'SIM Operator';
-            simperatorLabelDiv.appendChild(simperatorLabel);
-
-            const simOperatorMMCDiv = document.createElement('div');
-            simOperatorMMCDiv.className = 'gm-fields';
-            const simOperatorMMCLabel = document.createElement('label');
-            simOperatorMMCLabel.innerHTML = 'MCC/MNC';
-            this.simOperatorMMC = document.createElement('input');
-            this.simOperatorMMC.className = 'gm-network-sim-mmc';
-            this.simOperatorMMC.placeholder = 'eg: 20814';
-            this.simOperatorMMC.pattern = '[0-9]{5,6}';
-            this.simOperatorMMC.title = 'SIM Operator MCC/MNC';
-            this.simOperatorMMC.addEventListener('keyup', this.checkSimImsiErrors.bind(this));
-            simOperatorMMCDiv.appendChild(simOperatorMMCLabel);
-            simOperatorMMCDiv.appendChild(this.simOperatorMMC);
-
-            const simOperatorNameDiv = document.createElement('div');
-            simOperatorNameDiv.className = 'gm-fields';
-            const simOperatorNameLabel = document.createElement('label');
-            simOperatorNameLabel.innerHTML = 'Name';
-            this.simOperatorName = document.createElement('input');
-            this.simOperatorName.className = 'gm-network-sim-name';
-            this.simOperatorName.placeholder = 'eg: AT&T';
-            this.simOperatorName.title = 'SIM Operator Name';
-            simOperatorNameDiv.appendChild(simOperatorNameLabel);
-            simOperatorNameDiv.appendChild(this.simOperatorName);
-
-            const simMSINDiv = document.createElement('div');
-            simMSINDiv.className = 'gm-fields';
-            const simMSINLabel = document.createElement('label');
-            simMSINLabel.innerHTML = 'MSIN';
-            this.simMSIN = document.createElement('input');
-            this.simMSIN.className = 'gm-network-sim-msin';
-            this.simMSIN.placeholder = 'eg: 2176510739';
-            this.simMSIN.pattern = '[0-9]{9,10}';
-            this.simMSIN.title = 'SIM MSIN';
-            this.simMSIN.addEventListener('keyup', this.checkSimImsiErrors.bind(this));
-            simMSINDiv.appendChild(simMSINLabel);
-            simMSINDiv.appendChild(this.simMSIN);
-
-            const simOperatorPhoneDiv = document.createElement('div');
-            simOperatorPhoneDiv.className = 'gm-fields';
-            const simOperatorPhoneLabel = document.createElement('label');
-            simOperatorPhoneLabel.innerHTML = 'Phone Number';
-            this.simOperatorPhoneNumber = document.createElement('input');
-            this.simOperatorPhoneNumber.className = 'gm-network-sim-phone';
-            this.simOperatorPhoneNumber.placeholder = 'eg: 8004337300';
-            this.simOperatorPhoneNumber.pattern = '[0-9]*';
-            this.simOperatorPhoneNumber.title = 'Phone Number';
-            simOperatorPhoneDiv.appendChild(simOperatorPhoneLabel);
-            simOperatorPhoneDiv.appendChild(this.simOperatorPhoneNumber);
-
-            this.simOperator.appendChild(simperatorLabelDiv);
-            this.simOperator.appendChild(simOperatorMMCDiv);
-            this.simOperator.appendChild(simMSINDiv);
-            this.simOperator.appendChild(simOperatorNameDiv);
-            this.simOperator.appendChild(simOperatorPhoneDiv);
-        }
-
-        // Add submit button
-        this.submitBtn = document.createElement('button');
-        this.submitBtn.className = 'gm-network-update';
-        this.submitBtn.innerHTML = this.i18n.NETWORK_UPDATE || 'Update';
-        this.submitBtn.onclick = this.sendDataToInstance.bind(this);
-
-        // Setup
-        this.form.appendChild(inputs);
         this.form.appendChild(this.profileDetails);
-        if (this.basebandEnabled) {
-            this.form.appendChild(this.networkOperator);
-            this.form.appendChild(this.simOperator);
-        }
-        this.form.appendChild(this.submitBtn);
 
         this.widget.className = 'gm-overlay gm-network-plugin gm-hidden';
 
@@ -326,37 +361,24 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     /**
-     * MSIN verification according to MCC/MNC length:
-     * - MCC/MNC is 5 digits => MSIN should be 10 digits
-     * - MCC/MNC is 6 digits => MSIN should be 9 digits
-     * Only do the check if both are not empty: we might set one and not the other
-     * (We can't handle the case where one was set previously and the other is now
-     * beeing configured.)
+     * Update form according to the selected profile.
      */
-    checkSimImsiErrors() {
-        this.simMSIN.setCustomValidity('');
-        if (this.simOperatorMMC.value.length > 0 && this.simMSIN.value.length > 0) {
-            if (this.simOperatorMMC.value.length === 6 && this.simMSIN.value.length !== 9) {
-                this.simMSIN.setCustomValidity('Should be 9');
-            } else if (this.simOperatorMMC.value.length === 5 && this.simMSIN.value.length !== 10) {
-                this.simMSIN.setCustomValidity('Should be 10');
-            }
+    changeProfile() {
+        const profile = PROFILES.find((elem) => elem.name === this.selectProfile.value);
+        if (profile) {
+            this.loadDetails(profile);
+            this.profileDetails.classList.remove('gm-hidden');
+            this.sendDataToInstance();
+        } else {
+            this.profileDetails.classList.add('gm-hidden');
         }
     }
 
     /**
      * Send information to instance.
-     *
-     * @param {Event} event Event.
      */
-    sendDataToInstance(event) {
-        event.preventDefault();
-
-        if (!this.form.checkValidity()) {
-            return;
-        }
-
-        const profile = PROFILES.find((elem) => elem.name === this.select.value);
+    sendDataToInstance() {
+        const profile = PROFILES.find((elem) => elem.name === this.selectProfile.value);
         if (profile) {
             const msgs = [];
             if (profile.id === 0) {
@@ -374,51 +396,75 @@ module.exports = class Network extends OverlayPlugin {
             const json = {channel: 'network_profile', messages: msgs};
             this.instance.sendEvent(json);
         }
-
-        const msgs = [];
-        if (this.basebandEnabled) {
-            if (this.networkOperatorMMC.value) {
-                msgs.push('network operator ' + this.networkOperatorMMC.value);
-            }
-            if (this.networkOperatorName.value) {
-                msgs.push('network operator_name ' + this.networkOperatorName.value);
-            }
-
-            if (this.simOperatorMMC.value) {
-                msgs.push('sim operator ' + this.simOperatorMMC.value);
-            }
-
-            if (this.simOperatorName.value) {
-                msgs.push('sim operator_name ' + this.simOperatorName.value);
-            }
-
-            if (this.simMSIN.value) {
-                msgs.push('sim imsi_id ' + this.simMSIN.value);
-            }
-
-            if (this.simOperatorPhoneNumber.value) {
-                msgs.push('sim phone_number ' + this.simOperatorPhoneNumber.value);
-            }
-
-            if (msgs.length > 0) {
-                const json = {channel: 'baseband', messages: msgs};
-                this.instance.sendEvent(json);
-            }
-        }
-
-        this.toggleWidget();
     }
 
     /**
      * Update form according to the selected profile.
      */
-    changeProfile() {
-        const profile = PROFILES.find((elem) => elem.name === this.select.value);
+    changeMobileProfile() {
+        const profile = MOBILE_PROFILES.find((elem) => elem.name === this.selectMobileProfile.value);
         if (profile) {
-            this.loadDetails(profile);
-            this.profileDetails.classList.remove('gm-hidden');
+            const msgs = [];
+            msgs.push('setprofile mobile ' + profile.name);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         } else {
-            this.profileDetails.classList.add('gm-hidden');
+            log.error('Selected profile not found');
+        }
+    }
+
+    changeMobileSignalStrength() {
+        const signalStrength = MOBILE_SIGNAL_STRENGTH.find(
+            (elem) => elem.name === this.selectMobileSignalStrength.value);
+        if (signalStrength) {
+            const msgs = [];
+            msgs.push('setsignalstrength mobile ' + signalStrength.name);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
+        } else {
+            log.error('Selected signalStrength not found');
+        }
+    }
+
+    toggleWifiState() {
+        // Wifi state changed
+        this.wifiInput.disabled = true;
+        const msgs = [];
+        if (this.wifiInput.checked) {
+            msgs.push('enableif wifi');
+        } else {
+            msgs.push('disableif wifi');
+        }
+
+        const json = {channel: 'settings', messages: msgs};
+        this.instance.sendEvent(json);
+    }
+
+    toggleMobileState() {
+        this.mobileInput.disabled = true;
+        this.updateMobileSectionStatus();
+
+        const msgs = [];
+        if (this.mobileInput.checked) {
+            msgs.push('enableif mobile');
+        } else {
+            msgs.push('disableif mobile');
+        }
+
+        const json1 = {channel: 'settings', messages: msgs};
+        this.instance.sendEvent(json1);
+
+        const json2 = {channel: 'network_profile', messages: ['notify phone']};
+        this.instance.sendEvent(json2);
+    }
+
+    updateMobileSectionStatus() {
+        if (this.selectMobileProfile) {
+            this.selectMobileProfile.disabled = !this.mobileInput.checked;
+        }
+
+        if (this.selectMobileSignalStrength) {
+            this.selectMobileSignalStrength.disabled = !this.mobileInput.checked;
         }
     }
 
@@ -463,13 +509,79 @@ module.exports = class Network extends OverlayPlugin {
             return;
         }
 
-        const options = this.select.getElementsByTagName('option');
+        const options = this.selectProfile.getElementsByTagName('option');
         for (let i = 0; i < options.length; i++) {
             const option = options[i];
             if (option.value === profile.name) {
                 option.selected = 'selected';
             }
         }
-        this.changeProfile();
+    }
+
+    /**
+     * Update mobile profile list UI according to the current active profile.
+     *
+     * @param {string} profile Profile name.
+     */
+    setActiveMobileProfile(profile) {
+        if (!profile) {
+            log.error('setActiveMobileProfile: Error : provided profile is empty');
+            return;
+        }
+        const mobileProfile = MOBILE_PROFILES.find((elem) => elem.name === profile);
+        if (!mobileProfile) {
+            log.error('setActiveMobileProfile: Error : unknown provided profile');
+            return;
+        }
+
+        const options = this.selectMobileProfile.getElementsByTagName('option');
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.value === mobileProfile.name) {
+                option.selected = 'selected';
+                break;
+            }
+        }
+    }
+
+    /**
+     * Update mobile signal strength list UI according to the current active strength.
+     *
+     * @param {string} strength Signal strength name.
+     */
+    setActiveSignalStrength(strength) {
+        if (!strength) {
+            log.error('setActiveSignalStrength: Error : provided strength is empty');
+            return;
+        }
+        const signalStrength = MOBILE_SIGNAL_STRENGTH.find((elem) => elem.name === strength);
+        if (!signalStrength) {
+            log.error('setActiveSignalStrength: Error : unknown provided strength');
+            return;
+        }
+
+        const options = this.selectMobileSignalStrength.getElementsByTagName('option');
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.value === signalStrength.name) {
+                option.selected = 'selected';
+                break;
+            }
+        }
+    }
+
+    /**
+     * Update mobile signal Detail information.
+     *
+     * @param {string} detail Signal detail to update.
+     * @param {string} value  New signal detail value.
+     * @param {string} reset  If true ignore value and set "".
+     */
+    updateDetail(detail, value, reset) {
+        if (reset) {
+            this.fields[detail].innerHTML = '';
+        } else {
+            this.fields[detail].innerHTML = value;
+        }
     }
 };

@@ -780,8 +780,29 @@ module.exports = class GenymotionInstance {
                 widget: this.network,
                 capability: data.message.network,
             }, {
+                widget: this.network,
+                capability: data.message.mobileThrottling,
+                enable: (widget) => {
+                    widget.enableMobileThrottling();
+                },
+                disable: (widget) => {
+                    widget.disableMobileThrottling();
+                },
+            }, {
+                widget: this.network,
+                capability: data.message.enable5G,
+                enable: (widget) => {
+                    widget.enable5G();
+                },
+                disable: (widget) => {
+                    widget.disable5G();
+                },
+            }, {
                 widget: this.phone,
                 capability: data.message.phone,
+            }, {
+                widget: this.baseband,
+                capability: data.message.baseband,
             }, {
                 widget: this.diskIO,
                 capability: data.message.diskIO,
@@ -811,7 +832,7 @@ module.exports = class GenymotionInstance {
                         } else {
                             feature.widget.disable();
                         }
-                    } else {
+                    } else if (feature.capability === true) {
                         if (feature.enable) {
                             feature.enable(feature.widget);
                         } else {

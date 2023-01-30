@@ -42,8 +42,8 @@ module.exports = class Network extends OverlayPlugin {
          * could be sent without rendering the widget from srach
          * to avoid recreation of widget elements, check this parameters before.
          */
-        this.mobileThrottlingManaged = false;
-        this.network5Gmanaged = false;
+        this.mobileThrottlingConfigured = false;
+        this.network5GConfigured = false;
 
         this.wifiInputChecked = true;
         this.mobileInputChecked = true;
@@ -68,7 +68,7 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     enableMobileThrottling() {
-        if (this.mobileThrottlingManaged) {
+        if (this.mobileThrottlingConfigured) {
             return;
         }
 
@@ -146,11 +146,11 @@ module.exports = class Network extends OverlayPlugin {
 
         this.updateMobileSectionStatus();
 
-        this.mobileThrottlingManaged = true;
+        this.mobileThrottlingConfigured = true;
     }
 
     disableMobileThrottling() {
-        if (this.mobileThrottlingManaged) {
+        if (this.mobileThrottlingConfigured) {
             return;
         }
 
@@ -170,11 +170,11 @@ module.exports = class Network extends OverlayPlugin {
             });
         this.profileInputs.appendChild(this.selectProfile);
 
-        this.mobileThrottlingManaged = true;
+        this.mobileThrottlingConfigured = true;
     }
 
     enable5G() {
-        if (this.network5Gmanaged) {
+        if (this.network5GConfigured) {
             return;
         }
 
@@ -182,15 +182,15 @@ module.exports = class Network extends OverlayPlugin {
         const option = new Option(profile.label, profile.name);
         this.selectMobileProfile.add(option);
 
-        this.network5Gmanaged = true;
+        this.network5GConfigured = true;
     }
 
     disable5G() {
-        if (this.network5Gmanaged) {
+        if (this.network5GConfigured) {
             return;
         }
 
-        this.network5Gmanaged = true;
+        this.network5GConfigured = true;
     }
 
     // Handle settings event to enable/disable wifi|mobile data

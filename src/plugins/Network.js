@@ -39,8 +39,8 @@ module.exports = class Network extends OverlayPlugin {
 
         /*
          * Redis message for enabling/disabling mobile throttling and 5G support
-         * could be sent without rendering the widget from srach
-         * to avoid recreation of widget elements, check this parameters before.
+         * could be sent without rendering the widget from scratch
+         * to avoid recreation of widget elements, check these parameters before.
          */
         this.mobileThrottlingConfigured = false;
         this.network5GConfigured = false;

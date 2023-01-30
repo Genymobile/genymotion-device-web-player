@@ -37,6 +37,14 @@ module.exports = class Network extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
+        /*
+         * Redis message for enabling/disabling mobile throttling and 5G support
+         * could be sent without rendering the widget from srach
+         * to avoid recreation of widget elements, check this parameters before.
+         */
+        this.mobileThrottlingManaged = false;
+        this.network5Gmanaged = false;
+
         this.wifiInputChecked = true;
         this.mobileInputChecked = true;
 
@@ -60,6 +68,10 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     enableMobileThrottling() {
+        if (this.mobileThrottlingManaged) {
+            return;
+        }
+
         this.mobilethrottling = true;
         // Add wifi checkbox
         const wifiGroup = document.createElement('div');
@@ -133,9 +145,15 @@ module.exports = class Network extends OverlayPlugin {
             });
 
         this.updateMobileSectionStatus();
+
+        this.mobileThrottlingManaged = true;
     }
 
     disableMobileThrottling() {
+        if (this.mobileThrottlingManaged) {
+            return;
+        }
+
         this.mobilethrottling = false;
 
         // Generate input rows for network profiles
@@ -151,16 +169,28 @@ module.exports = class Network extends OverlayPlugin {
                 this.selectProfile.add(option);
             });
         this.profileInputs.appendChild(this.selectProfile);
+
+        this.mobileThrottlingManaged = true;
     }
 
     enable5G() {
+        if (this.network5Gmanaged) {
+            return;
+        }
+
         const profile = MOBILE_PROFILES.at(0);
         const option = new Option(profile.label, profile.name);
         this.selectMobileProfile.add(option);
+
+        this.network5Gmanaged = true;
     }
 
     disable5G() {
-        // Nothing to do!
+        if (this.network5Gmanaged) {
+            return;
+        }
+
+        this.network5Gmanaged = true;
     }
 
     // Handle settings event to enable/disable wifi|mobile data

@@ -128,9 +128,10 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             options.turn.username          WebRTC TURN servers username.
      * @param  {string}             options.turn.credential        WebRTC TURN servers password.
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
+     * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
      * @return {DeviceRenderer}                                    The device renderer instance.
      */
-    setupRenderer(dom, webRTCUrl, options) {
+    setupRenderer(dom, webRTCUrl, options, RendererClass = DeviceRenderer) {
         if (typeof dom === 'string') {
             dom = document.getElementById(dom);
         }
@@ -151,7 +152,7 @@ module.exports = class DeviceRendererFactory {
         // Load template before creating the Device Renderer that is using HTML elements
         this.loadTemplate(dom, this.templates[options.template], options);
 
-        const instance = new DeviceRenderer(dom, options);
+        const instance = new RendererClass(dom, options);
         this.instances.push(instance);
 
         this.addPlugins(instance, instance.options);

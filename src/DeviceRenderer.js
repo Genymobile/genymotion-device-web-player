@@ -35,6 +35,7 @@ module.exports = class DeviceRenderer {
 
         // Websocket
         this.webRTCWebsocket = null;
+        this.webRTCWebsocketName = 'gm-webrtc';
         this.useWebsocketAsDataChannel = false;
 
         // DOM elements
@@ -172,7 +173,7 @@ module.exports = class DeviceRenderer {
             this.reconnecting = true;
         }
 
-        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl);
+        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl, this.webRTCWebsocketName);
         this.webRTCWebsocket.onopen = this.sendAuthenticationToken.bind(this);
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);

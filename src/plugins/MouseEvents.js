@@ -157,7 +157,7 @@ module.exports = class MouseEvents {
         this.instance.videoWrapper.addEventListener('mousedown', this.onMousePressEvent.bind(this), false);
         this.instance.videoWrapper.addEventListener('mouseup', this.onMouseReleaseEvent.bind(this), false);
         this.instance.videoWrapper.addEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('wheel', this.onMouseWheelEvent.bind(this), { passive: false });
+        this.instance.videoWrapper.addEventListener('wheel', this.onMouseWheelEvent.bind(this), {passive: false});
         this.instance.videoWrapper.addEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
     }
 

@@ -678,13 +678,18 @@ module.exports = class DeviceRenderer {
      * @param {RTCSessionDescription} description Peer connection session description.
      */
     setLocalDescription(description) {
-        // Munging SDP before setLocalDescription is not really standard compliant, but seems like
-        // the only way to make Chrome advertise it prefers stereo.
-        // Setting maxplaybackrate and maxaveragebitrate are not necessary, but they
-        // may improve audio quality by specifying HQ defaults.
-        for (const m of description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)) {
-            description.sdp = description.sdp.replace(new RegExp("a=fmtp:" + m[1], "g"), "a=fmtp:" + m[1] + " stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000");
-            break; // Only once
+        /*
+         * Munging SDP before setLocalDescription is not really standard compliant, but seems like
+         * the only way to make Chrome advertise it prefers stereo.
+         * Setting maxplaybackrate and maxaveragebitrate are not necessary, but they
+         * may improve audio quality by specifying HQ defaults.
+         */
+        const m = description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)[0];
+        if (m) {
+            description.sdp = description.sdp.replace(
+                new RegExp('a=fmtp:' + m[1], 'g'),
+                'a=fmtp:' + m[1] + ' stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000'
+            );
         }
         this.peerConnection.setLocalDescription(description);
         if (this.isWebsocketOpen(this.webRTCWebsocket)) {

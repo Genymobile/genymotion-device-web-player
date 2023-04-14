@@ -33,7 +33,7 @@ const util = require('gulp-util');
 
 const PATHS = {
     SRC: {
-        APP: 'DeviceRendererFactory.js',
+        APP: 'index.js',
         BASE: './src',
         WORKER: './src/worker',
         TEMPLATES: './src/templates',
@@ -118,7 +118,7 @@ gulp.task('app-templates', function() {
 function getBundler() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
-        standalone: 'DeviceRendererFactory',
+        standalone: 'index',
         debug: true
     }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }

@@ -53,7 +53,7 @@ npm install @genymotion/device-web-player
 Package import (commonJS):
 
 ```js
-const DeviceRendererFactory = require('genymotion/device-web-player');
+const {DeviceRendererFactory} = require('genymotion/device-web-player');
 ```
 
 ```html

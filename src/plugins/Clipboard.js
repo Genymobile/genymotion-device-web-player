@@ -83,21 +83,14 @@ module.exports = class Clipboard extends OverlayPlugin {
         // Generate title
         const title = document.createElement('div');
         title.className = 'gm-title';
-        title.innerHTML = this.i18n.CLIPBOARD_TITLE || 'Clipboard';
+        title.innerHTML = this.i18n.CLIPBOARD_TITLE || 'Device Clipboard';
         this.container.appendChild(title);
 
         this.clipboardInput = document.createElement('textarea');
         this.clipboardInput.className = 'gm-clipboard-input';
 
-        this.copiedText = document.createElement('div');
-        this.copiedText.innerHTML = this.i18n.CLIPBOARD_COPIED || 'Copied to local clipboard';
-        this.copiedText.classList.add('gm-text-copied');
-        this.copiedText.classList.add('gm-invisible');
-        this.copiedText.classList.add('gm-hidden');
-
         // Setup
         this.container.appendChild(this.clipboardInput);
-        this.container.appendChild(this.copiedText);
         this.widget.className = 'gm-overlay gm-clipboard-plugin gm-hidden';
 
         // Add close button
@@ -127,9 +120,6 @@ module.exports = class Clipboard extends OverlayPlugin {
             this.instance.emit('close-overlays');
             this.instance.emit('keyboard-disable');
             this.clipboardInput.value = this.clipboard;
-            if (this.clipboard !== '') {
-                setTimeout(this.copyInstanceClipboardToClient, 100, this.clipboardInput, this.copiedText);
-            }
         } else {
             this.instance.emit('keyboard-enable');
             this.widget.onclose();

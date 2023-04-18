@@ -27,7 +27,6 @@ describe('Clipboard Plugin', () => {
             instance = new Instance();
             clipboard = new Clipboard(instance, {
                 CLIPBOARD_TITLE: 'TEST CLIPBOARD PLUGIN TITLE',
-                CLIPBOARD_COPIED: 'TEST CLIPBOARD COPIED TO CLIPBOARD'
             });
             plugin = document.getElementsByClassName('gm-clipboard-plugin')[0];
         });
@@ -45,7 +44,6 @@ describe('Clipboard Plugin', () => {
 
         test('has translations', () => {
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST CLIPBOARD PLUGIN TITLE'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST CLIPBOARD COPIED TO CLIPBOARD'));
         });
 
         test('reflects internal clipboard state when displayed', () => {

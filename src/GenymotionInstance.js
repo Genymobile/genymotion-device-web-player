@@ -826,17 +826,18 @@ module.exports = class GenymotionInstance {
                 },
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
-                    if (feature.capability === false) {
-                        if (feature.disable) {
-                            feature.disable(feature.widget);
-                        } else {
-                            feature.widget.disable();
-                        }
-                    } else if (feature.capability === true) {
+                    if (feature.capability === true) {
                         if (feature.enable) {
                             feature.enable(feature.widget);
                         } else {
                             feature.widget.enable();
+                        }
+                    } else {
+                        // If feature.capability is not defined or false
+                        if (feature.disable) {
+                            feature.disable(feature.widget);
+                        } else {
+                            feature.widget.disable();
                         }
                     }
                 }

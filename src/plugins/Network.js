@@ -52,7 +52,7 @@ module.exports = class Network extends OverlayPlugin {
         this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network
-        this.instance.registerEventCallback('NETWORK', this.setActive.bind(this));
+        this.instance.registerEventCallback('NETWORK', this.setActiveProfile.bind(this));
 
         /*
          * Listen for network messages:
@@ -529,11 +529,11 @@ module.exports = class Network extends OverlayPlugin {
     }
 
     /**
-     * Update UI according to the current active profile.
+     * Update UI according to the current active profile in the device.
      *
      * @param {string} id Profile id.
      */
-    setActive(id) {
+    setActiveProfile(id) {
         const profile = PROFILES.find((elem) => elem.id === Number(id));
         if (!profile || !String(id).length) {
             return;
@@ -546,6 +546,7 @@ module.exports = class Network extends OverlayPlugin {
                 option.selected = 'selected';
             }
         }
+        this.loadDetails(profile);
     }
 
     /**

@@ -20,6 +20,7 @@ const Phone = require('./plugins/Phone');
 const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
+const GamepadManager = require('./plugins/GamepadManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -55,6 +56,7 @@ const defaultOptions = {
     phone: true,
     streamResolution: true,
     diskIO: true,
+    gamepad: false,
     translateHomeKey: false,
     token: '',
     i18n: {},
@@ -117,6 +119,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.phone                  Baseband support activated. Default: true.
      * @param  {boolean}            options.streamResolution       Stream resolution control support activated. Default: true.
      * @param  {boolean}            options.diskIO                 Disk I/O throttling support activated. Default: true.
+     * @param  {boolean}            options.gamepad                Experimental gamepad support activated. Default: false.
      * @param  {boolean}            options.translateHomeKey       Whether or not the HOME key button should be decompose to META + ENTER. Default: false.
      * @param  {string}             options.token                  Instance access token (JWT). Default: ''.
      * @param  {Object}             options.i18n                   Translations keys for the UI. Default: {}.
@@ -216,6 +219,7 @@ module.exports = class DeviceRendererFactory {
             {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
+            {enabled: options.gamepad, class: GamepadManager},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
         ];
 

@@ -5,6 +5,7 @@ const CoordinateUtils = require('./plugins/CoordinateUtils');
 const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
+const Gamepad = require('./plugins/Gamepad');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -35,6 +36,7 @@ module.exports = class DeviceRenderer {
         this.keyboardEventsEnabled = false;
         this.touchEventsEnabled = false;
         this.mouseEventsEnabled = false;
+        this.gamepadEventsEnabled = false;
 
         // Websocket
         this.webRTCWebsocket = null;
@@ -82,6 +84,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
+            {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -529,6 +532,10 @@ module.exports = class DeviceRenderer {
 
             if (this.keyboardEventsEnabled) {
                 this.keyboardEvents.addKeyboardCallbacks();
+            }
+
+            if (this.gamepadEventsEnabled) {
+                this.gamepadManager.addGamepadCallbacks();
             }
 
             const playWithSound = this.video.play(); // needed on Safari (web & iOs)

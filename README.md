@@ -415,6 +415,13 @@ Enable or disable baseband (MMC/MNC) widget.
 - **Details:**
 Enables or disables the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
 
+### `gamepad`
+
+- **Type:** `Boolean`
+- **Default:** `false`
+- **Compatibility:** `SaaS`, `PaaS`
+- **Details:**
+Enable or disable experimental gamepad support & widget
 
 ### `translateHomeKey`
 

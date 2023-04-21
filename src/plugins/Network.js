@@ -48,7 +48,7 @@ module.exports = class Network extends OverlayPlugin {
         this.wifiInputChecked = true;
         this.mobileInputChecked = true;
 
-        // Listen for settings messages: "parameter <android_version:<version>"
+        // Listen for settings messages: "if wifi:on|off mobile:on|off"
         this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
         // Listen for initial network

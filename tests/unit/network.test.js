@@ -50,7 +50,6 @@ describe('Network Plugin', () => {
 
     describe('incoming events', () => {
         beforeEach(() => {
-            network.androidVersion = 7;
             network.renderWidget();
         });
         test('NETWORK', () => {

@@ -50,8 +50,9 @@ describe('Network Plugin', () => {
 
     describe('incoming events', () => {
         beforeEach(() => {
-            network.androidVersion = 7;
-            network.renderWidget();
+            network = new Network(instance, {});
+            // render default widget
+            network.disableMobileThrottling();
         });
         test('NETWORK', () => {
             const loadDetails = jest.spyOn(network, 'loadDetails');
@@ -62,10 +63,8 @@ describe('Network Plugin', () => {
             });
 
             NetworkProfiles.forEach((profile) => {
-                expect(async() => {
-                    instance.emit('NETWORK', profile.id);
-                    expect(loadDetails).toHaveBeenCalledWith(NetworkProfiles[NetworkProfiles.length - 1 - profile.id]);
-                });
+                instance.emit('NETWORK', profile.id);
+                expect(loadDetails).toHaveBeenCalledWith(NetworkProfiles[NetworkProfiles.length - 1 - profile.id]);
                 loadDetails.mockReset();
             });
         });
@@ -123,6 +122,8 @@ describe('Network Plugin', () => {
     describe('outgoing events', () => {
         beforeEach(() => {
             network = new Network(instance, {});
+            // render default widget
+            network.disableMobileThrottling();
         });
         test('wifi', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
@@ -145,18 +146,17 @@ describe('Network Plugin', () => {
                     messages.push(`set wifi dns_delay ${profile.dnsDelay.value}`);
                 }
 
-                expect(async() => {
-                    network.setActive(profile.id);
-                    await expect(sendEventSpy).toHaveBeenCalledTimes(1);
-                    expect(instance.outgoingMessages[0]).toEqual({channel: 'network_profile', messages: messages});
-                });
+                // Emulate user selection on profile
+                network.selectProfile.value = profile.name;
+                network.changeProfile();
+                expect(sendEventSpy).toHaveBeenCalledTimes(1);
+                expect(instance.outgoingMessages[0]).toEqual({channel: 'network_profile', messages: messages});
             });
 
             sendEventSpy.mockClear();
-            expect(async() => {
-                network.select.value = 'Select a profile';
-                await expect(sendEventSpy).toHaveBeenCalledTimes(0);
-            });
+            network.selectProfile.value = 'Select a profile';
+            network.changeProfile();
+            expect(sendEventSpy).toHaveBeenCalledTimes(0);
         });
     });
 });

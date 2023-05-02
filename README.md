@@ -128,7 +128,7 @@ Defines the layout of the player. Can be one of the following: `bootstrap`, `ful
 - **Default:** `undefined`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [login api](https://developer.genymotion.com/saas/#section/Authentication).
+Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [login api](https://developer.genymotion.com/saas/#operation/login).
 
 ### `i18n`
 

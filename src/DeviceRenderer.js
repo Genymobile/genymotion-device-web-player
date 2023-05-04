@@ -463,11 +463,19 @@ module.exports = class DeviceRenderer {
 
         const iceServers = [];
 
-        if (Object.keys(this.options.stun).length > 0) {
+        if (Array.isArray(this.options.stun)) {
+            this.options.stun.forEach((stunServer) => {
+                iceServers.push(stunServer);
+            });
+        } else if (Object.keys(this.options.stun).length > 0) {
             iceServers.push(this.options.stun);
         }
 
-        if (Object.keys(this.options.turn).length > 0) {
+        if (Array.isArray(this.options.turn)) {
+            this.options.turn.forEach((turnServer) => {
+                iceServers.push(turnServer);
+            });
+        } else if (Object.keys(this.options.turn).length > 0) {
             iceServers.push(this.options.turn);
         }
 

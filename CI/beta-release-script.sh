@@ -1,3 +1,5 @@
+#!/bin/bash -x
+
 cat <<EOF > /tmp/version.py
 
 import json

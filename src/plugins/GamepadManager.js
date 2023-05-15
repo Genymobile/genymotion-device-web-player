@@ -491,8 +491,8 @@ module.exports = class GamepadManager {
             if (information) {
                 gamepad.name = information[1];
                 gamepad.vendor = information[2];
-                gamepad.vendorID = Number('0x' + information[3]);
-                gamepad.productID = Number('0x' + information[4]);
+                gamepad.vendorID = Number('0x' + information[information.length-2]);
+                gamepad.productID = Number('0x' + information[information.length-1]);
             }
         }
         const gamepadInfos = this.instance.gamepadManager.getInfosFromID(gamepad.vendorID, gamepad.productID);

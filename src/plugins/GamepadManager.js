@@ -1,5 +1,8 @@
 'use strict';
 
+const log = require('loglevel');
+log.setDefaultLevel('debug');
+
 const dpadUp = 0x1 << 0; // State if the UP button of the DPAD is pressed.
 const dpadDown = 0x1 << 1; // State if the DOWN button of the DPAD is pressed.
 const dpadLeft = 0x1 << 2; // State if the LEFT button of the DPAD is pressed.
@@ -531,6 +534,8 @@ module.exports = class GamepadManager {
             } else if (actuator.pulse) {
                 actuator.pulse(strong, 200);
             }
+        } else {
+            log.error(`vibration unsupported for controller ${remoteIndex}`);
         }
     }
 };

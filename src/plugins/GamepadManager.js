@@ -14,6 +14,7 @@ module.exports = class GamepadManager {
         this.instance = instance;
         this.instance.gamepadManager = this;
         this.instance.gamepadEventsEnabled = true;
+        this.isRunning = false;
 
         this.gamepadInfos = [
             ['GPD Win 2 X-Box Controller', ControllerType.Xbox360, 0x0079, 0x18d4],
@@ -346,7 +347,9 @@ module.exports = class GamepadManager {
      */
     listenForInputs(localIndex, remoteIndex) {
         this.currentGamepads[localIndex] = {remoteIndex: remoteIndex, buttons: []};
-        this.loop();
+        if (!this.isRunning) {
+            this.loop();
+        }
     }
 
     /**
@@ -391,8 +394,10 @@ module.exports = class GamepadManager {
      */
     loop() {
         if (this.currentGamepads.length === 0) {
+            this.isRunning = false;
             return;
         }
+        this.isRunning = true;
         const rawGamepads = this.getRawGamepads();
         for (const gamepad of rawGamepads) {
             if (gamepad && this.currentGamepads[gamepad.index]) {

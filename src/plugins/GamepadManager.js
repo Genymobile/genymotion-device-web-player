@@ -3,11 +3,6 @@
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
-const dpadUp = 0x1 << 0; // State if the UP button of the DPAD is pressed.
-const dpadDown = 0x1 << 1; // State if the DOWN button of the DPAD is pressed.
-const dpadLeft = 0x1 << 2; // State if the LEFT button of the DPAD is pressed.
-const dpadRight = 0x1 << 3; // State if the RIGHT button of the DPAD is pressed.
-
 const ControllerType = Object.freeze({
     Xbox360: Symbol('Xbox360'),
     XboxOne: Symbol('XboxOne'),
@@ -440,21 +435,6 @@ module.exports = class GamepadManager {
                         }
                     });
                     window.dispatchEvent(axisEvent);
-                }
-
-                const dpadValue = (gamepad.buttons[12].pressed ? dpadUp : 0) |
-                    (gamepad.buttons[13].pressed ? dpadDown : 0) |
-                    (gamepad.buttons[14].pressed ? dpadLeft : 0) |
-                    (gamepad.buttons[15].pressed ? dpadRight : 0);
-                if (dpadValue !== this.currentGamepads[gamepad.index].lastDpadValue) {
-                    const dpadEvent = new CustomEvent('gm-gamepadDpad', {
-                        detail: {
-                            gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
-                            value: dpadValue,
-                        }
-                    });
-                    window.dispatchEvent(dpadEvent);
-                    this.currentGamepads[gamepad.index].lastDpadValue = dpadValue;
                 }
             }
         }

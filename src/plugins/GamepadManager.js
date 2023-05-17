@@ -262,7 +262,12 @@ module.exports = class GamepadManager {
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
+        const parsedGamepad = this.parseGamepad(event.gamepad);
+        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: parsedGamepad});
+        if (event.gamepad.mapping === '') {
+            log.error(`Unsupported gamepad mapping for gamepad ${parsedGamepad.name}`);
+            return;
+        }
         window.dispatchEvent(customEvent);
     }
 

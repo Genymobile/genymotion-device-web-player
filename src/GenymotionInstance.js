@@ -802,7 +802,7 @@ module.exports = class GenymotionInstance {
                 capability: data.message.phone,
             }, {
                 widget: this.baseband,
-                capability: data.message.baseband,
+                capability: data.message.phone,
             }, {
                 widget: this.diskIO,
                 capability: data.message.diskIO,

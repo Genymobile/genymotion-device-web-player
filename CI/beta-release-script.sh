@@ -1,6 +1,8 @@
 #!/bin/bash -x
 
-cat <<EOF > /tmp/version.py
+SCRIPT_PATH="/tmp/version.py"
+
+cat <<EOF > $SCRIPT_PATH
 
 import json
 import sys
@@ -13,9 +15,8 @@ with open("./package.json", "r") as package:
 
 EOF
 
-VERSION=$(python3 /tmp/version.py)
-sed -r -i "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/g" bower.json
-sed -r -i "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/g" package.json
+VERSION=$(python3  $SCRIPT_PATH)
+sed -r -i "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/g" bower.json package.json
 sed -r -i "s/device-web-player\@.+\/dist/device-web-player@$VERSION\/dist/g" README.md
 
 FILENAME="beta-device-web-player-$VERSION.tar.gz"
@@ -43,7 +44,7 @@ git add --force dist
 git checkout $GIT_BRANCH LICENSE
 git checkout $GIT_BRANCH package.json
 
-git commit -m "add yarn tar.gz"
+git commit -m "[DONOTMERGE] add yarn tar.gz"
 git push origin $BRANCH_NAME --force
 
 REPO_URL=$(git config --get remote.origin.url | sed 's|git@\(.*\):|https://\1/|')

@@ -74,7 +74,7 @@ const GenymotionManager = require('genymotion/device-web-player');
 Use `GenymotionManager` to instanciate one or more Genymotion device player.
 All you need is an HTML element to use as a container. See example below.
 To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
-or check the [PaaS documentation](https://docs.genymotion.com/paas/02_Getting_Started/), based on your device provider.
+or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requirements/), based on your device provider.
 
 ```html
 

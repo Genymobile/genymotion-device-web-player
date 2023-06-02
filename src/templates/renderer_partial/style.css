@@ -1,4 +1,4 @@
-.gm-template-player_partial {
+.gm-template-renderer_partial {
     top: 0;
     left: 0;
     margin: 0;
@@ -9,7 +9,7 @@
     background-color: black;
 }
 
-.gm-template-player_partial .gm-wrapper {
+.gm-template-renderer_partial .gm-wrapper {
     top: 0;
     left: 0;
     margin: 0;
@@ -19,7 +19,7 @@
     height: 100%;
 }
 
-.gm-template-player_partial .gm-video-wrapper {
+.gm-template-renderer_partial .gm-video-wrapper {
     position: relative;
     top: 0;
     left: 0;
@@ -30,7 +30,7 @@
     height: 100%;
 }
 
-.gm-template-player_partial .gm-video {
+.gm-template-renderer_partial .gm-video {
     position: relative;
     top: 0;
     left: 0;
@@ -41,7 +41,7 @@
     background-size: 40%;
 }
 
-.gm-template-player_partial .gm-toolbar {
+.gm-template-renderer_partial .gm-toolbar {
     position: absolute;
     top: 10px;
     right: 0;
@@ -50,7 +50,7 @@
     width: 50px;
 }
 
-.gm-template-player_partial .gm-version-number {
+.gm-template-renderer_partial .gm-version-number {
     position: fixed;
     right: 5px;
     bottom: 5px;

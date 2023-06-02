@@ -1,7 +1,7 @@
 'use strict';
 
 const Identifiers = require('../../src/plugins/Identifiers');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let identifiers;
 let instance;

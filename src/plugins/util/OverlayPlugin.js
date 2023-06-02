@@ -8,7 +8,7 @@
 module.exports = class OverlayPlugin {
     /**
      * Plugin initialization
-     * @param {Object} instance Genymotion player instance
+     * @param {Object} instance device renderer instance
      */
     constructor(instance) {
         this.overlays = [];

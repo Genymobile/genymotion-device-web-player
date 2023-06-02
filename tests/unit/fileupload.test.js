@@ -1,7 +1,7 @@
 'use strict';
 
 const FileUpload = require('../../src/plugins/FileUpload');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let uploader;
 let instance;

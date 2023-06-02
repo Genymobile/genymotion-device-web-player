@@ -1,7 +1,7 @@
 /**
  * Fullscreen plugin styles
  */
-.gm-player-instance .gm-fullscreen {
+.device-renderer-instance .gm-fullscreen {
   position: absolute;
   top: 0;
   left: 0;
@@ -9,13 +9,15 @@
   height: 100%;
   padding: 0;
 
-  .gm {
-    &-player {
+  .device {
+    &-renderer {
       background: $black !important;
       height: 100%;
       max-height: 100% !important;
     }
+  }
 
+  .gm {
     &-video {
       position: absolute;
       top: 0;

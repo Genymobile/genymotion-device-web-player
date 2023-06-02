@@ -71,18 +71,25 @@ module.exports = class KeyboardEvents {
         });
 
         // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-        window.addEventListener('blur', () => {
-            this.currentlyPressedKeys.forEach((value) => {
-                const text = '';
-                const json = {
-                    type: 'KEYBOARD_RELEASE',
-                    keychar: text,
-                    keycode: value,
-                };
-                this.instance.sendEvent(json);
-            });
-            this.currentlyPressedKeys.clear();
+        window.addEventListener('blur', this.cancelAllPressedKeys.bind(this));
+    }
+
+    /**
+     * Cancel all pressed keys.
+     * This is mainly used to avoid continuously pressed keys because of alt+tab
+     * or any other command that remove focus (blur) the page.
+     */
+    cancelAllPressedKeys() {
+        this.currentlyPressedKeys.forEach((value) => {
+            const text = '';
+            const json = {
+                type: 'KEYBOARD_RELEASE',
+                keychar: text,
+                keycode: value,
+            };
+            this.instance.sendEvent(json);
         });
+        this.currentlyPressedKeys.clear();
     }
 
     /**
@@ -218,11 +225,31 @@ module.exports = class KeyboardEvents {
         this.instance.root.tabIndex = 0;
 
         if (!this.isListenerAdded) {
-            this.instance.root.addEventListener('keypress', this.onKeyPress.bind(this));
-            this.instance.root.addEventListener('keydown', this.onKeyDown.bind(this));
-            this.instance.root.addEventListener('keyup', this.onKeyUp.bind(this));
+            if (!this.keyboardCallbacks) {
+                this.keyboardCallbacks = new Map([
+                    ['keypress', this.onKeyPress.bind(this)],
+                    ['keydown', this.onKeyDown.bind(this)],
+                    ['keyup', this.onKeyUp.bind(this)]
+                ]);
+            }
             this.instance.root.focus();
+            this.keyboardCallbacks.forEach((value, key) => {
+                window.addEventListener(key, value);
+            });
             this.isListenerAdded = true;
         }
+    }
+
+    /**
+     * Remove the event handlers callbacks (if they were created)
+     */
+    removeKeyboardCallbacks() {
+        if (!this.keyboardCallbacks || !this.isListenerAdded) {
+            return;
+        }
+        this.keyboardCallbacks.forEach((value, key) => {
+            window.removeEventListener(key, value);
+        });
+        this.isListenerAdded = false;
     }
 };

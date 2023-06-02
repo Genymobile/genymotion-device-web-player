@@ -2,7 +2,7 @@
 
 const IOThrottling = require('../../src/plugins/IOThrottling');
 const IOThrottlingProfiles = require('../../src/plugins/util/iothrottling-profiles');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let diskio;
 let instance;

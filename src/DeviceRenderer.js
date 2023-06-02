@@ -1,20 +1,24 @@
 'use strict';
 
 // Plugins
+const CoordinateUtils = require('./plugins/CoordinateUtils');
+const KeyboardEvents = require('./plugins/KeyboardEvents');
+const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
+const Gamepad = require('./plugins/Gamepad');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
- * Genymotion player instance.
- * Initialize a player for a specific instance
+ * Device renderer instance.
+ * Initialize a renderer for a specific VM instance
  */
-module.exports = class GenymotionInstance {
+module.exports = class DeviceRenderer {
     /**
-     * Player instance initialization.
+     * Renderer instance initialization.
      *
-     * @param {HTMLElement} domRoot DOM element to attach the player to.
+     * @param {HTMLElement} domRoot DOM element to attach the renderer to.
      * @param {Object}      options Instance configuration options.
      */
     constructor(domRoot, options) {
@@ -32,9 +36,11 @@ module.exports = class GenymotionInstance {
         this.keyboardEventsEnabled = false;
         this.touchEventsEnabled = false;
         this.mouseEventsEnabled = false;
+        this.gamepadEventsEnabled = false;
 
         // Websocket
         this.webRTCWebsocket = null;
+        this.webRTCWebsocketName = 'gm-webrtc';
         this.useWebsocketAsDataChannel = false;
 
         // DOM elements
@@ -66,6 +72,26 @@ module.exports = class GenymotionInstance {
                 && !event.target.classList.contains('gm-icon-button')
                 && !event.target.classList.contains('gm-dont-close')) {
                 this.emit('close-overlays');
+            }
+        });
+    }
+
+    /**
+     * Initialize custom plugins.
+     */
+    addCustomPlugins() {
+        const pluginInitMap = [
+            {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
+            {enabled: this.options.keyboard, class: KeyboardEvents},
+            {enabled: this.options.mouse, class: MouseEvents},
+            {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
+        ];
+
+        pluginInitMap.forEach((plugin) => {
+            const args = plugin.params || [];
+
+            if (plugin.enabled) {
+                new plugin.class(this, ...args);
             }
         });
     }
@@ -172,7 +198,7 @@ module.exports = class GenymotionInstance {
             this.reconnecting = true;
         }
 
-        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl);
+        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl, this.webRTCWebsocketName);
         this.webRTCWebsocket.onopen = this.sendAuthenticationToken.bind(this);
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);
@@ -437,11 +463,19 @@ module.exports = class GenymotionInstance {
 
         const iceServers = [];
 
-        if (Object.keys(this.options.stun).length > 0) {
+        if (Array.isArray(this.options.stun)) {
+            this.options.stun.forEach((stunServer) => {
+                iceServers.push(stunServer);
+            });
+        } else if (Object.keys(this.options.stun).length > 0) {
             iceServers.push(this.options.stun);
         }
 
-        if (Object.keys(this.options.turn).length > 0) {
+        if (Array.isArray(this.options.turn)) {
+            this.options.turn.forEach((turnServer) => {
+                iceServers.push(turnServer);
+            });
+        } else if (Object.keys(this.options.turn).length > 0) {
             iceServers.push(this.options.turn);
         }
 
@@ -460,31 +494,7 @@ module.exports = class GenymotionInstance {
         }
 
         if (typeof this.peerConnection.createDataChannel !== 'undefined') {
-            const dataChannelOptions = {
-                ordered: true,
-            };
-
-            this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
-
-            this.signalingDataChannel.onerror = (error) => {
-                log.warn('Data Channel Error:', error);
-            };
-
-            this.signalingDataChannel.onmessage = (event) => {
-                log.debug('Got Data Channel Message:', event.data);
-            };
-            this.signalingDataChannel.onopen = () => {
-                log.debug('Data Channel opened');
-            };
-
-            this.signalingDataChannel.onclose = () => {
-                log.debug('The Data Channel is Closed');
-            };
-
-            this.peerConnection.ondatachannel = (event) => {
-                const answererDataChannel = event.channel;
-                answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
-            };
+            this.createDataChannels();
         } else {
             this.useWebsocketAsDataChannel = true;
         }
@@ -530,6 +540,10 @@ module.exports = class GenymotionInstance {
 
             if (this.keyboardEventsEnabled) {
                 this.keyboardEvents.addKeyboardCallbacks();
+            }
+
+            if (this.gamepadEventsEnabled) {
+                this.gamepadManager.addGamepadCallbacks();
             }
 
             const playWithSound = this.video.play(); // needed on Safari (web & iOs)
@@ -632,6 +646,37 @@ module.exports = class GenymotionInstance {
     }
 
     /**
+     * Create datachannel(s)
+     */
+    createDataChannels() {
+        const dataChannelOptions = {
+            ordered: true,
+        };
+
+        this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
+
+        this.signalingDataChannel.onerror = (error) => {
+            log.warn('Data Channel Error:', error);
+        };
+
+        this.signalingDataChannel.onmessage = (event) => {
+            log.debug('Got Data Channel Message:', event.data);
+        };
+        this.signalingDataChannel.onopen = () => {
+            log.debug('Data Channel opened');
+        };
+
+        this.signalingDataChannel.onclose = () => {
+            log.debug('The Data Channel is Closed');
+        };
+
+        this.peerConnection.ondatachannel = (event) => {
+            const answererDataChannel = event.channel;
+            answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
+        };
+    }
+
+    /**
      * Send any ice candidates to the other peer.
      *
      * @param {RTCIceCandidate} iceCandidate Candidate to send.
@@ -648,6 +693,19 @@ module.exports = class GenymotionInstance {
      * @param {RTCSessionDescription} description Peer connection session description.
      */
     setLocalDescription(description) {
+        /*
+         * Munging SDP before setLocalDescription is not really standard compliant, but seems like
+         * the only way to make Chrome advertise it prefers stereo.
+         * Setting maxplaybackrate and maxaveragebitrate are not necessary, but they
+         * may improve audio quality by specifying HQ defaults.
+         */
+        const m = description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)[0];
+        if (m) {
+            description.sdp = description.sdp.replace(
+                new RegExp('a=fmtp:' + m[1], 'g'),
+                'a=fmtp:' + m[1] + ' stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000'
+            );
+        }
         this.peerConnection.setLocalDescription(description);
         if (this.isWebsocketOpen(this.webRTCWebsocket)) {
             this.webRTCWebsocket.send(JSON.stringify(description));
@@ -684,6 +742,10 @@ module.exports = class GenymotionInstance {
                 log.warn('Failed to create SDP ', error.message);
             }
         } else if (data.candidate) {
+            if (data.candidate === 'end-of-candidates') {
+                log.debug('End of ICE candidates received');
+                return;
+            }
             try {
                 const candidate = new RTCIceCandidate(data);
                 this.peerConnection.addIceCandidate(candidate);

@@ -1,7 +1,7 @@
 'use strict';
 
 const BasebandRIL = require('../../src/plugins/BasebandRIL');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let instance;
 let baseband;

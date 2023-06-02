@@ -3,7 +3,7 @@
 jest.mock('loglevel');
 
 const Camera = require('../../src/plugins/Camera');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let camera;
 let instance;

@@ -33,7 +33,7 @@ const util = require('gulp-util');
 
 const PATHS = {
     SRC: {
-        APP: 'GenymotionManager.js',
+        APP: 'index.js',
         BASE: './src',
         WORKER: './src/worker',
         TEMPLATES: './src/templates',
@@ -98,7 +98,7 @@ gulp.task('app-styles', function() {
         .pipe(base64())
         .pipe(autoprefixer())
         .pipe(gulpif(util.env.production, minifyCss()))
-        .pipe(concat('gm-player.min.css'))
+        .pipe(concat('device-renderer.min.css'))
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
 });
 
@@ -118,7 +118,7 @@ gulp.task('app-templates', function() {
 function getBundler() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
-        standalone: 'GenymotionManager',
+        standalone: 'index',
         debug: true
     }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }
@@ -137,7 +137,7 @@ gulp.task('app-js', function() {
                 ]
             ]
         }))))
-        .pipe(streamify(concat('gm-player.min.js')))
+        .pipe(streamify(concat('device-renderer.min.js')))
         .pipe(gulpif(util.env.production, streamify(uglify())))
         .pipe(gulp.dest(PATHS.DEST.LIB.JS));
 });
@@ -180,14 +180,10 @@ gulp.task('build', gulp.series(
 ));
 
 // Watch project update
-gulp.task('watch', gulp.series('build', function() {
+gulp.task('watch', gulp.series('build', function(cb) {
     gulp.watch([
         PATHS.SRC.ASSETS.STYLES + '/**/*.scss'
     ], gulp.series('app-styles'));
-
-    gulp.watch([
-        PATHS.TEST.UT + '/**/*.js'
-    ], gulp.series('test'));
 
     gulp.watch([
         PATHS.SRC.BASE + '/*.js',
@@ -196,6 +192,8 @@ gulp.task('watch', gulp.series('build', function() {
         PATHS.SRC.WORKER + '/**/*.js',
         PATHS.SRC.TEMPLATES + '/**/*'
     ], gulp.series('app-js'));
+
+    cb();
 }));
 
 // Serve project
@@ -206,7 +204,5 @@ gulp.task('serve', gulp.series('watch', function(cb) {
             baseDir: PATHS.DEST.BASE
         },
         port: 8000
-    });
-
-    cb();
+    }, cb);
 }));

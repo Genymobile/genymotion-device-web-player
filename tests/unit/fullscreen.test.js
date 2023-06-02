@@ -2,7 +2,7 @@
 'use strict';
 
 const FullScreen = require('../../src/plugins/Fullscreen');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 describe('FullScreen Plugin', () => {
     beforeEach(() => {

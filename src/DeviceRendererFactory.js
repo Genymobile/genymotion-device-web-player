@@ -1,16 +1,13 @@
 'use strict';
 
-const GenymotionInstance = require('./GenymotionInstance');
+const DeviceRenderer = require('./DeviceRenderer');
 const defaultsDeep = require('lodash/defaultsDeep');
 
 // Plugins
 const GPS = require('./plugins/GPS');
-const CoordinateUtils = require('./plugins/CoordinateUtils');
-const MouseEvents = require('./plugins/MouseEvents');
 const MultiTouchEvents = require('./plugins/MultiTouchEvents');
 const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
-const KeyboardEvents = require('./plugins/KeyboardEvents');
 const Clipboard = require('./plugins/Clipboard');
 const FileUpload = require('./plugins/FileUpload');
 const Camera = require('./plugins/Camera');
@@ -23,17 +20,18 @@ const Phone = require('./plugins/Phone');
 const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
+const GamepadManager = require('./plugins/GamepadManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 // Templates are loaded dynamically from the `templates` folder
-const TEMPLATE_JS = 'genymotion-js';
-const TEMPLATE_CSS = 'genymotion-css';
+const TEMPLATE_JS = 'device-renderer-js';
+const TEMPLATE_CSS = 'device-renderer-css';
 
 // Default options
 const defaultOptions = {
-    template: 'player',
+    template: 'renderer',
     touch: true,
     mouse: true,
     volume: true,
@@ -58,6 +56,7 @@ const defaultOptions = {
     phone: true,
     streamResolution: true,
     diskIO: true,
+    gamepad: false,
     translateHomeKey: false,
     token: '',
     i18n: {},
@@ -79,9 +78,9 @@ const defaultOptions = {
 };
 
 /**
- * Setup & create instances of the Genymotion player
+ * Setup & create instances of the device renderer
  */
-module.exports = class GenymotionManager {
+module.exports = class DeviceRendererFactory {
     constructor() {
         this.instances = [];
         /* global GEN_TEMPLATES */
@@ -89,12 +88,12 @@ module.exports = class GenymotionManager {
     }
 
     /**
-     * Setup a device player instance in the given dom element, for the Genymotion Cloud instance identified by its instanceWebRTCUrl.
+     * Setup a device renderer instance in the given dom element, for the device instance identified by its instanceWebRTCUrl.
      *
-     * @param  {HTMLElement|string} dom                            The DOM element (or its ID) to setup the device player into.
+     * @param  {HTMLElement|string} dom                            The DOM element (or its ID) to setup the device renderer into.
      * @param  {string}             webRTCUrl                      WebRTC URL of the instance.
      * @param  {Object}             options                        Various configuration options.
-     * @param  {string}             options.template               Template to use. Default: 'player'.
+     * @param  {string}             options.template               Template to use. Default: 'renderer'.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
      * @param  {boolean}            options.volume                 Audio volume control support activated. Default: true.
@@ -120,6 +119,7 @@ module.exports = class GenymotionManager {
      * @param  {boolean}            options.phone                  Baseband support activated. Default: true.
      * @param  {boolean}            options.streamResolution       Stream resolution control support activated. Default: true.
      * @param  {boolean}            options.diskIO                 Disk I/O throttling support activated. Default: true.
+     * @param  {boolean}            options.gamepad                Experimental gamepad support activated. Default: false.
      * @param  {boolean}            options.translateHomeKey       Whether or not the HOME key button should be decompose to META + ENTER. Default: false.
      * @param  {string}             options.token                  Instance access token (JWT). Default: ''.
      * @param  {Object}             options.i18n                   Translations keys for the UI. Default: {}.
@@ -131,9 +131,10 @@ module.exports = class GenymotionManager {
      * @param  {string}             options.turn.username          WebRTC TURN servers username.
      * @param  {string}             options.turn.credential        WebRTC TURN servers password.
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
-     * @return {GenymotionInstance}                                The Genymotion instance.
+     * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
+     * @return {DeviceRenderer}                                    The device renderer instance.
      */
-    setupInstance(dom, webRTCUrl, options) {
+    setupRenderer(dom, webRTCUrl, options, RendererClass = DeviceRenderer) {
         if (typeof dom === 'string') {
             dom = document.getElementById(dom);
         }
@@ -147,20 +148,28 @@ module.exports = class GenymotionManager {
         options.buttons = options.volume || options.rotation || options.navbar || options.power;
 
         log.debug('Creating genymotion display on ' + webRTCUrl);
-        dom.classList.add('gm-player-instance');
+        dom.classList.add('device-renderer-instance');
         dom.classList.add('gm-template-' + options.template);
         document.body.classList.add('gm-template-' + options.template + '-body');
 
-        return this.loadTemplate(dom, this.templates[options.template], options);
+        // Load template before creating the Device Renderer that is using HTML elements
+        this.loadTemplate(dom, this.templates[options.template], options);
+
+        const instance = new RendererClass(dom, options);
+        this.instances.push(instance);
+
+        this.addPlugins(instance, instance.options);
+        instance.onWebRTCReady();
+
+        return instance;
     }
 
     /**
      * Loads the selected template.
      *
-     * @param  {HTMLElement}        dom       The DOM element to setup the device player into.
+     * @param  {HTMLElement}        dom       The DOM element to setup the device renderer into.
      * @param  {string}             template  Template to use.
      * @param  {Object}             options   Various configuration options.
-     * @return {GenymotionInstance}          The Genymotion instance.
      */
     loadTemplate(dom, template, options) {
         const head = document.getElementsByTagName('head')[0];
@@ -185,28 +194,18 @@ module.exports = class GenymotionManager {
 
         // Handle template dom
         dom.innerHTML = template.html;
-
-        // Kick off next phase of setup
-        return this.addPlugins(dom, options);
     }
 
     /**
      * Initialize all the needed plugins.
      *
-     * @param  {HTMLElement}        dom      The DOM element to setup the device player into.
+     * @param  {DeviceRenderer}     instance The DeviceRenderer instance reference to link into each plugin.
      * @param  {Object}             options  Various configuration options.
-     * @return {GenymotionInstance}          The Genymotion instance.
      */
-    addPlugins(dom, options) {
-        const instance = new GenymotionInstance(dom, options);
-        this.instances.push(instance);
-
+    addPlugins(instance, options) {
         const pluginInitMap = [
-            {enabled: options.touch || options.mouse, class: CoordinateUtils},
-            {enabled: options.mouse, class: MouseEvents},
             {enabled: options.touch, class: MultiTouchEvents},
             {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.keyboard, class: KeyboardEvents},
             {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
             {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
             {enabled: options.camera, class: Camera, params: [options.i18n]},
@@ -220,6 +219,7 @@ module.exports = class GenymotionManager {
             {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
+            {enabled: options.gamepad, class: GamepadManager},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
         ];
 
@@ -231,8 +231,9 @@ module.exports = class GenymotionManager {
             }
         });
 
-        instance.onWebRTCReady();
-
-        return instance;
+        // Load instance dedicated plugins
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
     }
 };

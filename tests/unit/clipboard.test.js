@@ -3,7 +3,7 @@
 jest.mock('loglevel');
 
 const Clipboard = require('../../src/plugins/Clipboard');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let clipboard;
 let instance;

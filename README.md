@@ -65,8 +65,8 @@ const {DeviceRendererFactory} = require('genymotion/device-web-player');
 ### With CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/css/device-renderer.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@2.1.3/dist/js/device-renderer.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@3.0.0/dist/css/device-renderer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@3.0.0/dist/js/device-renderer.min.js"></script>
 ```
 
 ## Usage

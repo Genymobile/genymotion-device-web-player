@@ -366,15 +366,6 @@ module.exports = class GamepadManager {
     }
 
     /**
-     * Handle event message coming from the VM through the controller datachannel.
-     *
-     * @param {Object} event as the event received on the controller datachannel.
-     */
-    handleControllerEvent(event) {
-        this.instance.shadowFlatbufferWrapper.handleControllerEvent(event, this.instance);
-    }
-
-    /**
      * Maps a value from an old range [oldMin; oldMax] to a new range [newMin; newMax].
      * @param {number} oldMin minimum value of the old range
      * @param {number} oldMax maximum value of the old range
@@ -510,8 +501,8 @@ module.exports = class GamepadManager {
         if (!gamepad) {
             return;
         }
-        const actuator = gamepad.vibrationActuator || gamepad.hapticActuator[0];
-        if (actuator) {
+        if (gamepad.vibrationActuator) { // chrome
+            const actuator = gamepad.vibrationActuator;
             if (actuator.playEffect) {
                 const newWeakValue = this.computeValueInNewRange(0.0, 255.0, 0, 1.0, weak.toFixed(1));
                 const newStrongValue = this.computeValueInNewRange(0.0, 255.0, 0, 1.0, strong.toFixed(1));
@@ -521,11 +512,20 @@ module.exports = class GamepadManager {
                     weakMagnitude: newWeakValue,
                     strongMagnitude: newStrongValue
                 });
-            } else if (actuator.pulse) {
-                actuator.pulse(strong, 200);
+            } else {
+                log.error(`could not use vibration actuator for controller ${remoteIndex}`);
+                log.debug(gamepad);
             }
-        } else {
-            log.error(`vibration unsupported for controller ${remoteIndex}`);
+        } else if (gamepad.hapticActuators && gamepad.hapticActuators[0]) { // firefox
+            const actuator = gamepad.hapticActuators[0];
+            if (actuator.pulse) {
+                actuator.pulse(strong, 200);
+            } else {
+                log.error(`could not use haptic actuator for controller ${remoteIndex}`);
+                log.debug(gamepad);
+            }
+        } else { // unrecognised, for example DualSense
+            log.error(`no vibration actuator for controller ${remoteIndex}`);
         }
     }
 };

@@ -266,7 +266,6 @@ module.exports = class GamepadManager {
         const customEvent = new CustomEvent('gm-gamepadConnected', {detail: parsedGamepad});
         if (event.gamepad.mapping === '') {
             log.error(`Unsupported gamepad mapping for gamepad ${parsedGamepad.name}`);
-            return;
         }
         window.dispatchEvent(customEvent);
     }

@@ -2,10 +2,11 @@
 
 jest.mock('loglevel');
 
+const MediaManager = require('../../src/plugins/MediaManager');
 const Camera = require('../../src/plugins/Camera');
 const Instance = require('../mocks/DeviceRenderer');
 
-let camera;
+let mediaManager;
 let instance;
 
 describe('Camera Plugin', () => {
@@ -16,12 +17,13 @@ describe('Camera Plugin', () => {
             navbar: true,
             power: true
         });
-        camera = new Camera(instance, false);
+        mediaManager = new MediaManager(instance);
     });
 
     describe('api', () => {
         test('exposes a high level constructor', () => {
             expect(typeof Camera).toBe('function');
+            expect(typeof MediaManager).toBe('function');
         });
     });
 
@@ -44,34 +46,34 @@ describe('Camera Plugin', () => {
         });
     });
 
-    describe('camera', () => {
+    describe('mediaManager', () => {
         let startSpy;
         let stopSpy;
 
         beforeEach(() => {
-            startSpy = jest.spyOn(camera, 'startStreaming');
-            stopSpy = jest.spyOn(camera, 'stopStreaming');
+            startSpy = jest.spyOn(mediaManager, 'startStreaming');
+            stopSpy = jest.spyOn(mediaManager, 'stopStreaming');
 
-            camera.onVideoStreamError = jest.fn();
-            instance.addLocalStream = jest.fn();
+            mediaManager.onVideoStreamError = jest.fn();
+            mediaManager.addLocalStream = jest.fn();
         });
 
         afterEach(() => {
             startSpy.mockRestore();
             stopSpy.mockRestore();
             navigator.mediaDevices.getUserMedia.mockRestore();
-            camera.onVideoStreamError.mockRestore();
-            instance.addLocalStream.mockRestore();
+            mediaManager.onVideoStreamError.mockRestore();
+            mediaManager.addVideoStream.mockRestore();
         });
 
         it('can be toggled on', (done) => {
             const plugin = document.getElementsByClassName('gm-camera-button')[0];
 
-            instance.addLocalStream.mockImplementationOnce(() => {
+            mediaManager.addVideoStream.mockImplementationOnce(() => {
                 expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
                 expect(startSpy).toHaveBeenCalledTimes(1);
                 expect(stopSpy).toHaveBeenCalledTimes(0);
-                expect(camera.onVideoStreamError).toHaveBeenCalledTimes(0);
+                expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
                 done();
             });
 
@@ -81,7 +83,7 @@ describe('Camera Plugin', () => {
         it('can be toggled off', () => {
             const plugin = document.getElementsByClassName('gm-camera-button')[0];
 
-            camera.streaming = true;
+            mediaManager.videoStreaming = true;
             plugin.click();
             expect(startSpy).toHaveBeenCalledTimes(0);
             expect(stopSpy).toHaveBeenCalledTimes(1);
@@ -90,12 +92,12 @@ describe('Camera Plugin', () => {
         it('handle mediaDevices errors', (done) => {
             const plugin = document.getElementsByClassName('gm-camera-button')[0];
 
-            camera.onVideoStreamError.mockImplementationOnce(() => {
+            mediaManager.onVideoStreamError.mockImplementationOnce(() => {
                 expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
                 expect(startSpy).toHaveBeenCalledTimes(1);
                 expect(stopSpy).toHaveBeenCalledTimes(0);
-                expect(instance.addLocalStream).toHaveBeenCalledTimes(0);
-                expect(camera.onVideoStreamError).toHaveBeenCalledTimes(1);
+                expect(mediaManager.addLocalStream).toHaveBeenCalledTimes(0);
+                expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(1);
                 done();
             });
             navigator.mediaDevices.getUserMedia.mockReturnValueOnce(Promise.reject(null));

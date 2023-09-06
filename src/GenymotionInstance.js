@@ -311,10 +311,14 @@ module.exports = class GenymotionInstance {
 
         if (this.useWebsocketAsDataChannel) {
             if (this.isWebsocketOpen(this.webRTCWebsocket)) {
+                log.warn('Sendig event with websocket');
                 this.webRTCWebsocket.send(event);
+            } else {
+                log.warn('cannot send event, websocket is closed');
             }
         } else {
             if (this.signalingDataChannel && this.signalingDataChannel.readyState === 'open') {
+                log.warn('Sendig event with datachannel');
                 this.signalingDataChannel.send(event);
             } else {
                 log.warn('cannot send event, signaling data channel closed');

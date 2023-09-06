@@ -276,7 +276,8 @@ Enables or disables the fullscreen widget. This widget can be used to make the r
 - **Default:** `true`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-Enables or disables the camera widget. This widget can be used to forward local webcam to the Android virtual device.
+Enables or disables the camera widget. This widget can be used to forward local webcam video to the Android virtual device.
+By default, if the `microphone` property is also true, then the webcam audio will be used as well.
 
 ### `microphone`
 
@@ -286,9 +287,7 @@ Enables or disables the camera widget. This widget can be used to forward local 
 - **Default:** `false`
 - **Compatibility:** `PaaS`
 - **Details:**
-Enables or disables microphone injection. This can be used to forward local microphone to the Android virtual device.
-This option is only taken into account when `options.camera` is `true`. In this case, the camera widget enables
-both camera and microphone injection.
+Enables or disables microphone injection. This can be used to forward local microphone (or webcam audio) to the Android virtual device.
 
 ### `fileUpload`
 

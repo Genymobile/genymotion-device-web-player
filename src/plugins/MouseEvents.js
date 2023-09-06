@@ -1,5 +1,8 @@
 'use strict';
 
+const log = require('loglevel');
+log.setDefaultLevel('debug');
+
 /**
  * Instance mouse plugin.
  * Forward touch events to instance.
@@ -29,9 +32,6 @@ module.exports = class MouseEvents {
      */
     onMousePressEvent(event) {
         this.instance.video.muted = false;
-        if (event.button !== 0) {
-            return;
-        }
 
         event.preventDefault();
         event.stopPropagation();
@@ -40,13 +40,21 @@ module.exports = class MouseEvents {
         this.instance.y = this.instance.coordinateUtils.getYCoordinate(event);
 
         let json = '';
-        if (event.ctrlKey || event.metaKey) {
+        if (event.button === 2) {
+            log.debug('Right button pressed (' + this.instance.x + 'x' + this.instance.y);
             json = {
                 type: 'FAKE_MULTI_TOUCH_PRESS',
-                mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                mode: 1, x: this.instance.x, y: this.instance.y,
             };
         } else {
-            json = {type: 'MOUSE_PRESS', x: this.instance.x, y: this.instance.y};
+            if (event.ctrlKey || event.metaKey) {
+                json = {
+                    type: 'FAKE_MULTI_TOUCH_PRESS',
+                    mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                };
+            } else {
+                json = {type: 'MOUSE_PRESS', x: this.instance.x, y: this.instance.y};
+            }
         }
         this.instance.sendEvent(json);
 
@@ -59,23 +67,27 @@ module.exports = class MouseEvents {
      * @param {Event} event Event.
      */
     onMouseReleaseEvent(event) {
-        if (event.button !== 0) {
-            return;
-        }
-
         event.preventDefault();
         event.stopPropagation();
         this.leftButtonPressed = false;
         this.instance.x = this.instance.coordinateUtils.getXCoordinate(event);
         this.instance.y = this.instance.coordinateUtils.getYCoordinate(event);
         let json = '';
-        if (event.ctrlKey || event.metaKey) {
+        if (event.button === 2) {
+            log.debug('Right button released (' + this.instance.x + 'x' + this.instance.y);
             json = {
                 type: 'FAKE_MULTI_TOUCH_RELEASE',
-                mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                mode: 1, x: this.instance.x, y: this.instance.y,
             };
         } else {
-            json = {type: 'MOUSE_RELEASE', x: this.instance.x, y: this.instance.y};
+            if (event.ctrlKey || event.metaKey) {
+                json = {
+                    type: 'FAKE_MULTI_TOUCH_RELEASE',
+                    mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                };
+            } else {
+                json = {type: 'MOUSE_RELEASE', x: this.instance.x, y: this.instance.y};
+            }
         }
         this.instance.sendEvent(json);
 

@@ -41,7 +41,6 @@ module.exports = class DeviceRenderer {
 
         // Websocket
         this.webRTCWebsocket = null;
-        this.webRTCWebsocketName = 'gm-webrtc';
         this.useWebsocketAsDataChannel = false;
 
         // DOM elements

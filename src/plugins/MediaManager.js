@@ -191,11 +191,11 @@ module.exports = class MediaManager {
      * @param {RTCRtpSender} sender    Peer (sender).
      * @param {string}       direction Transceiver direction.
      */
-    setTransceiverDirection(sender) {
+    setTransceiverDirection(sender, direction) {
         // find transceiver that contains sender
         this.instance.peerConnection.getTransceivers().forEach((transceiver) => {
             if (transceiver.sender === sender) {
-                transceiver.direction = 'sendrecv';
+                transceiver.direction = direction;
             }
         });
     }

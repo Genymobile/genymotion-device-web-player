@@ -7,7 +7,9 @@ module.exports = class MediaManager {
     /**
      * Constructor to this MediaManager class
      * @param {DeviceRenderer} instance root instance
-     * @param {boolean} videoWithMicrophone flag indicating wether the video must always be played with the microphone. Defaults to the microphone flag in the instance options
+     * @param {boolean} videoWithMicrophone flag indicating wether the video must always be played with the microphone.
+     *  This flag is used when we don't want to split audio&video and instead want the audio bundled with the video in the same stream.
+     *  Defaults to the microphone flag in the instance options
      * @param {number} videoWidth Maximum video width. Defaults to 1280
      * @param {number} videoHeight Maximum video height. Defaults to 720
      */
@@ -263,6 +265,7 @@ module.exports = class MediaManager {
             }
         }
 
+        // if the flag for bundled audio&video stream is set, let's add the audio track of this stream too
         if (this.videoWithMicrophone && stream.getAudioTracks().length > 0) {
             if (this.microphoneSender) {
                 log.debug('Replacing audio track on sender');
@@ -320,6 +323,7 @@ module.exports = class MediaManager {
             if (this.cameraSender) {
                 this.instance.peerConnection.removeTrack(this.cameraSender);
             }
+            // if the if the flag for bundled audio&video stream is set, we'll remove the audio track too
             if (this.microphoneSender && this.videoWithMicrophone) {
                 this.instance.peerConnection.removeTrack(this.microphoneSender);
             }

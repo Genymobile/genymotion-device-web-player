@@ -58,9 +58,7 @@ module.exports = class Camera extends OverlayPlugin {
             this.toolbarBtn.className += ' gm-disabled-widget-pop-up';
             this.toolbarBtnImage.className += ' gm-disabled-widget-icon';
         } else {
-            this.toolbarBtn.onclick = () => {
-                this.instance.mediaManager.toggleVideoStreaming();
-            };
+            this.toolbarBtn.onclick = this.instance.mediaManager.toggleVideoStreaming;
         }
     }
 };

@@ -45,7 +45,7 @@ module.exports = class MediaManager {
                 log.debug(`microphone ${permissionObj.state}`);
                 permissionObj.addEventListener('change', this.onMicrophonePermissionChange.bind(this));
             } catch (error) {
-                log.debug('Can\'t get microphone permission object', error);
+                log.warn('Can\'t get microphone permission object', error);
                 return false;
             }
         }
@@ -55,7 +55,7 @@ module.exports = class MediaManager {
             log.debug(`camera ${permissionObj.state}`);
             permissionObj.addEventListener('change', this.onCameraPermissionChange.bind(this));
         } catch (error) {
-            log.debug('Can\'t get camera permission object', error);
+            log.warn('Can\'t get camera permission object', error);
             return false;
         }
 
@@ -139,7 +139,7 @@ module.exports = class MediaManager {
      * @param {Error} error Camera stream error.
      */
     onVideoStreamError(error) {
-        log.warn('Can\'t start client video stream', error);
+        log.error('Can\'t start client video stream', error);
     }
 
     /**
@@ -148,7 +148,7 @@ module.exports = class MediaManager {
      * @param {Error} error Microphone stream error.
      */
     onAudioStreamError(error) {
-        log.warn('Can\'t start client audio stream', error);
+        log.error('Can\'t start client audio stream', error);
     }
 
     /**

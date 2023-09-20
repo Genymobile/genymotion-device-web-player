@@ -34,28 +34,30 @@ module.exports = class MediaManager {
      * Tries to get the current microphone and camera permission status. If it can, binds listeners to their change
      * @returns {boolean} True if it could find the permissions object
      */
-    setupPermissions() {
+    async setupPermissions() {
         if (!navigator.permissions) {
             return false;
         }
 
-        navigator.permissions.query({name: 'microphone'})
-            .then((permissionObj) => {
+        if (this.instance.options.microphone) {
+            try {
+                const permissionObj = await navigator.permissions.query({name: 'microphone'});
                 log.debug(`microphone ${permissionObj.state}`);
                 permissionObj.addEventListener('change', this.onMicrophonePermissionChange.bind(this));
-            })
-            .catch((error) => {
+            } catch (error) {
                 log.debug('Can\'t get microphone permission object', error);
-            });
+                return false;
+            }
+        }
 
-        navigator.permissions.query({name: 'camera'})
-            .then((permissionObj) => {
-                log.debug(`camera ${permissionObj.state}`);
-                permissionObj.addEventListener('change', this.onCameraPermissionChange.bind(this));
-            })
-            .catch((error) => {
-                log.debug('Can\'t get camera permission object', error);
-            });
+        try {
+            const permissionObj = await navigator.permissions.query({name: 'camera'});
+            log.debug(`camera ${permissionObj.state}`);
+            permissionObj.addEventListener('change', this.onCameraPermissionChange.bind(this));
+        } catch (error) {
+            log.debug('Can\'t get camera permission object', error);
+            return false;
+        }
 
         return true;
     }
@@ -87,50 +89,48 @@ module.exports = class MediaManager {
     /**
      * Initialize and start client webcam video stream.
      */
-    startVideoStreaming() {
+    async startVideoStreaming() {
         if (!navigator.mediaDevices) {
             return;
         }
 
-        navigator.mediaDevices.getUserMedia({
-            audio: this.videoWithMicrophone,
-            video: {
-                width: this.videoWidth,
-                height: this.videoHeight,
-            },
-        })
-            .catch((err) => {
-                this.onVideoStreamError(err);
-            })
-            .then((mediaStream) => {
-                log.debug('Client video stream ready');
-                this.videoStreaming = true;
-                this.localVideoStream = mediaStream;
-                this.addVideoStream(mediaStream);
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: this.videoWithMicrophone,
+                video: {
+                    width: this.videoWidth,
+                    height: this.videoHeight,
+                },
             });
+            log.debug('Client video stream ready');
+            this.videoStreaming = true;
+            this.localVideoStream = mediaStream;
+            this.addVideoStream(mediaStream);
+        } catch (error) {
+            this.onVideoStreamError(error);
+        }
     }
 
     /**
      * Initialize and start client microphone audio stream.
      */
-    startAudioStreaming() {
+    async startAudioStreaming() {
         if (!navigator.mediaDevices) {
             return;
         }
 
-        navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: false
-        })
-            .catch((err) => {
-                this.onAudioStreamError(err);
-            })
-            .then((mediaStream) => {
-                log.debug('Client audio stream ready');
-                this.audioStreaming = true;
-                this.localAudioStream = mediaStream;
-                this.addAudioStream(mediaStream);
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false
             });
+            log.debug('Client audio stream ready');
+            this.audioStreaming = true;
+            this.localAudioStream = mediaStream;
+            this.addAudioStream(mediaStream);
+        } catch (error) {
+            this.onAudioStreamError(error);
+        }
     }
 
     /**

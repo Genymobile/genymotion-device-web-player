@@ -699,13 +699,20 @@ module.exports = class DeviceRenderer {
          * Setting maxplaybackrate and maxaveragebitrate are not necessary, but they
          * may improve audio quality by specifying HQ defaults.
          */
-        const m = description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)[0];
+        const m = [...description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)][0];
         if (m) {
+            /**
+             * Adding stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000 to the opus codec
+             * taking care of prepending with ';' if necessary
+             */
             description.sdp = description.sdp.replace(
-                new RegExp('a=fmtp:' + m[1], 'g'),
-                'a=fmtp:' + m[1] + ' stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000'
-            );
+                new RegExp(`(a=fmtp:${m[1]}) ?(.*)(\r?\n)`, 'g'),
+                (match, fmtpId, existingParams, lineEnding, offset, string) => {
+                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `
+                    return `${modified}stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000${lineEnding}`;
+                });
         }
+
         this.peerConnection.setLocalDescription(description);
         if (this.isWebsocketOpen(this.webRTCWebsocket)) {
             this.webRTCWebsocket.send(JSON.stringify(description));

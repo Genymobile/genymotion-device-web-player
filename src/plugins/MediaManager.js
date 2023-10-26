@@ -17,11 +17,12 @@ module.exports = class MediaManager {
         this.instance = instance;
         this.instance.mediaManager = this;
 
-        if (!navigator.mediaDevices || !this.setupPermissions()) {
+        if (!navigator.mediaDevices) {
             log.error('MediaDevices API unsupported: camera and microphone won\'t be available.');
             this.instance.mediaEventsEnabled = false;
             return;
         }
+        this.setupPermissions();
         this.instance.mediaEventsEnabled = true;
 
         this.videoStreaming = false;

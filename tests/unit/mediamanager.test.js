@@ -42,6 +42,8 @@ describe('Camera Plugin', () => {
             mediaManager.onAudioStreamError = jest.fn();
             mediaManager.addVideoStream = jest.fn();
             mediaManager.addAudioStream = jest.fn();
+            mediaManager.removeVideoStream = jest.fn();
+            mediaManager.removeAudioStream = jest.fn();
         });
 
         afterEach(() => {
@@ -54,6 +56,8 @@ describe('Camera Plugin', () => {
             mediaManager.onAudioStreamError.mockRestore();
             mediaManager.addVideoStream.mockRestore();
             mediaManager.addAudioStream.mockRestore();
+            mediaManager.removeVideoStream.mockRestore();
+            mediaManager.removeAudioStream.mockRestore();
         });
 
         it('video can be toggled on', (done) => {
@@ -63,6 +67,8 @@ describe('Camera Plugin', () => {
                 expect(stopVideoSpy).toHaveBeenCalledTimes(0);
                 expect(startAudioSpy).toHaveBeenCalledTimes(0);
                 expect(stopAudioSpy).toHaveBeenCalledTimes(0);
+                expect(mediaManager.videoStreaming).toBeTruthy();
+                expect(mediaManager.audioStreaming).toBeFalsy();
                 expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
                 done();
             });
@@ -86,6 +92,8 @@ describe('Camera Plugin', () => {
                 expect(stopAudioSpy).toHaveBeenCalledTimes(0);
                 expect(startVideoSpy).toHaveBeenCalledTimes(0);
                 expect(stopVideoSpy).toHaveBeenCalledTimes(0);
+                expect(mediaManager.audioStreaming).toBeTruthy();
+                expect(mediaManager.videoStreaming).toBeFalsy();
                 expect(mediaManager.onAudioStreamError).toHaveBeenCalledTimes(0);
                 done();
             });
@@ -102,7 +110,7 @@ describe('Camera Plugin', () => {
             expect(stopVideoSpy).toHaveBeenCalledTimes(0);
         });
 
-        it('handle mediaDevices video errors', (done) => {
+        it('handles mediaDevices video errors', (done) => {
             mediaManager.onVideoStreamError.mockImplementationOnce(() => {
                 expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
                 expect(startVideoSpy).toHaveBeenCalledTimes(1);
@@ -119,7 +127,7 @@ describe('Camera Plugin', () => {
             mediaManager.toggleVideoStreaming();
         });
 
-        it('handle mediaDevices audio errors', (done) => {
+        it('handles mediaDevices audio errors', (done) => {
             mediaManager.onAudioStreamError.mockImplementationOnce(() => {
                 expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
                 expect(startAudioSpy).toHaveBeenCalledTimes(1);
@@ -133,6 +141,95 @@ describe('Camera Plugin', () => {
                 done();
             });
             navigator.mediaDevices.getUserMedia.mockReturnValueOnce(Promise.reject(null));
+            mediaManager.toggleAudioStreaming();
+        });
+
+        it('handles stopping when not started', (done) => {
+            mediaManager.videoStreaming = false;
+            mediaManager.audioStreaming = false;
+            mediaManager.stopVideoStreaming();
+            mediaManager.stopAudioStreaming();
+
+            expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(0);
+            expect(startAudioSpy).toHaveBeenCalledTimes(0);
+            expect(stopAudioSpy).toHaveBeenCalledTimes(1);
+            expect(startVideoSpy).toHaveBeenCalledTimes(0);
+            expect(stopVideoSpy).toHaveBeenCalledTimes(1);
+            expect(mediaManager.addAudioStream).toHaveBeenCalledTimes(0);
+            expect(mediaManager.addVideoStream).toHaveBeenCalledTimes(0);
+            expect(mediaManager.removeAudioStream).toHaveBeenCalledTimes(0);
+            expect(mediaManager.removeVideoStream).toHaveBeenCalledTimes(0);
+            expect(mediaManager.videoStreaming).toBeFalsy();
+            expect(mediaManager.audioStreaming).toBeFalsy();
+
+            done();
+        });
+
+        it('handles starting video when audio is streaming', (done) => {
+            mediaManager.audioStreaming = true;
+
+            mediaManager.addVideoStream.mockImplementationOnce(() => {
+                expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+                expect(startVideoSpy).toHaveBeenCalledTimes(1);
+                expect(stopVideoSpy).toHaveBeenCalledTimes(0);
+                expect(startAudioSpy).toHaveBeenCalledTimes(0);
+                expect(stopAudioSpy).toHaveBeenCalledTimes(0);
+                expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
+                expect(mediaManager.videoStreaming).toBeTruthy();
+                done();
+            });
+
+            mediaManager.toggleVideoStreaming();
+        });
+
+        it('handles starting audio when video is streaming', (done) => {
+            mediaManager.videoStreaming = true;
+
+            mediaManager.addAudioStream.mockImplementationOnce(() => {
+                expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+                expect(startAudioSpy).toHaveBeenCalledTimes(1);
+                expect(stopAudioSpy).toHaveBeenCalledTimes(0);
+                expect(startVideoSpy).toHaveBeenCalledTimes(0);
+                expect(stopVideoSpy).toHaveBeenCalledTimes(0);
+                expect(mediaManager.onAudioStreamError).toHaveBeenCalledTimes(0);
+                expect(mediaManager.audioStreaming).toBeTruthy();
+                done();
+            });
+
+            mediaManager.toggleAudioStreaming();
+        });
+
+        it('handles stopping video when audio is streaming', (done) => {
+            mediaManager.videoStreaming = true;
+            mediaManager.audioStreaming = true;
+
+            mediaManager.removeVideoStream.mockImplementationOnce(() => {
+                expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(0);
+                expect(startVideoSpy).toHaveBeenCalledTimes(0);
+                expect(stopVideoSpy).toHaveBeenCalledTimes(1);
+                expect(startAudioSpy).toHaveBeenCalledTimes(0);
+                expect(stopAudioSpy).toHaveBeenCalledTimes(0);
+                expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
+                done();
+            });
+
+            mediaManager.toggleVideoStreaming();
+        });
+
+        it('handles stopping audio when video is streaming', (done) => {
+            mediaManager.videoStreaming = true;
+            mediaManager.audioStreaming = true;
+
+            mediaManager.removeAudioStream.mockImplementationOnce(() => {
+                expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(0);
+                expect(startVideoSpy).toHaveBeenCalledTimes(0);
+                expect(stopVideoSpy).toHaveBeenCalledTimes(0);
+                expect(startAudioSpy).toHaveBeenCalledTimes(0);
+                expect(stopAudioSpy).toHaveBeenCalledTimes(1);
+                expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
+                done();
+            });
+
             mediaManager.toggleAudioStreaming();
         });
     });

@@ -158,6 +158,9 @@ module.exports = class MediaManager {
      * Stop client webcam video stream.
      */
     stopVideoStreaming() {
+        if (!this.videoStreaming) {
+            return;
+        }
         log.debug('removed local video stream');
         this.removeVideoStream(this.localVideoStream);
         this.localVideoStream = null;
@@ -168,6 +171,9 @@ module.exports = class MediaManager {
      * Stop client microphone audio stream.
      */
     stopAudioStreaming() {
+        if (!this.audioStreaming) {
+            return;
+        }
         log.debug('removed local audio stream');
         this.removeAudioStream(this.localAudioStream);
         this.localAudioStream = null;

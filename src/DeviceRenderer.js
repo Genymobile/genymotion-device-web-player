@@ -6,6 +6,7 @@ const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
+const MediaManager = require('./plugins/MediaManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -40,7 +41,6 @@ module.exports = class DeviceRenderer {
 
         // Websocket
         this.webRTCWebsocket = null;
-        this.webRTCWebsocketName = 'gm-webrtc';
         this.useWebsocketAsDataChannel = false;
 
         // DOM elements
@@ -85,6 +85,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
             {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
+            {enabled: this.options.camera || this.options.microphone, class: MediaManager},
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -298,8 +299,8 @@ module.exports = class DeviceRenderer {
     disconnect() {
         this.initialized = false;
 
-        if (typeof this.camera !== 'undefined' && typeof this.camera.getClientVideoStream !== 'undefined') {
-            this.removeLocalStream(this.camera.getClientVideoStream());
+        if (typeof this.mediaManager !== 'undefined') {
+            this.mediaManager.disconnect();
         }
 
         if (this.webRTCWebsocket) {
@@ -365,94 +366,6 @@ module.exports = class DeviceRenderer {
             this.onWebRTCConnectionError.bind(this),
             this.sdpConstraints
         );
-    }
-
-    /**
-     * Find RTCRtpSender corresponding RTCRtpTransceiver and set its direction.
-     *
-     * @param {RTCRtpSender} sender    Peer (sender).
-     * @param {string}       direction Transceiver direction.
-     */
-    setTransceiverDirection(sender) {
-        // find transceiver that contains sender
-        this.peerConnection.getTransceivers().forEach((transceiver) => {
-            if (transceiver.sender === sender) {
-                transceiver.direction = 'sendrecv';
-            }
-        });
-    }
-
-    /**
-     * Add a local stream and send it through SDP renegotiation.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
-     * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addStream
-     *
-     * @param {MediaStream} stream Stream to add.
-     */
-    addLocalStream(stream) {
-        if (typeof this.peerConnection.addTrack === 'function') {
-            // If the new API "addTrack" is available, we use it
-
-            /**
-             * If cameraSender or microphoneSender is defined, this means that we already added
-             * it to the PeerConnection. Since removeTrack() just remove the track
-             * from it, re-add it and switch back the RTCRtpTranceiver direction
-             * to send and recv.
-             */
-            if (stream.getVideoTracks().length > 0) {
-                if (this.cameraSender) {
-                    log.debug('Replacing video track on sender');
-                    this.cameraSender.replaceTrack(stream.getVideoTracks()[0]);
-                    this.setTransceiverDirection(this.cameraSender, 'sendrecv');
-                } else {
-                    this.cameraSender = this.peerConnection.addTrack(stream.getVideoTracks()[0],
-                        stream);
-                }
-            }
-
-            if (this.options.microphone && stream.getAudioTracks().length > 0) {
-                if (this.microphoneSender) {
-                    log.debug('Replacing audio track on sender');
-                    this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
-                    this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
-                } else {
-                    this.microphoneSender = this.peerConnection.addTrack(stream.getAudioTracks()[0],
-                        stream);
-                }
-            }
-        } else {
-            // Else if it is not available, we use the old "addStream"
-            this.peerConnection.addStream(stream);
-        }
-        this.renegotiateWebRTCConnection();
-    }
-
-    /**
-     * Remove a local stream and stop sending it through SDP renegotiation.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeTrack
-     * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeStream
-     *
-     * @param {MediaStream} stream Stream to stop and remove.
-     */
-    removeLocalStream(stream) {
-        if (stream instanceof MediaStream) {
-            stream.getTracks().forEach((track) => {
-                track.stop();
-            });
-            // If the new API "removeTrack" is available, we use it
-            if (typeof this.peerConnection.addTrack === 'function') {
-                this.peerConnection.removeTrack(this.cameraSender);
-                if (this.microphoneSender) {
-                    this.peerConnection.removeTrack(this.microphoneSender);
-                }
-                // Else if it is not available, we use the old "removeStream"
-            } else {
-                this.peerConnection.removeStream(stream);
-            }
-            this.renegotiateWebRTCConnection();
-        }
     }
 
     /**

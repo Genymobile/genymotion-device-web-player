@@ -27,8 +27,6 @@ module.exports = class Camera extends OverlayPlugin {
         // Register plugin
         this.instance.camera = this;
 
-        this.streaming = false;
-
         // Display widget
         this.renderToolbarButton();
     }
@@ -60,73 +58,7 @@ module.exports = class Camera extends OverlayPlugin {
             this.toolbarBtn.className += ' gm-disabled-widget-pop-up';
             this.toolbarBtnImage.className += ' gm-disabled-widget-icon';
         } else {
-            this.toolbarBtn.onclick = this.toggleStreaming.bind(this);
+            this.toolbarBtn.onclick = this.instance.mediaManager.toggleVideoStreaming;
         }
-    }
-
-    /**
-     * Toggle local video forward forwarding.
-     * Redirect the client webcam video stream to the instance.
-     */
-    toggleStreaming() {
-        if (!this.streaming) {
-            this.startStreaming();
-        } else {
-            this.stopStreaming();
-        }
-    }
-
-    /**
-     * Initialize and start client webcam video stream.
-     */
-    startStreaming() {
-        if (!navigator.mediaDevices) {
-            return;
-        }
-
-        navigator.mediaDevices.getUserMedia({
-            audio: this.instance.options.microphone,
-            video: {
-                width:1280,
-                height: 720,
-            },
-        })
-            .catch((err) => {
-                this.onVideoStreamError(err);
-            })
-            .then((mediaStream) => {
-                log.debug('Client video stream ready');
-                this.streaming = true;
-                this.localStream = mediaStream;
-                this.instance.addLocalStream(mediaStream);
-            });
-    }
-
-    /**
-     * Client video stream error handler.
-     *
-     * @param {Error} error Camera stream error.
-     */
-    onVideoStreamError(error) {
-        log.warn('Can\'t start client video stream', error);
-    }
-
-    /**
-     * Stop client webcam video stream.
-     */
-    stopStreaming() {
-        log.debug('removed local stream');
-        this.instance.removeLocalStream(this.localStream);
-        this.localStream = null;
-        this.streaming = false;
-    }
-
-    /**
-     * Get client webcam video stream.
-     *
-     * @return {MediaStream} Client video stream
-     */
-    getClientVideoStream() {
-        return this.localStream;
     }
 };

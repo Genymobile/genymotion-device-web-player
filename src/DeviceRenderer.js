@@ -620,8 +620,9 @@ module.exports = class DeviceRenderer {
              */
             description.sdp = description.sdp.replace(
                 new RegExp(`(a=fmtp:${m[1]}) ?(.*)(\r?\n)`, 'g'),
+                // eslint-disable-next-line no-unused-vars
                 (match, fmtpId, existingParams, lineEnding, offset, string) => {
-                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `
+                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `;
                     return `${modified}stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000${lineEnding}`;
                 });
         }

@@ -6,6 +6,7 @@ const MediaManager = require('../../src/plugins/MediaManager');
 const Camera = require('../../src/plugins/Camera');
 const Instance = require('../mocks/DeviceRenderer');
 
+// eslint-disable-next-line no-unused-vars
 let mediaManager;
 let instance;
 

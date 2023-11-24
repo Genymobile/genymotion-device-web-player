@@ -352,8 +352,9 @@ module.exports = class DeviceRenderer {
     /**
      * Reconfigure & setup the peer-to-peer connection (SDP).
      * Can be used anytime to renegotiate the SDP if necessary.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    renegotiateWebRTCConnection() {
+    async renegotiateWebRTCConnection() {
         // For safari we add audio & video before sending SDP to avoid empty SDP
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         if (isSafari) {
@@ -361,11 +362,14 @@ module.exports = class DeviceRenderer {
             this.peerConnection.addTransceiver('video');
         }
         // creating SDP offer
-        this.peerConnection.createOffer(
-            this.setLocalDescription.bind(this),
-            this.onWebRTCConnectionError.bind(this),
-            this.sdpConstraints
-        );
+        try {
+            const description = await this.peerConnection.createOffer(this.sdpConstraints);
+            this.setLocalDescription(description);
+        } catch (error) {
+            this.onWebRTCConnectionError(error);
+            return false;
+        }
+        return true;
     }
 
     /**

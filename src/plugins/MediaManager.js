@@ -68,33 +68,34 @@ module.exports = class MediaManager {
     /**
      * Toggle local video forwarding.
      * Redirect the client webcam video stream to the instance.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    toggleVideoStreaming() {
+    async toggleVideoStreaming() {
         if (!this.videoStreaming) {
-            this.startVideoStreaming();
-        } else {
-            this.stopVideoStreaming();
+            return this.startVideoStreaming();
         }
+        return this.stopVideoStreaming();
     }
 
     /**
      * Toggle local audio forwarding.
      * Redirect the client microphone audio stream to the instance.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    toggleAudioStreaming() {
+    async toggleAudioStreaming() {
         if (!this.audioStreaming) {
-            this.startAudioStreaming();
-        } else {
-            this.stopAudioStreaming();
+            return this.startAudioStreaming();
         }
+        return this.stopAudioStreaming();
     }
 
     /**
      * Initialize and start client webcam video stream.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
     async startVideoStreaming() {
         if (!navigator.mediaDevices) {
-            return;
+            return false;
         }
 
         try {
@@ -108,18 +109,20 @@ module.exports = class MediaManager {
             log.debug('Client video stream ready');
             this.videoStreaming = true;
             this.localVideoStream = mediaStream;
-            this.addVideoStream(mediaStream);
+            return this.addVideoStream(mediaStream);
         } catch (error) {
             this.onVideoStreamError(error);
+            return false;
         }
     }
 
     /**
      * Initialize and start client microphone audio stream.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
     async startAudioStreaming() {
         if (!navigator.mediaDevices) {
-            return;
+            return false;
         }
 
         try {
@@ -130,9 +133,10 @@ module.exports = class MediaManager {
             log.debug('Client audio stream ready');
             this.audioStreaming = true;
             this.localAudioStream = mediaStream;
-            this.addAudioStream(mediaStream);
+            return this.addAudioStream(mediaStream);
         } catch (error) {
             this.onAudioStreamError(error);
+            return false;
         }
     }
 
@@ -156,28 +160,32 @@ module.exports = class MediaManager {
 
     /**
      * Stop client webcam video stream.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    stopVideoStreaming() {
+    async stopVideoStreaming() {
         if (!this.videoStreaming) {
-            return;
+            return false;
         }
         log.debug('removed local video stream');
-        this.removeVideoStream(this.localVideoStream);
+        const result = await this.removeVideoStream(this.localVideoStream);
         this.localVideoStream = null;
         this.videoStreaming = false;
+        return result;
     }
 
     /**
      * Stop client microphone audio stream.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    stopAudioStreaming() {
+    async stopAudioStreaming() {
         if (!this.audioStreaming) {
-            return;
+            return false;
         }
         log.debug('removed local audio stream');
-        this.removeAudioStream(this.localAudioStream);
+        const result = await this.removeAudioStream(this.localAudioStream);
         this.localAudioStream = null;
         this.audioStreaming = false;
+        return result;
     }
 
     /**
@@ -216,11 +224,12 @@ module.exports = class MediaManager {
      * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addStream
      *
      * @param {MediaStream} stream Audio stream to add.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    addAudioStream(stream) {
+    async addAudioStream(stream) {
         if (!this.instance.peerConnection) {
             log.error('Could not add audio stream: connection is not ready');
-            return;
+            return false;
         }
         /**
          * If microphoneSender is defined, this means that we already added
@@ -239,7 +248,7 @@ module.exports = class MediaManager {
                     stream);
             }
         }
-        this.instance.renegotiateWebRTCConnection();
+        return this.instance.renegotiateWebRTCConnection();
     }
 
     /**
@@ -249,11 +258,12 @@ module.exports = class MediaManager {
      * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addStream
      *
      * @param {MediaStream} stream Video stream to add.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    addVideoStream(stream) {
+    async addVideoStream(stream) {
         if (!this.instance.peerConnection) {
             log.error('Could not add video stream: connection is not ready');
-            return;
+            return false;
         }
         /**
          * If cameraSender is defined, this means that we already added
@@ -283,7 +293,7 @@ module.exports = class MediaManager {
                     stream);
             }
         }
-        this.instance.renegotiateWebRTCConnection();
+        return this.instance.renegotiateWebRTCConnection();
     }
 
     /**
@@ -293,11 +303,12 @@ module.exports = class MediaManager {
      * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeStream
      *
      * @param {MediaStream} stream Audio stream to stop and remove.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    removeAudioStream(stream) {
+    async removeAudioStream(stream) {
         if (!this.instance.peerConnection) {
             log.error('Could not remove audio stream: connection is not ready');
-            return;
+            return false;
         }
         if (stream instanceof MediaStream) {
             stream.getTracks().forEach((track) => {
@@ -306,8 +317,9 @@ module.exports = class MediaManager {
             if (this.microphoneSender) {
                 this.instance.peerConnection.removeTrack(this.microphoneSender);
             }
-            this.instance.renegotiateWebRTCConnection();
+            return this.instance.renegotiateWebRTCConnection();
         }
+        return false;
     }
 
     /**
@@ -317,11 +329,12 @@ module.exports = class MediaManager {
      * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeStream
      *
      * @param {MediaStream} stream Video stream to stop and remove.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    removeVideoStream(stream) {
+    async removeVideoStream(stream) {
         if (!this.instance.peerConnection) {
             log.error('Could not remove video stream: connection is not ready');
-            return;
+            return false;
         }
         if (stream instanceof MediaStream) {
             stream.getTracks().forEach((track) => {
@@ -334,8 +347,9 @@ module.exports = class MediaManager {
             if (this.microphoneSender && this.videoWithMicrophone) {
                 this.instance.peerConnection.removeTrack(this.microphoneSender);
             }
-            this.instance.renegotiateWebRTCConnection();
+            return this.instance.renegotiateWebRTCConnection();
         }
+        return false;
     }
 
     /**

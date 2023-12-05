@@ -352,8 +352,9 @@ module.exports = class DeviceRenderer {
     /**
      * Reconfigure & setup the peer-to-peer connection (SDP).
      * Can be used anytime to renegotiate the SDP if necessary.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    renegotiateWebRTCConnection() {
+    async renegotiateWebRTCConnection() {
         // For safari we add audio & video before sending SDP to avoid empty SDP
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         if (isSafari) {
@@ -361,11 +362,14 @@ module.exports = class DeviceRenderer {
             this.peerConnection.addTransceiver('video');
         }
         // creating SDP offer
-        this.peerConnection.createOffer(
-            this.setLocalDescription.bind(this),
-            this.onWebRTCConnectionError.bind(this),
-            this.sdpConstraints
-        );
+        try {
+            const description = await this.peerConnection.createOffer(this.sdpConstraints);
+            this.setLocalDescription(description);
+        } catch (error) {
+            this.onWebRTCConnectionError(error);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -620,8 +624,9 @@ module.exports = class DeviceRenderer {
              */
             description.sdp = description.sdp.replace(
                 new RegExp(`(a=fmtp:${m[1]}) ?(.*)(\r?\n)`, 'g'),
+                // eslint-disable-next-line no-unused-vars
                 (match, fmtpId, existingParams, lineEnding, offset, string) => {
-                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `
+                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `;
                     return `${modified}stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000${lineEnding}`;
                 });
         }

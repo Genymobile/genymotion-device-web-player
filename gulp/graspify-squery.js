@@ -24,18 +24,21 @@ const options = {
 module.exports = transformTools.makeStringTransform('graspify', options, (content, opts, done) => {
     try {
         // Normalize plain replacements
-        if (opts.opts && typeof opts.opts[0] === 'string') {
-            opts.opts = [opts.opts];
-        }
-        if (opts.config && typeof opts.config[0] === 'string') {
-            opts.config = [opts.config];
-        }
+        opts.opts = opts.opts ? 
+            Array.isArray(opts.opts) ? 
+                opts.opts : [opts.opts] 
+            : [];
+        opts.config = opts.config ? 
+            Array.isArray(opts.config) ? 
+                opts.config : [opts.config]
+            : [];
 
         // Merge opts & config for the full list of replacements an loop over
-        [].concat(opts.opts || [], opts.config || []).forEach((args) => {
+        [].concat(opts.opts, opts.config).forEach((args) => {
             const selectorType = args.length === 3 ? args.shift() : 'squery';
             const selector = args[0];
             const replacement = args[1];
+
             content = grasp.replace(selectorType, selector, replacement, content);
         });
 

@@ -97,6 +97,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     };
 
     // Device renderer instanciation
+    const { DeviceRendererFactory } = window.index
     const deviceRendererFactory = new DeviceRendererFactory();
     const renderer = deviceRendererFactory.setupRenderer(container,     // the container element or element ID to use
                                               webrtcAddress, // the websocket address of your instance connector

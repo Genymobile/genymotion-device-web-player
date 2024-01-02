@@ -116,6 +116,18 @@ gulp.task('app-templates', function() {
 });
 
 function getBundler() {
+    return new Promise((resolve) => {
+        if (!templates) {
+            gulp.series('app-templates')(() => {
+                resolve(setupBrowserify());
+            });
+        } else {
+            resolve(setupBrowserify());
+        }
+    });
+}
+
+function setupBrowserify() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
         standalone: 'index',
@@ -123,8 +135,9 @@ function getBundler() {
     }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }
 
-gulp.task('app-js', function() {
-    return merge2(getBundler().bundle()
+gulp.task('app-js', async function() {
+    const bundler = await getBundler();
+    return merge2(bundler.bundle()
         .pipe(source(PATHS.SRC.APP)), {end: true})
         .pipe(gulpif(util.env.debug, using()))
         .pipe(gulpif(util.env.production, streamify(babel({

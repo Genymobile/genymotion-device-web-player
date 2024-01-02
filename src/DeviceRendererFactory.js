@@ -203,6 +203,12 @@ module.exports = class DeviceRendererFactory {
      * @param  {Object}             options  Various configuration options.
      */
     addPlugins(instance, options) {
+        // Load instance dedicated plugins
+        //If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
+
         const pluginInitMap = [
             {enabled: options.touch, class: MultiTouchEvents},
             {enabled: options.fullscreen, class: Fullscreen},
@@ -230,10 +236,5 @@ module.exports = class DeviceRendererFactory {
                 new plugin.class(instance, ...args);
             }
         });
-
-        // Load instance dedicated plugins
-        if (typeof instance.addCustomPlugins === 'function') {
-            instance.addCustomPlugins();
-        }
     }
 };

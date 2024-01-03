@@ -299,7 +299,7 @@ module.exports = class DeviceRenderer {
     disconnect() {
         this.initialized = false;
 
-        if (typeof this.mediaManager !== 'undefined') {
+        if (this.mediaManager) {
             this.mediaManager.disconnect();
         }
 

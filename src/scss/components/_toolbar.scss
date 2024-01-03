@@ -109,9 +109,9 @@
       }
     }
 
-    &-gps-button, &-gps-button.gm-active {
+    &-gps-button {
       background-image: url("../assets/images/ic_location_inactive.svg");
-      &:hover {
+      &:hover, &.gm-active {
         background-image: url("../assets/images/ic_location_active.svg");
       }
     }

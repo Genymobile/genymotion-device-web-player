@@ -811,6 +811,9 @@ module.exports = class DeviceRenderer {
                 disable: (widget) => {
                     widget.setAvailability(false);
                 },
+            }, {
+                widget: this.fingerprint,
+                capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {

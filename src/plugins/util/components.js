@@ -1,20 +1,21 @@
+'use strict';
 
 const switchButton = (() => {
-    let switchStatus = false;
-
     const createSwitch = ({onChange}) => {
+        let switchStatus = false;
+
         const switchDiv = document.createElement('div');
         switchDiv.style.position = 'relative';
         switchDiv.style.display = 'inline-block';
         switchDiv.style.width = '50px';
         switchDiv.style.height = '20px';
-    
+
         const input = document.createElement('input');
         input.type = 'checkbox';
         input.style.opacity = '0';
         input.style.width = '0';
         input.style.height = '0';
-    
+
         const slider = document.createElement('span');
         slider.style.position = 'absolute';
         slider.style.cursor = 'pointer';
@@ -25,7 +26,9 @@ const switchButton = (() => {
         slider.style.backgroundColor = '#ccc';
         slider.style.transition = '.4s';
         slider.style.borderRadius = '15px';
-    
+
+        const sliderBefore = document.createElement('span');
+
         slider.addEventListener('click', () => {
             input.checked = !input.checked;
             if (input.checked) {
@@ -37,12 +40,13 @@ const switchButton = (() => {
                 slider.style.backgroundColor = '#ccc';
                 sliderBefore.style.transform = 'translateX(0)';
             }
-            onChange && onChange(switchStatus);
+            if (onChange) {
+                onChange(switchStatus);
+            }
         });
-    
-        const sliderBefore = document.createElement('span');
+
         sliderBefore.style.position = 'absolute';
-        sliderBefore.style.content = "";
+        sliderBefore.style.content = '';
         sliderBefore.style.height = '30px';
         sliderBefore.style.width = '30px';
         sliderBefore.style.left = '-3px';
@@ -50,16 +54,16 @@ const switchButton = (() => {
         sliderBefore.style.backgroundColor = 'white';
         sliderBefore.style.transition = '.4s';
         sliderBefore.style.borderRadius = '50%';
-    
+
         slider.appendChild(sliderBefore);
-    
+
         switchDiv.appendChild(input);
         switchDiv.appendChild(slider);
-        
-        return switchDiv;
-    }
-    return {createSwitch}
-})()
 
-module.exports = {switchButton}
+        return switchDiv;
+    };
+    return {createSwitch};
+})();
+
+module.exports = {switchButton};
 

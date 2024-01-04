@@ -29,6 +29,11 @@
       width: 24px;
     }
   }
+  
+  hr {
+    width: 100%;
+    opacity: 0.2;
+  }
 
   .gm {
     &-video {
@@ -115,5 +120,21 @@
         color: $btn-background-color;
       }
     }
+  }
+}
+.gm-loader {
+  position: relative;
+    &::after {
+    content: '';
+    width: 60%;
+    height: 80%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 20%;
+    margin-top: 5%;
+    background: transparent url("../assets/images/spinner-material.svg") center no-repeat;
+    background-size: 100%;
+    filter: inherit;
   }
 }

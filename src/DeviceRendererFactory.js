@@ -21,6 +21,7 @@ const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 const GamepadManager = require('./plugins/GamepadManager');
+const FingerPrint = require('./plugins/FingerPrint');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -57,6 +58,7 @@ const defaultOptions = {
     streamResolution: true,
     diskIO: true,
     gamepad: false,
+    fingerprint: true,
     translateHomeKey: false,
     token: '',
     i18n: {},
@@ -203,8 +205,10 @@ module.exports = class DeviceRendererFactory {
      * @param  {Object}             options  Various configuration options.
      */
     addPlugins(instance, options) {
-        // Load instance dedicated plugins
-        //If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
+        /*
+         * Load instance dedicated plugins
+         * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
+         */
         if (typeof instance.addCustomPlugins === 'function') {
             instance.addCustomPlugins();
         }
@@ -226,6 +230,7 @@ module.exports = class DeviceRendererFactory {
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
             {enabled: options.gamepad, class: GamepadManager},
+            {enabled: options.fingerprint , class: FingerPrint},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
         ];
 

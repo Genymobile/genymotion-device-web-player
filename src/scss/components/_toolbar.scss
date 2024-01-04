@@ -193,6 +193,25 @@
       }
     }
 
+    &-fingerprint-button {
+      background-image: url("../assets/images/ic_biometrics.svg");
+      &:hover, &.gm-active {
+        background-image: url("../assets/images/ic_biometrics_hover.svg");
+      }
+      &.fingerprint-require{
+        background-image: url("../assets/images/ic_biometrics_hover.svg");
+        filter: invert(0) !important;
+        animation: blink 2s linear infinite;
+      }
+      &.fingerprint-autoValidation{
+        background-image: url("../assets/images/ic_biometrics_auto_validation_black.svg");
+        filter: invert(0) !important;
+        &:hover, &.gm-active {
+          background-image: url("../assets/images/ic_biometrics_auto_validation.svg");
+        }
+      }
+    }
+
     &-default-turn-button {
       background-image: url("../assets/images/ic_warning.svg");
     }

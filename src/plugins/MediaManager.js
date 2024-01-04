@@ -133,7 +133,8 @@ module.exports = class MediaManager {
             log.debug('Client audio stream ready');
             this.audioStreaming = true;
             this.localAudioStream = mediaStream;
-            return await this.addAudioStream(mediaStream);
+            const addAudioStreamResult = await this.addAudioStream(mediaStream);
+            return addAudioStreamResult;
         } catch (error) {
             this.onAudioStreamError(error);
             return false;

@@ -423,6 +423,14 @@ Enables or disables the diskIO widget. This widget can be used to modify Disk IO
 - **Details:**
 Enable or disable experimental gamepad support & widget
 
+### `biometrics`
+
+- **Type:** `Boolean`
+- **Default:** `true`
+- **Compatibility:** `SaaS`, `PaaS`
+- **Details:**
+Enable or disable fingerprints widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above
+
 ### `translateHomeKey`
 
 - **Type:** `Boolean`

@@ -137,29 +137,26 @@
 }
 
 .gm-disabled-widget-pop-up {
+  position: relative;
   &::before {
-    position: relative;
-    float: left;
-    left: -220px;
+    position: absolute;
+    right: 100%;
     top: -7px;
-    color: $white;
     font-size: 15px;
     font-family: Roboto, sans-serif;
-    pointer-events: none;
-    z-index: 5;
-    padding: 12px 8px 10px 8px;
-    width: 210px;
-    background-color: $modal-background-color;
+    z-index: 20;
+    padding: 12px 20px;
+    margin-right: 10px;
+    background-color: #303339;
     vertical-align: middle;
-    content: "Not\00a0 currently\00a0supported";
+    content: "Not\00a0 currently\00a0 supported";
     display: none;
   }
   
-  :hover::before {
+  &:hover::before {
     display: block;
   }
 }
-
 
 .gm-disabled-widget-icon {
   opacity: 0.3;

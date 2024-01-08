@@ -22,6 +22,10 @@ module.exports = class MouseEvents {
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
     }
 
+    destroy() {
+        this.removeMouseCallbacks();
+    }
+
     /**
      * Mouse press event handler.
      *
@@ -159,6 +163,18 @@ module.exports = class MouseEvents {
         this.instance.videoWrapper.addEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
         this.instance.videoWrapper.addEventListener('wheel', this.onMouseWheelEvent.bind(this), {passive: false});
         this.instance.videoWrapper.addEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
+    }
+
+    /**
+     * Remove all events handlers
+     */
+    removeMouseCallbacks() {
+        this.instance.videoWrapper.removeEventListener('mousedown', this.onMousePressEvent.bind(this), false);
+        this.instance.videoWrapper.removeEventListener('mouseup', this.onMouseReleaseEvent.bind(this), false);
+        this.instance.videoWrapper.removeEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
+        this.instance.videoWrapper.removeEventListener('wheel', this.onMouseWheelEvent.bind(this), {passive: false});
+        this.instance.videoWrapper.removeEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
+        document.removeEventListener('mouseup', this.boundEventListener, false);
     }
 
     getWheelDeltaPixels(delta, mode) {

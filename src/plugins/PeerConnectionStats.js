@@ -21,7 +21,7 @@ module.exports = class PeerConnectionStats {
 
         this.connection = connection;
 
-        setTimeout(() => {
+        this.timeoutID = setTimeout(() => {
             this.connection.getStats(null).then((stats) => {
                 stats.forEach((entry) => {
                     if (entry.kind === 'video') {
@@ -106,5 +106,11 @@ module.exports = class PeerConnectionStats {
         if (element) {
             element.remove();
         }
+    }
+
+    destroy() {
+        clearTimeout(this.timeoutID);
+        delete this.connection;
+        delete this.instance;
     }
 };

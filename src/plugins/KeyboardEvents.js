@@ -69,9 +69,6 @@ module.exports = class KeyboardEvents {
         this.instance.registerEventCallback('keyboard-enable', () => {
             this.transmitKeys = true;
         });
-
-        // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-        window.addEventListener('blur', this.cancelAllPressedKeys.bind(this));
     }
 
     /**
@@ -225,6 +222,9 @@ module.exports = class KeyboardEvents {
         this.instance.root.tabIndex = 0;
 
         if (!this.isListenerAdded) {
+            // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
+            window.addEventListener('blur', this.cancelAllPressedKeys.bind(this));
+
             if (!this.keyboardCallbacks) {
                 this.keyboardCallbacks = new Map([
                     ['keypress', this.onKeyPress.bind(this)],
@@ -247,6 +247,7 @@ module.exports = class KeyboardEvents {
         if (!this.keyboardCallbacks || !this.isListenerAdded) {
             return;
         }
+        window.removeEventListener('blur', this.cancelAllPressedKeys.bind(this));
         this.keyboardCallbacks.forEach((value, key) => {
             window.removeEventListener(key, value);
         });

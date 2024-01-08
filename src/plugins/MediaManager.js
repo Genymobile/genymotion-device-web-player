@@ -46,6 +46,7 @@ module.exports = class MediaManager {
             try {
                 const permissionObj = await navigator.permissions.query({name: 'microphone'});
                 log.debug(`microphone ${permissionObj.state}`);
+                this.microphonePermissionObject = permissionObj;
                 permissionObj.addEventListener('change', this.onMicrophonePermissionChange.bind(this));
             } catch (error) {
                 log.warn('Can\'t get microphone permission object', error);
@@ -56,6 +57,7 @@ module.exports = class MediaManager {
         try {
             const permissionObj = await navigator.permissions.query({name: 'camera'});
             log.debug(`camera ${permissionObj.state}`);
+            this.cameraPermissionObject = permissionObj;
             permissionObj.addEventListener('change', this.onCameraPermissionChange.bind(this));
         } catch (error) {
             log.warn('Can\'t get camera permission object', error);
@@ -362,5 +364,10 @@ module.exports = class MediaManager {
         if (this.videoStreaming) {
             this.stopVideoStreaming();
         }
+    }
+
+    destroy() {
+        this.microphonePermissionObject?.removeEventListener('change', this.onMicrophonePermissionChange.bind(this));
+        this.cameraPermissionObject?.removeEventListener('change', this.onCameraPermissionChange.bind(this));
     }
 };

@@ -299,9 +299,7 @@ module.exports = class DeviceRenderer {
     disconnect() {
         this.initialized = false;
 
-        if (typeof this.mediaManager !== 'undefined') {
-            this.mediaManager.disconnect();
-        }
+        this.mediaManager?.disconnect();
 
         if (this.webRTCWebsocket) {
             this.webRTCWebsocket.close();

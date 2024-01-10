@@ -23,6 +23,8 @@ const IOThrottling = require('./plugins/IOThrottling');
 const GamepadManager = require('./plugins/GamepadManager');
 const FingerPrint = require('./plugins/FingerPrint');
 
+const store = require('./store');
+
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
@@ -158,6 +160,8 @@ module.exports = class DeviceRendererFactory {
         this.loadTemplate(dom, this.templates[options.template], options);
 
         const instance = new RendererClass(dom, options);
+        store(instance);
+
         this.instances.push(instance);
 
         this.addPlugins(instance, instance.options);
@@ -207,31 +211,31 @@ module.exports = class DeviceRendererFactory {
     addPlugins(instance, options) {
         /*
          * Load instance dedicated plugins
-         * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
-         */
+        * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
+        */
         if (typeof instance.addCustomPlugins === 'function') {
             instance.addCustomPlugins();
         }
 
         const pluginInitMap = [
-            {enabled: options.touch, class: MultiTouchEvents},
-            {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
-            {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
-            {enabled: options.camera, class: Camera, params: [options.i18n]},
-            {enabled: options.battery, class: Battery, params: [options.i18n]},
-            {enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n]},
-            {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
-            {enabled: options.capture, class: Screencast, params: [options.i18n]},
-            {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n]},
-            {enabled: options.phone, class: Phone, params: [options.i18n]},
-            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
-            {enabled: options.streamResolution, class: StreamResolution},
-            {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
-            {enabled: options.gamepad, class: GamepadManager},
-            {enabled: options.fingerprint , class: FingerPrint},
-            {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
+            { enabled: options.touch, class: MultiTouchEvents },
+            { enabled: options.fullscreen, class: Fullscreen },
+            { enabled: options.clipboard, class: Clipboard, params: [options.i18n] },
+            { enabled: options.fileUpload, class: FileUpload, params: [options.i18n] },
+            { enabled: options.camera, class: Camera, params: [options.i18n] },
+            { enabled: options.battery, class: Battery, params: [options.i18n] },
+            { enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n] },
+            { enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport] },
+            { enabled: options.capture, class: Screencast, params: [options.i18n] },
+            { enabled: options.identifiers, class: Identifiers, params: [options.i18n] },
+            { enabled: options.network, class: Network, params: [options.i18n] },
+            { enabled: options.phone, class: Phone, params: [options.i18n] },
+            { enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband] },
+            { enabled: options.streamResolution, class: StreamResolution },
+            { enabled: options.diskIO, class: IOThrottling, params: [options.i18n] },
+            { enabled: options.gamepad, class: GamepadManager },
+            { enabled: options.fingerprint, class: FingerPrint },
+            { enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey] },
         ];
 
         pluginInitMap.forEach((plugin) => {

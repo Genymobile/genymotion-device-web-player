@@ -33,7 +33,7 @@
         &.active {
           pointer-events: all;
           background-color: #152616;
-          color: #11b920;
+          color: $succes-color;
           &::before {
             content: attr(data-text);
           }
@@ -72,7 +72,7 @@
           width: 80%;
           cursor: pointer;
           &:hover {
-            background: #2c2C2C;
+            background: $btn-hover-background-color;
             border-radius: 15px;
             margin: 0 auto;
           }

@@ -1,8 +1,23 @@
 'use strict';
 
+/**
+ * Factory function to create a custom switch button.
+ * @namespace
+ * @typedef {Object} SwitchButton
+ * @property {Function} createSwitch - Function to create and return the switch button component.
+ */
+
+/**
+ * Creates a custom switch button component.
+ * @function
+ * @memberof SwitchButton
+ * @param {Object} options - Options for configuring the switch button.
+ * @param {Function} [options.onChange] - Optional callback function to be executed when the switch state changes.
+ * @returns {HTMLElement} - The switch button component as an HTML element. setState function is exposed to change the state of the switch button.
+ */
+
 const switchButton = (() => {
     const createSwitch = ({onChange}) => {
-        let switchStatus = false;
 
         const switchDiv = document.createElement('div');
         switchDiv.style.position = 'relative';
@@ -31,18 +46,7 @@ const switchButton = (() => {
 
         slider.addEventListener('click', () => {
             input.checked = !input.checked;
-            if (input.checked) {
-                switchStatus = true;
-                slider.style.backgroundColor = '#E6195E';
-                sliderBefore.style.transform = 'translateX(26px)';
-            } else {
-                switchStatus = false;
-                slider.style.backgroundColor = '#ccc';
-                sliderBefore.style.transform = 'translateX(0)';
-            }
-            if (onChange) {
-                onChange(switchStatus);
-            }
+            changeStateRenderer();
         });
 
         sliderBefore.style.position = 'absolute';
@@ -59,6 +63,29 @@ const switchButton = (() => {
 
         switchDiv.appendChild(input);
         switchDiv.appendChild(slider);
+
+        const changeStateRenderer = () => {
+            if (input.checked) {
+                slider.style.backgroundColor = '#E6195E';
+                sliderBefore.style.transform = 'translateX(26px)';
+            } else {
+                slider.style.backgroundColor = '#ccc';
+                sliderBefore.style.transform = 'translateX(0)';
+            }
+            if (onChange && typeof onChange === 'function') {
+                onChange(input.checked);
+            }
+        }
+
+        //Expose a function to change the state of the switch button
+        const setState = (value) => {
+            //avoid infinite loop
+            if (input.checked === value) return;
+            input.checked = value;
+            changeStateRenderer()
+        }
+
+        switchDiv.setState = setState;
 
         return switchDiv;
     };

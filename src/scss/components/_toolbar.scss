@@ -204,7 +204,7 @@
         animation: blink 2s linear infinite;
       }
       &.fingerprint-autoValidation{
-        background-image: url("../assets/images/ic_biometrics_auto_validation_black.svg");
+        background-image: url("../assets/images/ic_biometrics_auto_validation.svg");
         filter: invert(0) !important;
         &:hover, &.gm-active {
           background-image: url("../assets/images/ic_biometrics_auto_validation.svg");

@@ -79,6 +79,7 @@ const defaultOptions = {
     },
     connectionFailedURL: '',
     turn: {},
+    giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions'
 };
 
 /**
@@ -135,6 +136,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             options.turn.username          WebRTC TURN servers username.
      * @param  {string}             options.turn.credential        WebRTC TURN servers password.
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
+     * @param  {string}             options.giveFeedbackLink       URL to the feedback form. Default: 'https://github.com/orgs/Genymobile/discussions'
      * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
      * @return {DeviceRenderer}                                    The device renderer instance.
      */
@@ -211,8 +213,8 @@ module.exports = class DeviceRendererFactory {
     addPlugins(instance, options) {
         /*
          * Load instance dedicated plugins
-        * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
-        */
+         * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
+         */
         if (typeof instance.addCustomPlugins === 'function') {
             instance.addCustomPlugins();
         }

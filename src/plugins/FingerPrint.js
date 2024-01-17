@@ -55,7 +55,6 @@ module.exports = class FingerPrint extends OverlayPlugin {
         this.state = new Proxy({
             isScanStart: false,
             isRecognizedFPByDefault: false,
-            isStatusIdle: false,
             isEnrolling: false,
             isScanning: false,
         }, {
@@ -73,30 +72,30 @@ module.exports = class FingerPrint extends OverlayPlugin {
                 const authRequiredDiv = document.querySelector('.gm-fingerprint-dialog-auth-required-status');
 
                 switch (prop) {
-                case 'isStatusIdle':
-                    break;
                 case 'isScanStart':
                 case 'isEnrolling':
                 case 'isScanning':
                     if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
                         authRequiredDiv.classList.add('active');
-                        authRequiredDiv.setAttribute('data-text', this.i18n.yes ?? 'Yes');
+                        authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
                         this.toolbarBtnImage.classList.add('fingerprint-require');
                     } else {
                         authRequiredDiv.classList.remove('active');
-                        authRequiredDiv.setAttribute('data-text', this.i18n.no ??  'No');
+                        authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
                         this.toolbarBtnImage.classList.remove('fingerprint-require');
                     }
                     break;
                 case 'isRecognizedFPByDefault':
                     if (value) {
+                        // eslint-disable-next-line no-unused-expressions
                         !oldValue && this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE);
                         this.toolbarBtnImage.classList.add('fingerprint-autoValidation');
                     } else {
+                        // eslint-disable-next-line no-unused-expressions
                         oldValue && this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_FALSE);
                         this.toolbarBtnImage.classList.remove('fingerprint-autoValidation');
                     }
-                    //update switch
+                    // update switch
                     document.querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status').setState(value);
                     break;
                 default:
@@ -112,13 +111,13 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
         // register callback
         this.instance.registerEventCallback('fingerprint', (message) => this.handleFingerprintEvent(message));
-        if (this.instance.store.getState().isWebRTCReady) {
+        if (this.instance.store.getState().isWebRTCConnectionReady) {
             this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL);
         } else {
-            const unSubscribe = this.instance.store.subscribe(({isWebRTCReady}) => {
-                if (isWebRTCReady) {
-                    this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL)                        
-                    unSubscribe()
+            const unSubscribe = this.instance.store.subscribe(({isWebRTCConnectionReady}) => {
+                if (isWebRTCConnectionReady) {
+                    this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL);
+                    unSubscribe();
                 }
             });
         }
@@ -170,7 +169,8 @@ module.exports = class FingerPrint extends OverlayPlugin {
         autRequiredStatus.classList.add('gm-fingerprint-dialog-auth-required-status');
         autRequiredStatus.classList.add(this.state.isScanStart ? 'active' : 'inactive');
         autRequiredStatus.classList.remove(this.state.isScanStart ? 'active' : 'inactive');
-        autRequiredStatus.setAttribute('data-text', this.state.isScanStart ? this.i18n.yes ?? 'Yes' : this.i18n.no ??  'No');
+        autRequiredStatus.setAttribute('data-text', this.state.isScanStart ?
+            this.i18n.yes || 'Yes' : this.i18n.no || 'No');
 
         authRequiredDiv.appendChild(authActiveLabel);
         authRequiredDiv.appendChild(autRequiredStatus);
@@ -243,7 +243,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
         const giveFeedbackDiv = document.createElement('div');
         giveFeedbackDiv.classList.add('gm-fingerprint-dialog-give-feedback');
         const giveFeedbackLink = document.createElement('a');
-        giveFeedbackLink.href = 'https://github.com/orgs/Genymobile/discussions';
+        giveFeedbackLink.href = this.instance.options.giveFeedbackLink;
         giveFeedbackLink.innerHTML = this.i18n.FINGERPRINT_GIVE_FEEDBACK_LABEL || 'Give feedback';
         giveFeedbackLink.target = '_blank';
         giveFeedbackLink.rel = 'noopener noreferrer';
@@ -340,9 +340,6 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
     handleFingerprintEvent(message) {
         // State synchronization
-        if (message !== FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_IDLE) {
-            this.state.isStatusIdle = false;
-        }
         switch (message) {
         case FINGERPRINT_MESSAGES.toReceive.SCAN_START:
             this.state.isScanStart = true;
@@ -359,9 +356,6 @@ module.exports = class FingerPrint extends OverlayPlugin {
                     btn.classList.remove('gm-loader');
                 });
             this.closeWidget();
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_IDLE:
-            this.state.isStatusIdle = true;
             break;
         case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_SCANNING:
             this.state.isScanning = true;
@@ -380,7 +374,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
             break;
         }
     }
-    
+
     /**
      * Send information to instance.
      *

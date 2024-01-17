@@ -448,6 +448,14 @@ Translate home key to `META` + `ENTER`
 - **Details:**
 Redirection page in case of connection error.
 
+### `giveFeedbackLink`
+
+- **Type:** `String`
+- **Default:** `giveFeedbackLink`
+- **Compatibility:** `SaaS`, `PaaS`
+- **Details:**
+Set url for feedback page.
+
 ## Contributing
 
 Read through our [contributing guidelines](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CONTRIBUTING.md) to learn about our submission process, coding rules and more.

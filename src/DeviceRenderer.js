@@ -212,7 +212,7 @@ module.exports = class DeviceRenderer {
      */
     onConnectionClosed() {
         this.webRTCWebsocket.onclose = (event) => {
-            this.store.dispatch({type: 'SET_WEBRTC_READY', payload: false});
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
             this.video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
@@ -568,8 +568,8 @@ module.exports = class DeviceRenderer {
             log.debug('Got Data Channel Message:', event.data);
         };
         this.signalingDataChannel.onopen = () => {
-            //Adding status to store, this way all logic for new connection can be handled by plugin
-            this.store.dispatch({type: 'SET_WEBRTC_READY', payload: true});
+            // Adding status to store, this way all logic for new connection can be handled by plugin
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: true});
             log.debug('Data Channel opened');
         };
 

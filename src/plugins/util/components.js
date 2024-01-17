@@ -44,11 +44,6 @@ const switchButton = (() => {
 
         const sliderBefore = document.createElement('span');
 
-        slider.addEventListener('click', () => {
-            input.checked = !input.checked;
-            changeStateRenderer();
-        });
-
         sliderBefore.style.position = 'absolute';
         sliderBefore.style.content = '';
         sliderBefore.style.height = '30px';
@@ -75,15 +70,22 @@ const switchButton = (() => {
             if (onChange && typeof onChange === 'function') {
                 onChange(input.checked);
             }
-        }
+        };
 
-        //Expose a function to change the state of the switch button
+        // Expose a function to change the state of the switch button
         const setState = (value) => {
-            //avoid infinite loop
-            if (input.checked === value) return;
+            // avoid infinite loop
+            if (input.checked === value) {
+                return;
+            }
             input.checked = value;
-            changeStateRenderer()
-        }
+            changeStateRenderer();
+        };
+
+        // Bind event listeners to the switch button click event
+        slider.addEventListener('click', () => {
+            setState(!input.checked);
+        });
 
         switchDiv.setState = setState;
 

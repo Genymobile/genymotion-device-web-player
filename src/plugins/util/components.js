@@ -84,6 +84,7 @@ const switchButton = (() => {
 
         // Bind event listeners to the switch button click event
         slider.addEventListener('click', () => {
+            // Toggle button status on/off
             setState(!input.checked);
         });
 

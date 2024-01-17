@@ -1,5 +1,5 @@
 'use strict';
-const {generateUID} = require('../utils/uuid');
+const {generateUID} = require('../utils/helpers');
 
 const initialState = {
     isWebRTCConnectionReady: false,

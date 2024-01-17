@@ -86,15 +86,25 @@ module.exports = class FingerPrint extends OverlayPlugin {
                     }
                     break;
                 case 'isRecognizedFPByDefault':
+                    /* At start we fetch the value from the HAL with this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL)
+                    * so the instance send an AUTO_RECOGNIZE_FALSE event, which change the isRecognizedFPByDefault state (this.state.isRecognizedFPByDefault) 
+                    * which trigger a this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE); 
+                    * so the instance send an AUTO_RECOGNIZE_FALSE event ... and we get an infinite loop
+                    * to avoid this we check if the value is different from the old one but we update UI anyway (to get the right ui state at start)
+                    */
+                    if (value !== oldValue) {
+                        if (value) {
+                           this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE);
+                        } else {
+                           this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_FALSE);
+                        }
+                    }
                     if (value) {
-                        // eslint-disable-next-line no-unused-expressions
-                        !oldValue && this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE);
-                        this.toolbarBtnImage.classList.add('fingerprint-autoValidation');
+                         this.toolbarBtnImage.classList.add('fingerprint-autoValidation');        
                     } else {
-                        // eslint-disable-next-line no-unused-expressions
-                        oldValue && this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_FALSE);
                         this.toolbarBtnImage.classList.remove('fingerprint-autoValidation');
                     }
+
                     // update switch
                     document.querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status').setState(value);
                     break;

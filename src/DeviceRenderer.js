@@ -70,6 +70,10 @@ module.exports = class DeviceRenderer {
         document.addEventListener('click', this.clickHandlerCloseOverlay.bind(this));
     }
 
+    /**
+     * Handler for click event, responsible for closing overlay when clicking outside of it.
+     * @param {PointerEvent} event Event that triggered this handler
+     */
     clickHandlerCloseOverlay(event) {
         if (!this.hasSomeParentTheClass(event.target, 'gm-overlay')
             && !event.target.classList.contains('gm-icon-button')
@@ -226,7 +230,7 @@ module.exports = class DeviceRenderer {
         this.webRTCWebsocket.onclose = (event) => {
             this.video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
-            log.debug('Error! Maybe your VM is not available yet? (' + event.code +') ' + event.reason);
+            log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
             case 1000:
@@ -494,8 +498,8 @@ module.exports = class DeviceRenderer {
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    window.addEventListener('click', addSound, {once:true});
-                    window.addEventListener('touchend', addSound, {once:true});
+                    window.addEventListener('click', addSound, {once: true});
+                    window.addEventListener('touchend', addSound, {once: true});
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -511,8 +515,8 @@ module.exports = class DeviceRenderer {
                         this.dispatchEvent('video', {msg: 'play manually allowed by click'});
                         log.debug('Playing video with sound disabled has been authorized due to user click');
                     };
-                    div.addEventListener('click', allowPlay, {once:true});
-                    div.addEventListener('touchend', allowPlay, {once:true});
+                    div.addEventListener('click', allowPlay, {once: true});
+                    div.addEventListener('touchend', allowPlay, {once: true});
                 });
             });
         };
@@ -563,6 +567,9 @@ module.exports = class DeviceRenderer {
         this.renegotiateWebRTCConnection();
     }
 
+    /**
+     * Handler when the peer connection state changes
+     */
     onConnectionStateChange() {
         log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
         if (this.peerConnection.iceConnectionState === 'disconnected') {
@@ -845,6 +852,12 @@ module.exports = class DeviceRenderer {
         }
     }
 
+    /**
+     * Destructor for the device renderer. This won't actually destroy the instance, but simply remove all event bindings
+     * so that things can be garbage-collected.
+     * References to the instance in the caller need to be manually deleted too in order for the instance to be garbage-collected.
+     * This method also calls recursively the destroy methods on the plugins if they exist.
+     */
     destroy() {
         document.removeEventListener('click', this.clickHandlerCloseOverlay.bind(this));
         this.peerConnection?.removeEventListener('connectionstatechange', this.onConnectionStateChange);

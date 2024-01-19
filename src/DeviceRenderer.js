@@ -859,8 +859,10 @@ module.exports = class DeviceRenderer {
      * This method also calls recursively the destroy methods on the plugins if they exist.
      */
     destroy() {
-        document.removeEventListener('click', this.clickHandlerCloseOverlay.bind(this));
+        // remove onConnectionStateChange handler in order to prevent reconnecting after disconnect
         this.peerConnection?.removeEventListener('connectionstatechange', this.onConnectionStateChange);
+        this.disconnect();
+        document.removeEventListener('click', this.clickHandlerCloseOverlay);
         this.mediaManager?.destroy();
         this.gamepadManager?.destroy();
         this.peerConnectionStats?.destroy();

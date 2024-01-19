@@ -213,11 +213,7 @@ module.exports = class DeviceRendererFactory {
     addPlugins(instance, options) {
         /*
          * Load instance dedicated plugins
-         * If addCustomPlugins is called after new plugin.class we get an error for option.camera cause Camera rendertoolbar link mediaManager toggleview which is not yet defined (cause defined in addCustomePlugins)
          */
-        if (typeof instance.addCustomPlugins === 'function') {
-            instance.addCustomPlugins();
-        }
 
         const pluginInitMap = [
             { enabled: options.touch, class: MultiTouchEvents },
@@ -247,5 +243,9 @@ module.exports = class DeviceRendererFactory {
                 new plugin.class(instance, ...args);
             }
         });
+
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
     }
 };

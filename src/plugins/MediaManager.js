@@ -374,6 +374,9 @@ module.exports = class MediaManager {
         this.microphoneSender = null;
     }
 
+    /**
+     * Plugin destructor, responsible for removing all callbacks & bindings so that things are garbage-collected
+     */
     destroy() {
         this.microphonePermissionObject?.removeEventListener('change', this.onMicrophonePermissionChange.bind(this));
         this.cameraPermissionObject?.removeEventListener('change', this.onCameraPermissionChange.bind(this));

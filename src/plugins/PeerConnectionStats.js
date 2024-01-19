@@ -108,6 +108,9 @@ module.exports = class PeerConnectionStats {
         }
     }
 
+    /**
+     * Plugin destructor, responsible for removing all callbacks & bindings so that things are garbage-collected
+     */
     destroy() {
         clearTimeout(this.timeoutID);
         delete this.connection;

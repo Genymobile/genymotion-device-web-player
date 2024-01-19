@@ -22,6 +22,9 @@ module.exports = class MouseEvents {
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
     }
 
+    /**
+     * Plugin destructor, responsible for removing all callbacks & bindings so that things are garbage-collected
+     */
     destroy() {
         this.removeMouseCallbacks();
     }

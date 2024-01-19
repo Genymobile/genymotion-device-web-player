@@ -67,19 +67,14 @@ module.exports = class DeviceRenderer {
         this.x = 0;
         this.y = 0;
 
-        document.addEventListener('click', this.clickHandlerCloseOverlay.bind(this));
-    }
-
-    /**
-     * Handler for click event, responsible for closing overlay when clicking outside of it.
-     * @param {PointerEvent} event Event that triggered this handler
-     */
-    clickHandlerCloseOverlay(event) {
-        if (!this.hasSomeParentTheClass(event.target, 'gm-overlay')
-            && !event.target.classList.contains('gm-icon-button')
-            && !event.target.classList.contains('gm-dont-close')) {
-            this.emit('close-overlays');
-        }
+        this.clickHandlerCloseOverlay = (event) => {
+            if (!this.hasSomeParentTheClass(event.target, 'gm-overlay')
+                && !event.target.classList.contains('gm-icon-button')
+                && !event.target.classList.contains('gm-dont-close')) {
+                this.emit('close-overlays');
+            }
+        };
+        document.addEventListener('click', this.clickHandlerCloseOverlay);
     }
 
     /**
@@ -558,6 +553,12 @@ module.exports = class DeviceRenderer {
             div.innerHTML = message;
         };
 
+        this.onConnectionStateChange = () => {
+            log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
+            if (this.peerConnection.iceConnectionState === 'disconnected') {
+                this.onWebRTCReady();
+            }
+        };
         this.peerConnection.addEventListener('connectionstatechange', this.onConnectionStateChange);
 
         this.peerConnection.onnegotiationneeded = () => {
@@ -565,16 +566,6 @@ module.exports = class DeviceRenderer {
         };
 
         this.renegotiateWebRTCConnection();
-    }
-
-    /**
-     * Handler when the peer connection state changes
-     */
-    onConnectionStateChange() {
-        log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
-        if (this.peerConnection.iceConnectionState === 'disconnected') {
-            this.onWebRTCReady();
-        }
     }
 
     /**

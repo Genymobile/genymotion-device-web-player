@@ -68,7 +68,7 @@ module.exports = class DeviceRenderer {
         this.y = 0;
 
         document.addEventListener('click', (event) => {
-            if (!this.hasSomeParentTheClass(event.target, 'gm-overlay')
+            if (event.target.closest('.gm-overlay') === null
                 && !event.target.classList.contains('gm-icon-button')
                 && !event.target.classList.contains('gm-dont-close')) {
                 this.emit('close-overlays');
@@ -156,20 +156,6 @@ module.exports = class DeviceRenderer {
         this.callbacks[eventTag].forEach((callback) => {
             callback(payload);
         });
-    }
-
-    /**
-     * Look for a class applied in a element parent tree.
-     *
-     * @param  {HTMLElement} element   DOM element to check.
-     * @param  {string}      className Class name to look for.
-     * @return {boolean}               Whether or not the class has been found in the given element parents.
-     */
-    hasSomeParentTheClass(element, className) {
-        if (element.classList && element.classList.contains(className)) {
-            return true;
-        }
-        return element.parentNode && this.hasSomeParentTheClass(element.parentNode, className);
     }
 
     /**

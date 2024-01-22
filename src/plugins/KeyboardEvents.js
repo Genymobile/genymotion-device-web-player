@@ -223,7 +223,7 @@ module.exports = class KeyboardEvents {
 
         if (!this.isListenerAdded) {
             // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-            window.addEventListener('blur', this.cancelAllPressedKeys.bind(this));
+            this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
 
             if (!this.keyboardCallbacks) {
                 this.keyboardCallbacks = new Map([
@@ -234,7 +234,7 @@ module.exports = class KeyboardEvents {
             }
             this.instance.root.focus();
             this.keyboardCallbacks.forEach((value, key) => {
-                window.addEventListener(key, value);
+                this.instance.addListener(window, key, value);
             });
             this.isListenerAdded = true;
         }
@@ -247,9 +247,9 @@ module.exports = class KeyboardEvents {
         if (!this.keyboardCallbacks || !this.isListenerAdded) {
             return;
         }
-        window.removeEventListener('blur', this.cancelAllPressedKeys.bind(this));
+        this.instance.removeListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
         this.keyboardCallbacks.forEach((value, key) => {
-            window.removeEventListener(key, value);
+            this.instance.removeListener(window, key, value);
         });
         this.isListenerAdded = false;
     }

@@ -77,7 +77,7 @@ module.exports = class DeviceRenderer {
                 this.emit('close-overlays');
             }
         };
-        document.addEventListener('click', this.clickHandlerCloseOverlay);
+        this.addListener(document, 'click', this.clickHandlerCloseOverlay);
     }
 
     /**
@@ -474,14 +474,14 @@ module.exports = class DeviceRenderer {
                     this.videoWrapper.prepend(popup);
                     const addSound = () => {
                         this.video.muted = false;
-                        window.removeEventListener('click', addSound);
-                        window.removeEventListener('touchend', addSound);
+                        this.removeListener(window, 'click', addSound);
+                        this.removeListener(window, 'touchend', addSound);
                         this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    window.addEventListener('click', addSound, {once: true});
-                    window.addEventListener('touchend', addSound, {once: true});
+                    this.addListener(window, 'click', addSound, {once: true});
+                    this.addListener(window, 'touchend', addSound, {once: true});
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -490,15 +490,15 @@ module.exports = class DeviceRenderer {
                     this.classList.add('gm-video-overlay');
                     this.videoWrapper.prepend(div);
                     const allowPlay = () => {
-                        window.removeEventListener('click', allowPlay);
-                        window.removeEventListener('touchend', allowPlay);
+                        this.removeListener(window, 'click', allowPlay);
+                        this.removeListener(window, 'touchend', allowPlay);
                         this.video.play();
                         div.remove();
                         this.dispatchEvent('video', {msg: 'play manually allowed by click'});
                         log.debug('Playing video with sound disabled has been authorized due to user click');
                     };
-                    div.addEventListener('click', allowPlay, {once: true});
-                    div.addEventListener('touchend', allowPlay, {once: true});
+                    this.addListener(div, 'click', allowPlay, {once: true});
+                    this.addListener(div, 'touchend', allowPlay, {once: true});
                 });
             });
         };
@@ -525,14 +525,14 @@ module.exports = class DeviceRenderer {
                     '</br>See <a href="">help</a> to setup TURN configuration.'
                 );
                 const openDocumentationLink = () => {
-                    div.removeEventListener('click', openDocumentationLink);
-                    div.removeEventListener('touchend', openDocumentationLink);
+                    this.removeListener(div, 'click', openDocumentationLink);
+                    this.removeListener(div, 'touchend', openDocumentationLink);
                     this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
                     div.remove();
                     window.open(this.options.connectionFailedURL, '_blank');
                 };
-                div.addEventListener('click', openDocumentationLink);
-                div.addEventListener('touchend', openDocumentationLink);
+                this.addListener(div, 'click', openDocumentationLink);
+                this.addListener(div, 'touchend', openDocumentationLink);
             } else {
                 message = message.replace('{DOC_AVAILABLE}', '');
             }
@@ -546,7 +546,7 @@ module.exports = class DeviceRenderer {
                 this.onWebRTCReady();
             }
         };
-        this.peerConnection.addEventListener('connectionstatechange', this.onConnectionStateChange);
+        this.addListener(this.peerConnection, 'connectionstatechange', this.onConnectionStateChange);
 
         this.peerConnection.onnegotiationneeded = () => {
             log.debug('on Negotiation needed');
@@ -882,12 +882,7 @@ module.exports = class DeviceRenderer {
      */
     destroy() {
         this.removeAllListeners();
-        // remove onConnectionStateChange handler in order to prevent reconnecting after disconnect
-        this.peerConnection?.removeEventListener('connectionstatechange', this.onConnectionStateChange);
         this.disconnect();
-        document.removeEventListener('click', this.clickHandlerCloseOverlay);
-        this.mediaManager?.destroy();
-        this.gamepadManager?.destroy();
         this.peerConnectionStats?.destroy();
         delete this.peerConnectionStats;
         delete this.video;

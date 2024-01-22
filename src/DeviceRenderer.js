@@ -53,6 +53,9 @@ module.exports = class DeviceRenderer {
         // Event callbacks
         this.callbacks = {};
 
+        // Event listeners
+        this.allListeners = [];
+
         // WebRTC related attributes
         this.peerConnection = null;
         this.signalingDataChannel = null;
@@ -844,12 +847,51 @@ module.exports = class DeviceRenderer {
     }
 
     /**
+     * This function wraps around the plain js `addEventListener` function, also registering everything in a local array.
+     * The aim is to be able to remove all listeners at a later time.
+     * @param {EventTarget} object Object which emits the event
+     * @param {String} event A case-sensitive string reprensenting the event type to listen for
+     * @param {any} handler The object that receives a notification when an event of the specified type occus. This must be either `null`, an object with a `handleEvent()` method, or a function.
+     * @param {any} options Either a bool, specifying the `useCapture` arg, or an object specifying the `options` arg. Refer to the js api.
+     */
+    addListener(object, event, handler, options = {}) {
+        object.addEventListener(event, handler, options);
+        this.allListeners.push({object, event, handler, options});
+    }
+
+    /**
+     * This function wraps around the plain js `removeEventListener` function, also registering everything in a local array.
+     * The aim is to be able to remove all listeners at a later time.
+     * @param {EventTarget} object Object which emits the event
+     * @param {String} event A case-sensitive string reprensenting the event type to listen for
+     * @param {any} handler The object that receives a notification when an event of the specified type occus. This must be either `null`, an object with a `handleEvent()` method, or a function.
+     * @param {any} options Either a bool, specifying the `useCapture` arg, or an object specifying the `options` arg. Refer to the js api.
+     */
+    removeListener(object, event, handler, options = {}) {
+        const index = this.allListeners.indexOf({object, event, handler, options});
+        if (index !== -1) {
+            this.allListeners.splice(index, 1);
+        }
+    }
+
+    /**
+     * Removes all listeners that were added through `addListener`
+     */
+    removeAllListeners() {
+        this.allListeners.forEach(({object, event, handler, options}) => {
+            object.removeEventListener(event, handler, options);
+        });
+        this.allListeners.length = 0;
+    }
+
+    /**
      * Destructor for the device renderer. This won't actually destroy the instance, but simply remove all event bindings
      * so that things can be garbage-collected.
      * References to the instance in the caller need to be manually deleted too in order for the instance to be garbage-collected.
      * This method also calls recursively the destroy methods on the plugins if they exist.
      */
     destroy() {
+        this.removeAllListeners();
         // remove onConnectionStateChange handler in order to prevent reconnecting after disconnect
         this.peerConnection?.removeEventListener('connectionstatechange', this.onConnectionStateChange);
         this.disconnect();

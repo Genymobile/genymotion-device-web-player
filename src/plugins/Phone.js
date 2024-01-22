@@ -72,7 +72,7 @@ module.exports = class Phone extends OverlayPlugin {
         this.phoneInput.type = 'text';
         this.phoneInput.className = 'gm-phone-number';
         this.phoneInput.placeholder = this.i18n.PHONE_CALL_PLACEHOLDER || 'Please enter the phone number';
-        this.phoneInput.addEventListener('keyup', this.validate.bind(this));
+        this.instance.addListener(this.phoneInput, 'keyup', this.validate.bind(this));
         this.phoneBtn.className = 'gm-phone-call';
         this.phoneBtn.innerHTML = this.i18n.PHONE_CALL || 'Call';
         this.phoneBtn.onclick = this.sendPhoneCallToInstance.bind(this);
@@ -93,7 +93,7 @@ module.exports = class Phone extends OverlayPlugin {
         this.textInput.className = 'gm-phone-message';
         this.textInput.placeholder = this.i18n.PHONE_MESSAGE_PLACEHOLDER || 'Please enter the incoming message';
         this.textInput.rows = 5;
-        this.textInput.addEventListener('keyup', this.validate.bind(this));
+        this.instance.addListener(this.textInput, 'keyup', this.validate.bind(this));
         this.textBtn.className = 'gm-phone-send';
         this.textBtn.innerHTML = this.i18n.PHONE_MESSAGE || 'Send message';
         this.textBtn.onclick = this.sendSMSToInstance.bind(this);

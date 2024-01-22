@@ -47,7 +47,7 @@ module.exports = class MediaManager {
                 const permissionObj = await navigator.permissions.query({name: 'microphone'});
                 log.debug(`microphone ${permissionObj.state}`);
                 this.microphonePermissionObject = permissionObj;
-                permissionObj.addEventListener('change', this.onMicrophonePermissionChange.bind(this));
+                this.instance.addListener(permissionObj, 'change', this.onMicrophonePermissionChange.bind(this));
             } catch (error) {
                 log.warn('Can\'t get microphone permission object', error);
                 return false;
@@ -58,7 +58,7 @@ module.exports = class MediaManager {
             const permissionObj = await navigator.permissions.query({name: 'camera'});
             log.debug(`camera ${permissionObj.state}`);
             this.cameraPermissionObject = permissionObj;
-            permissionObj.addEventListener('change', this.onCameraPermissionChange.bind(this));
+            this.instance.addListener(permissionObj, 'change', this.onCameraPermissionChange.bind(this));
         } catch (error) {
             log.warn('Can\'t get camera permission object', error);
             return false;
@@ -364,13 +364,5 @@ module.exports = class MediaManager {
         if (this.videoStreaming) {
             this.stopVideoStreaming();
         }
-    }
-
-    /**
-     * Plugin destructor, responsible for removing all callbacks & bindings so that things are garbage-collected
-     */
-    destroy() {
-        this.microphonePermissionObject?.removeEventListener('change', this.onMicrophonePermissionChange.bind(this));
-        this.cameraPermissionObject?.removeEventListener('change', this.onCameraPermissionChange.bind(this));
     }
 };

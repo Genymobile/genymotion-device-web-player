@@ -27,8 +27,8 @@ module.exports = class Gamepad extends OverlayPlugin {
         // Register plugin
         this.instance.gamepad = this;
 
-        window.addEventListener('gm-gamepadButtonPressed', this.onGamepadButtonPressed.bind(this));
-        window.addEventListener('gm-gamepadButtonReleased', this.onGamepadButtonReleased.bind(this));
+        this.instance.addListener(window, 'gm-gamepadButtonPressed', this.onGamepadButtonPressed.bind(this));
+        this.instance.addListener(window, 'gm-gamepadButtonReleased', this.onGamepadButtonReleased.bind(this));
 
         // Display widget
         this.renderToolbarButton();
@@ -72,8 +72,8 @@ module.exports = class Gamepad extends OverlayPlugin {
         this.content = document.createElement('div');
         this.container.appendChild(this.content);
         this.generateContent();
-        window.addEventListener('gm-gamepadConnected', this.generateContent.bind(this));
-        window.addEventListener('gm-gamepadDisconnected', this.generateContent.bind(this));
+        this.instance.addListener(window, 'gm-gamepadConnected', this.generateContent.bind(this));
+        this.instance.addListener(window, 'gm-gamepadDisconnected', this.generateContent.bind(this));
 
         // Setup
         this.widget.className = 'gm-overlay gm-gamepad-plugin gm-hidden';

@@ -259,7 +259,7 @@ module.exports = class Identifiers extends OverlayPlugin {
         input.className = 'gm-identifier-' + type + '-input';
         input.type = 'text';
         input.required = true;
-        input.addEventListener('keyup', validationMethod);
+        this.instance.addListener(input, 'keyup', validationMethod);
         inputWrap.appendChild(input);
 
         // Some customization

@@ -135,7 +135,8 @@ module.exports = class MediaManager {
             log.debug('Client audio stream ready');
             this.audioStreaming = true;
             this.localAudioStream = mediaStream;
-            return this.addAudioStream(mediaStream);
+            const addAudioStreamResult = await this.addAudioStream(mediaStream);
+            return addAudioStreamResult;
         } catch (error) {
             this.onAudioStreamError(error);
             return false;
@@ -240,15 +241,20 @@ module.exports = class MediaManager {
          * to send and recv.
          */
 
-        if (this.instance.options.microphone && stream.getAudioTracks().length > 0) {
-            if (this.microphoneSender) {
-                log.debug('Replacing audio track on sender');
-                this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
-                this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
-            } else {
-                this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0],
-                    stream);
+        try {
+            if (this.instance.options.microphone && stream.getAudioTracks().length > 0) {
+                if (this.microphoneSender) {
+                    log.debug('Replacing audio track on sender');
+                    await this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
+                    this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
+                } else {
+                    this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0],
+                        stream);
+                }
             }
+        } catch (error) {
+            log.error(error);
+            return false;
         }
         return this.instance.renegotiateWebRTCConnection();
     }
@@ -364,5 +370,7 @@ module.exports = class MediaManager {
         if (this.videoStreaming) {
             this.stopVideoStreaming();
         }
+        this.cameraSender = null;
+        this.microphoneSender = null;
     }
 };

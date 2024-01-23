@@ -222,9 +222,10 @@ module.exports = class DeviceRenderer {
      */
     onConnectionClosed() {
         this.webRTCWebsocket.onclose = (event) => {
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
             this.video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
-            log.debug('Error! Maybe your VM is not available yet? (' + event.code +') ' + event.reason);
+            log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
             case 1000:
@@ -492,8 +493,8 @@ module.exports = class DeviceRenderer {
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    window.addEventListener('click', addSound, {once:true});
-                    window.addEventListener('touchend', addSound, {once:true});
+                    window.addEventListener('click', addSound, {once: true});
+                    window.addEventListener('touchend', addSound, {once: true});
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -580,6 +581,8 @@ module.exports = class DeviceRenderer {
             log.debug('Got Data Channel Message:', event.data);
         };
         this.signalingDataChannel.onopen = () => {
+            // Adding status to store, this way all logic for new connection can be handled by plugin
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: true});
             log.debug('Data Channel opened');
         };
 
@@ -811,6 +814,9 @@ module.exports = class DeviceRenderer {
                 disable: (widget) => {
                     widget.setAvailability(false);
                 },
+            }, {
+                widget: this.fingerprint,
+                capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {

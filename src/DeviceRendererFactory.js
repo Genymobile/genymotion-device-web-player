@@ -21,6 +21,9 @@ const BasebandRIL = require('./plugins/BasebandRIL');
 const StreamResolution = require('./plugins/StreamResolution');
 const IOThrottling = require('./plugins/IOThrottling');
 const GamepadManager = require('./plugins/GamepadManager');
+const FingerPrint = require('./plugins/FingerPrint');
+
+const store = require('./store');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -57,6 +60,7 @@ const defaultOptions = {
     streamResolution: true,
     diskIO: true,
     gamepad: false,
+    fingerprint: true,
     translateHomeKey: false,
     token: '',
     i18n: {},
@@ -75,6 +79,7 @@ const defaultOptions = {
     },
     connectionFailedURL: '',
     turn: {},
+    giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions'
 };
 
 /**
@@ -131,6 +136,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             options.turn.username          WebRTC TURN servers username.
      * @param  {string}             options.turn.credential        WebRTC TURN servers password.
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
+     * @param  {string}             options.giveFeedbackLink       URL to the feedback form. Default: 'https://github.com/orgs/Genymobile/discussions'
      * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
      * @return {DeviceRenderer}                                    The device renderer instance.
      */
@@ -156,6 +162,8 @@ module.exports = class DeviceRendererFactory {
         this.loadTemplate(dom, this.templates[options.template], options);
 
         const instance = new RendererClass(dom, options);
+        store(instance);
+
         this.instances.push(instance);
 
         this.addPlugins(instance, instance.options);
@@ -203,24 +211,29 @@ module.exports = class DeviceRendererFactory {
      * @param  {Object}             options  Various configuration options.
      */
     addPlugins(instance, options) {
+        /*
+         * Load instance dedicated plugins
+         */
+
         const pluginInitMap = [
-            {enabled: options.touch, class: MultiTouchEvents},
-            {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
-            {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
-            {enabled: options.camera, class: Camera, params: [options.i18n]},
-            {enabled: options.battery, class: Battery, params: [options.i18n]},
-            {enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n]},
-            {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
-            {enabled: options.capture, class: Screencast, params: [options.i18n]},
-            {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n]},
-            {enabled: options.phone, class: Phone, params: [options.i18n]},
-            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
-            {enabled: options.streamResolution, class: StreamResolution},
-            {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
-            {enabled: options.gamepad, class: GamepadManager},
-            {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
+            { enabled: options.touch, class: MultiTouchEvents },
+            { enabled: options.fullscreen, class: Fullscreen },
+            { enabled: options.clipboard, class: Clipboard, params: [options.i18n] },
+            { enabled: options.fileUpload, class: FileUpload, params: [options.i18n] },
+            { enabled: options.camera, class: Camera, params: [options.i18n] },
+            { enabled: options.battery, class: Battery, params: [options.i18n] },
+            { enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n] },
+            { enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport] },
+            { enabled: options.capture, class: Screencast, params: [options.i18n] },
+            { enabled: options.identifiers, class: Identifiers, params: [options.i18n] },
+            { enabled: options.network, class: Network, params: [options.i18n] },
+            { enabled: options.phone, class: Phone, params: [options.i18n] },
+            { enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband] },
+            { enabled: options.streamResolution, class: StreamResolution },
+            { enabled: options.diskIO, class: IOThrottling, params: [options.i18n] },
+            { enabled: options.gamepad, class: GamepadManager },
+            { enabled: options.fingerprint, class: FingerPrint },
+            { enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey] },
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -231,7 +244,6 @@ module.exports = class DeviceRendererFactory {
             }
         });
 
-        // Load instance dedicated plugins
         if (typeof instance.addCustomPlugins === 'function') {
             instance.addCustomPlugins();
         }

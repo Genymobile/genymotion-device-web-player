@@ -249,11 +249,26 @@ module.exports = class GamepadManager {
     }
 
     /**
+     * Plugin destructor, responsible for removing all of its callbacks and bindings
+     */
+    destroy() {
+        this.removeGamepadCallbacks();
+    }
+
+    /**
      * Add the listeners for gamepad connect & disconnect
      */
     addGamepadCallbacks() {
         window.addEventListener('gamepadconnected', this.onGamepadConnected.bind(this));
         window.addEventListener('gamepaddisconnected', this.onGamepadDisonnected.bind(this));
+    }
+
+    /**
+     * Remove the listeners for gamepad connect & disconnect
+     */
+    removeGamepadCallbacks() {
+        window.removeEventListener('gamepadconnected', this.onGamepadConnected.bind(this));
+        window.removeEventListener('gamepaddisconnected', this.onGamepadDisonnected.bind(this));
     }
 
     /**

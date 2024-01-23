@@ -97,6 +97,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     };
 
     // Device renderer instanciation
+    const { DeviceRendererFactory } = window.index
     const deviceRendererFactory = new DeviceRendererFactory();
     const renderer = deviceRendererFactory.setupRenderer(container,     // the container element or element ID to use
                                               webrtcAddress, // the websocket address of your instance connector
@@ -422,6 +423,14 @@ Enables or disables the diskIO widget. This widget can be used to modify Disk IO
 - **Details:**
 Enable or disable experimental gamepad support & widget
 
+### `biometrics`
+
+- **Type:** `Boolean`
+- **Default:** `true`
+- **Compatibility:** `SaaS`, `PaaS`
+- **Details:**
+Enable or disable fingerprints widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above
+
 ### `translateHomeKey`
 
 - **Type:** `Boolean`
@@ -438,6 +447,14 @@ Translate home key to `META` + `ENTER`
 - **Compatibility:** `SaaS`, `PaaS`
 - **Details:**
 Redirection page in case of connection error.
+
+### `giveFeedbackLink`
+
+- **Type:** `String`
+- **Default:** `giveFeedbackLink`
+- **Compatibility:** `SaaS`, `PaaS`
+- **Details:**
+Set url for feedback page.
 
 ## Contributing
 

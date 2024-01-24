@@ -474,14 +474,12 @@ module.exports = class DeviceRenderer {
                     this.videoWrapper.prepend(popup);
                     const addSound = () => {
                         this.video.muted = false;
-                        this.removeAddSoundClickListener();
-                        this.removeAddSoundTouchListener();
+                        this.removeAddSoundListener();
                         this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    this.removeAddSoundClickListener = this.addListener(window, 'click', addSound, {once: true});
-                    this.removeAddSoundTouchListener = this.addListener(window, 'touchend', addSound, {once: true});
+                    this.removeAddSoundListener = this.addListener(window, ['click', 'touchend'], addSound);
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -490,15 +488,13 @@ module.exports = class DeviceRenderer {
                     this.classList.add('gm-video-overlay');
                     this.videoWrapper.prepend(div);
                     const allowPlay = () => {
-                        this.removeAllowPlayClickListener();
-                        this.removeAllowPlayTouchListener();
+                        this.removeAllowPlayListener();
                         this.video.play();
                         div.remove();
                         this.dispatchEvent('video', {msg: 'play manually allowed by click'});
                         log.debug('Playing video with sound disabled has been authorized due to user click');
                     };
-                    this.removeAllowPlayClickListener = this.addListener(div, 'click', allowPlay, {once: true});
-                    this.removeAllowPlayTouchListener = this.addListener(div, 'touchend', allowPlay, {once: true});
+                    this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
                 });
             });
         };
@@ -525,14 +521,12 @@ module.exports = class DeviceRenderer {
                     '</br>See <a href="">help</a> to setup TURN configuration.'
                 );
                 const openDocumentationLink = () => {
-                    this.removeOpenDocClickListener();
-                    this.removeOpenDocTouchListener();
+                    this.removeOpenDocListener();
                     this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
                     div.remove();
                     window.open(this.options.connectionFailedURL, '_blank');
                 };
-                this.removeOpenDocClickListener = this.addListener(div, 'click', openDocumentationLink);
-                this.removeOpenDocTouchListener = this.addListener(div, 'touchend', openDocumentationLink);
+                this.removeOpenDocListener = this.addListener(div, ['click', 'touchend'], openDocumentationLink);
             } else {
                 message = message.replace('{DOC_AVAILABLE}', '');
             }
@@ -834,21 +828,29 @@ module.exports = class DeviceRenderer {
      * This function wraps around the plain js `addEventListener` function, also registering everything in a local array.
      * The aim is to be able to remove all listeners at a later time.
      * @param {EventTarget} object Object which emits the event
-     * @param {String} event A case-sensitive string reprensenting the event type to listen for
+     * @param {Array<String>|String} events Either one case-sensitive string reprensenting the event type to listen for, or an array of such strings
      * @param {any} handler The object that receives a notification when an event of the specified type occus. This must be either `null`, an object with a `handleEvent()` method, or a function.
      * @param {any} options Either a bool, specifying the `useCapture` arg, or an object specifying the `options` arg. Refer to the js api.
      * @return {function} A removeListener function. This must be saved on the caller side if you ever want to use it to remove the listener
      */
-    addListener(object, event, handler, options = {}) {
-        object.addEventListener(event, handler, options);
-        const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
-        this.allListeners.push({id, object, event, handler, options});
+    addListener(object, events, handler, options = {}) {
+        const eventArray = Array.isArray(events)?events:[events];
+        const ids = [];
+        eventArray.forEach((event) => {
+            const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
+            object.addEventListener(event, handler, options);
+            this.allListeners.push({id, object, event, handler, options});
+            ids.push(id);
+        });
+
         return () => {
-            const index = this.allListeners.findIndex((item) => item.id === id);
-            if (index !== -1) {
-                this.allListeners.splice(index, 1);
-                object.removeEventListener(event, handler, options);
-            }
+            ids.forEach((id) => {
+                const index = this.allListeners.findIndex((item) => item.id === id);
+                if (index !== -1) {
+                    this.allListeners.splice(index, 1);
+                    object.removeEventListener(event, handler, options);
+                }
+            });
         };
     }
 

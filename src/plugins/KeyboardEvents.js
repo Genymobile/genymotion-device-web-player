@@ -223,18 +223,18 @@ module.exports = class KeyboardEvents {
 
         if (!this.isListenerAdded) {
             // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-            this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
+            this.removeBlurListener = this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
 
             if (!this.keyboardCallbacks) {
-                this.keyboardCallbacks = new Map([
-                    ['keypress', this.onKeyPress.bind(this)],
-                    ['keydown', this.onKeyDown.bind(this)],
-                    ['keyup', this.onKeyUp.bind(this)]
-                ]);
+                this.keyboardCallbacks = [
+                    {event: 'keypress', handler: this.onKeyPress.bind(this), removeListener: null},
+                    {event: 'keydown', handler: this.onKeyDown.bind(this), removeListener: null},
+                    {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null}
+                ];
             }
             this.instance.root.focus();
-            this.keyboardCallbacks.forEach((value, key) => {
-                this.instance.addListener(window, key, value);
+            this.keyboardCallbacks.forEach((item, index, array) => {
+                array[index].removeListener = this.instance.addListener(window, item.event, item.handler);
             });
             this.isListenerAdded = true;
         }
@@ -247,9 +247,9 @@ module.exports = class KeyboardEvents {
         if (!this.keyboardCallbacks || !this.isListenerAdded) {
             return;
         }
-        this.instance.removeListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
-        this.keyboardCallbacks.forEach((value, key) => {
-            this.instance.removeListener(window, key, value);
+        this.removeBlurListener();
+        this.keyboardCallbacks.forEach((item) => {
+            item.removeListener();
         });
         this.isListenerAdded = false;
     }

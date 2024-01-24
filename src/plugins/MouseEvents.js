@@ -50,7 +50,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        this.instance.addListener(document, 'mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener = this.instance.addListener(document, 'mouseup', this.boundEventListener, false);
     }
 
     /**
@@ -79,7 +79,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        this.instance.removeListener(document, 'mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener();
     }
 
     /**
@@ -103,7 +103,7 @@ module.exports = class MouseEvents {
         };
         this.instance.sendEvent(json);
 
-        this.instance.removeListener(document, 'mouseup', this.boundEventListener, false);
+        this.instance.removeMouseUpListener();
     }
 
     /**

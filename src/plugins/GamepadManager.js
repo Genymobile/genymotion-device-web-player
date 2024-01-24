@@ -253,7 +253,7 @@ module.exports = class GamepadManager {
      */
     addGamepadCallbacks() {
         this.instance.addListener(window,'gamepadconnected', this.onGamepadConnected.bind(this));
-        this.instance.readdListenermoveListener(window,'gamepaddisconnected', this.onGamepadConnected.bind(this));
+        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadConnected.bind(this));
     }
 
     /**

@@ -835,21 +835,19 @@ module.exports = class DeviceRenderer {
      */
     addListener(object, events, handler, options = {}) {
         const eventArray = Array.isArray(events)?events:[events];
-        const ids = [];
+        const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
         eventArray.forEach((event) => {
-            const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
             object.addEventListener(event, handler, options);
             this.allListeners.push({id, object, event, handler, options});
-            ids.push(id);
         });
 
         return () => {
-            ids.forEach((id) => {
-                const index = this.allListeners.findIndex((item) => item.id === id);
-                if (index !== -1) {
-                    this.allListeners.splice(index, 1);
-                    object.removeEventListener(event, handler, options);
+            this.allListeners = this.allListeners.filter((item) => {
+                if (item.id === id) {
+                    object.removeEventListener(item.event, item.handler, item.options);
+                    return false;
                 }
+                return true;
             });
         };
     }

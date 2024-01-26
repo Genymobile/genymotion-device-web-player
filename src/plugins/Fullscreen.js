@@ -16,8 +16,8 @@ module.exports = class Fullscreen {
 
         // we register for fullscreen event changes
         if (document.addEventListener) {
-            document.addEventListener('webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
-            document.addEventListener('fullscreenchange', this.onFullscreenEvent.bind(this), false);
+            this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
+            this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
         }
 
         // Display widget

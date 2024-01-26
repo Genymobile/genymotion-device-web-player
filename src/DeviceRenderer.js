@@ -53,6 +53,9 @@ module.exports = class DeviceRenderer {
         // Event callbacks
         this.callbacks = {};
 
+        // Event listeners
+        this.allListeners = [];
+
         // WebRTC related attributes
         this.peerConnection = null;
         this.signalingDataChannel = null;
@@ -74,7 +77,7 @@ module.exports = class DeviceRenderer {
                 this.emit('close-overlays');
             }
         };
-        document.addEventListener('click', this.clickHandlerCloseOverlay);
+        this.addListener(document, 'click', this.clickHandlerCloseOverlay);
     }
 
     /**
@@ -471,14 +474,12 @@ module.exports = class DeviceRenderer {
                     this.videoWrapper.prepend(popup);
                     const addSound = () => {
                         this.video.muted = false;
-                        window.removeEventListener('click', addSound);
-                        window.removeEventListener('touchend', addSound);
+                        this.removeAddSoundListener();
                         this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    window.addEventListener('click', addSound, {once: true});
-                    window.addEventListener('touchend', addSound, {once: true});
+                    this.removeAddSoundListener = this.addListener(window, ['click', 'touchend'], addSound);
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -487,15 +488,13 @@ module.exports = class DeviceRenderer {
                     this.classList.add('gm-video-overlay');
                     this.videoWrapper.prepend(div);
                     const allowPlay = () => {
-                        window.removeEventListener('click', allowPlay);
-                        window.removeEventListener('touchend', allowPlay);
+                        this.removeAllowPlayListener();
                         this.video.play();
                         div.remove();
                         this.dispatchEvent('video', {msg: 'play manually allowed by click'});
                         log.debug('Playing video with sound disabled has been authorized due to user click');
                     };
-                    div.addEventListener('click', allowPlay, {once: true});
-                    div.addEventListener('touchend', allowPlay, {once: true});
+                    this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
                 });
             });
         };
@@ -522,14 +521,12 @@ module.exports = class DeviceRenderer {
                     '</br>See <a href="">help</a> to setup TURN configuration.'
                 );
                 const openDocumentationLink = () => {
-                    div.removeEventListener('click', openDocumentationLink);
-                    div.removeEventListener('touchend', openDocumentationLink);
+                    this.removeOpenDocListener();
                     this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
                     div.remove();
                     window.open(this.options.connectionFailedURL, '_blank');
                 };
-                div.addEventListener('click', openDocumentationLink);
-                div.addEventListener('touchend', openDocumentationLink);
+                this.removeOpenDocListener = this.addListener(div, ['click', 'touchend'], openDocumentationLink);
             } else {
                 message = message.replace('{DOC_AVAILABLE}', '');
             }
@@ -543,7 +540,7 @@ module.exports = class DeviceRenderer {
                 this.onWebRTCReady();
             }
         };
-        this.peerConnection.addEventListener('connectionstatechange', this.onConnectionStateChange);
+        this.addListener(this.peerConnection, 'connectionstatechange', this.onConnectionStateChange);
 
         this.peerConnection.onnegotiationneeded = () => {
             log.debug('on Negotiation needed');
@@ -828,18 +825,52 @@ module.exports = class DeviceRenderer {
     }
 
     /**
+     * This function wraps around the plain js `addEventListener` function, also registering everything in a local array.
+     * The aim is to be able to remove all listeners at a later time.
+     * @param {EventTarget} object Object which emits the event
+     * @param {Array<String>|String} events Either one case-sensitive string reprensenting the event type to listen for, or an array of such strings
+     * @param {any} handler The object that receives a notification when an event of the specified type occus. This must be either `null`, an object with a `handleEvent()` method, or a function.
+     * @param {any} options Either a bool, specifying the `useCapture` arg, or an object specifying the `options` arg. Refer to the js api.
+     * @return {function} A removeListener function. This must be saved on the caller side if you ever want to use it to remove the listener
+     */
+    addListener(object, events, handler, options = {}) {
+        const eventArray = Array.isArray(events)?events:[events];
+        const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
+        eventArray.forEach((event) => {
+            object.addEventListener(event, handler, options);
+            this.allListeners.push({id, object, event, handler, options});
+        });
+
+        return () => {
+            this.allListeners = this.allListeners.filter((item) => {
+                if (item.id === id) {
+                    object.removeEventListener(item.event, item.handler, item.options);
+                    return false;
+                }
+                return true;
+            });
+        };
+    }
+
+    /**
+     * Removes all listeners that were added through `addListener`
+     */
+    removeAllListeners() {
+        this.allListeners.forEach(({object, event, handler, options}) => {
+            object.removeEventListener(event, handler, options);
+        });
+        this.allListeners.length = 0;
+    }
+
+    /**
      * Destructor for the device renderer. This won't actually destroy the instance, but simply remove all event bindings
      * so that things can be garbage-collected.
      * References to the instance in the caller need to be manually deleted too in order for the instance to be garbage-collected.
      * This method also calls recursively the destroy methods on the plugins if they exist.
      */
     destroy() {
-        // remove onConnectionStateChange handler in order to prevent reconnecting after disconnect
-        this.peerConnection?.removeEventListener('connectionstatechange', this.onConnectionStateChange);
+        this.removeAllListeners();
         this.disconnect();
-        document.removeEventListener('click', this.clickHandlerCloseOverlay);
-        this.mediaManager?.destroy();
-        this.gamepadManager?.destroy();
         this.peerConnectionStats?.destroy();
         delete this.peerConnectionStats;
         delete this.video;

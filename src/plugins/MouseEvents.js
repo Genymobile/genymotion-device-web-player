@@ -23,13 +23,6 @@ module.exports = class MouseEvents {
     }
 
     /**
-     * Plugin destructor, responsible for removing all callbacks & bindings so that things are garbage-collected
-     */
-    destroy() {
-        this.removeMouseCallbacks();
-    }
-
-    /**
      * Mouse press event handler.
      *
      * @param {Event} event Event.
@@ -57,7 +50,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        document.addEventListener('mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener = this.instance.addListener(document, 'mouseup', this.boundEventListener, false);
     }
 
     /**
@@ -86,7 +79,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        document.removeEventListener('mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener();
     }
 
     /**
@@ -110,7 +103,7 @@ module.exports = class MouseEvents {
         };
         this.instance.sendEvent(json);
 
-        document.removeEventListener('mouseup', this.boundEventListener, false);
+        this.instance.removeMouseUpListener();
     }
 
     /**
@@ -161,23 +154,13 @@ module.exports = class MouseEvents {
      * Bind all event handlers to the video wrapper.
      */
     addMouseCallbacks() {
-        this.instance.videoWrapper.addEventListener('mousedown', this.onMousePressEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('mouseup', this.onMouseReleaseEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('wheel', this.onMouseWheelEvent.bind(this), {passive: false});
-        this.instance.videoWrapper.addEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
-    }
-
-    /**
-     * Remove all events handlers
-     */
-    removeMouseCallbacks() {
-        this.instance.videoWrapper.removeEventListener('mousedown', this.onMousePressEvent.bind(this), false);
-        this.instance.videoWrapper.removeEventListener('mouseup', this.onMouseReleaseEvent.bind(this), false);
-        this.instance.videoWrapper.removeEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
-        this.instance.videoWrapper.removeEventListener('wheel', this.onMouseWheelEvent.bind(this), {passive: false});
-        this.instance.videoWrapper.removeEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
-        document.removeEventListener('mouseup', this.boundEventListener, false);
+        this.instance.addListener(this.instance.videoWrapper, 'mousedown', this.onMousePressEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'mouseup', this.onMouseReleaseEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'mousemove', this.onMouseMoveEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'wheel', this.onMouseWheelEvent.bind(this), {
+            passive: false
+        });
+        this.instance.addListener(this.instance.videoWrapper, 'contextmenu', this.cancelContextMenu.bind(this), false);
     }
 
     getWheelDeltaPixels(delta, mode) {

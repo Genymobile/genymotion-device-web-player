@@ -153,7 +153,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             this.simOperatorMMC.placeholder = 'eg: 20814';
             this.simOperatorMMC.pattern = '[0-9]{5,6}';
             this.simOperatorMMC.title = 'SIM Operator MCC/MNC';
-            this.simOperatorMMC.addEventListener('keyup', this.checkSimImsiErrors.bind(this));
+            this.instance.addListener(this.simOperatorMMC, 'keyup', this.checkSimImsiErrors.bind(this));
             simOperatorMMCDiv.appendChild(simOperatorMMCLabel);
             simOperatorMMCDiv.appendChild(this.simOperatorMMC);
 
@@ -177,7 +177,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             this.simMSIN.placeholder = 'eg: 2176510739';
             this.simMSIN.pattern = '[0-9]{9,10}';
             this.simMSIN.title = 'SIM MSIN';
-            this.simMSIN.addEventListener('keyup', this.checkSimImsiErrors.bind(this));
+            this.instance.addListener(this.simMSIN, 'keyup', this.checkSimImsiErrors.bind(this));
             simMSINDiv.appendChild(simMSINLabel);
             simMSINDiv.appendChild(this.simMSIN);
 

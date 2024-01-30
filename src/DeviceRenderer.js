@@ -23,11 +23,12 @@ module.exports = class DeviceRenderer {
      * @param {Object}      options Instance configuration options.
      */
     constructor(domRoot, options) {
+        this.identifier = Math.random() * 100;
         this.timeoutCallbacks = [];
         this.videoBackupStyleBackground = '';
 
         // Options associated with this instance
-        this.options = options;
+        this[this.identifier.toString()] = options;
 
         // Websocket & WebRTC connection state
         this.initialized = false;
@@ -81,11 +82,11 @@ module.exports = class DeviceRenderer {
      */
     addCustomPlugins() {
         const pluginInitMap = [
-            {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
-            {enabled: this.options.keyboard, class: KeyboardEvents},
-            {enabled: this.options.mouse, class: MouseEvents},
-            {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
-            {enabled: this.options.camera || this.options.microphone, class: MediaManager},
+            {enabled: this[this.identifier.toString()].touch || this[this.identifier.toString()].mouse, class: CoordinateUtils},
+            {enabled: this[this.identifier.toString()].keyboard, class: KeyboardEvents},
+            {enabled: this[this.identifier.toString()].mouse, class: MouseEvents},
+            {enabled: this[this.identifier.toString()].gamepad, class: Gamepad, params: [this.gamepadManager, this[this.identifier.toString()].i18n]},
+            {enabled: this[this.identifier.toString()].camera || this[this.identifier.toString()].microphone, class: MediaManager},
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -199,7 +200,7 @@ module.exports = class DeviceRenderer {
             this.reconnecting = true;
         }
 
-        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl, this.webRTCWebsocketName);
+        this.webRTCWebsocket = new WebSocket(this[this.identifier.toString()].webRTCUrl, this.webRTCWebsocketName);
         this.webRTCWebsocket.onopen = this.sendAuthenticationToken.bind(this);
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);
@@ -285,7 +286,7 @@ module.exports = class DeviceRenderer {
     sendAuthenticationToken() {
         const tokenRequest = {
             type: 'token',
-            token: this.options.token,
+            token: this[this.identifier.toString()].token,
         };
 
         if (this.isWebsocketOpen(this.webRTCWebsocket)) {
@@ -378,20 +379,20 @@ module.exports = class DeviceRenderer {
 
         const iceServers = [];
 
-        if (Array.isArray(this.options.stun)) {
-            this.options.stun.forEach((stunServer) => {
+        if (Array.isArray(this[this.identifier.toString()].stun)) {
+            this[this.identifier.toString()].stun.forEach((stunServer) => {
                 iceServers.push(stunServer);
             });
-        } else if (Object.keys(this.options.stun).length > 0) {
-            iceServers.push(this.options.stun);
+        } else if (Object.keys(this[this.identifier.toString()].stun).length > 0) {
+            iceServers.push(this[this.identifier.toString()].stun);
         }
 
-        if (Array.isArray(this.options.turn)) {
-            this.options.turn.forEach((turnServer) => {
+        if (Array.isArray(this[this.identifier.toString()].turn)) {
+            this[this.identifier.toString()].turn.forEach((turnServer) => {
                 iceServers.push(turnServer);
             });
-        } else if (Object.keys(this.options.turn).length > 0) {
-            iceServers.push(this.options.turn);
+        } else if (Object.keys(this[this.identifier.toString()].turn).length > 0) {
+            iceServers.push(this[this.identifier.toString()].turn);
         }
 
         const config = {
@@ -479,7 +480,7 @@ module.exports = class DeviceRenderer {
                     this.dispatchEvent('video', {msg: 'play automatically allowed without sound'});
                     const popup = document.createElement('div');
                     popup.classList.add('gm-click-to-unmute');
-                    popup.innerHTML = this.options.i18n.UNMUTE_INVITE || 'By default, the sound has been turned off, '
+                    popup.innerHTML = this[this.identifier.toString()].i18n.UNMUTE_INVITE || 'By default, the sound has been turned off, '
                         + 'please click anywhere to re-enable audio';
                     this.videoWrapper.prepend(popup);
                     const addSound = () => {
@@ -527,7 +528,7 @@ module.exports = class DeviceRenderer {
             div.classList.add('gm-overlay-cant-connect');
             div.classList.add('gm-video-overlay');
             this.videoWrapper.prepend(div);
-            if (this.options.connectionFailedURL) {
+            if (this[this.identifier.toString()].connectionFailedURL) {
                 message = message.replace(
                     '{DOC_AVAILABLE}',
                     '</br>See <a href="">help</a> to setup TURN configuration.'
@@ -535,7 +536,7 @@ module.exports = class DeviceRenderer {
                 const openDocumentationLink = () => {
                     this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
                     div.remove();
-                    window.open(this.options.connectionFailedURL, '_blank');
+                    window.open(this[this.identifier.toString()].connectionFailedURL, '_blank');
                 };
                 div.addEventListener('click', openDocumentationLink);
                 div.addEventListener('touchend', openDocumentationLink);
@@ -702,8 +703,8 @@ module.exports = class DeviceRenderer {
         if (this.fileUpload) {
             const msg = {
                 type: 'address',
-                fileUploadAddress: this.options.fileUploadUrl,
-                token: this.options.token,
+                fileUploadAddress: this[this.identifier.toString()].fileUploadUrl,
+                token: this[this.identifier.toString()].token,
             };
 
             if (this.fileUpload.loaderWorker) {

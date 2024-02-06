@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/Genymobile/genymotion-device-web-player#readme",
   "dependencies": {
-    "lodash": "^4.17.21",
     "loglevel": "^1.8.0",
     "webrtc-adapter": "^7.7.1"
   },

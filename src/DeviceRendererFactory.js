@@ -1,7 +1,6 @@
 'use strict';
 
 const DeviceRenderer = require('./DeviceRenderer');
-const defaultsDeep = require('lodash/defaultsDeep');
 
 // Plugins
 const GPS = require('./plugins/GPS');
@@ -142,20 +141,25 @@ module.exports = class DeviceRendererFactory {
         if (typeof options === 'undefined') {
             options = {};
         }
-        options = defaultsDeep(options, defaultOptions);
-        options.webRTCUrl = webRTCUrl;
+        const rendererOptions = {};
+        Object.assign(rendererOptions, defaultOptions, options);
+        rendererOptions.webRTCUrl = webRTCUrl;
         // if we have at least one button to setup, we will instantiate the "buttons" plugin
-        options.buttons = options.volume || options.rotation || options.navbar || options.power;
+        rendererOptions.buttons =
+            rendererOptions.volume ||
+            rendererOptions.rotation ||
+            rendererOptions.navbar ||
+            rendererOptions.power;
 
         log.debug('Creating genymotion display on ' + webRTCUrl);
         dom.classList.add('device-renderer-instance');
-        dom.classList.add('gm-template-' + options.template);
-        document.body.classList.add('gm-template-' + options.template + '-body');
+        dom.classList.add('gm-template-' + rendererOptions.template);
+        document.body.classList.add('gm-template-' + rendererOptions.template + '-body');
 
         // Load template before creating the Device Renderer that is using HTML elements
-        this.loadTemplate(dom, this.templates[options.template], options);
+        this.loadTemplate(dom, this.templates[rendererOptions.template], rendererOptions);
 
-        const instance = new RendererClass(dom, options);
+        const instance = new RendererClass(dom, rendererOptions);
         this.instances.push(instance);
 
         this.addPlugins(instance, instance.options);

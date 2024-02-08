@@ -6,7 +6,7 @@ const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
-const MediaManager = require('./plugins/MediaManager');
+const Camera = require('./plugins/Camera');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -89,7 +89,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
             {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
-            {enabled: this.options.camera || this.options.microphone, class: MediaManager},
+            {enabled: this.options.camera, class: Camera, params: [this.options.i18n]},
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -802,7 +802,7 @@ module.exports = class DeviceRenderer {
                     widget.setAvailability(false);
                 },
             }, {
-                widget: this.fingerprint,
+                widget: this.biometrics,
                 capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {

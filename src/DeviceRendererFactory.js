@@ -10,7 +10,6 @@ const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
 const Clipboard = require('./plugins/Clipboard');
 const FileUpload = require('./plugins/FileUpload');
-const Camera = require('./plugins/Camera');
 const Battery = require('./plugins/Battery');
 const StreamBitrate = require('./plugins/StreamBitrate');
 const Screencast = require('./plugins/Screencast');
@@ -24,6 +23,7 @@ const GamepadManager = require('./plugins/GamepadManager');
 const FingerPrint = require('./plugins/FingerPrint');
 
 const store = require('./store');
+const MediaManager = require('./plugins/MediaManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -216,26 +216,29 @@ module.exports = class DeviceRendererFactory {
          */
 
         const pluginInitMap = [
-            {enabled: options.touch, class: MultiTouchEvents},
-            {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
-            {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
-            {enabled: options.camera, class: Camera, params: [options.i18n]},
-            {enabled: options.battery, class: Battery, params: [options.i18n]},
-            {enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n]},
-            {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
-            {enabled: options.capture, class: Screencast, params: [options.i18n]},
-            {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n]},
-            {enabled: options.phone, class: Phone, params: [options.i18n]},
-            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
-            {enabled: options.streamResolution, class: StreamResolution},
-            {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
-            {enabled: options.gamepad, class: GamepadManager},
-            {enabled: options.fingerprint, class: FingerPrint},
-            {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
+            { enabled: options.touch, class: MultiTouchEvents },
+            { enabled: options.fullscreen, class: Fullscreen },
+            { enabled: options.clipboard, class: Clipboard, params: [options.i18n] },
+            { enabled: options.fileUpload, class: FileUpload, params: [options.i18n] },
+            { enabled: options.battery, class: Battery, params: [options.i18n] },
+            { enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n] },
+            { enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport] },
+            { enabled: options.capture, class: Screencast, params: [options.i18n] },
+            { enabled: options.identifiers, class: Identifiers, params: [options.i18n] },
+            { enabled: options.network, class: Network, params: [options.i18n] },
+            { enabled: options.phone, class: Phone, params: [options.i18n] },
+            { enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband] },
+            { enabled: options.streamResolution, class: StreamResolution },
+            { enabled: options.diskIO, class: IOThrottling, params: [options.i18n] },
+            { enabled: options.gamepad, class: GamepadManager },
+            { enabled: options.fingerprint, class: FingerPrint },
+            { enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey] },
+            { enabled: options.camera || options.microphone, class: MediaManager },
         ];
 
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
         pluginInitMap.forEach((plugin) => {
             const args = plugin.params || [];
 
@@ -244,8 +247,5 @@ module.exports = class DeviceRendererFactory {
             }
         });
 
-        if (typeof instance.addCustomPlugins === 'function') {
-            instance.addCustomPlugins();
-        }
     }
 };

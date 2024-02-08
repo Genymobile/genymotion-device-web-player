@@ -236,6 +236,9 @@ module.exports = class DeviceRendererFactory {
             { enabled: options.camera || options.microphone, class: MediaManager },
         ];
 
+        if (typeof instance.addCustomPlugins === 'function') {
+            instance.addCustomPlugins();
+        }
         pluginInitMap.forEach((plugin) => {
             const args = plugin.params || [];
 
@@ -244,8 +247,5 @@ module.exports = class DeviceRendererFactory {
             }
         });
 
-        if (typeof instance.addCustomPlugins === 'function') {
-            instance.addCustomPlugins();
-        }
     }
 };

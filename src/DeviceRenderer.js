@@ -802,7 +802,7 @@ module.exports = class DeviceRenderer {
                     widget.setAvailability(false);
                 },
             }, {
-                widget: this.fingerprint,
+                widget: this.biometrics,
                 capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {

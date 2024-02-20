@@ -1,7 +1,7 @@
 'use strict';
 
 const StreamBitrate = require('../../src/plugins/StreamBitrate');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let chooser;
 let instance;

@@ -50,7 +50,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        document.addEventListener('mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener = this.instance.addListener(document, 'mouseup', this.boundEventListener, false);
     }
 
     /**
@@ -79,12 +79,12 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        document.removeEventListener('mouseup', this.boundEventListener, false);
+        this.removeMouseUpListener();
     }
 
     /**
      * External mouse release event classback.
-     * Called when onmouseup event occurs outside of the player.
+     * Called when onmouseup event occurs outside of the renderer.
      *
      * @param {Event} event Event.
      */
@@ -103,7 +103,7 @@ module.exports = class MouseEvents {
         };
         this.instance.sendEvent(json);
 
-        document.removeEventListener('mouseup', this.boundEventListener, false);
+        this.instance.removeMouseUpListener();
     }
 
     /**
@@ -134,7 +134,7 @@ module.exports = class MouseEvents {
         event.stopPropagation();
         this.instance.x = this.instance.coordinateUtils.getXCoordinate(event);
         this.instance.y = this.instance.coordinateUtils.getYCoordinate(event);
-        const delta = event.wheelDelta;
+        const delta = this.getWheelDeltaPixels(event.deltaY, event.deltaMode);
         const json = {type: 'WHEEL', x: this.instance.x, y: this.instance.y, delta: delta};
         this.instance.sendEvent(json);
     }
@@ -154,10 +154,31 @@ module.exports = class MouseEvents {
      * Bind all event handlers to the video wrapper.
      */
     addMouseCallbacks() {
-        this.instance.videoWrapper.addEventListener('mousedown', this.onMousePressEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('mouseup', this.onMouseReleaseEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('mousemove', this.onMouseMoveEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('mousewheel', this.onMouseWheelEvent.bind(this), false);
-        this.instance.videoWrapper.addEventListener('contextmenu', this.cancelContextMenu.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'mousedown', this.onMousePressEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'mouseup', this.onMouseReleaseEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'mousemove', this.onMouseMoveEvent.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'wheel', this.onMouseWheelEvent.bind(this), {
+            passive: false
+        });
+        this.instance.addListener(this.instance.videoWrapper, 'contextmenu', this.cancelContextMenu.bind(this), false);
+    }
+
+    getWheelDeltaPixels(delta, mode) {
+        // Reasonable defaults
+        const PIXEL_STEP = 1;
+        const LINE_HEIGHT = 40;
+        const PAGE_HEIGHT = 800;
+
+        let pixels = delta * PIXEL_STEP;
+
+        if (pixels && mode) {
+            if (mode === 1) { // delta in LINE units
+                pixels *= LINE_HEIGHT;
+            } else { // delta in PAGE units
+                pixels *= PAGE_HEIGHT;
+            }
+        }
+
+        return pixels;
     }
 };

@@ -2,7 +2,7 @@
 
 /**
  * Display fullscreen plugin.
- * Gives the ability to display the player on the whole screen.
+ * Gives the ability to display the renderer on the whole screen.
  */
 module.exports = class Fullscreen {
     /**
@@ -16,8 +16,8 @@ module.exports = class Fullscreen {
 
         // we register for fullscreen event changes
         if (document.addEventListener) {
-            document.addEventListener('webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
-            document.addEventListener('fullscreenchange', this.onFullscreenEvent.bind(this), false);
+            this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
+            this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
         }
 
         // Display widget
@@ -25,7 +25,7 @@ module.exports = class Fullscreen {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');

@@ -69,20 +69,24 @@ module.exports = class KeyboardEvents {
         this.instance.registerEventCallback('keyboard-enable', () => {
             this.transmitKeys = true;
         });
+    }
 
-        // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
-        window.addEventListener('blur', () => {
-            this.currentlyPressedKeys.forEach((value) => {
-                const text = '';
-                const json = {
-                    type: 'KEYBOARD_RELEASE',
-                    keychar: text,
-                    keycode: value,
-                };
-                this.instance.sendEvent(json);
-            });
-            this.currentlyPressedKeys.clear();
+    /**
+     * Cancel all pressed keys.
+     * This is mainly used to avoid continuously pressed keys because of alt+tab
+     * or any other command that remove focus (blur) the page.
+     */
+    cancelAllPressedKeys() {
+        this.currentlyPressedKeys.forEach((value) => {
+            const text = '';
+            const json = {
+                type: 'KEYBOARD_RELEASE',
+                keychar: text,
+                keycode: value,
+            };
+            this.instance.sendEvent(json);
         });
+        this.currentlyPressedKeys.clear();
     }
 
     /**
@@ -218,11 +222,35 @@ module.exports = class KeyboardEvents {
         this.instance.root.tabIndex = 0;
 
         if (!this.isListenerAdded) {
-            this.instance.root.addEventListener('keypress', this.onKeyPress.bind(this));
-            this.instance.root.addEventListener('keydown', this.onKeyDown.bind(this));
-            this.instance.root.addEventListener('keyup', this.onKeyUp.bind(this));
+            // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
+            this.removeBlurListener = this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
+
+            if (!this.keyboardCallbacks) {
+                this.keyboardCallbacks = [
+                    {event: 'keypress', handler: this.onKeyPress.bind(this), removeListener: null},
+                    {event: 'keydown', handler: this.onKeyDown.bind(this), removeListener: null},
+                    {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null}
+                ];
+            }
             this.instance.root.focus();
+            this.keyboardCallbacks.forEach((item, index, array) => {
+                array[index].removeListener = this.instance.addListener(window, item.event, item.handler);
+            });
             this.isListenerAdded = true;
         }
+    }
+
+    /**
+     * Remove the event handlers callbacks (if they were created)
+     */
+    removeKeyboardCallbacks() {
+        if (!this.keyboardCallbacks || !this.isListenerAdded) {
+            return;
+        }
+        this.removeBlurListener();
+        this.keyboardCallbacks.forEach((item) => {
+            item.removeListener();
+        });
+        this.isListenerAdded = false;
     }
 };

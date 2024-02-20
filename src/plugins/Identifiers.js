@@ -34,7 +34,7 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
-        // Listen for IDs from player
+        // Listen for IDs from renderer
         this.instance.registerEventCallback('ANDROID_ID', (payload) => {
             this.androidInput.value = payload;
         });
@@ -61,7 +61,7 @@ module.exports = class Identifiers extends OverlayPlugin {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
@@ -259,7 +259,7 @@ module.exports = class Identifiers extends OverlayPlugin {
         input.className = 'gm-identifier-' + type + '-input';
         input.type = 'text';
         input.required = true;
-        input.addEventListener('keyup', validationMethod);
+        this.instance.addListener(input, 'keyup', validationMethod);
         inputWrap.appendChild(input);
 
         // Some customization

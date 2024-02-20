@@ -1,12 +1,12 @@
 'use strict';
 
-const Original = require('../../src/GenymotionInstance');
+const Original = require('../../src/DeviceRenderer');
 
-module.exports = class GenymotionInstance extends Original {
+module.exports = class DeviceRenderer extends Original {
     constructor(options) {
         document.body.innerHTML = `
 <div class="gm-wrapper">
-    <div class="gm-player">
+    <div class="gm-renderer">
         <div class="gm-video-wrapper">
             <video class="gm-video" autoplay preload="none">
                 Your browser does not support the VIDEO tag
@@ -33,6 +33,12 @@ module.exports = class GenymotionInstance extends Original {
 
         super(document.body, options || {});
         this.outgoingMessages = [];
+        this.store = {
+            getState: () => {
+                return {};
+            },
+            subscribe: jest.fn(),
+        };
     }
 
     /**

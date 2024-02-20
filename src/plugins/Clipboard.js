@@ -33,7 +33,7 @@ module.exports = class Clipboard extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
-        // Listen for framework messages: "clipboard <from_android|from_player> <base64>"
+        // Listen for framework messages: "clipboard <from_android|from_renderer> <base64>"
         this.instance.registerEventCallback('framework', (message) => {
             const values = message.split(' ');
             if (values.length !== 3 || values[0] !== 'clipboard') {
@@ -54,7 +54,7 @@ module.exports = class Clipboard extends OverlayPlugin {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');

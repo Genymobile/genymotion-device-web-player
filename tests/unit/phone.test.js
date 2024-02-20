@@ -1,7 +1,7 @@
 'use strict';
 
 const Phone = require('../../src/plugins/Phone');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let phone;
 let instance;

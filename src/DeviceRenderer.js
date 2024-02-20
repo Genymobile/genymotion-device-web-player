@@ -1,20 +1,26 @@
 'use strict';
 
 // Plugins
+const CoordinateUtils = require('./plugins/CoordinateUtils');
+const KeyboardEvents = require('./plugins/KeyboardEvents');
+const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
+const Gamepad = require('./plugins/Gamepad');
+const Camera = require('./plugins/Camera');
 
+const {generateUID} = require('./utils/helpers');
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
- * Genymotion player instance.
- * Initialize a player for a specific instance
+ * Device renderer instance.
+ * Initialize a renderer for a specific VM instance
  */
-module.exports = class GenymotionInstance {
+module.exports = class DeviceRenderer {
     /**
-     * Player instance initialization.
+     * Renderer instance initialization.
      *
-     * @param {HTMLElement} domRoot DOM element to attach the player to.
+     * @param {HTMLElement} domRoot DOM element to attach the renderer to.
      * @param {Object}      options Instance configuration options.
      */
     constructor(domRoot, options) {
@@ -32,6 +38,7 @@ module.exports = class GenymotionInstance {
         this.keyboardEventsEnabled = false;
         this.touchEventsEnabled = false;
         this.mouseEventsEnabled = false;
+        this.gamepadEventsEnabled = false;
 
         // Websocket
         this.webRTCWebsocket = null;
@@ -47,6 +54,9 @@ module.exports = class GenymotionInstance {
         // Event callbacks
         this.callbacks = {};
 
+        // Event listeners
+        this.allListeners = [];
+
         // WebRTC related attributes
         this.peerConnection = null;
         this.signalingDataChannel = null;
@@ -61,11 +71,33 @@ module.exports = class GenymotionInstance {
         this.x = 0;
         this.y = 0;
 
-        document.addEventListener('click', (event) => {
-            if (!this.hasSomeParentTheClass(event.target, 'gm-overlay')
+        this.clickHandlerCloseOverlay = (event) => {
+            if (event.target.closest('.gm-overlay') === null
                 && !event.target.classList.contains('gm-icon-button')
                 && !event.target.classList.contains('gm-dont-close')) {
                 this.emit('close-overlays');
+            }
+        };
+        this.addListener(document, 'click', this.clickHandlerCloseOverlay);
+    }
+
+    /**
+     * Initialize custom plugins.
+     */
+    addCustomPlugins() {
+        const pluginInitMap = [
+            {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
+            {enabled: this.options.keyboard, class: KeyboardEvents},
+            {enabled: this.options.mouse, class: MouseEvents},
+            {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
+            {enabled: this.options.camera, class: Camera, params: [this.options.i18n]},
+        ];
+
+        pluginInitMap.forEach((plugin) => {
+            const args = plugin.params || [];
+
+            if (plugin.enabled) {
+                new plugin.class(this, ...args);
             }
         });
     }
@@ -132,20 +164,6 @@ module.exports = class GenymotionInstance {
     }
 
     /**
-     * Look for a class applied in a element parent tree.
-     *
-     * @param  {HTMLElement} element   DOM element to check.
-     * @param  {string}      className Class name to look for.
-     * @return {boolean}               Whether or not the class has been found in the given element parents.
-     */
-    hasSomeParentTheClass(element, className) {
-        if (element.classList && element.classList.contains(className)) {
-            return true;
-        }
-        return element.parentNode && this.hasSomeParentTheClass(element.parentNode, className);
-    }
-
-    /**
      * Check a websocket instance status.
      *
      * @param  {WebSocket} webSocket websocket instance.
@@ -172,7 +190,7 @@ module.exports = class GenymotionInstance {
             this.reconnecting = true;
         }
 
-        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl);
+        this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl, this.webRTCWebsocketName);
         this.webRTCWebsocket.onopen = this.sendAuthenticationToken.bind(this);
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);
@@ -195,9 +213,10 @@ module.exports = class GenymotionInstance {
      */
     onConnectionClosed() {
         this.webRTCWebsocket.onclose = (event) => {
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
             this.video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
-            log.debug('Error! Maybe your VM is not available yet? (' + event.code +') ' + event.reason);
+            log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
             case 1000:
@@ -272,9 +291,7 @@ module.exports = class GenymotionInstance {
     disconnect() {
         this.initialized = false;
 
-        if (typeof this.camera !== 'undefined' && typeof this.camera.getClientVideoStream !== 'undefined') {
-            this.removeLocalStream(this.camera.getClientVideoStream());
-        }
+        this.mediaManager?.disconnect();
 
         if (this.webRTCWebsocket) {
             this.webRTCWebsocket.close();
@@ -325,8 +342,9 @@ module.exports = class GenymotionInstance {
     /**
      * Reconfigure & setup the peer-to-peer connection (SDP).
      * Can be used anytime to renegotiate the SDP if necessary.
+     * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    renegotiateWebRTCConnection() {
+    async renegotiateWebRTCConnection() {
         // For safari we add audio & video before sending SDP to avoid empty SDP
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         if (isSafari) {
@@ -334,99 +352,14 @@ module.exports = class GenymotionInstance {
             this.peerConnection.addTransceiver('video');
         }
         // creating SDP offer
-        this.peerConnection.createOffer(
-            this.setLocalDescription.bind(this),
-            this.onWebRTCConnectionError.bind(this),
-            this.sdpConstraints
-        );
-    }
-
-    /**
-     * Find RTCRtpSender corresponding RTCRtpTransceiver and set its direction.
-     *
-     * @param {RTCRtpSender} sender    Peer (sender).
-     * @param {string}       direction Transceiver direction.
-     */
-    setTransceiverDirection(sender) {
-        // find transceiver that contains sender
-        this.peerConnection.getTransceivers().forEach((transceiver) => {
-            if (transceiver.sender === sender) {
-                transceiver.direction = 'sendrecv';
-            }
-        });
-    }
-
-    /**
-     * Add a local stream and send it through SDP renegotiation.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
-     * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addStream
-     *
-     * @param {MediaStream} stream Stream to add.
-     */
-    addLocalStream(stream) {
-        if (typeof this.peerConnection.addTrack === 'function') {
-            // If the new API "addTrack" is available, we use it
-
-            /**
-             * If cameraSender or microphoneSender is defined, this means that we already added
-             * it to the PeerConnection. Since removeTrack() just remove the track
-             * from it, re-add it and switch back the RTCRtpTranceiver direction
-             * to send and recv.
-             */
-            if (stream.getVideoTracks().length > 0) {
-                if (this.cameraSender) {
-                    log.debug('Replacing video track on sender');
-                    this.cameraSender.replaceTrack(stream.getVideoTracks()[0]);
-                    this.setTransceiverDirection(this.cameraSender, 'sendrecv');
-                } else {
-                    this.cameraSender = this.peerConnection.addTrack(stream.getVideoTracks()[0],
-                        stream);
-                }
-            }
-
-            if (this.options.microphone && stream.getAudioTracks().length > 0) {
-                if (this.microphoneSender) {
-                    log.debug('Replacing audio track on sender');
-                    this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
-                    this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
-                } else {
-                    this.microphoneSender = this.peerConnection.addTrack(stream.getAudioTracks()[0],
-                        stream);
-                }
-            }
-        } else {
-            // Else if it is not available, we use the old "addStream"
-            this.peerConnection.addStream(stream);
+        try {
+            const description = await this.peerConnection.createOffer(this.sdpConstraints);
+            this.setLocalDescription(description);
+        } catch (error) {
+            this.onWebRTCConnectionError(error);
+            return false;
         }
-        this.renegotiateWebRTCConnection();
-    }
-
-    /**
-     * Remove a local stream and stop sending it through SDP renegotiation.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeTrack
-     * and https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeStream
-     *
-     * @param {MediaStream} stream Stream to stop and remove.
-     */
-    removeLocalStream(stream) {
-        if (stream instanceof MediaStream) {
-            stream.getTracks().forEach((track) => {
-                track.stop();
-            });
-            // If the new API "removeTrack" is available, we use it
-            if (typeof this.peerConnection.addTrack === 'function') {
-                this.peerConnection.removeTrack(this.cameraSender);
-                if (this.microphoneSender) {
-                    this.peerConnection.removeTrack(this.microphoneSender);
-                }
-                // Else if it is not available, we use the old "removeStream"
-            } else {
-                this.peerConnection.removeStream(stream);
-            }
-            this.renegotiateWebRTCConnection();
-        }
+        return true;
     }
 
     /**
@@ -437,11 +370,19 @@ module.exports = class GenymotionInstance {
 
         const iceServers = [];
 
-        if (Object.keys(this.options.stun).length > 0) {
+        if (Array.isArray(this.options.stun)) {
+            this.options.stun.forEach((stunServer) => {
+                iceServers.push(stunServer);
+            });
+        } else if (Object.keys(this.options.stun).length > 0) {
             iceServers.push(this.options.stun);
         }
 
-        if (Object.keys(this.options.turn).length > 0) {
+        if (Array.isArray(this.options.turn)) {
+            this.options.turn.forEach((turnServer) => {
+                iceServers.push(turnServer);
+            });
+        } else if (Object.keys(this.options.turn).length > 0) {
             iceServers.push(this.options.turn);
         }
 
@@ -460,31 +401,7 @@ module.exports = class GenymotionInstance {
         }
 
         if (typeof this.peerConnection.createDataChannel !== 'undefined') {
-            const dataChannelOptions = {
-                ordered: true,
-            };
-
-            this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
-
-            this.signalingDataChannel.onerror = (error) => {
-                log.warn('Data Channel Error:', error);
-            };
-
-            this.signalingDataChannel.onmessage = (event) => {
-                log.debug('Got Data Channel Message:', event.data);
-            };
-            this.signalingDataChannel.onopen = () => {
-                log.debug('Data Channel opened');
-            };
-
-            this.signalingDataChannel.onclose = () => {
-                log.debug('The Data Channel is Closed');
-            };
-
-            this.peerConnection.ondatachannel = (event) => {
-                const answererDataChannel = event.channel;
-                answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
-            };
+            this.createDataChannels();
         } else {
             this.useWebsocketAsDataChannel = true;
         }
@@ -532,6 +449,10 @@ module.exports = class GenymotionInstance {
                 this.keyboardEvents.addKeyboardCallbacks();
             }
 
+            if (this.gamepadEventsEnabled) {
+                this.gamepadManager.addGamepadCallbacks();
+            }
+
             const playWithSound = this.video.play(); // needed on Safari (web & iOs)
             if (!playWithSound) {
                 return;
@@ -550,19 +471,17 @@ module.exports = class GenymotionInstance {
                     this.dispatchEvent('video', {msg: 'play automatically allowed without sound'});
                     const popup = document.createElement('div');
                     popup.classList.add('gm-click-to-unmute');
-                    popup.innerHTML = 'By default, the sound has been turned off, '
+                    popup.innerHTML = this.options.i18n.UNMUTE_INVITE || 'By default, the sound has been turned off, '
                         + 'please click anywhere to re-enable audio';
                     this.videoWrapper.prepend(popup);
                     const addSound = () => {
                         this.video.muted = false;
-                        this.video.removeEventListener('click', addSound);
-                        this.video.removeEventListener('touchend', addSound);
+                        this.removeAddSoundListener();
                         this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
                         popup.remove();
                         log.debug('Playing video with sound enabled has been authorized due to user click');
                     };
-                    this.video.addEventListener('click', addSound);
-                    this.video.addEventListener('touchend', addSound);
+                    this.removeAddSoundListener = this.addListener(window, ['click', 'touchend'], addSound);
                 }).catch(() => {
                     log.debug('Can\'t play video, even with sound disabled');
                     this.dispatchEvent('video', {msg: 'play denied even without sound'});
@@ -571,13 +490,13 @@ module.exports = class GenymotionInstance {
                     this.classList.add('gm-video-overlay');
                     this.videoWrapper.prepend(div);
                     const allowPlay = () => {
+                        this.removeAllowPlayListener();
                         this.video.play();
                         div.remove();
                         this.dispatchEvent('video', {msg: 'play manually allowed by click'});
                         log.debug('Playing video with sound disabled has been authorized due to user click');
                     };
-                    div.addEventListener('click', allowPlay);
-                    div.addEventListener('touchend', allowPlay);
+                    this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
                 });
             });
         };
@@ -604,12 +523,12 @@ module.exports = class GenymotionInstance {
                     '</br>See <a href="">help</a> to setup TURN configuration.'
                 );
                 const openDocumentationLink = () => {
+                    this.removeOpenDocListener();
                     this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
                     div.remove();
                     window.open(this.options.connectionFailedURL, '_blank');
                 };
-                div.addEventListener('click', openDocumentationLink);
-                div.addEventListener('touchend', openDocumentationLink);
+                this.removeOpenDocListener = this.addListener(div, ['click', 'touchend'], openDocumentationLink);
             } else {
                 message = message.replace('{DOC_AVAILABLE}', '');
             }
@@ -617,18 +536,52 @@ module.exports = class GenymotionInstance {
             div.innerHTML = message;
         };
 
-        this.peerConnection.onconnectionstatechange = () => {
+        this.onConnectionStateChange = () => {
             log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
             if (this.peerConnection.iceConnectionState === 'disconnected') {
                 this.onWebRTCReady();
             }
         };
+        this.addListener(this.peerConnection, 'connectionstatechange', this.onConnectionStateChange);
 
         this.peerConnection.onnegotiationneeded = () => {
             log.debug('on Negotiation needed');
         };
 
         this.renegotiateWebRTCConnection();
+    }
+
+    /**
+     * Create datachannel(s)
+     */
+    createDataChannels() {
+        const dataChannelOptions = {
+            ordered: true,
+        };
+
+        this.signalingDataChannel = this.peerConnection.createDataChannel('events', dataChannelOptions);
+
+        this.signalingDataChannel.onerror = (error) => {
+            log.warn('Data Channel Error:', error);
+        };
+
+        this.signalingDataChannel.onmessage = (event) => {
+            log.debug('Got Data Channel Message:', event.data);
+        };
+        this.signalingDataChannel.onopen = () => {
+            // Adding status to store, this way all logic for new connection can be handled by plugin
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: true});
+            log.debug('Data Channel opened');
+        };
+
+        this.signalingDataChannel.onclose = () => {
+            log.debug('The Data Channel is Closed');
+        };
+
+        this.peerConnection.ondatachannel = (event) => {
+            const answererDataChannel = event.channel;
+            answererDataChannel.onmessage = this.onDataChannelMessage.bind(this);
+        };
     }
 
     /**
@@ -648,6 +601,27 @@ module.exports = class GenymotionInstance {
      * @param {RTCSessionDescription} description Peer connection session description.
      */
     setLocalDescription(description) {
+        /*
+         * Munging SDP before setLocalDescription is not really standard compliant, but seems like
+         * the only way to make Chrome advertise it prefers stereo.
+         * Setting maxplaybackrate and maxaveragebitrate are not necessary, but they
+         * may improve audio quality by specifying HQ defaults.
+         */
+        const m = [...description.sdp.matchAll(/a=rtpmap:(\d+) opus\/48000\/2/g)][0];
+        if (m) {
+            /**
+             * Adding stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000 to the opus codec
+             * taking care of prepending with ';' if necessary
+             */
+            description.sdp = description.sdp.replace(
+                new RegExp(`(a=fmtp:${m[1]}) ?(.*)(\r?\n)`, 'g'),
+                // eslint-disable-next-line no-unused-vars
+                (match, fmtpId, existingParams, lineEnding, offset, string) => {
+                    const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `;
+                    return `${modified}stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000${lineEnding}`;
+                });
+        }
+
         this.peerConnection.setLocalDescription(description);
         if (this.isWebsocketOpen(this.webRTCWebsocket)) {
             this.webRTCWebsocket.send(JSON.stringify(description));
@@ -684,6 +658,10 @@ module.exports = class GenymotionInstance {
                 log.warn('Failed to create SDP ', error.message);
             }
         } else if (data.candidate) {
+            if (data.candidate === 'end-of-candidates') {
+                log.debug('End of ICE candidates received');
+                return;
+            }
             try {
                 const candidate = new RTCIceCandidate(data);
                 this.peerConnection.addIceCandidate(candidate);
@@ -824,6 +802,9 @@ module.exports = class GenymotionInstance {
                 disable: (widget) => {
                     widget.setAvailability(false);
                 },
+            }, {
+                widget: this.fingerprint,
+                capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {
@@ -848,5 +829,61 @@ module.exports = class GenymotionInstance {
         if (data.code === 'SUCCESS') {
             this.emit(data.type, data.message);
         }
+    }
+
+    /**
+     * This function wraps around the plain js `addEventListener` function, also registering everything in a local array.
+     * The aim is to be able to remove all listeners at a later time.
+     * @param {EventTarget} object Object which emits the event
+     * @param {Array<String>|String} events Either one case-sensitive string reprensenting the event type to listen for, or an array of such strings
+     * @param {any} handler The object that receives a notification when an event of the specified type occus. This must be either `null`, an object with a `handleEvent()` method, or a function.
+     * @param {any} options Either a bool, specifying the `useCapture` arg, or an object specifying the `options` arg. Refer to the js api.
+     * @return {function} A removeListener function. This must be saved on the caller side if you ever want to use it to remove the listener
+     */
+    addListener(object, events, handler, options = {}) {
+        const eventArray = Array.isArray(events)?events:[events];
+        const id = generateUID();
+        eventArray.forEach((event) => {
+            object.addEventListener(event, handler, options);
+            this.allListeners.push({id, object, event, handler, options});
+        });
+
+        return () => {
+            this.allListeners = this.allListeners.filter((item) => {
+                if (item.id === id) {
+                    object.removeEventListener(item.event, item.handler, item.options);
+                    return false;
+                }
+                return true;
+            });
+        };
+    }
+
+    /**
+     * Removes all listeners that were added through `addListener`
+     */
+    removeAllListeners() {
+        this.allListeners.forEach(({object, event, handler, options}) => {
+            object.removeEventListener(event, handler, options);
+        });
+        this.allListeners.length = 0;
+    }
+
+    /**
+     * Destructor for the device renderer. This won't actually destroy the instance, but simply remove all event bindings
+     * so that things can be garbage-collected.
+     * References to the instance in the caller need to be manually deleted too in order for the instance to be garbage-collected.
+     * This method also calls recursively the destroy methods on the plugins if they exist.
+     */
+    destroy() {
+        this.removeAllListeners();
+        this.disconnect();
+        this.peerConnectionStats?.destroy();
+        delete this.peerConnectionStats;
+        delete this.video;
+        delete this.wrapper;
+        delete this.videoWrapper;
+        delete this.root;
+        delete this.stream;
     }
 };

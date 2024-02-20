@@ -67,7 +67,7 @@ module.exports = class GPS extends OverlayPlugin {
     }
 
     /**
-     * Add the button to the player toolbar.
+     * Add the button to the renderer toolbar.
      */
     renderToolbarButton() {
         const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
@@ -177,7 +177,7 @@ module.exports = class GPS extends OverlayPlugin {
         input.max = max;
         input.className = 'gm-gps-' + name;
         input.step = 'any';
-        input.addEventListener('keyup', this.checkErrors.bind(this));
+        this.instance.addListener(input, 'keyup', this.checkErrors.bind(this));
         inputWrap.appendChild(input);
 
         return inputWrap;

@@ -3,7 +3,7 @@
 jest.mock('loglevel');
 
 const GPS = require('../../src/plugins/GPS');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let gps;
 let instance;

@@ -86,8 +86,8 @@ module.exports = class MultiTouchEvents {
      * Bind all event handlers to the video wrapper.
      */
     addTouchCallbacks() {
-        this.instance.videoWrapper.addEventListener('touchstart', this.onScreenTouchStart.bind(this), false);
-        this.instance.videoWrapper.addEventListener('touchend', this.onScreenTouchEnd.bind(this), false);
-        this.instance.videoWrapper.addEventListener('touchmove', this.onScreenTouchMove.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'touchstart', this.onScreenTouchStart.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'touchend', this.onScreenTouchEnd.bind(this), false);
+        this.instance.addListener(this.instance.videoWrapper, 'touchmove', this.onScreenTouchMove.bind(this), false);
     }
 };

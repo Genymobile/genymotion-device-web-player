@@ -1,7 +1,7 @@
 'use strict';
 
 const Battery = require('../../src/plugins/Battery');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let battery;
 let instance;

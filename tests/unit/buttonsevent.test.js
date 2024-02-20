@@ -1,7 +1,7 @@
 'use strict';
 
 const ButtonsEvents = require('../../src/plugins/ButtonsEvents');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let instance;
 

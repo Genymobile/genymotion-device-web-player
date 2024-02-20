@@ -2,7 +2,7 @@
 
 const Network = require('../../src/plugins/Network');
 const NetworkProfiles = require('../../src/plugins/util/network-profiles');
-const Instance = require('../mocks/GenymotionInstance');
+const Instance = require('../mocks/DeviceRenderer');
 
 let network;
 let instance;

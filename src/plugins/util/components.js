@@ -18,7 +18,6 @@
 
 const switchButton = (() => {
     const createSwitch = ({onChange}) => {
-
         const switchDiv = document.createElement('div');
         switchDiv.style.position = 'relative';
         switchDiv.style.display = 'inline-block';

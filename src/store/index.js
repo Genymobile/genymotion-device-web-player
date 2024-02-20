@@ -6,7 +6,6 @@ const initialState = {
 };
 
 const createStore = (instance, reducer, state) => {
-    
     const listeners = [];
 
     const getState = () => instance.store.state;

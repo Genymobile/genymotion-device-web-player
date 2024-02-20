@@ -8,7 +8,7 @@ const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
 const Camera = require('./plugins/Camera');
 
-const { generateUID } = require('./utils/helpers');
+const {generateUID} = require('./utils/helpers');
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
@@ -219,54 +219,54 @@ module.exports = class DeviceRenderer {
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
-                case 1000:
-                case 1001:
-                case 1005:
-                    log.debug('Closing websocket');
-                    this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
-                    break;
+            case 1000:
+            case 1001:
+            case 1005:
+                log.debug('Closing websocket');
+                this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
+                break;
 
-                case 1002:
-                case 1003:
-                case 1006:
-                case 1007:
-                case 1008:
-                case 1009:
-                case 1010:
-                case 1011:
-                case 1012:
-                case 1013:
-                case 1014:
-                case 1015: {
-                    // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
-                    this.dispatchEvent('closeConnectionUnavailable', {msg: 'Can\'t connect to the WebSocket'});
-                    log.debug('Retrying in 3 seconds...');
+            case 1002:
+            case 1003:
+            case 1006:
+            case 1007:
+            case 1008:
+            case 1009:
+            case 1010:
+            case 1011:
+            case 1012:
+            case 1013:
+            case 1014:
+            case 1015: {
+                // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
+                this.dispatchEvent('closeConnectionUnavailable', {msg: 'Can\'t connect to the WebSocket'});
+                log.debug('Retrying in 3 seconds...');
 
-                    const timeout = setTimeout(() => {
-                        this.openWebRTCConnection();
-                    }, 3000);
-                    this.timeoutCallbacks.push(timeout);
-                    this.webRTCConnectionRetryCount++;
-                    break;
-                }
-                case 4242: // wrong token provided
-                    this.dispatchEvent('closeWrongToken', {msg: 'Wrong token, can\'t establish connection'});
-                    break;
+                const timeout = setTimeout(() => {
+                    this.openWebRTCConnection();
+                }, 3000);
+                this.timeoutCallbacks.push(timeout);
+                this.webRTCConnectionRetryCount++;
+                break;
+            }
+            case 4242: // wrong token provided
+                this.dispatchEvent('closeWrongToken', {msg: 'Wrong token, can\'t establish connection'});
+                break;
 
-                case 4243: // token no longer valid
-                    this.dispatchEvent('closeNoLongerValidToken', {
-                        msg: 'The token provided is no longer valid',
-                    });
-                    break;
+            case 4243: // token no longer valid
+                this.dispatchEvent('closeNoLongerValidToken', {
+                    msg: 'The token provided is no longer valid',
+                });
+                break;
 
-                case 4244: // server is shutting down
-                    this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
-                    break;
+            case 4244: // server is shutting down
+                this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
+                break;
 
-                default:
-                    this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
-                    // Do nothing (for now)
-                    break;
+            default:
+                this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
+                // Do nothing (for now)
+                break;
             }
         };
     }

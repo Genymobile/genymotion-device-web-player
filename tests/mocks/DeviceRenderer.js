@@ -33,6 +33,12 @@ module.exports = class DeviceRenderer extends Original {
 
         super(document.body, options || {});
         this.outgoingMessages = [];
+        this.store = {
+            getState: () => {
+                return {};
+            },
+            subscribe: jest.fn(),
+        };
     }
 
     /**

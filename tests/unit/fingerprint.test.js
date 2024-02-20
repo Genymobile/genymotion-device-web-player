@@ -9,7 +9,9 @@ let instance;
 
 describe('FingerPrint Plugin', () => {
     beforeEach(() => {
-        instance = new Instance();
+        instance = new Instance({
+            giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions'
+        });
         new FingerPrint(instance, {}, true);
     });
 
@@ -83,11 +85,11 @@ describe('FingerPrint Plugin', () => {
 
         test('Auto validate fingerprint\'s request when auto validation is enabled', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            expect(sendEventSpy).toHaveBeenCalledTimes(0);
             const autoValidation = document
                 .querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status span');
             autoValidation.click();
 
-            expect(sendEventSpy).toHaveBeenCalledTimes(0);
             instance.emit('fingerprint', 'current_status scanning');
             instance.emit('fingerprint', 'scan start');
 
@@ -98,7 +100,7 @@ describe('FingerPrint Plugin', () => {
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 channel: 'fingerprint', messages: [
-                    'scan recognized',
+                    'set auto_recognize true',
                 ],
             });
             sendEventSpy.mockRestore();

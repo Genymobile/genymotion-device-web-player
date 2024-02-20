@@ -7,6 +7,7 @@
 
 const through = require('through2');
 const File = require('vinyl');
+const path = require('path');
 
 /**
  * templateCollector
@@ -29,7 +30,7 @@ module.exports = function templateCollector(options) {
             }
 
             // Break up filename
-            const pieces = file.relative.split('/');
+            const pieces = file.relative.split(path.sep);
             const template = pieces[0];
             const fileName = pieces[1];
 

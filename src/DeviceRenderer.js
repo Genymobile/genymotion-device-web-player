@@ -6,8 +6,9 @@ const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
-const MediaManager = require('./plugins/MediaManager');
+const Camera = require('./plugins/Camera');
 
+const { generateUID } = require('./utils/helpers');
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
@@ -89,7 +90,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
             {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
-            {enabled: this.options.camera || this.options.microphone, class: MediaManager},
+            {enabled: this.options.camera, class: Camera, params: [this.options.i18n]},
         ];
 
         pluginInitMap.forEach((plugin) => {
@@ -212,59 +213,60 @@ module.exports = class DeviceRenderer {
      */
     onConnectionClosed() {
         this.webRTCWebsocket.onclose = (event) => {
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
             this.video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
-            case 1000:
-            case 1001:
-            case 1005:
-                log.debug('Closing websocket');
-                this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
-                break;
+                case 1000:
+                case 1001:
+                case 1005:
+                    log.debug('Closing websocket');
+                    this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
+                    break;
 
-            case 1002:
-            case 1003:
-            case 1006:
-            case 1007:
-            case 1008:
-            case 1009:
-            case 1010:
-            case 1011:
-            case 1012:
-            case 1013:
-            case 1014:
-            case 1015: {
-                // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
-                this.dispatchEvent('closeConnectionUnavailable', {msg: 'Can\'t connect to the WebSocket'});
-                log.debug('Retrying in 3 seconds...');
+                case 1002:
+                case 1003:
+                case 1006:
+                case 1007:
+                case 1008:
+                case 1009:
+                case 1010:
+                case 1011:
+                case 1012:
+                case 1013:
+                case 1014:
+                case 1015: {
+                    // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
+                    this.dispatchEvent('closeConnectionUnavailable', {msg: 'Can\'t connect to the WebSocket'});
+                    log.debug('Retrying in 3 seconds...');
 
-                const timeout = setTimeout(() => {
-                    this.openWebRTCConnection();
-                }, 3000);
-                this.timeoutCallbacks.push(timeout);
-                this.webRTCConnectionRetryCount++;
-                break;
-            }
-            case 4242: // wrong token provided
-                this.dispatchEvent('closeWrongToken', {msg: 'Wrong token, can\'t establish connection'});
-                break;
+                    const timeout = setTimeout(() => {
+                        this.openWebRTCConnection();
+                    }, 3000);
+                    this.timeoutCallbacks.push(timeout);
+                    this.webRTCConnectionRetryCount++;
+                    break;
+                }
+                case 4242: // wrong token provided
+                    this.dispatchEvent('closeWrongToken', {msg: 'Wrong token, can\'t establish connection'});
+                    break;
 
-            case 4243: // token no longer valid
-                this.dispatchEvent('closeNoLongerValidToken', {
-                    msg: 'The token provided is no longer valid',
-                });
-                break;
+                case 4243: // token no longer valid
+                    this.dispatchEvent('closeNoLongerValidToken', {
+                        msg: 'The token provided is no longer valid',
+                    });
+                    break;
 
-            case 4244: // server is shutting down
-                this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
-                break;
+                case 4244: // server is shutting down
+                    this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
+                    break;
 
-            default:
-                this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
-                // Do nothing (for now)
-                break;
+                default:
+                    this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
+                    // Do nothing (for now)
+                    break;
             }
         };
     }
@@ -567,6 +569,8 @@ module.exports = class DeviceRenderer {
             log.debug('Got Data Channel Message:', event.data);
         };
         this.signalingDataChannel.onopen = () => {
+            // Adding status to store, this way all logic for new connection can be handled by plugin
+            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: true});
             log.debug('Data Channel opened');
         };
 
@@ -798,6 +802,9 @@ module.exports = class DeviceRenderer {
                 disable: (widget) => {
                     widget.setAvailability(false);
                 },
+            }, {
+                widget: this.fingerprint,
+                capability: data.message.biometrics,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {
@@ -835,7 +842,7 @@ module.exports = class DeviceRenderer {
      */
     addListener(object, events, handler, options = {}) {
         const eventArray = Array.isArray(events)?events:[events];
-        const id = new Date().getTime(); // TODO replace me with a proper uid once jérémy's fingerprint PR is merged
+        const id = generateUID();
         eventArray.forEach((event) => {
             object.addEventListener(event, handler, options);
             this.allListeners.push({id, object, event, handler, options});

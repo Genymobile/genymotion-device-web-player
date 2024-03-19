@@ -234,7 +234,7 @@ module.exports = class KeyboardEvents {
             }
             this.instance.root.focus();
             this.keyboardCallbacks.forEach((item, index, array) => {
-                array[index].removeListener = this.instance.addListener(window, item.event, item.handler);
+                array[index].removeListener = this.instance.addListener(this.instance.root, item.event, item.handler);
             });
             this.isListenerAdded = true;
         }

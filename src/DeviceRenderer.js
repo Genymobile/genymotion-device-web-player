@@ -876,6 +876,14 @@ module.exports = class DeviceRenderer {
      * This method also calls recursively the destroy methods on the plugins if they exist.
      */
     destroy() {
+        /**
+         *  if the websocket is in connecting state,
+         *  we can't destroy the instance cause object is not fully initialized
+         */
+        if (this.webRTCWebsocket.readyState === 0) {
+            return;
+        }
+
         this.removeAllListeners();
         this.disconnect();
         this.peerConnectionStats?.destroy();

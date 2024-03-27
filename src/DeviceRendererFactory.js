@@ -60,7 +60,7 @@ const defaultOptions = {
     streamResolution: true,
     diskIO: true,
     gamepad: false,
-    fingerprint: true,
+    biometrics: true,
     translateHomeKey: false,
     token: '',
     i18n: {},
@@ -231,7 +231,7 @@ module.exports = class DeviceRendererFactory {
             {enabled: options.streamResolution, class: StreamResolution},
             {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
             {enabled: options.gamepad, class: GamepadManager},
-            {enabled: options.fingerprint, class: FingerPrint},
+            {enabled: options.biometrics, class: FingerPrint},
             {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
             {enabled: options.camera || options.microphone, class: MediaManager},
         ];

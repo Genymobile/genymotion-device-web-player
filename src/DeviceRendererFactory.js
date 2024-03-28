@@ -3,27 +3,7 @@
 const DeviceRenderer = require('./DeviceRenderer');
 const defaultsDeep = require('lodash/defaultsDeep');
 
-// Plugins
-const GPS = require('./plugins/GPS');
-const MultiTouchEvents = require('./plugins/MultiTouchEvents');
-const ButtonsEvents = require('./plugins/ButtonsEvents');
-const Fullscreen = require('./plugins/Fullscreen');
-const Clipboard = require('./plugins/Clipboard');
-const FileUpload = require('./plugins/FileUpload');
-const Battery = require('./plugins/Battery');
-const StreamBitrate = require('./plugins/StreamBitrate');
-const Screencast = require('./plugins/Screencast');
-const Identifiers = require('./plugins/Identifiers');
-const Network = require('./plugins/Network');
-const Phone = require('./plugins/Phone');
-const BasebandRIL = require('./plugins/BasebandRIL');
-const StreamResolution = require('./plugins/StreamResolution');
-const IOThrottling = require('./plugins/IOThrottling');
-const GamepadManager = require('./plugins/GamepadManager');
-const FingerPrint = require('./plugins/FingerPrint');
-
 const store = require('./store');
-const MediaManager = require('./plugins/MediaManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -166,7 +146,7 @@ module.exports = class DeviceRendererFactory {
 
         this.instances.push(instance);
 
-        this.addPlugins(instance, instance.options);
+        this.addPlugins(instance);
         instance.onWebRTCReady();
 
         return instance;
@@ -210,39 +190,36 @@ module.exports = class DeviceRendererFactory {
      * @param  {DeviceRenderer}     instance The DeviceRenderer instance reference to link into each plugin.
      * @param  {Object}             options  Various configuration options.
      */
-    addPlugins(instance, options) {
+    addPlugins(instance) {
         /*
          * Load instance dedicated plugins
          */
 
         const pluginInitMap = [
-            {enabled: options.touch, class: MultiTouchEvents},
-            {enabled: options.fullscreen, class: Fullscreen},
-            {enabled: options.clipboard, class: Clipboard, params: [options.i18n]},
-            {enabled: options.fileUpload, class: FileUpload, params: [options.i18n]},
-            {enabled: options.battery, class: Battery, params: [options.i18n]},
-            {enabled: options.streamBitrate, class: StreamBitrate, params: [options.i18n]},
-            {enabled: options.gps, class: GPS, params: [options.i18n, options.gpsSpeedSupport]},
-            {enabled: options.capture, class: Screencast, params: [options.i18n]},
-            {enabled: options.identifiers, class: Identifiers, params: [options.i18n]},
-            {enabled: options.network, class: Network, params: [options.i18n]},
-            {enabled: options.phone, class: Phone, params: [options.i18n]},
-            {enabled: options.baseband, class: BasebandRIL, params: [options.i18n, options.baseband]},
-            {enabled: options.streamResolution, class: StreamResolution},
-            {enabled: options.diskIO, class: IOThrottling, params: [options.i18n]},
-            {enabled: options.gamepad, class: GamepadManager},
-            {enabled: options.biometrics, class: FingerPrint},
-            {enabled: options.buttons, class: ButtonsEvents, params: [options.i18n, options.translateHomeKey]},
-            {enabled: options.camera || options.microphone, class: MediaManager},
         ];
 
         if (typeof instance.addCustomPlugins === 'function') {
-            instance.addCustomPlugins();
+            const customPlugins = instance.addCustomPlugins();
+            if (Array.isArray(customPlugins)){
+                pluginInitMap.push(...customPlugins);
+            }
         }
+
+        const dependenciesLoaded = [];
         pluginInitMap.forEach((plugin) => {
             const args = plugin.params || [];
 
             if (plugin.enabled) {
+                // load dependencies
+                if (plugin.dependencies) {
+                    plugin.dependencies.forEach((Dep) => {
+                        if (dependenciesLoaded.indexOf(Dep.name) !== -1) {
+                            return;
+                        }
+                        new Dep(instance);
+                        dependenciesLoaded.push(Dep.name);
+                    });
+                }
                 new plugin.class(instance, ...args);
             }
         });

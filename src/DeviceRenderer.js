@@ -1,12 +1,30 @@
 'use strict';
 
 // Plugins
+const MultiTouchEvents = require('./plugins/MultiTouchEvents');
+const ButtonsEvents = require('./plugins/ButtonsEvents');
+const Fullscreen = require('./plugins/Fullscreen');
+const Clipboard = require('./plugins/Clipboard');
+const StreamBitrate = require('./plugins/StreamBitrate');
+const Screencast = require('./plugins/Screencast');
+const StreamResolution = require('./plugins/StreamResolution');
 const CoordinateUtils = require('./plugins/CoordinateUtils');
 const KeyboardEvents = require('./plugins/KeyboardEvents');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
 const Camera = require('./plugins/Camera');
+const GPS = require('./plugins/GPS');
+const FileUpload = require('./plugins/FileUpload');
+const Battery = require('./plugins/Battery');
+const Identifiers = require('./plugins/Identifiers');
+const Network = require('./plugins/Network');
+const Phone = require('./plugins/Phone');
+const BasebandRIL = require('./plugins/BasebandRIL');
+const IOThrottling = require('./plugins/IOThrottling');
+const GamepadManager = require('./plugins/GamepadManager');
+const FingerPrint = require('./plugins/FingerPrint');
+const MediaManager = require('./plugins/MediaManager');
 
 const {generateUID} = require('./utils/helpers');
 const log = require('loglevel');
@@ -83,23 +101,39 @@ module.exports = class DeviceRenderer {
 
     /**
      * Initialize custom plugins.
+     * @returns {Array} List of plugins to initialize.
      */
     addCustomPlugins() {
         const pluginInitMap = [
+            {enabled: this.options.touch, class: MultiTouchEvents},
+            {enabled: this.options.fullscreen, class: Fullscreen},
+            {enabled: this.options.clipboard, class: Clipboard, params: [this.options.i18n]},
+            {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
+            {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies:[MediaManager]},
+            {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
+            {enabled: this.options.gps, class: GPS, params: [this.options.i18n, this.options.gpsSpeedSupport]},
+            {enabled: this.options.capture, class: Screencast, params: [this.options.i18n]},
+            {enabled: this.options.streamResolution, class: StreamResolution},
+            {
+                enabled: this.options.buttons,
+                class: ButtonsEvents,
+                params: [this.options.i18n, this.options.translateHomeKey]
+            },
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
-            {enabled: this.options.gamepad, class: Gamepad, params: [this.gamepadManager, this.options.i18n]},
-            {enabled: this.options.camera, class: Camera, params: [this.options.i18n]},
+            {enabled: this.options.gamepad, class: Gamepad, params: [this.options.i18n], dependencies:[GamepadManager]},
+            {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
+            {enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n]},
+            {enabled: this.options.network, class: Network, params: [this.options.i18n]},
+            {enabled: this.options.phone, class: Phone, params: [this.options.i18n]},
+            {enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n, this.options.baseband]},
+            {enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n]},
+            {enabled: this.options.biometrics, class: FingerPrint},
+            {enabled: this.options.microphone, class: MediaManager},
         ];
 
-        pluginInitMap.forEach((plugin) => {
-            const args = plugin.params || [];
-
-            if (plugin.enabled) {
-                new plugin.class(this, ...args);
-            }
-        });
+        return pluginInitMap;
     }
 
     /**

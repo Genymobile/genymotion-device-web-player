@@ -257,29 +257,26 @@ module.exports = class GamepadManager {
     }
 
     /**
-     * Handler for gamepad connection. Reemits a custom event with the parsed gamepad.
+     * Handler for gamepad connection/disconnection. Reemits a custom event with the parsed gamepad.
      * User class must then call listenForInputs in order to provide the remote index & start listening for inputs.
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const parsedGamepad = this.parseGamepad(event.gamepad);
-        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: parsedGamepad});
-        if (event.gamepad.mapping === '') {
-            log.error(`Unsupported gamepad mapping for gamepad ${parsedGamepad.name}`);
-            return;
+        log.debug(event)
+        const eventType = event.type
+        if (eventType === 'gamepadconnected') {
+            log.debug("GamepadManager gamepad plugged");
+            const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
+            window.dispatchEvent(customEvent);
+        } else if (eventType === 'gamepaddisconnected') {
+            log.debug("GamepadManager gamepad unplugged");
+            const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
+            window.dispatchEvent(customEvent);
+
+            this.stopListeningInputs(event.gamepad.index);
+        } else {
+            log.debug("GamepadManager unknown gamepad connection event");
         }
-        window.dispatchEvent(customEvent);
-    }
-
-    /**
-     * Handler for gamepad disconnection. Also stops listening for inputs for this gamepad and emits a custom event
-     * @param {GamepadEvent} event raw event coming from the browser Gamepad API
-     */
-    onGamepadDisonnected(event) {
-        const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
-        window.dispatchEvent(customEvent);
-
-        this.stopListeningInputs(event.gamepad.index);
     }
 
     /**

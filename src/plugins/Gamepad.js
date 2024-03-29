@@ -28,6 +28,8 @@ module.exports = class Gamepad extends OverlayPlugin {
         this.instance.addListener(window, 'gm-gamepadButtonPressed', this.onGamepadButtonPressed.bind(this));
         this.instance.addListener(window, 'gm-gamepadButtonReleased', this.onGamepadButtonReleased.bind(this));
 
+        this.instance.registerEventCallback('vinput', this.handleConfirmation.bind(this));
+
         // Display widget
         this.renderToolbarButton();
         this.renderWidget();
@@ -70,8 +72,8 @@ module.exports = class Gamepad extends OverlayPlugin {
         this.content = document.createElement('div');
         this.container.appendChild(this.content);
         this.generateContent();
-        this.instance.addListener(window, 'gm-gamepadConnected', this.generateContent.bind(this));
-        this.instance.addListener(window, 'gm-gamepadDisconnected', this.generateContent.bind(this));
+        this.instance.addListener(window, 'gm-gamepadConnected', this.handleGamepadPlugged.bind(this));
+        this.instance.addListener(window, 'gm-gamepadDisconnected', this.handleGamepadUnplugged.bind(this));
 
         // Setup
         this.widget.className = 'gm-overlay gm-gamepad-plugin gm-hidden';
@@ -110,6 +112,42 @@ module.exports = class Gamepad extends OverlayPlugin {
         }
     }
 
+    handleGamepadPlugged(event) {
+        log.debug("Gamepad plugged");
+        const gamepad = event.detail
+        log.debug(gamepad);
+        this.generateContent();
+        this.sendGamepadPlugEvent(gamepad.remoteIndex, gamepad.name);
+    }
+
+    handleGamepadUnplugged() {
+        log.debug("Gamepad unplugged");
+        const gamepad = event.detail
+        log.debug(gamepad);
+        this.generateContent();
+        this.sendGamepadUnplugEvent(gamepad.remoteIndex);
+    }
+
+    sendGamepadPlugEvent(index, name) {
+        const json = {
+            channel : 'vinput' , messages : [
+                'gamepad_plugin ' + index + ' ' + name + ''
+            ]
+        };
+
+        this.instance.sendEvent(json);
+    }
+
+    sendGamepadUnplugEvent(index) {
+        const json = {
+            channel : 'vinput' , messages : [
+                'gamepad_plugout ' + index
+            ]
+        };
+
+        this.instance.sendEvent(json);
+    }
+
     /**
      * Display or hide the widget.
      */
@@ -127,42 +165,11 @@ module.exports = class Gamepad extends OverlayPlugin {
         this.toolbarBtnImage.classList.toggle('gm-active');
     }
 
-    gamepadButtonToKeyboardButton(button) {
-        switch (button) {
-        case 0: // BUTTON_A
-            return 304;
-        case 1: // BUTTON_B
-            return 305;
-        case 2: // BUTTON_X
-            return 307;
-        case 3: // BUTTON_Y
-            return 308;
-        case 4: // BUTTON_L1
-            return 310;
-        case 5: // BUTTON_R1
-            return 311;
-        case 6: // BUTTON_L2
-            return 312;
-        case 7: // BUTTON_R2
-            return 313;
-        case 8: // BUTTON_SELECT
-            return 314;
-        case 9: // BUTTON_START
-            return 315;
-        case 10: // BUTTON_THUMBL
-            return 317;
-        case 11: // BUTTON_THUMBR
-            return 318;
-        case 12: // DPAD_UP
-            return 103;
-        case 13: // DPAD_DOWN
-            return 108;
-        case 14: // DPAD_LEFT
-            return 105;
-        case 15: // DPAD_RIGHT
-            return 106;
-        default:
-            return null;
+    handleConfirmation(message) {
+        log.debug('Received confirmation message: ' + message);
+        const values = message.split(' ');
+        if (values[0] === 'gamepad_plugin_confirmation' && values.length === 3) {
+            this.instance.gamepadManager.listenForInputs(parseInt(values[1]), parseInt(values[2]))
         }
     }
 
@@ -171,9 +178,9 @@ module.exports = class Gamepad extends OverlayPlugin {
         log.debug(event.detail);
 
         const json = {
-            type: 'KEYBOARD_PRESS',
-            keychar: '',
-            keycode: this.gamepadButtonToKeyboardButton(event.detail.buttonIndex),
+            channel : 'vinput' , messages : [
+                'gamepad_press ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
+            ]
         };
         this.instance.sendEvent(json);
     }
@@ -183,9 +190,9 @@ module.exports = class Gamepad extends OverlayPlugin {
         log.debug(event.detail);
 
         const json = {
-            type: 'KEYBOARD_RELEASE',
-            keychar: '',
-            keycode: this.gamepadButtonToKeyboardButton(event.detail.buttonIndex),
+            channel : 'vinput' , messages : [
+                'gamepad_release ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
+            ]
         };
         this.instance.sendEvent(json);
     }

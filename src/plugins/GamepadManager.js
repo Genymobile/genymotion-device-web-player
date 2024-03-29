@@ -257,29 +257,23 @@ module.exports = class GamepadManager {
     }
 
     /**
-     * Handler for gamepad connection. Reemits a custom event with the parsed gamepad.
+     * Handler for gamepad connection/disconnection. Reemits a custom event with the parsed gamepad.
      * User class must then call listenForInputs in order to provide the remote index & start listening for inputs.
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const parsedGamepad = this.parseGamepad(event.gamepad);
-        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: parsedGamepad});
-        if (event.gamepad.mapping === '') {
-            log.error(`Unsupported gamepad mapping for gamepad ${parsedGamepad.name}`);
-            return;
+        const eventType = event.type
+        if (eventType === 'gamepadconnected') {
+            const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
+            window.dispatchEvent(customEvent);
+        } else if (eventType === 'gamepaddisconnected') {
+            const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
+            window.dispatchEvent(customEvent);
+
+            this.stopListeningInputs(event.gamepad.index);
+        } else {
+            log.debug("GamepadManager unknown gamepad connection event");
         }
-        window.dispatchEvent(customEvent);
-    }
-
-    /**
-     * Handler for gamepad disconnection. Also stops listening for inputs for this gamepad and emits a custom event
-     * @param {GamepadEvent} event raw event coming from the browser Gamepad API
-     */
-    onGamepadDisonnected(event) {
-        const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
-        window.dispatchEvent(customEvent);
-
-        this.stopListeningInputs(event.gamepad.index);
     }
 
     /**
@@ -288,6 +282,20 @@ module.exports = class GamepadManager {
      */
     getRawGamepads() {
         return navigator.getGamepads();
+    }
+
+    /**
+     * Fetches a raw gamepad by index from the browser Gamepad API
+     * @returns {gamepad} or undefined if not found
+     */
+    getRawGamepad(index) {
+        const rawGamepads = navigator.getGamepads();
+        for (let i = 0; i < rawGamepads.length; i++) {
+            if (rawGamepads[i].index === index) {
+                return rawGamepads[i];
+            }
+        }
+        return undefined;
     }
 
     /**
@@ -351,7 +359,10 @@ module.exports = class GamepadManager {
      * @param {number} remoteIndex index of this gamepad in the remote VM
      */
     listenForInputs(localIndex, remoteIndex) {
-        this.currentGamepads[localIndex] = {remoteIndex: remoteIndex, buttons: []};
+        const gamepad = this.getRawGamepad(remoteIndex);
+        this.currentGamepads[localIndex] = {remoteIndex: remoteIndex,
+                                            buttons: [gamepad.buttons.length],
+                                            axes: [gamepad.axes.length]};
         if (!this.isRunning) {
             this.loop();
         }
@@ -428,14 +439,20 @@ module.exports = class GamepadManager {
                 }
 
                 for (let i = 0; i < gamepad.axes.length; i++) {
-                    const axisEvent = new CustomEvent('gm-gamepadAxis', {
-                        detail: {
-                            gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
-                            axisIndex: i,
-                            value: gamepad.axes[i],
-                        }
-                    });
-                    window.dispatchEvent(axisEvent);
+                    // If the axes value is different from stored one
+                    if (gamepad.axes[i] != this.currentGamepads[gamepad.index].axes[i]) {
+                        // Store current axes value
+                        this.currentGamepads[gamepad.index].axes[i] = gamepad.axes[i]
+                        // Dipatch event since axes value changed
+                        const axisEvent = new CustomEvent('gm-gamepadAxis', {
+                            detail: {
+                                gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
+                                axisIndex: i,
+                                value: gamepad.axes[i],
+                            }
+                        });
+                        window.dispatchEvent(axisEvent);
+                    }
                 }
             }
         }

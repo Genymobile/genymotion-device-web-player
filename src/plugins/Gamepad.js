@@ -114,16 +114,16 @@ module.exports = class Gamepad extends OverlayPlugin {
     }
 
     handleGamepadPlugged(event) {
-        log.debug("Gamepad plugged");
-        const gamepad = event.detail
+        log.debug('Gamepad plugged');
+        const gamepad = event.detail;
         this.generateContent();
         this.sendGamepadPlugEvent(gamepad.localIndex, gamepad.name.split(' ').join('_'),
-                                    gamepad.vendorID, gamepad.productID);
+            gamepad.vendorID, gamepad.productID);
     }
 
     handleGamepadUnplugged() {
-        log.debug("Gamepad unplugged");
-        const gamepad = event.detail
+        log.debug('Gamepad unplugged');
+        const gamepad = event.detail;
         this.generateContent();
         this.sendGamepadUnplugEvent(gamepad.remoteIndex);
     }
@@ -168,7 +168,7 @@ module.exports = class Gamepad extends OverlayPlugin {
     handleConfirmation(message) {
         const values = message.split(' ');
         if (values[0] === 'gamepad_plugin_confirmation' && values.length === 3) {
-            this.instance.gamepadManager.listenForInputs(parseInt(values[1]), parseInt(values[2]))
+            this.instance.gamepadManager.listenForInputs(parseInt(values[1]), parseInt(values[2]));
         }
     }
 

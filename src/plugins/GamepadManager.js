@@ -262,7 +262,7 @@ module.exports = class GamepadManager {
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const eventType = event.type
+        const eventType = event.type;
         if (eventType === 'gamepadconnected') {
             const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
             window.dispatchEvent(customEvent);
@@ -272,7 +272,7 @@ module.exports = class GamepadManager {
 
             this.stopListeningInputs(event.gamepad.index);
         } else {
-            log.debug("GamepadManager unknown gamepad connection event");
+            log.debug('GamepadManager unknown gamepad connection event');
         }
     }
 
@@ -286,6 +286,7 @@ module.exports = class GamepadManager {
 
     /**
      * Fetches a raw gamepad by index from the browser Gamepad API
+     * @param {number} index, the index of desired gamepad
      * @returns {gamepad} or undefined if not found
      */
     getRawGamepad(index) {
@@ -295,6 +296,7 @@ module.exports = class GamepadManager {
                 return rawGamepads[i];
             }
         }
+        // eslint-disable-next-line no-undefined
         return undefined;
     }
 
@@ -361,8 +363,8 @@ module.exports = class GamepadManager {
     listenForInputs(localIndex, remoteIndex) {
         const gamepad = this.getRawGamepad(remoteIndex);
         this.currentGamepads[localIndex] = {remoteIndex: remoteIndex,
-                                            buttons: [gamepad.buttons.length],
-                                            axes: [gamepad.axes.length]};
+            buttons: [gamepad.buttons.length],
+            axes: [gamepad.axes.length]};
         if (!this.isRunning) {
             this.loop();
         }
@@ -440,9 +442,9 @@ module.exports = class GamepadManager {
 
                 for (let i = 0; i < gamepad.axes.length; i++) {
                     // If the axes value is different from stored one
-                    if (gamepad.axes[i] != this.currentGamepads[gamepad.index].axes[i]) {
+                    if (gamepad.axes[i] !== this.currentGamepads[gamepad.index].axes[i]) {
                         // Store current axes value
-                        this.currentGamepads[gamepad.index].axes[i] = gamepad.axes[i]
+                        this.currentGamepads[gamepad.index].axes[i] = gamepad.axes[i];
                         // Dipatch event since axes value changed
                         const axisEvent = new CustomEvent('gm-gamepadAxis', {
                             detail: {

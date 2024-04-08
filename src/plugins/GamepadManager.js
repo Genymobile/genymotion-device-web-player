@@ -253,7 +253,7 @@ module.exports = class GamepadManager {
      */
     addGamepadCallbacks() {
         this.instance.addListener(window,'gamepadconnected', this.onGamepadConnected.bind(this));
-        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadDisonnected.bind(this));
+        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadDisconnected.bind(this));
     }
 
     /**
@@ -262,26 +262,18 @@ module.exports = class GamepadManager {
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        if (event.type === 'gamepadconnected') {
-            const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
-            window.dispatchEvent(customEvent);
-        } else {
-            log.debug('GamepadManager unknown gamepad connection event');
-        }
+        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
+        window.dispatchEvent(customEvent);
     }
 
     /**
      * Handler for gamepad disconnection. Also stops listening for inputs for this gamepad and emits a custom event
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
-    onGamepadDisonnected(event) {
-        if (event.type === 'gamepaddisconnected') {
-            const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
-            window.dispatchEvent(customEvent);
-            this.stopListeningInputs(event.gamepad.index);
-        } else {
-            log.debug('GamepadManager unknown gamepad connection event');
-        }
+    onGamepadDisconnected(event) {
+        const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
+        window.dispatchEvent(customEvent);
+        this.stopListeningInputs(event.gamepad.index);
     }
 
     /**
@@ -290,22 +282,6 @@ module.exports = class GamepadManager {
      */
     getRawGamepads() {
         return navigator.getGamepads();
-    }
-
-    /**
-     * Fetches a raw gamepad by index from the browser Gamepad API
-     * @param {number} index, the index of desired gamepad
-     * @returns {gamepad} or undefined if not found
-     */
-    getRawGamepad(index) {
-        const rawGamepads = navigator.getGamepads();
-        for (let i = 0; i < rawGamepads.length; i++) {
-            if (rawGamepads[i].index === index) {
-                return rawGamepads[i];
-            }
-        }
-        // eslint-disable-next-line no-undefined
-        return undefined;
     }
 
     /**
@@ -365,14 +341,14 @@ module.exports = class GamepadManager {
 
     /**
      * Starts listening for inputs for this gamepad: Adds it to the list with its remote index and starts the polling loop.
-     * @param {number} guestIndex index of this gamepad provided by the browser API
-     * @param {number} hostIndex index of this gamepad in the remote VM
+     * @param {number} hostIndex index of this gamepad provided by the browser API
+     * @param {number} guestIndex index of this gamepad in the remote VM
      */
-    listenForInputs(guestIndex, hostIndex) {
-        const gamepad = this.getRawGamepad(guestIndex);
-        this.currentGamepads[hostIndex] = {remoteIndex: hostIndex,
-            buttons: [gamepad.buttons.length],
-            axes: [gamepad.axes.length]};
+    listenForInputs(hostIndex, guestIndex) {
+        this.currentGamepads[hostIndex] = {
+            guestIndex,
+            buttons: [],
+            axes: []};
         if (!this.isRunning) {
             this.loop();
         }

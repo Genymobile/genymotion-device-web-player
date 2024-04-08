@@ -121,7 +121,7 @@ module.exports = class Gamepad extends OverlayPlugin {
             gamepad.vendorID, gamepad.productID);
     }
 
-    handleGamepadUnplugged() {
+    handleGamepadUnplugged(event) {
         log.debug('Gamepad unplugged');
         const gamepad = event.detail;
         this.generateContent();

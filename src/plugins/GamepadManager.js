@@ -253,23 +253,31 @@ module.exports = class GamepadManager {
      */
     addGamepadCallbacks() {
         this.instance.addListener(window,'gamepadconnected', this.onGamepadConnected.bind(this));
-        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadConnected.bind(this));
+        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadDisonnected.bind(this));
     }
 
     /**
-     * Handler for gamepad connection/disconnection. Reemits a custom event with the parsed gamepad.
+     * Handler for gamepad connection. Reemits a custom event with the parsed gamepad.
      * User class must then call listenForInputs in order to provide the remote index & start listening for inputs.
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const eventType = event.type;
-        if (eventType === 'gamepadconnected') {
+        if (event.type === 'gamepadconnected') {
             const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
             window.dispatchEvent(customEvent);
-        } else if (eventType === 'gamepaddisconnected') {
+        } else {
+            log.debug('GamepadManager unknown gamepad connection event');
+        }
+    }
+
+    /**
+     * Handler for gamepad disconnection. Also stops listening for inputs for this gamepad and emits a custom event
+     * @param {GamepadEvent} event raw event coming from the browser Gamepad API
+     */
+    onGamepadDisonnected(event) {
+        if (event.type === 'gamepaddisconnected') {
             const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
             window.dispatchEvent(customEvent);
-
             this.stopListeningInputs(event.gamepad.index);
         } else {
             log.debug('GamepadManager unknown gamepad connection event');
@@ -357,12 +365,12 @@ module.exports = class GamepadManager {
 
     /**
      * Starts listening for inputs for this gamepad: Adds it to the list with its remote index and starts the polling loop.
-     * @param {number} localIndex index of this gamepad provided by the browser API
-     * @param {number} remoteIndex index of this gamepad in the remote VM
+     * @param {number} guestIndex index of this gamepad provided by the browser API
+     * @param {number} hostIndex index of this gamepad in the remote VM
      */
-    listenForInputs(localIndex, remoteIndex) {
-        const gamepad = this.getRawGamepad(remoteIndex);
-        this.currentGamepads[localIndex] = {remoteIndex: remoteIndex,
+    listenForInputs(guestIndex, hostIndex) {
+        const gamepad = this.getRawGamepad(guestIndex);
+        this.currentGamepads[hostIndex] = {remoteIndex: hostIndex,
             buttons: [gamepad.buttons.length],
             axes: [gamepad.axes.length]};
         if (!this.isRunning) {

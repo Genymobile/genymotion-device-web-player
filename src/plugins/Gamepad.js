@@ -116,8 +116,10 @@ module.exports = class Gamepad extends OverlayPlugin {
     handleGamepadPlugged(event) {
         log.debug('Gamepad plugged');
         const gamepad = event.detail;
+        log.debug(gamepad);
+        log.debug(gamepad.hostIndex);
         this.generateContent();
-        this.sendGamepadPlugEvent(gamepad.localIndex, gamepad.name.split(' ').join('_'),
+        this.sendGamepadPlugEvent(gamepad.hostIndex, gamepad.name.split(' ').join('_'),
             gamepad.vendorID, gamepad.productID);
     }
 
@@ -125,7 +127,7 @@ module.exports = class Gamepad extends OverlayPlugin {
         log.debug('Gamepad unplugged');
         const gamepad = event.detail;
         this.generateContent();
-        this.sendGamepadUnplugEvent(gamepad.remoteIndex);
+        this.sendGamepadUnplugEvent(gamepad.guestIndex);
     }
 
     sendGamepadPlugEvent(index, name, vendorID, productID) {

@@ -151,7 +151,7 @@ gulp.task('app-js', async function() {
             ]
         }))))
         .pipe(streamify(concat('device-renderer.min.js')))
-        .pipe(gulpif(util.env.production, streamify(uglify())))
+        .pipe(gulpif(util.env.production, streamify(uglify({keep_fnames : true}))))
         .pipe(gulp.dest(PATHS.DEST.LIB.JS));
 });
 

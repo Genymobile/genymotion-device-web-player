@@ -110,20 +110,15 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.clipboard, class: Clipboard, params: [this.options.i18n]},
             {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
             {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies:[MediaManager]},
+            {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
             {enabled: this.options.gps, class: GPS, params: [this.options.i18n, this.options.gpsSpeedSupport]},
             {enabled: this.options.capture, class: Screencast, params: [this.options.i18n]},
             {enabled: this.options.streamResolution, class: StreamResolution},
-            {
-                enabled: this.options.buttons,
-                class: ButtonsEvents,
-                params: [this.options.i18n, this.options.translateHomeKey]
-            },
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
             {enabled: this.options.gamepad, class: Gamepad, params: [this.options.i18n], dependencies:[GamepadManager]},
-            {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n]},
             {enabled: this.options.network, class: Network, params: [this.options.i18n]},
             {enabled: this.options.phone, class: Phone, params: [this.options.i18n]},
@@ -131,6 +126,11 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n]},
             {enabled: this.options.biometrics, class: FingerPrint},
             {enabled: this.options.microphone, dependencies:[MediaManager]},
+            {
+                enabled: this.options.buttons,
+                class: ButtonsEvents,
+                params: [this.options.i18n, this.options.translateHomeKey]
+            },
         ];
 
         return pluginInitMap;

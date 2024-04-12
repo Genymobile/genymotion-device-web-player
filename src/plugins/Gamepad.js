@@ -13,16 +13,14 @@ module.exports = class Gamepad extends OverlayPlugin {
      * Plugin initialization.
      *
      * @param {Object} instance Associated instance.
-     * @param {Object} gamepadManager Gamepad manager.
      * @param {Object} i18n     Translations keys for the UI.
      */
-    constructor(instance, gamepadManager, i18n) {
+    constructor(instance, i18n) {
         super(instance);
 
         // Reference instance
         this.instance = instance;
         this.i18n = i18n || {};
-        this.manager = gamepadManager;
 
         // Register plugin
         this.instance.gamepad = this;
@@ -47,7 +45,7 @@ module.exports = class Gamepad extends OverlayPlugin {
         const toolbar = toolbars.children[0];
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-battery-button';
+        this.toolbarBtnImage.className = 'gm-icon-button gm-gamepad-button';
         this.toolbarBtnImage.title = this.i18n.GAMEPAD_TITLE || 'Gamepad';
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         this.toolbarBtn.onclick = this.toggleWidget.bind(this);

@@ -66,6 +66,13 @@
       }
     }
 
+    &-gamepad-button {
+      background-image: url("../assets/images/ic_gamepad_inactive.svg");
+      &:hover, &.gm-active {
+        background-image: url("../assets/images/ic_gamepad_active.svg");
+      }
+    }
+
     &-power {
       background-image: url("../assets/images/ic_icon_power_inactive.svg");
       &:hover {

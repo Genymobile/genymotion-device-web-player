@@ -253,7 +253,7 @@ module.exports = class GamepadManager {
      */
     addGamepadCallbacks() {
         this.instance.addListener(window,'gamepadconnected', this.onGamepadConnected.bind(this));
-        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadConnected.bind(this));
+        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadDisconnected.bind(this));
     }
 
     /**
@@ -262,12 +262,7 @@ module.exports = class GamepadManager {
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadConnected(event) {
-        const parsedGamepad = this.parseGamepad(event.gamepad);
-        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: parsedGamepad});
-        if (event.gamepad.mapping === '') {
-            log.error(`Unsupported gamepad mapping for gamepad ${parsedGamepad.name}`);
-            return;
-        }
+        const customEvent = new CustomEvent('gm-gamepadConnected', {detail: this.parseGamepad(event.gamepad)});
         window.dispatchEvent(customEvent);
     }
 
@@ -275,10 +270,9 @@ module.exports = class GamepadManager {
      * Handler for gamepad disconnection. Also stops listening for inputs for this gamepad and emits a custom event
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
-    onGamepadDisonnected(event) {
+    onGamepadDisconnected(event) {
         const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
         window.dispatchEvent(customEvent);
-
         this.stopListeningInputs(event.gamepad.index);
     }
 
@@ -306,28 +300,13 @@ module.exports = class GamepadManager {
     }
 
     /**
-     * Finds the parsed gamepad by the remoteIndex. If not found, returns undefined.
-     * @param {number} remoteIndex index of this gamepad in the remote VM
-     * @returns {Object} the parsed gamepad by the remoteIndex if found, otherwise undefined.
+     * Finds the raw gamepad by the guestIndex. If not found, returns undefined.
+     * @param {number} guestIndex index of this gamepad in the remote VM
+     * @returns {Object} the raw gamepad by the guestIndex if found, otherwise undefined.
      */
-    getByRemoteIndex(remoteIndex) {
+    getRawGamepadByGuestIndex(guestIndex) {
         for (let i = 0; i < this.currentGamepads.length; i++) {
-            if (this.currentGamepads[i].remoteIndex === remoteIndex) {
-                return this.getGamepads()[i];
-            }
-        }
-        // eslint-disable-next-line no-undefined
-        return undefined;
-    }
-
-    /**
-     * Finds the raw gamepad by the remoteIndex. If not found, returns undefined.
-     * @param {number} remoteIndex index of this gamepad in the remote VM
-     * @returns {Object} the raw gamepad by the remoteIndex if found, otherwise undefined.
-     */
-    getRawGamepadByRemoteIndex(remoteIndex) {
-        for (let i = 0; i < this.currentGamepads.length; i++) {
-            if (this.currentGamepads[i].remoteIndex === remoteIndex) {
+            if (this.currentGamepads[i].guestIndex === guestIndex) {
                 return this.getRawGamepads()[i];
             }
         }
@@ -347,11 +326,14 @@ module.exports = class GamepadManager {
 
     /**
      * Starts listening for inputs for this gamepad: Adds it to the list with its remote index and starts the polling loop.
-     * @param {number} localIndex index of this gamepad provided by the browser API
-     * @param {number} remoteIndex index of this gamepad in the remote VM
+     * @param {number} hostIndex index of this gamepad provided by the browser API
+     * @param {number} guestIndex index of this gamepad in the remote VM
      */
-    listenForInputs(localIndex, remoteIndex) {
-        this.currentGamepads[localIndex] = {remoteIndex: remoteIndex, buttons: []};
+    listenForInputs(hostIndex, guestIndex) {
+        this.currentGamepads[hostIndex] = {
+            guestIndex,
+            buttons: [],
+            axes: []};
         if (!this.isRunning) {
             this.loop();
         }
@@ -359,10 +341,10 @@ module.exports = class GamepadManager {
 
     /**
      * Stops listening for inputs for this gamepad: removes it from the list
-     * @param {number} localIndex index of this gamepad provided by the browser API
+     * @param {number} hostIndex index of this gamepad provided by the browser API
      */
-    stopListeningInputs(localIndex) {
-        this.currentGamepads.splice(localIndex, 1);
+    stopListeningInputs(hostIndex) {
+        this.currentGamepads.splice(hostIndex, 1);
     }
 
     /**
@@ -408,7 +390,7 @@ module.exports = class GamepadManager {
                         }
                         const buttonEvent = new CustomEvent('gm-gamepadButtonPressed', {
                             detail: {
-                                gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
+                                gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
                                 buttonIndex: i,
                                 value: gamepad.buttons[i].value,
                             }
@@ -418,7 +400,7 @@ module.exports = class GamepadManager {
                         this.currentGamepads[gamepad.index].buttons.splice(pressedButtonIndex, 1);
                         const buttonEvent = new CustomEvent('gm-gamepadButtonReleased', {
                             detail: {
-                                gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
+                                gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
                                 buttonIndex: i,
                                 value: gamepad.buttons[i].value,
                             }
@@ -428,14 +410,20 @@ module.exports = class GamepadManager {
                 }
 
                 for (let i = 0; i < gamepad.axes.length; i++) {
-                    const axisEvent = new CustomEvent('gm-gamepadAxis', {
-                        detail: {
-                            gamepadIndex: this.currentGamepads[gamepad.index].remoteIndex,
-                            axisIndex: i,
-                            value: gamepad.axes[i],
-                        }
-                    });
-                    window.dispatchEvent(axisEvent);
+                    // If the axes value is different from stored one
+                    if (gamepad.axes[i] !== this.currentGamepads[gamepad.index].axes[i]) {
+                        // Store current axes value
+                        this.currentGamepads[gamepad.index].axes[i] = gamepad.axes[i];
+                        // Dipatch event since axes value changed
+                        const axisEvent = new CustomEvent('gm-gamepadAxis', {
+                            detail: {
+                                gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
+                                axisIndex: i,
+                                value: gamepad.axes[i],
+                            }
+                        });
+                        window.dispatchEvent(axisEvent);
+                    }
                 }
             }
         }
@@ -451,7 +439,7 @@ module.exports = class GamepadManager {
     parseGamepad(rawGamepad) {
         const isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
         const gamepad = {
-            localIndex: rawGamepad.index,
+            hostIndex: rawGamepad.index,
             name: rawGamepad.id,
             power: 'unknown',
             controllerType: ControllerType.Xbox360,
@@ -459,7 +447,7 @@ module.exports = class GamepadManager {
             vendorID: 0,
             productID: 0,
             state: rawGamepad.connected ? 'plugged' : 'undefined',
-            remoteIndex: this.currentGamepads[rawGamepad.index]?.remoteIndex,
+            guestIndex: this.currentGamepads[rawGamepad.index]?.guestIndex,
         };
         if (isFirefox) {
             const regex = /^([0-9a-f]{1,4})-([0-9a-f]{1,4})-\s*(.*)\s*$/i;
@@ -488,16 +476,16 @@ module.exports = class GamepadManager {
     }
 
     /**
-     * Plays a vibration effect in the requested gamepad (if found by remoteIndex)
+     * Plays a vibration effect in the requested gamepad (if found by guestIndex)
      * Depending on the platform, this may do nothing or use the haptics actuator instead of the vibration actuator
      * In that case, only the strong magnitude is taken into account.
-     * @param {number} remoteIndex index of this gamepad in the remote VM
+     * @param {number} guestIndex index of this gamepad in the remote VM
      * @param {number} weak weak magnitude intensity, between 0.0 & 1.0
      * @param {number} strong strong magnitude intensity, between 0.0 & 1.0
      */
-    vibration(remoteIndex, weak, strong) {
+    vibration(guestIndex, weak, strong) {
         // raw gamepad are needed here to access actuators
-        const gamepad = this.getRawGamepadByRemoteIndex(remoteIndex);
+        const gamepad = this.getRawGamepadByGuestIndex(guestIndex);
         if (!gamepad) {
             return;
         }
@@ -513,7 +501,7 @@ module.exports = class GamepadManager {
                     strongMagnitude: newStrongValue
                 });
             } else {
-                log.error(`could not use vibration actuator for controller ${remoteIndex}`);
+                log.error(`could not use vibration actuator for controller ${guestIndex}`);
                 log.debug(gamepad);
             }
         } else if (gamepad.hapticActuators && gamepad.hapticActuators[0]) { // firefox
@@ -521,11 +509,11 @@ module.exports = class GamepadManager {
             if (actuator.pulse) {
                 actuator.pulse(strong, 200);
             } else {
-                log.error(`could not use haptic actuator for controller ${remoteIndex}`);
+                log.error(`could not use haptic actuator for controller ${guestIndex}`);
                 log.debug(gamepad);
             }
         } else { // unrecognised, for example DualSense
-            log.error(`no vibration actuator for controller ${remoteIndex}`);
+            log.error(`no vibration actuator for controller ${guestIndex}`);
         }
     }
 };

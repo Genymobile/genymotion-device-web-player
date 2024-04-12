@@ -502,7 +502,6 @@ module.exports = class GamepadManager {
                 });
             } else {
                 log.error(`could not use vibration actuator for controller ${guestIndex}`);
-                log.debug(gamepad);
             }
         } else if (gamepad.hapticActuators && gamepad.hapticActuators[0]) { // firefox
             const actuator = gamepad.hapticActuators[0];
@@ -510,7 +509,6 @@ module.exports = class GamepadManager {
                 actuator.pulse(strong, 200);
             } else {
                 log.error(`could not use haptic actuator for controller ${guestIndex}`);
-                log.debug(gamepad);
             }
         } else { // unrecognised, for example DualSense
             log.error(`no vibration actuator for controller ${guestIndex}`);

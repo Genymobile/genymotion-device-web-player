@@ -418,10 +418,10 @@ Enables or disables the diskIO widget. This widget can be used to modify Disk IO
 ### `gamepad`
 
 - **Type:** `Boolean`
-- **Default:** `false`
+- **Default:** `true`
 - **Compatibility:** `SaaS`, `PaaS`
 - **Details:**
-Enable or disable experimental gamepad support & widget
+Enable or disable gamepad support & widget
 
 ### `biometrics`
 

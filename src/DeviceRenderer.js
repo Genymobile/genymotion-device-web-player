@@ -839,6 +839,9 @@ module.exports = class DeviceRenderer {
             }, {
                 widget: this.fingerprint,
                 capability: data.message.biometrics,
+            }, {
+                widget: this.gamepad,
+                capability: data.message.gamepad,
             }].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {

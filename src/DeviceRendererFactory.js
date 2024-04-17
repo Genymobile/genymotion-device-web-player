@@ -39,7 +39,7 @@ const defaultOptions = {
     phone: true,
     streamResolution: true,
     diskIO: true,
-    gamepad: false,
+    gamepad: true,
     biometrics: true,
     translateHomeKey: false,
     token: '',

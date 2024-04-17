@@ -116,7 +116,6 @@ module.exports = class Gamepad extends OverlayPlugin {
     handleGamepadPlugged(event) {
         log.debug('Gamepad plugged');
         const gamepad = event.detail;
-        log.debug(gamepad);
         this.generateContent();
         this.sendGamepadPlugEvent(gamepad.hostIndex, gamepad.name.split(' ').join('_'),
             gamepad.vendorID, gamepad.productID);
@@ -167,7 +166,7 @@ module.exports = class Gamepad extends OverlayPlugin {
     }
 
     handleConfirmation(message) {
-        log.debug('Plugin confirmation');
+        log.debug('Gamepad plugin confirmation');
         const values = message.split(' ');
         if (values[0] === 'gamepad_plugin_confirmation' && values.length === 3) {
             this.instance.gamepadManager.listenForInputs(parseInt(values[1]), parseInt(values[2]));
@@ -175,8 +174,6 @@ module.exports = class Gamepad extends OverlayPlugin {
     }
 
     onGamepadButtonPressed(event) {
-        log.debug('button pressed');
-
         const json = {
             channel : 'vinput' , messages : [
                 'gamepad_press ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
@@ -186,8 +183,6 @@ module.exports = class Gamepad extends OverlayPlugin {
     }
 
     onGamepadButtonReleased(event) {
-        log.debug('button released');
-
         const json = {
             channel : 'vinput' , messages : [
                 'gamepad_release ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
@@ -197,8 +192,6 @@ module.exports = class Gamepad extends OverlayPlugin {
     }
 
     onGamepadAxisChanged(event) {
-        log.debug('Axis changed');
-
         const json = {
             channel : 'vinput' , messages : [
                 'gamepad_axis ' + event.detail.gamepadIndex + ' ' + event.detail.axisIndex + ' ' + event.detail.value

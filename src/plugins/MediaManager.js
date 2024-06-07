@@ -250,6 +250,18 @@ module.exports = class MediaManager {
                 } else {
                     this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0],
                         stream);
+                    // find transceiver that contains sender
+                    this.instance.peerConnection.getTransceivers().forEach((transceiver) => {
+                        if (transceiver.sender === this.microphoneSender) {
+                            // Audio codecs restriction - opus only
+                            if (transceiver.setCodecPreferences) {
+                                const audioCodecs = RTCRtpReceiver.getCapabilities('audio').codecs.filter(
+                                    (codec) => codec.mimeType === 'audio/opus'
+                                );
+                                transceiver.setCodecPreferences(audioCodecs);
+                            }
+                        }
+                    });
                 }
             }
         } catch (error) {

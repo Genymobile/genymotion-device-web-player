@@ -39,10 +39,10 @@ const createStore = (instance, reducer, state) => {
 
 const reducer = (state, action) => {
     switch (action.type) {
-    case 'WEBRTC_CONNECTION_READY':
-        return {...state, isWebRTCConnectionReady: action.payload};
-    default:
-        return state;
+        case 'WEBRTC_CONNECTION_READY':
+            return {...state, isWebRTCConnectionReady: action.payload};
+        default:
+            return state;
     }
 };
 

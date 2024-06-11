@@ -22,7 +22,7 @@ describe('Camera Plugin', () => {
             instance = new Instance();
             mediaManager = new MediaManager(instance); // needed for button initialisation
             new Camera(instance, {
-                CAMERA_TITLE: 'TEST CAMERA PLUGIN BUTTON TITLE'
+                CAMERA_TITLE: 'TEST CAMERA PLUGIN BUTTON TITLE',
             });
         });
 

@@ -11,7 +11,7 @@ describe('FileUpload Plugin', () => {
     beforeEach(() => {
         instance = new Instance();
         uploader = new FileUpload(instance, {
-            UPLOADER_INSTALLING: 'TEST UPLOADER PLUGIN INSTALLING...'
+            UPLOADER_INSTALLING: 'TEST UPLOADER PLUGIN INSTALLING...',
         });
         plugin = document.getElementsByClassName('gm-uploader-plugin')[0];
     });
@@ -37,8 +37,7 @@ describe('FileUpload Plugin', () => {
                 UPLOADER_DISCLAIMER: 'TEST UPLOADER PLUGIN DISCLAIMER',
                 UPLOADER_INPROGRESS: 'TEST UPLOADER PLUGIN IN PROGRESS',
                 UPLOADER_SUCCESS: 'TEST UPLOADER PLUGIN SUCCESS',
-                UPLOADER_FAILURE: 'TEST UPLOADER PLUGIN FAILURE'
-
+                UPLOADER_FAILURE: 'TEST UPLOADER PLUGIN FAILURE',
             });
             plugin = document.getElementsByClassName('gm-uploader-plugin')[0];
         });
@@ -187,9 +186,8 @@ describe('FileUpload Plugin', () => {
                 expect(updateOpenGAppsStatus).toHaveBeenCalledTimes(2);
                 expect(sendEventSpy).toHaveBeenCalledTimes(1);
                 expect(instance.outgoingMessages[0]).toEqual({
-                    channel: 'systempatcher', messages: [
-                        'notify last_result'
-                    ]
+                    channel: 'systempatcher',
+                    messages: ['notify last_result'],
                 });
             });
         });
@@ -256,9 +254,8 @@ describe('FileUpload Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'systempatcher', messages: [
-                    'install opengapps'
-                ]
+                channel: 'systempatcher',
+                messages: ['install opengapps'],
             });
         });
 
@@ -270,9 +267,8 @@ describe('FileUpload Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'systempatcher', messages: [
-                    'cancel'
-                ]
+                channel: 'systempatcher',
+                messages: ['cancel'],
             });
         });
 
@@ -284,9 +280,8 @@ describe('FileUpload Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'systempatcher', messages: [
-                    'reboot'
-                ]
+                channel: 'systempatcher',
+                messages: ['reboot'],
             });
         });
     });

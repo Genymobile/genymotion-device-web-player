@@ -15,5 +15,5 @@ module.exports = {
     KeyboardEvents,
     MouseEvents,
     MediaManager,
-    GamepadManager
+    GamepadManager,
 };

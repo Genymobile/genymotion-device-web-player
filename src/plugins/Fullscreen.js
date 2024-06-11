@@ -90,8 +90,7 @@ module.exports = class Fullscreen {
      * @return {boolean} Whether fullscreen mode is active or not.
      */
     fullscreenEnabled() {
-        return document.fullscreenElement
-            || document.webkitFullscreenElement;
+        return document.fullscreenElement || document.webkitFullscreenElement;
     }
 
     /**

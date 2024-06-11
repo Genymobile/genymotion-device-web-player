@@ -99,9 +99,8 @@ describe('Clipboard Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'framework', messages: [
-                    'set_device_clipboard dGVzdCB2YWx1ZQ==',
-                ],
+                channel: 'framework',
+                messages: ['set_device_clipboard dGVzdCB2YWx1ZQ=='],
             });
         });
     });

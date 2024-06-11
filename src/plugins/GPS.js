@@ -221,19 +221,13 @@ module.exports = class GPS extends OverlayPlugin {
         inputs.className = 'gm-col';
 
         const latitudeLabel = this.i18n.GPS_LATITUDE || 'Latitude (°)';
-        inputs.appendChild(this.generateInput(
-            'latitude', latitudeLabel, this.mapLat, -90.0, 90.0
-        ));
+        inputs.appendChild(this.generateInput('latitude', latitudeLabel, this.mapLat, -90.0, 90.0));
 
         const longitudeLabel = this.i18n.GPS_LONGITUDE || 'Longitude (°)';
-        inputs.appendChild(this.generateInput(
-            'longitude', longitudeLabel, this.mapLng, -180.0, 180.0
-        ));
+        inputs.appendChild(this.generateInput('longitude', longitudeLabel, this.mapLng, -180.0, 180.0));
 
         const altitudeLabel = this.i18n.GPS_ALTITUDE || 'Altitude (m)';
-        inputs.appendChild(this.generateInput(
-            'altitude', altitudeLabel, this.elevation, -10000, 10000
-        ));
+        inputs.appendChild(this.generateInput('altitude', altitudeLabel, this.elevation, -10000, 10000));
 
         const accuracyLabel = this.i18n.GPS_ACCURACY || 'Accuracy (m)';
         inputs.appendChild(this.generateInput('accuracy', accuracyLabel, 0, 0, 200));
@@ -421,19 +415,26 @@ module.exports = class GPS extends OverlayPlugin {
                 }
             });
             // Get altitude from elevation service if we don't have any
-            if (!position.coords.altitude && this.elevationService &&
-                position.coords.latitude && position.coords.longitude) {
+            if (
+                !position.coords.altitude &&
+                this.elevationService &&
+                position.coords.latitude &&
+                position.coords.longitude
+            ) {
                 const location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                this.elevationService.getElevationForLocations({
-                    'locations': [location],
-                }, (results, status) => {
-                    if (status === 'OK') {
-                        // Retrieve the first result
-                        if (results[0]) {
-                            this.setFieldValue('gm-gps-altitude', results[0].elevation);
+                this.elevationService.getElevationForLocations(
+                    {
+                        locations: [location],
+                    },
+                    (results, status) => {
+                        if (status === 'OK') {
+                            // Retrieve the first result
+                            if (results[0]) {
+                                this.setFieldValue('gm-gps-altitude', results[0].elevation);
+                            }
                         }
-                    }
-                });
+                    },
+                );
             }
         });
     }
@@ -443,11 +444,14 @@ module.exports = class GPS extends OverlayPlugin {
      */
     checkForGeolocation() {
         if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(() => {
-                this.setGeolocButtonAvailability(true);
-            }, () => {
-                this.setGeolocButtonAvailability(false);
-            });
+            navigator.geolocation.getCurrentPosition(
+                () => {
+                    this.setGeolocButtonAvailability(true);
+                },
+                () => {
+                    this.setGeolocButtonAvailability(false);
+                },
+            );
         } else {
             this.setGeolocButtonAvailability(false);
         }
@@ -556,16 +560,19 @@ module.exports = class GPS extends OverlayPlugin {
 
         if (this.elevationService) {
             const location = new google.maps.LatLng(lat, lng);
-            this.elevationService.getElevationForLocations({
-                'locations': [location],
-            }, (results, status) => {
-                if (status === 'OK') {
-                    // Retrieve the first result
-                    if (results[0]) {
-                        this.elevation = results[0].elevation;
+            this.elevationService.getElevationForLocations(
+                {
+                    locations: [location],
+                },
+                (results, status) => {
+                    if (status === 'OK') {
+                        // Retrieve the first result
+                        if (results[0]) {
+                            this.elevation = results[0].elevation;
+                        }
                     }
-                }
-            });
+                },
+            );
         }
     }
 

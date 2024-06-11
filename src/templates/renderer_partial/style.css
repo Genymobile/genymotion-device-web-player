@@ -37,7 +37,7 @@
     width: calc(95% - 50px);
     height: 100%;
     padding: 0;
-    background: transparent url("../../assets/images/loader.svg") center no-repeat;
+    background: transparent url('../../assets/images/loader.svg') center no-repeat;
     background-size: 40%;
 }
 
@@ -58,7 +58,7 @@
     color: white;
 }
 
-@media only screen and (max-width: 650px)  {
+@media only screen and (max-width: 650px) {
     .gm-overlay {
         left: auto;
         width: calc(100vw - 100px);
@@ -67,7 +67,7 @@
     }
 }
 
-@media only screen and (min-width: 475px)  {
+@media only screen and (min-width: 475px) {
     .gm-click-to-unmute {
         left: calc(50% - 190px) !important;
     }

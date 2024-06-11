@@ -21,7 +21,7 @@ const createStore = (instance, reducer, state) => {
         const uid = generateUID();
         listeners.push({
             uid,
-            cb: () => listener(getState())
+            cb: () => listener(getState()),
         });
 
         const unsubscribe = () => {
@@ -51,4 +51,3 @@ const store = (instance) => {
 };
 
 module.exports = store;
-

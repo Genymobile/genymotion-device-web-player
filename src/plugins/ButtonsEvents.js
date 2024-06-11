@@ -36,14 +36,20 @@ module.exports = class ButtonsEvents {
 
         if (this.instance.options.volume) {
             this.renderToolbarButton(
-                VOLUME_DOWN_KEYCODE, 'gm-sound-down', i18n.BUTTONS_SOUND_DOWN || 'Sound down', false
+                VOLUME_DOWN_KEYCODE,
+                'gm-sound-down',
+                i18n.BUTTONS_SOUND_DOWN || 'Sound down',
+                false,
             );
             this.renderToolbarButton(VOLUME_UP_KEYCODE, 'gm-sound-up', i18n.BUTTONS_SOUND_UP || 'Sound up', false);
         }
 
         if (this.instance.options.navbar) {
             this.renderToolbarButton(
-                RECENT_APP_KEYCODE, 'gm-recent', i18n.BUTTONS_RECENT_APPS || 'Recent applications', true
+                RECENT_APP_KEYCODE,
+                'gm-recent',
+                i18n.BUTTONS_RECENT_APPS || 'Recent applications',
+                true,
             );
             this.renderToolbarButton(HOME_KEYCODE, 'gm-home', i18n.BUTTONS_HOME || 'Home', true);
             this.renderToolbarButton(BACK_KEYCODE, 'gm-back', i18n.BUTTONS_BACK || 'Back', true);
@@ -97,10 +103,12 @@ module.exports = class ButtonsEvents {
             return;
         }
 
-        if (id === HOME_KEYCODE && this.translateHomeKey) { // home is meta + enter
+        if (id === HOME_KEYCODE && this.translateHomeKey) {
+            // home is meta + enter
             this.keyPressEvent(parseInt(META_KEYCODE), '');
             this.keyPressEvent(parseInt(ENTER_KEYCODE), '');
-        } else if (id.substring(0, 2) === '0x') { // else if it is a raw key we send it
+        } else if (id.substring(0, 2) === '0x') {
+            // else if it is a raw key we send it
             const key = parseInt(id, 16);
             this.keyPressEvent(key, '0\n');
         }
@@ -118,13 +126,16 @@ module.exports = class ButtonsEvents {
             return;
         }
 
-        if (id === HOME_KEYCODE && this.translateHomeKey) { // "home" is "meta + enter" on PaaS, "move_home" on SaaS
+        if (id === HOME_KEYCODE && this.translateHomeKey) {
+            // "home" is "meta + enter" on PaaS, "move_home" on SaaS
             this.keyReleaseEvent(parseInt(ENTER_KEYCODE), '');
             this.keyReleaseEvent(parseInt(META_KEYCODE), '');
-        } else if (id === ROTATE_KEYCODE) { // rotate is a custom command
+        } else if (id === ROTATE_KEYCODE) {
+            // rotate is a custom command
             const json = {type: 'ROTATE'};
             this.instance.sendEvent(json);
-        } else if (id.substring(0, 2) === '0x') { // else if it is a raw key we send it
+        } else if (id.substring(0, 2) === '0x') {
+            // else if it is a raw key we send it
             const key = parseInt(id, 16);
             this.keyReleaseEvent(key, '0\n');
         }
@@ -147,7 +158,7 @@ module.exports = class ButtonsEvents {
             button: {
                 className: button.className,
                 onclick: button.onclick,
-            }
+            },
         };
     }
 

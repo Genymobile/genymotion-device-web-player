@@ -83,7 +83,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
         inputs.className = 'gm-inputs';
 
         const IOThrottlingLabel = this.i18n.IOTHROTTLING_PROFILE || 'Profile';
-        inputs.innerHTML = '<label>'+ IOThrottlingLabel + '</label>';
+        inputs.innerHTML = '<label>' + IOThrottlingLabel + '</label>';
 
         // Create select
         this.select = document.createElement('select');
@@ -214,10 +214,8 @@ module.exports = class IOThrottling extends OverlayPlugin {
 
         if (this.form.checkValidity()) {
             const json = {
-                channel: 'diskio', messages: [
-                    'set readbyterate ' + this.readByteRate.value * BYTES_PER_MEGABYTE,
-                    'clearcache'
-                ]
+                channel: 'diskio',
+                messages: ['set readbyterate ' + this.readByteRate.value * BYTES_PER_MEGABYTE, 'clearcache'],
             };
             this.instance.sendEvent(json);
             this.toggleWidget();

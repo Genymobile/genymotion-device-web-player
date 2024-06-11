@@ -85,7 +85,7 @@ module.exports = function() {
                     } else {
                         const status = {
                             type: 'FILE_UPLOAD',
-                            'done': true,
+                            done: true,
                         };
                         self.socket.send(JSON.stringify(status));
                         self.isUploading = false;
@@ -133,8 +133,8 @@ module.exports = function() {
 
                     const data = {
                         type: 'FILE_UPLOAD',
-                        'name': self.file.name,
-                        'size': self.file.size,
+                        name: self.file.name,
+                        size: self.file.size,
                     };
                     self.socket.send(JSON.stringify(data));
                 }

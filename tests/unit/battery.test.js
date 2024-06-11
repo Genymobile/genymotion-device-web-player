@@ -26,7 +26,7 @@ describe('Battery Plugin', () => {
             battery = new Battery(instance, {
                 BATTERY_TITLE: 'TEST BATTERY PLUGIN TITLE',
                 BATTERY_CHARGE_LEVEL: 'TEST BATTERY PLUGIN CHARGE LEVEL',
-                BATTERY_CHARGE_STATE: 'TEST BATTERY PLUGIN CHARGE STATE'
+                BATTERY_CHARGE_STATE: 'TEST BATTERY PLUGIN CHARGE STATE',
             });
             plugin = document.getElementsByClassName('gm-battery-plugin')[0];
         });
@@ -146,10 +146,8 @@ describe('Battery Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'battery', messages: [
-                    'set state level 69',
-                    'set state status charging',
-                ],
+                channel: 'battery',
+                messages: ['set state level 69', 'set state status charging'],
             });
         });
 
@@ -159,10 +157,8 @@ describe('Battery Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'battery', messages: [
-                    'set state level 42',
-                    'set state status charging',
-                ],
+                channel: 'battery',
+                messages: ['set state level 42', 'set state status charging'],
             });
         });
 
@@ -171,10 +167,8 @@ describe('Battery Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'battery', messages: [
-                    'set state level 50',
-                    'set state status discharging',
-                ],
+                channel: 'battery',
+                messages: ['set state level 50', 'set state status discharging'],
             });
         });
     });

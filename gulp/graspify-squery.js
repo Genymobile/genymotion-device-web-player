@@ -23,14 +23,8 @@ const options = {
 module.exports = transformTools.makeStringTransform('graspify', options, (content, opts, done) => {
     try {
         // Normalize plain replacements
-        opts.opts = opts.opts ?
-            Array.isArray(opts.opts) ?
-                opts.opts : [opts.opts]
-            : [];
-        opts.config = opts.config ?
-            Array.isArray(opts.config) ?
-                opts.config : [opts.config]
-            : [];
+        opts.opts = opts.opts ? Array.isArray(opts.opts) ? opts.opts : [opts.opts] : [];
+        opts.config = opts.config ? Array.isArray(opts.config) ? opts.config : [opts.config] : [];
 
         // Merge opts & config for the full list of replacements an loop over
         [].concat(opts.opts, opts.config).forEach((args) => {
@@ -38,7 +32,7 @@ module.exports = transformTools.makeStringTransform('graspify', options, (conten
             const selector = args[0];
             const replacement = args[1];
 
-            content = content.replace(selector.substring(1,selector.length), replacement);
+            content = content.replace(selector.substring(1, selector.length), replacement);
         });
 
         done(null, content);

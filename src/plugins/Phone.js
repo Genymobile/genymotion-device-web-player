@@ -165,9 +165,7 @@ module.exports = class Phone extends OverlayPlugin {
             return;
         }
 
-        const json = {channel: 'baseband', messages: [
-            'gsm call ' + this.phoneInput.value
-        ]};
+        const json = {channel: 'baseband', messages: ['gsm call ' + this.phoneInput.value]};
         this.instance.sendEvent(json);
         this.toggleWidget();
     }
@@ -196,9 +194,8 @@ module.exports = class Phone extends OverlayPlugin {
         }
 
         const json = {
-            channel: 'baseband', messages: [
-                'sms send ' + this.phoneInput.value + ' ' + this.textInput.value
-            ]
+            channel: 'baseband',
+            messages: ['sms send ' + this.phoneInput.value + ' ' + this.textInput.value],
         };
         this.instance.sendEvent(json);
         this.toggleWidget();

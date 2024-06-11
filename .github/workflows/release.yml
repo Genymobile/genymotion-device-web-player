@@ -4,35 +4,35 @@
 name: Release
 
 on:
-  push:
-    tags: [v*]
+    push:
+        tags: [v*]
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - name: Build project
-        run: |
-          yarn install
-          yarn validate
-          yarn test
-          yarn build
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+                  registry-url: https://registry.npmjs.org/
+            - name: Build project
+              run: |
+                  yarn install
+                  yarn validate
+                  yarn test
+                  yarn build
+            - name: Create GitHub Release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: Release ${{ github.ref }}
+                  draft: false
+                  prerelease: false
 
-      - name: NPM Release
-        run: yarn publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+            - name: NPM Release
+              run: yarn publish --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

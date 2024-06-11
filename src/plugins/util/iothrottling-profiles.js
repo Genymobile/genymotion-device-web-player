@@ -9,19 +9,24 @@
  * writeIoRate: The number of write operation allowed per second
  *
  */
-module.exports = [{
-    name: 'High-end device',
-    label: 'High-end device',
-    readByteRate: 200,
-}, {
-    name: 'Mid-range device',
-    label: 'Mid-range device',
-    readByteRate: 100,
-}, {
-    name: 'Low-end device',
-    label: 'Low-end device',
-    readByteRate: 50,
-}, {
-    name: 'Custom',
-    label: 'Custom device',
-}];
+module.exports = [
+    {
+        name: 'High-end device',
+        label: 'High-end device',
+        readByteRate: 200,
+    },
+    {
+        name: 'Mid-range device',
+        label: 'Mid-range device',
+        readByteRate: 100,
+    },
+    {
+        name: 'Low-end device',
+        label: 'Low-end device',
+        readByteRate: 50,
+    },
+    {
+        name: 'Custom',
+        label: 'Custom device',
+    },
+];

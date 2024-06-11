@@ -9,5 +9,5 @@ function generateUID() {
 }
 
 module.exports = {
-    generateUID
+    generateUID,
 };

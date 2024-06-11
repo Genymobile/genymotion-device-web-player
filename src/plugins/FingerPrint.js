@@ -72,20 +72,20 @@ module.exports = class FingerPrint extends OverlayPlugin {
                 const authRequiredDiv = document.querySelector('.gm-fingerprint-dialog-auth-required-status');
 
                 switch (prop) {
-                case 'isScanStart':
-                case 'isEnrolling':
-                case 'isScanning':
-                    if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
-                        authRequiredDiv.classList.add('active');
-                        authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
-                        this.toolbarBtnImage.classList.add('fingerprint-require');
-                    } else {
-                        authRequiredDiv.classList.remove('active');
-                        authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
-                        this.toolbarBtnImage.classList.remove('fingerprint-require');
-                    }
-                    break;
-                case 'isRecognizedFPByDefault':
+                    case 'isScanStart':
+                    case 'isEnrolling':
+                    case 'isScanning':
+                        if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
+                            authRequiredDiv.classList.add('active');
+                            authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
+                            this.toolbarBtnImage.classList.add('fingerprint-require');
+                        } else {
+                            authRequiredDiv.classList.remove('active');
+                            authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
+                            this.toolbarBtnImage.classList.remove('fingerprint-require');
+                        }
+                        break;
+                    case 'isRecognizedFPByDefault':
                     /*
                      * At start we fetch the value from the HAL with this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL)
                      * so the instance send an AUTO_RECOGNIZE_FALSE event, which change the isRecognizedFPByDefault state (this.state.isRecognizedFPByDefault)
@@ -93,24 +93,26 @@ module.exports = class FingerPrint extends OverlayPlugin {
                      * so the instance send an AUTO_RECOGNIZE_FALSE event ... and we get an infinite loop
                      * to avoid this we check if the value is different from the old one but we update UI anyway (to get the right ui state at start)
                      */
-                    if (value !== oldValue) {
-                        if (value) {
-                            this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE);
-                        } else {
-                            this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_FALSE);
+                        if (value !== oldValue) {
+                            if (value) {
+                                this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_TRUE);
+                            } else {
+                                this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.SET_AUTO_RECOGNIZE_FALSE);
+                            }
                         }
-                    }
-                    if (value) {
-                        this.toolbarBtnImage.classList.add('fingerprint-autoValidation');
-                    } else {
-                        this.toolbarBtnImage.classList.remove('fingerprint-autoValidation');
-                    }
+                        if (value) {
+                            this.toolbarBtnImage.classList.add('fingerprint-autoValidation');
+                        } else {
+                            this.toolbarBtnImage.classList.remove('fingerprint-autoValidation');
+                        }
 
-                    // update switch
-                    document.querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status').setState(value);
-                    break;
-                default:
-                    break;
+                        // update switch
+                        document
+                            .querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status')
+                            .setState(value);
+                        break;
+                    default:
+                        break;
                 }
                 return true;
             }
@@ -352,37 +354,37 @@ module.exports = class FingerPrint extends OverlayPlugin {
     handleFingerprintEvent(message) {
         // State synchronization
         switch (message) {
-        case FINGERPRINT_MESSAGES.toReceive.SCAN_START:
-            this.state.isScanStart = true;
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.SCAN_SUCCESS:
-        case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR_TIMEOUT:
-        case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR_CANCELED:
-        case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR:
-            this.state.isEnrolling = false;
-            this.state.isScanning = false;
-            this.state.isScanStart = false;
-            Array.from(document.querySelectorAll('.gm-fingerprint-dialog-button'))
-                .forEach((btn) => {
-                    btn.classList.remove('gm-loader');
-                });
-            this.closeWidget();
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_SCANNING:
-            this.state.isScanning = true;
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_ENROLLING:
-            this.state.isEnrolling = true;
-            this.state.isScanning = false;
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.AUTO_RECOGNIZE_FALSE:
-            this.state.isRecognizedFPByDefault = false;
-            break;
-        case FINGERPRINT_MESSAGES.toReceive.AUTO_RECOGNIZE_TRUE:
-            this.state.isRecognizedFPByDefault = true;
-            break;
-        default:
-            break;
+            case FINGERPRINT_MESSAGES.toReceive.SCAN_START:
+                this.state.isScanStart = true;
+                break;
+            case FINGERPRINT_MESSAGES.toReceive.SCAN_SUCCESS:
+            case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR_TIMEOUT:
+            case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR_CANCELED:
+            case FINGERPRINT_MESSAGES.toReceive.SCAN_ERROR:
+                this.state.isEnrolling = false;
+                this.state.isScanning = false;
+                this.state.isScanStart = false;
+                Array.from(document.querySelectorAll('.gm-fingerprint-dialog-button'))
+                    .forEach((btn) => {
+                        btn.classList.remove('gm-loader');
+                    });
+                this.closeWidget();
+                break;
+            case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_SCANNING:
+                this.state.isScanning = true;
+                break;
+            case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_ENROLLING:
+                this.state.isEnrolling = true;
+                this.state.isScanning = false;
+                break;
+            case FINGERPRINT_MESSAGES.toReceive.AUTO_RECOGNIZE_FALSE:
+                this.state.isRecognizedFPByDefault = false;
+                break;
+            case FINGERPRINT_MESSAGES.toReceive.AUTO_RECOGNIZE_TRUE:
+                this.state.isRecognizedFPByDefault = true;
+                break;
+            default:
+                break;
         }
     }
 

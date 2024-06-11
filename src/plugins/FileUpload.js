@@ -48,17 +48,17 @@ module.exports = class FileUpload extends OverlayPlugin {
             this.loaderWorker.onmessage = (event) => {
                 const msg = event.data;
                 switch (msg.code) {
-                case 'SUCCESS':
-                    this.onUploadSuccess();
-                    break;
-                case 'FAIL':
-                    this.onUploadFailure();
-                    break;
-                case 'PROGRESS':
-                    this.setUploadProgress(msg.value);
-                    break;
-                default:
-                    break;
+                    case 'SUCCESS':
+                        this.onUploadSuccess();
+                        break;
+                    case 'FAIL':
+                        this.onUploadFailure();
+                        break;
+                    case 'PROGRESS':
+                        this.setUploadProgress(msg.value);
+                        break;
+                    default:
+                        break;
                 }
             };
         }
@@ -307,27 +307,27 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     onSystemPatcherLastResultEvent(message) {
         switch (message) {
-        case 'success':
-            this.displayStep('successScreen');
-            // On flashing success, force display success screen
-            if (this.flashing && this.widget.classList.contains('gm-hidden')) {
-                this.toggleWidget();
-            }
-            this.flashing = false;
-            break;
-        case 'unavailable':
-        case 'network_error':
-        case 'corrupted_archive':
-        case 'install_error':
-            this.displayStep('errorScreen');
-            // On flashing error, force display errorscreen
-            if (this.flashing && this.widget.classList.contains('gm-hidden')) {
-                this.toggleWidget();
-            }
-            this.flashing = false;
-            break;
-        default:
-            break;
+            case 'success':
+                this.displayStep('successScreen');
+                // On flashing success, force display success screen
+                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                    this.toggleWidget();
+                }
+                this.flashing = false;
+                break;
+            case 'unavailable':
+            case 'network_error':
+            case 'corrupted_archive':
+            case 'install_error':
+                this.displayStep('errorScreen');
+                // On flashing error, force display errorscreen
+                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                    this.toggleWidget();
+                }
+                this.flashing = false;
+                break;
+            default:
+                break;
         }
     }
 

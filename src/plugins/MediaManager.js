@@ -32,7 +32,7 @@ module.exports = class MediaManager {
         this.videoHeight = videoHeight;
         this.videoWithMicrophone = videoWithMicrophone;
 
-        //register mute/unmute to exposed API
+        // register mute/unmute to exposed API
         this.instance.apiManager.registerFunction('mute', () => {
             this.instance.video.isMuted = true;
             this.instance.video.muted = true;

@@ -44,11 +44,11 @@ module.exports = class CoordinateUtils {
      * @return {boolean} True if the instance and the renderer video are in the same orientation.
      */
     hasSameOrientation() {
-        return this.video.videoWidth / this.video.videoHeight > 1 &&
-            this.video.offsetWidth / this.video.offsetHeight > 1
-            ||
-            this.video.videoWidth / this.video.videoHeight < 1 &&
-            this.video.offsetWidth / this.video.offsetHeight < 1;
+        return (
+            (this.video.videoWidth / this.video.videoHeight > 1 &&
+                this.video.offsetWidth / this.video.offsetHeight > 1) ||
+            (this.video.videoWidth / this.video.videoHeight < 1 && this.video.offsetWidth / this.video.offsetHeight < 1)
+        );
     }
 
     /**
@@ -137,16 +137,16 @@ module.exports = class CoordinateUtils {
         let videoRealSizeX;
         if (this.hasSameOrientation()) {
             if (this.hasLeftAndRightBorders()) {
-                videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+                videoRealSizeX = (this.video.videoWidth / this.video.videoHeight) * this.video.offsetHeight;
                 return this.video.videoWidth / videoRealSizeX;
             }
             return this.video.videoWidth / this.video.offsetWidth;
         }
         if (this.hasLeftAndRightBorders()) {
-            videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+            videoRealSizeX = (this.video.videoWidth / this.video.videoHeight) * this.video.offsetHeight;
             return this.video.videoWidth / videoRealSizeX;
         }
-        const videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+        const videoRealSizeY = (this.video.videoHeight / this.video.videoWidth) * this.video.offsetWidth;
         return this.video.videoHeight / videoRealSizeY;
     }
 
@@ -160,14 +160,14 @@ module.exports = class CoordinateUtils {
             if (this.hasLeftAndRightBorders()) {
                 return this.video.videoHeight / this.video.offsetHeight;
             }
-            videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+            videoRealSizeY = (this.video.videoHeight / this.video.videoWidth) * this.video.offsetWidth;
             return this.video.videoHeight / videoRealSizeY;
         }
         if (this.hasLeftAndRightBorders()) {
-            videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+            videoRealSizeX = (this.video.videoWidth / this.video.videoHeight) * this.video.offsetHeight;
             return this.video.videoWidth / videoRealSizeX;
         }
-        videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+        videoRealSizeY = (this.video.videoHeight / this.video.videoWidth) * this.video.offsetWidth;
         return this.video.videoHeight / videoRealSizeY;
     }
 
@@ -180,7 +180,7 @@ module.exports = class CoordinateUtils {
         if (this.hasLeftAndRightBorders()) {
             return 0;
         }
-        const videoRealSizeY = this.video.videoHeight / this.video.videoWidth * this.video.offsetWidth;
+        const videoRealSizeY = (this.video.videoHeight / this.video.videoWidth) * this.video.offsetWidth;
         return (this.video.offsetHeight - videoRealSizeY) / 2;
     }
 
@@ -193,7 +193,7 @@ module.exports = class CoordinateUtils {
         if (!this.hasLeftAndRightBorders()) {
             return 0;
         }
-        const videoRealSizeX = this.video.videoWidth / this.video.videoHeight * this.video.offsetHeight;
+        const videoRealSizeX = (this.video.videoWidth / this.video.videoHeight) * this.video.offsetHeight;
         return (this.video.offsetWidth - videoRealSizeX) / 2;
     }
 };

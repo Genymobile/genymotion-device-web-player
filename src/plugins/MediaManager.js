@@ -18,7 +18,7 @@ module.exports = class MediaManager {
         this.instance.mediaManager = this;
 
         if (!navigator.mediaDevices) {
-            log.error('MediaDevices API unsupported: camera and microphone won\'t be available.');
+            log.error("MediaDevices API unsupported: camera and microphone won't be available.");
             this.instance.mediaEventsEnabled = false;
             return;
         }
@@ -49,7 +49,7 @@ module.exports = class MediaManager {
                 this.microphonePermissionObject = permissionObj;
                 this.instance.addListener(permissionObj, 'change', this.onMicrophonePermissionChange.bind(this));
             } catch (error) {
-                log.warn('Can\'t get microphone permission object', error);
+                log.warn("Can't get microphone permission object", error);
                 return false;
             }
         }
@@ -60,7 +60,7 @@ module.exports = class MediaManager {
             this.cameraPermissionObject = permissionObj;
             this.instance.addListener(permissionObj, 'change', this.onCameraPermissionChange.bind(this));
         } catch (error) {
-            log.warn('Can\'t get camera permission object', error);
+            log.warn("Can't get camera permission object", error);
             return false;
         }
 
@@ -130,7 +130,7 @@ module.exports = class MediaManager {
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
-                video: false
+                video: false,
             });
             log.debug('Client audio stream ready');
             this.audioStreaming = true;
@@ -149,7 +149,7 @@ module.exports = class MediaManager {
      * @param {Error} error Camera stream error.
      */
     onVideoStreamError(error) {
-        log.error('Can\'t start client video stream', error);
+        log.error("Can't start client video stream", error);
     }
 
     /**
@@ -158,7 +158,7 @@ module.exports = class MediaManager {
      * @param {Error} error Microphone stream error.
      */
     onAudioStreamError(error) {
-        log.error('Can\'t start client audio stream', error);
+        log.error("Can't start client audio stream", error);
     }
 
     /**
@@ -248,8 +248,7 @@ module.exports = class MediaManager {
                     await this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
                     this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
                 } else {
-                    this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0],
-                        stream);
+                    this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0], stream);
                 }
             }
         } catch (error) {
@@ -285,8 +284,7 @@ module.exports = class MediaManager {
                 this.cameraSender.replaceTrack(stream.getVideoTracks()[0]);
                 this.setTransceiverDirection(this.cameraSender, 'sendrecv');
             } else {
-                this.cameraSender = this.instance.peerConnection.addTrack(stream.getVideoTracks()[0],
-                    stream);
+                this.cameraSender = this.instance.peerConnection.addTrack(stream.getVideoTracks()[0], stream);
             }
         }
 
@@ -297,8 +295,7 @@ module.exports = class MediaManager {
                 this.microphoneSender.replaceTrack(stream.getAudioTracks()[0]);
                 this.setTransceiverDirection(this.microphoneSender, 'sendrecv');
             } else {
-                this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0],
-                    stream);
+                this.microphoneSender = this.instance.peerConnection.addTrack(stream.getAudioTracks()[0], stream);
             }
         }
         return this.instance.renegotiateWebRTCConnection();

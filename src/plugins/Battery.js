@@ -270,10 +270,8 @@ module.exports = class Battery extends OverlayPlugin {
         const level = Number(this.chargeInput.value);
         const charging = this.chargingInput.checked ? 'charging' : 'discharging';
         const json = {
-            channel: 'battery', messages: [
-                'set state level ' + level,
-                'set state status ' + charging,
-            ],
+            channel: 'battery',
+            messages: ['set state level ' + level, 'set state status ' + charging],
         };
         this.instance.sendEvent(json);
     }

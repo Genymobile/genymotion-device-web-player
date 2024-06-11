@@ -117,8 +117,12 @@ module.exports = class Gamepad extends OverlayPlugin {
         log.debug('Gamepad plugged');
         const gamepad = event.detail;
         this.generateContent();
-        this.sendGamepadPlugEvent(gamepad.hostIndex, gamepad.name.split(' ').join('_'),
-            gamepad.vendorID, gamepad.productID);
+        this.sendGamepadPlugEvent(
+            gamepad.hostIndex,
+            gamepad.name.split(' ').join('_'),
+            gamepad.vendorID,
+            gamepad.productID,
+        );
     }
 
     handleGamepadUnplugged(event) {
@@ -130,9 +134,8 @@ module.exports = class Gamepad extends OverlayPlugin {
 
     sendGamepadPlugEvent(index, name, vendorID, productID) {
         const json = {
-            channel : 'vinput' , messages : [
-                'gamepad_plugin ' + index + ' ' + name + ' ' + vendorID + ' ' + productID
-            ]
+            channel: 'vinput',
+            messages: ['gamepad_plugin ' + index + ' ' + name + ' ' + vendorID + ' ' + productID],
         };
 
         this.instance.sendEvent(json);
@@ -140,9 +143,8 @@ module.exports = class Gamepad extends OverlayPlugin {
 
     sendGamepadUnplugEvent(index) {
         const json = {
-            channel : 'vinput' , messages : [
-                'gamepad_plugout ' + index
-            ]
+            channel: 'vinput',
+            messages: ['gamepad_plugout ' + index],
         };
 
         this.instance.sendEvent(json);
@@ -175,27 +177,26 @@ module.exports = class Gamepad extends OverlayPlugin {
 
     onGamepadButtonPressed(event) {
         const json = {
-            channel : 'vinput' , messages : [
-                'gamepad_press ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
-            ]
+            channel: 'vinput',
+            messages: ['gamepad_press ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex],
         };
         this.instance.sendEvent(json);
     }
 
     onGamepadButtonReleased(event) {
         const json = {
-            channel : 'vinput' , messages : [
-                'gamepad_release ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex
-            ]
+            channel: 'vinput',
+            messages: ['gamepad_release ' + event.detail.gamepadIndex + ' ' + event.detail.buttonIndex],
         };
         this.instance.sendEvent(json);
     }
 
     onGamepadAxisChanged(event) {
         const json = {
-            channel : 'vinput' , messages : [
-                'gamepad_axis ' + event.detail.gamepadIndex + ' ' + event.detail.axisIndex + ' ' + event.detail.value
-            ]
+            channel: 'vinput',
+            messages: [
+                'gamepad_axis ' + event.detail.gamepadIndex + ' ' + event.detail.axisIndex + ' ' + event.detail.value,
+            ],
         };
         this.instance.sendEvent(json);
     }

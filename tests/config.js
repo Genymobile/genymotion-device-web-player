@@ -3,7 +3,5 @@
 module.exports = {
     clearMocks: true,
     reporters: ['default', 'jest-junit'],
-    testMatch: [
-        '**/?(*.)+(test).js'
-    ]
+    testMatch: ['**/?(*.)+(test).js'],
 };

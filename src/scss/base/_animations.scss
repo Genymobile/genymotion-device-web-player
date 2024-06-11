@@ -1,5 +1,11 @@
 @keyframes blink {
-    0% { opacity: 1; }
-    30% { opacity: 0.3; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
 }

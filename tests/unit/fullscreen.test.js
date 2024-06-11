@@ -1,4 +1,3 @@
-
 'use strict';
 
 const FullScreen = require('../../src/plugins/Fullscreen');

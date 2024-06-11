@@ -23,12 +23,16 @@ describe('BasebandRIL Plugin', () => {
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
-            new BasebandRIL(instance, {
-                BASEBAND_TITLE: 'TEST BASEBAND PLUGIN TITLE',
-                NETWORK_OPERATOR: 'TEST BASEBAND PLUGIN NETWORK OPERATOR',
-                NETWORK_SIM_OPERATOR: 'TEST BASEBAND PLUGIN SIM OPERATOR',
-                NETWORK_UPDATE: 'TEST BASEBAND PLUGIN UPDATE'
-            }, true);
+            new BasebandRIL(
+                instance,
+                {
+                    BASEBAND_TITLE: 'TEST BASEBAND PLUGIN TITLE',
+                    NETWORK_OPERATOR: 'TEST BASEBAND PLUGIN NETWORK OPERATOR',
+                    NETWORK_SIM_OPERATOR: 'TEST BASEBAND PLUGIN SIM OPERATOR',
+                    NETWORK_UPDATE: 'TEST BASEBAND PLUGIN UPDATE',
+                },
+                true,
+            );
             plugin = document.getElementsByClassName('gm-baseband-plugin')[0];
         });
 
@@ -106,25 +110,27 @@ describe('BasebandRIL Plugin', () => {
             baseband.simOperatorMMC.value = '123456';
             baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
-            expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: [
-                'network operator 123456',
-                'network operator_name value',
-                'sim operator 123456',
-            ]});
+            expect(instance.outgoingMessages[0]).toEqual({
+                channel: 'baseband',
+                messages: ['network operator 123456', 'network operator_name value', 'sim operator 123456'],
+            });
 
             baseband.simOperatorName.value = 'value';
             baseband.simMSIN.value = '0123456789';
             baseband.simOperatorPhoneNumber.value = '0011223344';
             baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
-            expect(instance.outgoingMessages[1]).toEqual({channel: 'baseband', messages: [
-                'network operator 123456',
-                'network operator_name value',
-                'sim operator 123456',
-                'sim operator_name value',
-                'sim imsi_id 0123456789',
-                'sim phone_number 0011223344'
-            ]});
+            expect(instance.outgoingMessages[1]).toEqual({
+                channel: 'baseband',
+                messages: [
+                    'network operator 123456',
+                    'network operator_name value',
+                    'sim operator 123456',
+                    'sim operator_name value',
+                    'sim imsi_id 0123456789',
+                    'sim phone_number 0011223344',
+                ],
+            });
         });
     });
 });

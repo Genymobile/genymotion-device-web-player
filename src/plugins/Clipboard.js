@@ -161,9 +161,8 @@ module.exports = class Clipboard extends OverlayPlugin {
      */
     sendDataToInstance() {
         const json = {
-            channel: 'framework', messages: [
-                'set_device_clipboard ' + window.btoa(unescape(encodeURIComponent(this.clipboard))),
-            ],
+            channel: 'framework',
+            messages: ['set_device_clipboard ' + window.btoa(unescape(encodeURIComponent(this.clipboard)))],
         };
         this.instance.sendEvent(json);
     }

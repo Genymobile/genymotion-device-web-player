@@ -116,7 +116,8 @@ module.exports = class Network extends OverlayPlugin {
         this.selectMobileProfile.name = 'select-mobile-profile';
         this.selectMobileProfile.onchange = this.changeMobileProfile.bind(this);
         // Add option for each child
-        MOBILE_PROFILES.slice().reverse()
+        MOBILE_PROFILES.slice()
+            .reverse()
             .forEach((profile) => {
                 // 5g is available only for version >= 10
                 if (profile.name === '5g') {
@@ -138,7 +139,8 @@ module.exports = class Network extends OverlayPlugin {
         this.selectMobileSignalStrength.onchange = this.changeMobileSignalStrength.bind(this);
         this.inputMobileSignalStrength.appendChild(this.selectMobileSignalStrength);
         // Add option for each child
-        MOBILE_SIGNAL_STRENGTH.slice().reverse()
+        MOBILE_SIGNAL_STRENGTH.slice()
+            .reverse()
             .forEach((strength) => {
                 const option = new Option(strength.label, strength.name);
                 this.selectMobileSignalStrength.add(option);
@@ -163,7 +165,8 @@ module.exports = class Network extends OverlayPlugin {
         this.selectProfile.add(defaultOption);
         this.selectProfile.onchange = this.changeProfile.bind(this);
         // Add option for each child
-        PROFILES.slice().reverse()
+        PROFILES.slice()
+            .reverse()
             .forEach((profile) => {
                 const option = new Option(profile.label, profile.name);
                 this.selectProfile.add(option);
@@ -253,35 +256,49 @@ module.exports = class Network extends OverlayPlugin {
 
             this.setActiveMobileProfile(mobileProfile[1]);
             this.setActiveSignalStrength(signalStrength[1]);
-            this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled'
-                || !this.mobileInput.checked);
+            this.updateDetail(
+                'downSpeed',
+                downSpeed[2] + ' b/s',
+                downSpeed[1] === 'disabled' || !this.mobileInput.checked,
+            );
             this.updateDetail('upSpeed', upSpeed[2] + 'b/s', upSpeed[1] === 'disabled' || !this.mobileInput.checked);
-            this.updateDetail('downDelay', downDelay[2] + ' s', downDelay[1] === 'disabled'
-                || !this.mobileInput.checked);
+            this.updateDetail(
+                'downDelay',
+                downDelay[2] + ' s',
+                downDelay[1] === 'disabled' || !this.mobileInput.checked,
+            );
             this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || !this.mobileInput.checked);
-            this.updateDetail('downPacketLoss', downPacketLoss[2] + ' %', downPacketLoss[1] === 'disabled'
-                || !this.mobileInput.checked);
-            this.updateDetail('upPacketLoss', upPacketLoss[2] + ' %', upPacketLoss[1] === 'disabled'
-                || !this.mobileInput.checked);
+            this.updateDetail(
+                'downPacketLoss',
+                downPacketLoss[2] + ' %',
+                downPacketLoss[1] === 'disabled' || !this.mobileInput.checked,
+            );
+            this.updateDetail(
+                'upPacketLoss',
+                upPacketLoss[2] + ' %',
+                upPacketLoss[1] === 'disabled' || !this.mobileInput.checked,
+            );
             this.updateDetail('dnsDelay', dnsDelay[2] + ' s', dnsDelay[1] === 'disabled' || !this.mobileInput.checked);
         } else {
             const isThrottlingEnabled =
-            upSpeed[1] === 'enabled'
-            && downSpeed[1] === 'enabled'
-            && upDelay[1] === 'enabled'
-            && downDelay[1] === 'enabled'
-            && upPacketLoss[1] === 'enabled'
-            && downPacketLoss[1] === 'enabled'
-            && dnsDelay[1] === 'enabled';
+                upSpeed[1] === 'enabled' &&
+                downSpeed[1] === 'enabled' &&
+                upDelay[1] === 'enabled' &&
+                downDelay[1] === 'enabled' &&
+                upPacketLoss[1] === 'enabled' &&
+                downPacketLoss[1] === 'enabled' &&
+                dnsDelay[1] === 'enabled';
 
             const profile = PROFILES.find((elem) => {
-                return elem.downSpeed.value === parseFloat(downSpeed[2]) &&
+                return (
+                    elem.downSpeed.value === parseFloat(downSpeed[2]) &&
                     elem.downDelay.value === parseFloat(downDelay[2]) &&
                     elem.downPacketLoss.value === parseFloat(downPacketLoss[2]) &&
                     elem.upSpeed.value === parseFloat(upSpeed[2]) &&
                     elem.upDelay.value === parseFloat(upDelay[2]) &&
                     elem.upPacketLoss.value === parseFloat(upPacketLoss[2]) &&
-                    elem.dnsDelay.value === parseFloat(dnsDelay[2]);
+                    elem.dnsDelay.value === parseFloat(dnsDelay[2])
+                );
             });
 
             if (profile && isThrottlingEnabled) {
@@ -445,7 +462,8 @@ module.exports = class Network extends OverlayPlugin {
 
     changeMobileSignalStrength() {
         const signalStrength = MOBILE_SIGNAL_STRENGTH.find(
-            (elem) => elem.name === this.selectMobileSignalStrength.value);
+            (elem) => elem.name === this.selectMobileSignalStrength.value,
+        );
         if (signalStrength) {
             const msgs = [];
             msgs.push('setsignalstrength mobile ' + signalStrength.name);

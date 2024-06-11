@@ -1,5 +1,5 @@
 {
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended"],
     "env": {
         "browser": true,
         "es6": true,
@@ -12,7 +12,14 @@
     "rules": {
         // Possible errors
         "no-console": "error",
-        "no-extra-parens": "error",
+        "no-extra-parens": [
+            "error",
+            "all",
+            {
+                "nestedBinaryExpressions": false,
+                "enforceForArrowConditionals": false
+            }
+        ],
         "no-loss-of-precision": "error",
         "no-promise-executor-return": "error",
         "no-template-curly-in-string": "error",

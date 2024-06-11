@@ -98,8 +98,8 @@ module.exports = class GamepadManager {
             ['HORIPAD 4 FPS Plus', ControllerType.Dualshock4, 0x0738, 0x8384],
             ['Mad Catz FightPad Pro PS4', ControllerType.Dualshock4, 0x0738, 0x8250],
             ['Mad Catz Fightstick TE S+', ControllerType.Dualshock4, 0x0738, 0x8384],
-            ['Armor Armor 3 Pad PS4', ControllerType.Dualshock4, 0x0C12, 0x0E10],
-            ['EMIO PS4 Elite Controller', ControllerType.Dualshock4, 0x0C12, 0x1CF6],
+            ['Armor Armor 3 Pad PS4', ControllerType.Dualshock4, 0x0c12, 0x0e10],
+            ['EMIO PS4 Elite Controller', ControllerType.Dualshock4, 0x0c12, 0x1cf6],
             ['Razer Raiju PS4 Controller', ControllerType.Dualshock4, 0x1532, 0x1000],
             ['Razer Panthera PS4 Controller', ControllerType.Dualshock4, 0x1532, 0x0401],
             ['STRIKEPAD PS4 Grip Add-on', ControllerType.Dualshock4, 0x054c, 0x05c5],
@@ -115,7 +115,7 @@ module.exports = class GamepadManager {
             ['Mad Catz FightStick TE 2', ControllerType.Dualshock4, 0x0738, 0x8480],
             ['Armor 3, Level Up Cobra', ControllerType.Dualshock4, 0x7545, 0x0104],
             ['Razer Raiju 2 Tournament Edition (USB)', ControllerType.Dualshock4, 0x1532, 0x1007],
-            ['Razer Raiju 2 Tournament Edition (BT)', ControllerType.Dualshock4, 0x1532, 0x100A],
+            ['Razer Raiju 2 Tournament Edition (BT)', ControllerType.Dualshock4, 0x1532, 0x100a],
             ['Razer Raiju 2 Ultimate Edition (USB)', ControllerType.Dualshock4, 0x1532, 0x1004],
             ['Razer Raiju 2 Ultimate Edition (BT)', ControllerType.Dualshock4, 0x1532, 0x1009],
             ['Razer Panthera Evo Fightstick', ControllerType.Dualshock4, 0x1532, 0x1008],
@@ -151,7 +151,7 @@ module.exports = class GamepadManager {
             ['PDP Xbox One Controller', ControllerType.XboxOne, 0x0e6f, 0x0163],
             ['PDP Battlefield One', ControllerType.XboxOne, 0x0e6f, 0x0164],
             ['PDP Titanfall 2', ControllerType.XboxOne, 0x0e6f, 0x0165],
-            ['Pelican PL-3601 \'TSZ\' Wired Xbox 360 Controller', ControllerType.Xbox360, 0x0e6f, 0x0201],
+            ["Pelican PL-3601 'TSZ' Wired Xbox 360 Controller", ControllerType.Xbox360, 0x0e6f, 0x0201],
             ['Afterglow Gamepad for Xbox 360', ControllerType.Xbox360, 0x0e6f, 0x0213],
             ['Rock Candy Gamepad for Xbox 360', ControllerType.Xbox360, 0x0e6f, 0x021f],
             ['Rock Candy Gamepad for Xbox One 2015', ControllerType.XboxOne, 0x0e6f, 0x0246],
@@ -252,8 +252,8 @@ module.exports = class GamepadManager {
      * Add the listeners for gamepad connect & disconnect
      */
     addGamepadCallbacks() {
-        this.instance.addListener(window,'gamepadconnected', this.onGamepadConnected.bind(this));
-        this.instance.addListener(window,'gamepaddisconnected', this.onGamepadDisconnected.bind(this));
+        this.instance.addListener(window, 'gamepadconnected', this.onGamepadConnected.bind(this));
+        this.instance.addListener(window, 'gamepaddisconnected', this.onGamepadDisconnected.bind(this));
     }
 
     /**
@@ -333,7 +333,8 @@ module.exports = class GamepadManager {
         this.currentGamepads[hostIndex] = {
             guestIndex,
             buttons: [],
-            axes: []};
+            axes: [],
+        };
         if (!this.isRunning) {
             this.loop();
         }
@@ -364,7 +365,7 @@ module.exports = class GamepadManager {
         }
 
         const newRange = Math.abs(newMax - newMin);
-        return (value - oldMin) * newRange / oldRange + newMin;
+        return ((value - oldMin) * newRange) / oldRange + newMin;
     }
 
     /**
@@ -393,7 +394,7 @@ module.exports = class GamepadManager {
                                 gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
                                 buttonIndex: i,
                                 value: gamepad.buttons[i].value,
-                            }
+                            },
                         });
                         window.dispatchEvent(buttonEvent);
                     } else if (!gamepad.buttons[i].pressed && pressedButtonIndex !== -1) {
@@ -403,7 +404,7 @@ module.exports = class GamepadManager {
                                 gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
                                 buttonIndex: i,
                                 value: gamepad.buttons[i].value,
-                            }
+                            },
                         });
                         window.dispatchEvent(buttonEvent);
                     }
@@ -420,7 +421,7 @@ module.exports = class GamepadManager {
                                 gamepadIndex: this.currentGamepads[gamepad.index].guestIndex,
                                 axisIndex: i,
                                 value: gamepad.axes[i],
-                            }
+                            },
                         });
                         window.dispatchEvent(axisEvent);
                     }
@@ -463,8 +464,8 @@ module.exports = class GamepadManager {
             if (information) {
                 gamepad.name = information[1];
                 gamepad.vendor = information[2];
-                gamepad.vendorID = Number('0x' + information[information.length-2]);
-                gamepad.productID = Number('0x' + information[information.length-1]);
+                gamepad.vendorID = Number('0x' + information[information.length - 2]);
+                gamepad.productID = Number('0x' + information[information.length - 1]);
             }
         }
         const gamepadInfos = this.instance.gamepadManager.getInfosFromID(gamepad.vendorID, gamepad.productID);
@@ -489,7 +490,8 @@ module.exports = class GamepadManager {
         if (!gamepad) {
             return;
         }
-        if (gamepad.vibrationActuator) { // chrome
+        if (gamepad.vibrationActuator) {
+            // chrome
             const actuator = gamepad.vibrationActuator;
             if (actuator.playEffect) {
                 const newWeakValue = this.computeValueInNewRange(0.0, 255.0, 0, 1.0, weak.toFixed(1));
@@ -498,19 +500,21 @@ module.exports = class GamepadManager {
                     startDelay: 0,
                     duration: 200,
                     weakMagnitude: newWeakValue,
-                    strongMagnitude: newStrongValue
+                    strongMagnitude: newStrongValue,
                 });
             } else {
                 log.error(`could not use vibration actuator for controller ${guestIndex}`);
             }
-        } else if (gamepad.hapticActuators && gamepad.hapticActuators[0]) { // firefox
+        } else if (gamepad.hapticActuators && gamepad.hapticActuators[0]) {
+            // firefox
             const actuator = gamepad.hapticActuators[0];
             if (actuator.pulse) {
                 actuator.pulse(strong, 200);
             } else {
                 log.error(`could not use haptic actuator for controller ${guestIndex}`);
             }
-        } else { // unrecognised, for example DualSense
+        } else {
+            // unrecognised, for example DualSense
             log.error(`no vibration actuator for controller ${guestIndex}`);
         }
     }

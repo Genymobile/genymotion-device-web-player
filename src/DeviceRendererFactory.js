@@ -4,6 +4,7 @@ const DeviceRenderer = require('./DeviceRenderer');
 const defaultsDeep = require('lodash/defaultsDeep');
 
 const store = require('./store');
+const apiManager = require('./APIManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -144,12 +145,14 @@ module.exports = class DeviceRendererFactory {
         const instance = new RendererClass(dom, options);
         store(instance);
 
+        instance.apiManager = apiManager;
+
         this.instances.push(instance);
 
         this.addPlugins(instance);
         instance.onWebRTCReady();
 
-        return instance;
+        return instance.apiManager.apiFunctions;
     }
 
     /**

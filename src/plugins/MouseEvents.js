@@ -28,7 +28,10 @@ module.exports = class MouseEvents {
      * @param {Event} event Event.
      */
     onMousePressEvent(event) {
-        this.instance.video.muted = false;
+        /** At launch the sound is muted until a click is performed on the <video>
+         * `this.instance.mediaManager.isMuted` is necessary to force the sound to be muted even if the user clicked on the video
+         */
+        this.instance.video.muted = !this.instance.mediaManager.isMuted ? this.instance.video.muted : false;
         if (event.button !== 0) {
             return;
         }

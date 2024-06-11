@@ -103,7 +103,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     // Device renderer instanciation
     const {DeviceRendererFactory} = window.index;
     const deviceRendererFactory = new DeviceRendererFactory();
-    const playerAPI = deviceRendererFactory.setupRenderer(
+    const rendererAPI = deviceRendererFactory.setupRenderer(
         container, // the container element or element ID to use
         webrtcAddress, // the websocket address of your instance connector
         options, // options object to enable or disable features
@@ -118,13 +118,13 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
 ## Player API
 
-plugin options and websocket communication can be handle trought the API object returned by setupRenderer fn.
+plugin options and websocket communication can be handle trought the API object returned by setupRenderer function.
 
-Built-in exposed fn are
+Built-in exposed functions are
 
 ### `getRegisteredFunctions`
 
-which return the list of available fn with an optionnal description
+which return the list of available functions with an optionnal description
 
 ### `disconnect`
 

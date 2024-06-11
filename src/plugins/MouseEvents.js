@@ -43,7 +43,9 @@ module.exports = class MouseEvents {
         if (event.ctrlKey || event.metaKey) {
             json = {
                 type: 'FAKE_MULTI_TOUCH_PRESS',
-                mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                mode: event.shiftKey ? 2 : 1,
+                x: this.instance.x,
+                y: this.instance.y,
             };
         } else {
             json = {type: 'MOUSE_PRESS', x: this.instance.x, y: this.instance.y};
@@ -72,7 +74,9 @@ module.exports = class MouseEvents {
         if (event.ctrlKey || event.metaKey) {
             json = {
                 type: 'FAKE_MULTI_TOUCH_RELEASE',
-                mode: event.shiftKey ? 2 : 1, x: this.instance.x, y: this.instance.y,
+                mode: event.shiftKey ? 2 : 1,
+                x: this.instance.x,
+                y: this.instance.y,
             };
         } else {
             json = {type: 'MOUSE_RELEASE', x: this.instance.x, y: this.instance.y};
@@ -158,7 +162,7 @@ module.exports = class MouseEvents {
         this.instance.addListener(this.instance.videoWrapper, 'mouseup', this.onMouseReleaseEvent.bind(this), false);
         this.instance.addListener(this.instance.videoWrapper, 'mousemove', this.onMouseMoveEvent.bind(this), false);
         this.instance.addListener(this.instance.videoWrapper, 'wheel', this.onMouseWheelEvent.bind(this), {
-            passive: false
+            passive: false,
         });
         this.instance.addListener(this.instance.videoWrapper, 'contextmenu', this.cancelContextMenu.bind(this), false);
     }
@@ -172,9 +176,11 @@ module.exports = class MouseEvents {
         let pixels = delta * PIXEL_STEP;
 
         if (pixels && mode) {
-            if (mode === 1) { // delta in LINE units
+            if (mode === 1) {
+                // delta in LINE units
                 pixels *= LINE_HEIGHT;
-            } else { // delta in PAGE units
+            } else {
+                // delta in PAGE units
                 pixels *= PAGE_HEIGHT;
             }
         }

@@ -17,7 +17,7 @@ module.exports = class APIManager {
         // record fn to get registered functions
         this.registerFunction(
             'getRegisteredFunctions',
-            () => this.listRegisteredFunctions(),
+            () => this.getRegisteredFunctions(),
             'list all registered functions',
         );
 
@@ -54,7 +54,7 @@ module.exports = class APIManager {
         this.instance.registerEventCallback(event, fn);
     }
 
-    listRegisteredFunctions() {
+    getRegisteredFunctions() {
         const exposedFunctionsDescription = Object.entries(this.apiFunctions).reduce((acc, val) => {
             acc[val[0]] = val[1].description;
             return acc;
@@ -62,6 +62,10 @@ module.exports = class APIManager {
         return exposedFunctionsDescription;
     }
 
+    /**
+     * Get exposed API functions
+     * @returns {Array} list of api {apiName: string, apiDescription: string}
+     */
     getExposedApiFunctions() {
         const exposedFunctions = Object.entries(this.apiFunctions).reduce((acc, val) => {
             acc[val[0]] = val[1].fn;

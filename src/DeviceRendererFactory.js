@@ -119,7 +119,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
      * @param  {string}             options.giveFeedbackLink       URL to the feedback form. Default: 'https://github.com/orgs/Genymobile/discussions'
      * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
-     * @return {DeviceRenderer}                                    The device renderer instance.
+     * @return {Array}                                             An array of API for device renderer instance, see return of APIManager.getExposedApiFunctions.
      */
     setupRenderer(dom, webRTCUrl, options, RendererClass = DeviceRenderer) {
         if (typeof dom === 'string') {

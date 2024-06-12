@@ -54,6 +54,10 @@ module.exports = class APIManager {
         this.instance.registerEventCallback(event, fn);
     }
 
+    /**
+     * Get exposed API description
+     * @returns {Array} list of api description {apiName: string, apiDescription: string}
+     */
     getRegisteredFunctions() {
         const exposedFunctionsDescription = Object.entries(this.apiFunctions).reduce((acc, val) => {
             acc[val[0]] = val[1].description;
@@ -64,7 +68,7 @@ module.exports = class APIManager {
 
     /**
      * Get exposed API functions
-     * @returns {Array} list of api {apiName: string, apiDescription: string}
+     * @returns {Array} list of api fn {apiName: fn}
      */
     getExposedApiFunctions() {
         const exposedFunctions = Object.entries(this.apiFunctions).reduce((acc, val) => {

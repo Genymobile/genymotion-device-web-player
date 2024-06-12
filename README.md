@@ -118,21 +118,21 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
 ## Player API
 
-plugin options and websocket communication can be handle trought the API object returned by setupRenderer function.
+Plugin options and websocket communication can be handled through the API object returned by the `setupRenderer` function.
 
 Built-in exposed functions are
 
 ### `getRegisteredFunctions`
 
-which return the list of available functions with an optionnal description
+which returns the list of available functions with an optional description
 
 ### `disconnect`
 
-which disconnect player from VM and cleanup memory listener
+which disconnects the player from the VM and cleanups the memory listener
 
 ### `addEventListener`
 
-used to listen messages emit from VM such as 'fingerprint', 'gps', 'BATTERY_LEVEL'
+used to listen to messages emitted from the VM such as 'fingerprint', 'gps', 'BATTERY_LEVEL'
 
 ```html
 addEventListener('fingerprint', (msg)=>{ console.log(msg) })
@@ -140,7 +140,7 @@ addEventListener('fingerprint', (msg)=>{ console.log(msg) })
 
 ### `sendData`
 
-used to send message to VM.
+used to send messages to the VM.
 
 ```html
 sendData({ channel: 'battery', messages: ['set state level 10', 'set state status true'], })

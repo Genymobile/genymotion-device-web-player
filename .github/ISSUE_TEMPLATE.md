@@ -1,7 +1,7 @@
 ## Prerequisites
 
-- [ ] I've read & comply with the [contributing guidelines](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CONTRIBUTING.md)
-- [ ] I've searched open issues if my demand is already reported.
+-   [ ] I've read & comply with the [contributing guidelines](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CONTRIBUTING.md)
+-   [ ] I've searched open issues if my demand is already reported.
 
 ## Description
 

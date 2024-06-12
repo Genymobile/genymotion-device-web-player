@@ -22,7 +22,7 @@ describe.only('StreamBitrate Plugin', () => {
         beforeEach(() => {
             instance = new Instance();
             new StreamBitrate(instance, {
-                STREAMRATE_TITLE: 'TEST QUALITY PLUGIN TITLE'
+                STREAMRATE_TITLE: 'TEST QUALITY PLUGIN TITLE',
             });
         });
 

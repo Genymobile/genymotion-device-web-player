@@ -11,7 +11,7 @@ describe('ButtonsEvents Plugin', () => {
             rotation: true,
             volume: true,
             navbar: true,
-            power: true
+            power: true,
         });
         new ButtonsEvents(instance, {}, false);
     });
@@ -28,7 +28,7 @@ describe('ButtonsEvents Plugin', () => {
                 rotation: true,
                 volume: true,
                 navbar: true,
-                power: true
+                power: true,
             });
             new ButtonsEvents(instance, {}, false);
 
@@ -64,17 +64,21 @@ describe('ButtonsEvents Plugin', () => {
                 rotation: true,
                 volume: true,
                 navbar: true,
-                power: true
+                power: true,
             });
-            new ButtonsEvents(instance, {
-                BUTTONS_ROTATE: 'TEST BUTTONS EVENTS ROTATE BUTTON',
-                BUTTONS_SOUND_DOWN: 'TEST BUTTONS EVENTS SOUND_DOWN BUTTON',
-                BUTTONS_SOUND_UP: 'TEST BUTTONS EVENTS SOUND_UP BUTTON',
-                BUTTONS_RECENT_APPS: 'TEST BUTTONS EVENTS RECENT_APPS BUTTON',
-                BUTTONS_HOME: 'TEST BUTTONS EVENTS HOME BUTTON',
-                BUTTONS_BACK: 'TEST BUTTONS EVENTS BACK BUTTON',
-                BUTTONS_POWER: 'TEST BUTTONS EVENTS POWER BUTTON'
-            }, false);
+            new ButtonsEvents(
+                instance,
+                {
+                    BUTTONS_ROTATE: 'TEST BUTTONS EVENTS ROTATE BUTTON',
+                    BUTTONS_SOUND_DOWN: 'TEST BUTTONS EVENTS SOUND_DOWN BUTTON',
+                    BUTTONS_SOUND_UP: 'TEST BUTTONS EVENTS SOUND_UP BUTTON',
+                    BUTTONS_RECENT_APPS: 'TEST BUTTONS EVENTS RECENT_APPS BUTTON',
+                    BUTTONS_HOME: 'TEST BUTTONS EVENTS HOME BUTTON',
+                    BUTTONS_BACK: 'TEST BUTTONS EVENTS BACK BUTTON',
+                    BUTTONS_POWER: 'TEST BUTTONS EVENTS POWER BUTTON',
+                },
+                false,
+            );
 
             // Toolbar buttons
             const plugin = document.body;
@@ -106,7 +110,7 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'ROTATE'
+                type: 'ROTATE',
             });
         });
 
@@ -116,13 +120,17 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000072'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000072'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000072'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000072'),
+                keychar: '0\n',
             });
         });
 
@@ -132,13 +140,17 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000070'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000070'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000070'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000070'),
+                keychar: '0\n',
             });
         });
 
@@ -148,13 +160,17 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x010000be'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x010000be'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x010000be'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x010000be'),
+                keychar: '0\n',
             });
         });
 
@@ -164,19 +180,23 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000010'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000010'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000010'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000010'),
+                keychar: '0\n',
             });
         });
 
         test('home - translated', () => {
             instance = new Instance({
-                navbar: true
+                navbar: true,
             });
             new ButtonsEvents(instance, {}, true);
             const button = document.getElementsByClassName('gm-home')[0];
@@ -185,19 +205,27 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000022'), keychar: ''
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000022'),
+                keychar: '',
             });
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000005'), keychar: ''
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000005'),
+                keychar: '',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(4);
             expect(instance.outgoingMessages[2]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000005'), keychar: ''
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000005'),
+                keychar: '',
             });
             expect(instance.outgoingMessages[3]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000022'), keychar: ''
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000022'),
+                keychar: '',
             });
         });
 
@@ -207,13 +235,17 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x01000061'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x01000061'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x01000061'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x01000061'),
+                keychar: '0\n',
             });
         });
 
@@ -223,13 +255,17 @@ describe('ButtonsEvents Plugin', () => {
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS', keycode: parseInt('0x0100010b'), keychar: '0\n'
+                type: 'KEYBOARD_PRESS',
+                keycode: parseInt('0x0100010b'),
+                keychar: '0\n',
             });
 
             button.dispatchEvent(new Event('mouseup'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE', keycode: parseInt('0x0100010b'), keychar: '0\n'
+                type: 'KEYBOARD_RELEASE',
+                keycode: parseInt('0x0100010b'),
+                keychar: '0\n',
             });
         });
     });

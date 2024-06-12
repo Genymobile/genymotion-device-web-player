@@ -26,7 +26,7 @@ describe('Identifiers Plugin', () => {
             new Identifiers(instance, {
                 IDENTIFIERS_TITLE: 'TEST IDENTIFIERS PLUGIN TITLE',
                 IDENTIFIERS_UPDATE: 'TEST IDENTIFIERS PLUGIN UPDATE BUTTON',
-                IDENTIFIERS_GENERATE: 'TEST IDENTIFIERS PLUGIN GENERATE BUTTON'
+                IDENTIFIERS_GENERATE: 'TEST IDENTIFIERS PLUGIN GENERATE BUTTON',
             });
             plugin = document.getElementsByClassName('gm-identifiers-plugin')[0];
         });
@@ -142,9 +142,8 @@ describe('Identifiers Plugin', () => {
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(1);
         expect(instance.outgoingMessages[0]).toEqual({
-            channel : 'settings' , messages : [
-                'set parameter device_id:0123456789abcde'
-            ]
+            channel: 'settings',
+            messages: ['set parameter device_id:0123456789abcde'],
         });
 
         identifiers.androidInput.value = '0123456789abcdef';
@@ -152,9 +151,8 @@ describe('Identifiers Plugin', () => {
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(2);
         expect(instance.outgoingMessages[1]).toEqual({
-            channel : 'framework' , messages : [
-                'set parameter android_id:0123456789abcdef'
-            ]
+            channel: 'framework',
+            messages: ['set parameter android_id:0123456789abcdef'],
         });
 
         identifiers.androidInput.value = '0123456789abcdef';
@@ -162,14 +160,12 @@ describe('Identifiers Plugin', () => {
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(4);
         expect(instance.outgoingMessages[2]).toEqual({
-            channel : 'framework' , messages : [
-                'set parameter android_id:0123456789abcdef'
-            ]
+            channel: 'framework',
+            messages: ['set parameter android_id:0123456789abcdef'],
         });
         expect(instance.outgoingMessages[3]).toEqual({
-            channel : 'settings' , messages : [
-                'set parameter device_id:0123456789abcde'
-            ]
+            channel: 'settings',
+            messages: ['set parameter device_id:0123456789abcde'],
         });
 
         identifiers.androidInput.value = '1234567891234@é%';
@@ -177,9 +173,8 @@ describe('Identifiers Plugin', () => {
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(5);
         expect(instance.outgoingMessages[4]).toEqual({
-            channel : 'settings' , messages : [
-                'set parameter device_id:0123456789abcde'
-            ]
+            channel: 'settings',
+            messages: ['set parameter device_id:0123456789abcde'],
         });
     });
 });

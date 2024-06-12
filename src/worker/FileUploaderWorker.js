@@ -65,45 +65,45 @@ module.exports = function() {
 
         if (msg.type === 'FILE_UPLOAD') {
             switch (msg.code) {
-            case 'NEXT': {
-                if (self.uploadedSize < self.file.size) {
-                    const chunkLength = self.getChunkSize(self.file.size);
-                    let blob;
-                    const reader = new FileReader();
-                    reader.onload = self.uploadData;
-                    reader.onabort = self.onFailure;
-                    reader.onerror = self.onFailure;
+                case 'NEXT': {
+                    if (self.uploadedSize < self.file.size) {
+                        const chunkLength = self.getChunkSize(self.file.size);
+                        let blob;
+                        const reader = new FileReader();
+                        reader.onload = self.uploadData;
+                        reader.onabort = self.onFailure;
+                        reader.onerror = self.onFailure;
 
-                    if (self.file.size - self.uploadedSize > chunkLength) {
-                        blob = self.file.slice(self.uploadedSize, self.uploadedSize + chunkLength);
-                        self.uploadedSize += chunkLength;
+                        if (self.file.size - self.uploadedSize > chunkLength) {
+                            blob = self.file.slice(self.uploadedSize, self.uploadedSize + chunkLength);
+                            self.uploadedSize += chunkLength;
+                        } else {
+                            blob = self.file.slice(self.uploadedSize);
+                            self.uploadedSize = self.file.size;
+                        }
+                        reader.readAsArrayBuffer(blob);
                     } else {
-                        blob = self.file.slice(self.uploadedSize);
-                        self.uploadedSize = self.file.size;
+                        const status = {
+                            type: 'FILE_UPLOAD',
+                            done: true,
+                        };
+                        self.socket.send(JSON.stringify(status));
+                        self.isUploading = false;
                     }
-                    reader.readAsArrayBuffer(blob);
-                } else {
-                    const status = {
-                        type: 'FILE_UPLOAD',
-                        'done': true,
-                    };
-                    self.socket.send(JSON.stringify(status));
-                    self.isUploading = false;
+                    break;
                 }
-                break;
-            }
-            case 'PROGRESS':
-                postMessage(msg);
-                break;
-            case 'SUCCESS':
-                postMessage(msg);
-                break;
-            case 'FAIL':
-                self.hasError = true;
-                postMessage(msg);
-                break;
-            default:
-                break;
+                case 'PROGRESS':
+                    postMessage(msg);
+                    break;
+                case 'SUCCESS':
+                    postMessage(msg);
+                    break;
+                case 'FAIL':
+                    self.hasError = true;
+                    postMessage(msg);
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -112,35 +112,35 @@ module.exports = function() {
         const msg = event.data;
 
         switch (msg.type) {
-        case 'address':
-            self.token = msg.token;
-            self.address = msg.fileUploadAddress;
-            self.connect(self.address);
-            break;
-        case 'close':
-            self.isUploading = false;
-            if (self.socket) {
-                self.socket.onclose = null;
-                self.socket.close();
-            }
-            break;
-        case 'upload':
-            if (!self.isUploading) {
-                self.file = msg.file;
-                self.isUploading = true;
-                self.hasError = false;
-                self.uploadedSize = 0;
+            case 'address':
+                self.token = msg.token;
+                self.address = msg.fileUploadAddress;
+                self.connect(self.address);
+                break;
+            case 'close':
+                self.isUploading = false;
+                if (self.socket) {
+                    self.socket.onclose = null;
+                    self.socket.close();
+                }
+                break;
+            case 'upload':
+                if (!self.isUploading) {
+                    self.file = msg.file;
+                    self.isUploading = true;
+                    self.hasError = false;
+                    self.uploadedSize = 0;
 
-                const data = {
-                    type: 'FILE_UPLOAD',
-                    'name': self.file.name,
-                    'size': self.file.size,
-                };
-                self.socket.send(JSON.stringify(data));
-            }
-            break;
-        default:
-            break;
+                    const data = {
+                        type: 'FILE_UPLOAD',
+                        name: self.file.name,
+                        size: self.file.size,
+                    };
+                    self.socket.send(JSON.stringify(data));
+                }
+                break;
+            default:
+                break;
         }
     };
 };

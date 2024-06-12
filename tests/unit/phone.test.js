@@ -30,7 +30,7 @@ describe('Phone Plugin', () => {
                 PHONE_INCOMING: 'TEST PHONE PLUGIN INCOMING',
                 PHONE_MESSAGE_PLACEHOLDER: 'TEST PHONE PLUGIN MESSAGE PLACEHOLDER',
                 PHONE_MESSAGE: 'TEST PHONE PLUGIN MESSAGE',
-                PHONE_MESSAGE_VALUE: 'TEST PHONE PLUGIN MESSAGE_VALUE'
+                PHONE_MESSAGE_VALUE: 'TEST PHONE PLUGIN MESSAGE_VALUE',
             });
             plugin = document.getElementsByClassName('gm-phone-plugin')[0];
         });
@@ -67,9 +67,7 @@ describe('Phone Plugin', () => {
             phone.sendPhoneCallToInstance();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
-            expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: [
-                'gsm call 0123456789'
-            ]});
+            expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: ['gsm call 0123456789']});
         });
 
         test('sms send', () => {
@@ -84,9 +82,10 @@ describe('Phone Plugin', () => {
             phone.sendSMSToInstance();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
-            expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: [
-                'sms send 0123456789 Hello world'
-            ]});
+            expect(instance.outgoingMessages[0]).toEqual({
+                channel: 'baseband',
+                messages: ['sms send 0123456789 Hello world'],
+            });
         });
     });
 });

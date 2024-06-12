@@ -34,9 +34,10 @@ module.exports = class PeerConnectionStats {
                         if (entry.type === 'track') {
                             this.logAndBroadcast('width', entry.frameWidth);
                             this.logAndBroadcast('height', entry.frameHeight);
-                            this.logAndBroadcast('jitter', Math.round(
-                                entry.jitterBufferDelay / entry.jitterBufferEmittedCount * 1000
-                            ));
+                            this.logAndBroadcast(
+                                'jitter',
+                                Math.round((entry.jitterBufferDelay / entry.jitterBufferEmittedCount) * 1000),
+                            );
                         }
                     }
                     if (entry.type === 'candidate-pair' && entry.state === 'succeeded') {

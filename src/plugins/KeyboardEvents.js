@@ -229,7 +229,7 @@ module.exports = class KeyboardEvents {
                 this.keyboardCallbacks = [
                     {event: 'keypress', handler: this.onKeyPress.bind(this), removeListener: null},
                     {event: 'keydown', handler: this.onKeyDown.bind(this), removeListener: null},
-                    {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null}
+                    {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null},
                 ];
             }
             this.instance.root.focus();

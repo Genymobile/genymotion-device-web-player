@@ -95,4 +95,3 @@ const switchButton = (() => {
 })();
 
 module.exports = {switchButton};
-

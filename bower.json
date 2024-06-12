@@ -1,9 +1,6 @@
 {
-  "name": "genymotion-webrtc-client",
-  "main": [
-    "dist/js/device-renderer.min.js",
-    "dist/css/device-renderer.min.css"
-  ],
-  "moduleType": "globals",
-  "version": "3.2.2"
+    "name": "genymotion-webrtc-client",
+    "main": ["dist/js/device-renderer.min.js", "dist/css/device-renderer.min.css"],
+    "moduleType": "globals",
+    "version": "3.2.2"
 }

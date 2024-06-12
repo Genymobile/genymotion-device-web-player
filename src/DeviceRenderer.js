@@ -90,9 +90,11 @@ module.exports = class DeviceRenderer {
         this.y = 0;
 
         this.clickHandlerCloseOverlay = (event) => {
-            if (event.target.closest('.gm-overlay') === null
-                && !event.target.classList.contains('gm-icon-button')
-                && !event.target.classList.contains('gm-dont-close')) {
+            if (
+                event.target.closest('.gm-overlay') === null &&
+                !event.target.classList.contains('gm-icon-button') &&
+                !event.target.classList.contains('gm-dont-close')
+            ) {
                 this.emit('close-overlays');
             }
         };
@@ -109,7 +111,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.fullscreen, class: Fullscreen},
             {enabled: this.options.clipboard, class: Clipboard, params: [this.options.i18n]},
             {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
-            {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies:[MediaManager]},
+            {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
             {enabled: this.options.gps, class: GPS, params: [this.options.i18n, this.options.gpsSpeedSupport]},
@@ -118,18 +120,23 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
             {enabled: this.options.mouse, class: MouseEvents},
-            {enabled: this.options.gamepad, class: Gamepad, params: [this.options.i18n], dependencies:[GamepadManager]},
+            {
+                enabled: this.options.gamepad,
+                class: Gamepad,
+                params: [this.options.i18n],
+                dependencies: [GamepadManager],
+            },
             {enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n]},
             {enabled: this.options.network, class: Network, params: [this.options.i18n]},
             {enabled: this.options.phone, class: Phone, params: [this.options.i18n]},
             {enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n, this.options.baseband]},
             {enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n]},
             {enabled: this.options.biometrics, class: FingerPrint},
-            {enabled: this.options.microphone, dependencies:[MediaManager]},
+            {enabled: this.options.microphone, dependencies: [MediaManager]},
             {
                 enabled: this.options.buttons,
                 class: ButtonsEvents,
-                params: [this.options.i18n, this.options.translateHomeKey]
+                params: [this.options.i18n, this.options.translateHomeKey],
             },
         ];
 
@@ -253,54 +260,54 @@ module.exports = class DeviceRenderer {
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
             switch (event.code) {
-            case 1000:
-            case 1001:
-            case 1005:
-                log.debug('Closing websocket');
-                this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
-                break;
+                case 1000:
+                case 1001:
+                case 1005:
+                    log.debug('Closing websocket');
+                    this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
+                    break;
 
-            case 1002:
-            case 1003:
-            case 1006:
-            case 1007:
-            case 1008:
-            case 1009:
-            case 1010:
-            case 1011:
-            case 1012:
-            case 1013:
-            case 1014:
-            case 1015: {
-                // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
-                this.dispatchEvent('closeConnectionUnavailable', {msg: 'Can\'t connect to the WebSocket'});
-                log.debug('Retrying in 3 seconds...');
+                case 1002:
+                case 1003:
+                case 1006:
+                case 1007:
+                case 1008:
+                case 1009:
+                case 1010:
+                case 1011:
+                case 1012:
+                case 1013:
+                case 1014:
+                case 1015: {
+                    // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
+                    this.dispatchEvent('closeConnectionUnavailable', {msg: "Can't connect to the WebSocket"});
+                    log.debug('Retrying in 3 seconds...');
 
-                const timeout = setTimeout(() => {
-                    this.openWebRTCConnection();
-                }, 3000);
-                this.timeoutCallbacks.push(timeout);
-                this.webRTCConnectionRetryCount++;
-                break;
-            }
-            case 4242: // wrong token provided
-                this.dispatchEvent('closeWrongToken', {msg: 'Wrong token, can\'t establish connection'});
-                break;
+                    const timeout = setTimeout(() => {
+                        this.openWebRTCConnection();
+                    }, 3000);
+                    this.timeoutCallbacks.push(timeout);
+                    this.webRTCConnectionRetryCount++;
+                    break;
+                }
+                case 4242: // wrong token provided
+                    this.dispatchEvent('closeWrongToken', {msg: "Wrong token, can't establish connection"});
+                    break;
 
-            case 4243: // token no longer valid
-                this.dispatchEvent('closeNoLongerValidToken', {
-                    msg: 'The token provided is no longer valid',
-                });
-                break;
+                case 4243: // token no longer valid
+                    this.dispatchEvent('closeNoLongerValidToken', {
+                        msg: 'The token provided is no longer valid',
+                    });
+                    break;
 
-            case 4244: // server is shutting down
-                this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
-                break;
+                case 4244: // server is shutting down
+                    this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
+                    break;
 
-            default:
-                this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
-                // Do nothing (for now)
-                break;
+                default:
+                    this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
+                    // Do nothing (for now)
+                    break;
             }
         };
     }
@@ -492,52 +499,59 @@ module.exports = class DeviceRenderer {
                 return;
             }
 
-            playWithSound.then(() => {
-                log.debug('Playing video with sound enabled');
-                this.dispatchEvent('video', {msg: 'play automatically allowed with sound'});
-            }).catch(() => {
-                log.debug('Can\'t play video with sound enabled');
-                this.dispatchEvent('video', {msg: 'play with sound denied'});
-                this.video.muted = true;
-                const playWithoutSound = this.video.play();
-                playWithoutSound.then(() => {
-                    log.debug('Playing video with sound disabled');
-                    this.dispatchEvent('video', {msg: 'play automatically allowed without sound'});
-                    const popup = document.createElement('div');
-                    popup.classList.add('gm-click-to-unmute');
-                    popup.innerHTML = this.options.i18n.UNMUTE_INVITE || 'By default, the sound has been turned off, '
-                        + 'please click anywhere to re-enable audio';
-                    this.videoWrapper.prepend(popup);
-                    const addSound = () => {
-                        this.video.muted = false;
-                        this.removeAddSoundListener();
-                        this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
-                        popup.remove();
-                        log.debug('Playing video with sound enabled has been authorized due to user click');
-                    };
-                    this.removeAddSoundListener = this.addListener(window, ['click', 'touchend'], addSound);
-                }).catch(() => {
-                    log.debug('Can\'t play video, even with sound disabled');
-                    this.dispatchEvent('video', {msg: 'play denied even without sound'});
-                    const div = document.createElement('div');
-                    this.classList.add('gm-click-to-display');
-                    this.classList.add('gm-video-overlay');
-                    this.videoWrapper.prepend(div);
-                    const allowPlay = () => {
-                        this.removeAllowPlayListener();
-                        this.video.play();
-                        div.remove();
-                        this.dispatchEvent('video', {msg: 'play manually allowed by click'});
-                        log.debug('Playing video with sound disabled has been authorized due to user click');
-                    };
-                    this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
+            playWithSound
+                .then(() => {
+                    log.debug('Playing video with sound enabled');
+                    this.dispatchEvent('video', {msg: 'play automatically allowed with sound'});
+                })
+                .catch(() => {
+                    log.debug("Can't play video with sound enabled");
+                    this.dispatchEvent('video', {msg: 'play with sound denied'});
+                    this.video.muted = true;
+                    const playWithoutSound = this.video.play();
+                    playWithoutSound
+                        .then(() => {
+                            log.debug('Playing video with sound disabled');
+                            this.dispatchEvent('video', {msg: 'play automatically allowed without sound'});
+                            const popup = document.createElement('div');
+                            popup.classList.add('gm-click-to-unmute');
+                            popup.innerHTML =
+                                this.options.i18n.UNMUTE_INVITE ||
+                                'By default, the sound has been turned off, ' +
+                                    'please click anywhere to re-enable audio';
+                            this.videoWrapper.prepend(popup);
+                            const addSound = () => {
+                                this.video.muted = false;
+                                this.removeAddSoundListener();
+                                this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
+                                popup.remove();
+                                log.debug('Playing video with sound enabled has been authorized due to user click');
+                            };
+                            this.removeAddSoundListener = this.addListener(window, ['click', 'touchend'], addSound);
+                        })
+                        .catch(() => {
+                            log.debug("Can't play video, even with sound disabled");
+                            this.dispatchEvent('video', {msg: 'play denied even without sound'});
+                            const div = document.createElement('div');
+                            this.classList.add('gm-click-to-display');
+                            this.classList.add('gm-video-overlay');
+                            this.videoWrapper.prepend(div);
+                            const allowPlay = () => {
+                                this.removeAllowPlayListener();
+                                this.video.play();
+                                div.remove();
+                                this.dispatchEvent('video', {msg: 'play manually allowed by click'});
+                                log.debug('Playing video with sound disabled has been authorized due to user click');
+                            };
+                            this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
+                        });
                 });
-            });
         };
 
         this.peerConnection.oniceconnectionstatechange = () => {
-            const iceConnectionState =
-                this.peerConnection ? this.peerConnection.iceConnectionState : 'No peerConnection';
+            const iceConnectionState = this.peerConnection
+                ? this.peerConnection.iceConnectionState
+                : 'No peerConnection';
             log.debug('iceConnectionState: ', iceConnectionState);
             this.dispatchEvent('iceConnectionState', {msg: iceConnectionState});
 
@@ -545,7 +559,8 @@ module.exports = class DeviceRenderer {
                 return;
             }
 
-            let message = '<div class="gm-error-text">Aw, snap!<br/>Connection failed.<p>Check your internet ' +
+            let message =
+                '<div class="gm-error-text">Aw, snap!<br/>Connection failed.<p>Check your internet ' +
                 'connection & firewall rules.{DOC_AVAILABLE}</p></div>';
             const div = document.createElement('div');
             div.classList.add('gm-overlay-cant-connect');
@@ -554,7 +569,7 @@ module.exports = class DeviceRenderer {
             if (this.options.connectionFailedURL) {
                 message = message.replace(
                     '{DOC_AVAILABLE}',
-                    '</br>See <a href="">help</a> to setup TURN configuration.'
+                    '</br>See <a href="">help</a> to setup TURN configuration.',
                 );
                 const openDocumentationLink = () => {
                     this.removeOpenDocListener();
@@ -653,7 +668,8 @@ module.exports = class DeviceRenderer {
                 (match, fmtpId, existingParams, lineEnding, offset, string) => {
                     const modified = existingParams ? `${fmtpId} ${existingParams};` : `${fmtpId} `;
                     return `${modified}stereo=1;maxplaybackrate=48000;maxaveragebitrate=256000${lineEnding}`;
-                });
+                },
+            );
         }
 
         this.peerConnection.setLocalDescription(description);
@@ -686,7 +702,7 @@ module.exports = class DeviceRenderer {
                 this.peerConnection.setRemoteDescription(
                     sdp,
                     this.onWebRTCConnectionEstablished.bind(this),
-                    this.onWebRTCConnectionError.bind(this)
+                    this.onWebRTCConnectionError.bind(this),
                 );
             } catch (error) {
                 log.warn('Failed to create SDP ', error.message);
@@ -776,73 +792,88 @@ module.exports = class DeviceRenderer {
                 }
             }
         } else if (data.type === 'CAPABILITIES') {
-            [{
-                widget: this.battery,
-                capability: data.message.battery,
-            }, {
-                widget: this.camera,
-                capability: data.message.camera,
-            }, {
-                widget: this.gps,
-                capability: data.message.gps,
-            }, {
-                widget: this.identifiers,
-                capability: data.message.identifiers,
-            }, {
-                widget: this.network,
-                capability: data.message.network,
-            }, {
-                widget: this.network,
-                capability: data.message.mobileThrottling,
-                enable: (widget) => {
-                    widget.enableMobileThrottling();
+            [
+                {
+                    widget: this.battery,
+                    capability: data.message.battery,
                 },
-                disable: (widget) => {
-                    widget.disableMobileThrottling();
+                {
+                    widget: this.camera,
+                    capability: data.message.camera,
                 },
-            }, {
-                widget: this.network,
-                capability: data.message.enable5G,
-                enable: (widget) => {
-                    widget.enable5G();
+                {
+                    widget: this.gps,
+                    capability: data.message.gps,
                 },
-                disable: (widget) => {
-                    widget.disable5G();
+                {
+                    widget: this.identifiers,
+                    capability: data.message.identifiers,
                 },
-            }, {
-                widget: this.phone,
-                capability: data.message.phone,
-            }, {
-                widget: this.baseband,
-                capability: data.message.phone,
-            }, {
-                widget: this.diskIO,
-                capability: data.message.diskIO,
-            }, {
-                widget: this.buttonsEvents,
-                capability: data.message.accelerometer,
-                enable: (widget) => {
-                    widget.enableRotation();
+                {
+                    widget: this.network,
+                    capability: data.message.network,
                 },
-                disable: (widget) => {
-                    widget.disableRotation();
+                {
+                    widget: this.network,
+                    capability: data.message.mobileThrottling,
+                    enable: (widget) => {
+                        widget.enableMobileThrottling();
+                    },
+                    disable: (widget) => {
+                        widget.disableMobileThrottling();
+                    },
                 },
-            }, {
-                widget: this.fileUpload,
-                capability: data.message.systemPatcher,
-                enable: (widget) => {
-                    widget.setAvailability(true);
+                {
+                    widget: this.network,
+                    capability: data.message.enable5G,
+                    enable: (widget) => {
+                        widget.enable5G();
+                    },
+                    disable: (widget) => {
+                        widget.disable5G();
+                    },
                 },
-                disable: (widget) => {
-                    widget.setAvailability(false);
+                {
+                    widget: this.phone,
+                    capability: data.message.phone,
                 },
-            }, {
-                widget: this.fingerprint,
-                capability: data.message.biometrics,
-            }, {
-                widget: this.gamepad,
-                capability: data.message.gamepad,
-            }].forEach((feature) => {
+                {
+                    widget: this.baseband,
+                    capability: data.message.phone,
+                },
+                {
+                    widget: this.diskIO,
+                    capability: data.message.diskIO,
+                },
+                {
+                    widget: this.buttonsEvents,
+                    capability: data.message.accelerometer,
+                    enable: (widget) => {
+                        widget.enableRotation();
+                    },
+                    disable: (widget) => {
+                        widget.disableRotation();
+                    },
+                },
+                {
+                    widget: this.fileUpload,
+                    capability: data.message.systemPatcher,
+                    enable: (widget) => {
+                        widget.setAvailability(true);
+                    },
+                    disable: (widget) => {
+                        widget.setAvailability(false);
+                    },
+                },
+                {
+                    widget: this.fingerprint,
+                    capability: data.message.biometrics,
+                },
+                {
+                    widget: this.gamepad,
+                    capability: data.message.gamepad,
+                },
+            ].forEach((feature) => {
                 if (typeof feature.widget !== 'undefined') {
                     if (feature.capability === true) {
                         if (feature.enable) {
@@ -878,7 +909,7 @@ module.exports = class DeviceRenderer {
      * @return {function} A removeListener function. This must be saved on the caller side if you ever want to use it to remove the listener
      */
     addListener(object, events, handler, options = {}) {
-        const eventArray = Array.isArray(events)?events:[events];
+        const eventArray = Array.isArray(events) ? events : [events];
         const id = generateUID();
         eventArray.forEach((event) => {
             object.addEventListener(event, handler, options);

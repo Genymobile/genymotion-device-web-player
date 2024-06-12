@@ -54,12 +54,12 @@ const defaultOptions = {
             'stun:stun-na.genymotion.com:80',
             'stun:stun-na.genymotion.com:443',
             'stun:stun-na.genymotion.com:3478',
-            'stun:stun-na.genymotion.com:5349'
+            'stun:stun-na.genymotion.com:5349',
         ],
     },
     connectionFailedURL: '',
     turn: {},
-    giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions'
+    giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions',
 };
 
 /**
@@ -195,12 +195,11 @@ module.exports = class DeviceRendererFactory {
          * Load instance dedicated plugins
          */
 
-        const pluginInitMap = [
-        ];
+        const pluginInitMap = [];
 
         if (typeof instance.getPlugins === 'function') {
             const plugins = instance.getPlugins();
-            if (Array.isArray(plugins)){
+            if (Array.isArray(plugins)) {
                 pluginInitMap.push(...plugins);
             }
         }

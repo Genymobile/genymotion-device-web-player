@@ -99,14 +99,18 @@ module.exports = class Identifiers extends OverlayPlugin {
 
         // Build field list
         const android = this.generateInput(
-            'android', 'Android ID', '',
+            'android',
+            'Android ID',
+            '',
             this.generateRandomAndroidId.bind(this),
-            this.validateAndroidId.bind(this)
+            this.validateAndroidId.bind(this),
         );
         const device = this.generateInput(
-            'device', 'Device ID', '(IMEI/MEID)',
+            'device',
+            'Device ID',
+            '(IMEI/MEID)',
             this.generateRandomDeviceId.bind(this),
-            this.validateDeviceId.bind(this)
+            this.validateDeviceId.bind(this),
         );
         inputs.appendChild(android);
         inputs.appendChild(device);
@@ -165,18 +169,16 @@ module.exports = class Identifiers extends OverlayPlugin {
 
         if (androidId && this.androidInput.checkValidity()) {
             const json = {
-                channel : 'framework' , messages : [
-                    'set parameter android_id:' + androidId
-                ]
+                channel: 'framework',
+                messages: ['set parameter android_id:' + androidId],
             };
             this.instance.sendEvent(json);
         }
 
         if (deviceId && this.deviceInput.checkValidity()) {
             const json = {
-                channel : 'settings' , messages : [
-                    'set parameter device_id:' + deviceId
-                ]
+                channel: 'settings',
+                messages: ['set parameter device_id:' + deviceId],
             };
             this.instance.sendEvent(json);
         }
@@ -265,10 +267,10 @@ module.exports = class Identifiers extends OverlayPlugin {
         // Some customization
         if (type === 'device') {
             input.maxLength = 15;
-            input.pattern = '['+HEX+']{14,15}';
+            input.pattern = '[' + HEX + ']{14,15}';
         } else if (type === 'android') {
             input.maxLength = 16;
-            input.pattern = '['+HEX+']{16}';
+            input.pattern = '[' + HEX + ']{16}';
         }
 
         button.className = 'gm-identifier-' + type + '-generate';
@@ -277,12 +279,7 @@ module.exports = class Identifiers extends OverlayPlugin {
         inputWrap.appendChild(button);
 
         field.className = 'gm-identifier-' + type;
-        field.innerHTML = '<label>'
-            + label
-            + '<i class="gm-description">'
-            + description
-            + '</i>'
-            + '</label>';
+        field.innerHTML = '<label>' + label + '<i class="gm-description">' + description + '</i>' + '</label>';
         field.appendChild(inputWrap);
 
         this[type + 'Input'] = input;

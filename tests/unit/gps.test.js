@@ -27,22 +27,26 @@ describe('GPS Plugin', () => {
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
-            gps = new GPS(instance, {
-                GPS_TITLE: 'TEST GPS PLUGIN TITLE',
-                GPS_CANCEL: 'TEST GPS PLUGIN CANCEL',
-                GPS_CAPTURE: 'TEST GPS PLUGIN CAPTURE',
-                GPS_LATITUDE: 'TEST GPS PLUGIN LATITUDE',
-                GPS_LONGITUDE: 'TEST GPS PLUGIN LONGITUDE',
-                GPS_ALTITUDE: 'TEST GPS PLUGIN ALTITUDE',
-                GPS_ACCURACY: 'TEST GPS PLUGIN ACCURACY',
-                GPS_BEARING: 'TEST GPS PLUGIN BEARING',
-                GPS_SPEED: 'TEST GPS PLUGIN SPEED',
-                GPS_MAP: 'TEST GPS PLUGIN MAP',
-                GPS_GEOLOC: 'TEST GPS PLUGIN GEOLOC',
-                GPS_SUBMIT: 'TEST GPS PLUGIN SUBMIT',
-                GPS_GEOLOC_TOOLTIP: 'TEST GPS PLUGIN GEOLOC TOOLTIP',
-                GPS_NOGEOLOC_TOOLTIP: 'TEST GPS PLUGIN NOGEOLOC TOOLTIP'
-            }, true);
+            gps = new GPS(
+                instance,
+                {
+                    GPS_TITLE: 'TEST GPS PLUGIN TITLE',
+                    GPS_CANCEL: 'TEST GPS PLUGIN CANCEL',
+                    GPS_CAPTURE: 'TEST GPS PLUGIN CAPTURE',
+                    GPS_LATITUDE: 'TEST GPS PLUGIN LATITUDE',
+                    GPS_LONGITUDE: 'TEST GPS PLUGIN LONGITUDE',
+                    GPS_ALTITUDE: 'TEST GPS PLUGIN ALTITUDE',
+                    GPS_ACCURACY: 'TEST GPS PLUGIN ACCURACY',
+                    GPS_BEARING: 'TEST GPS PLUGIN BEARING',
+                    GPS_SPEED: 'TEST GPS PLUGIN SPEED',
+                    GPS_MAP: 'TEST GPS PLUGIN MAP',
+                    GPS_GEOLOC: 'TEST GPS PLUGIN GEOLOC',
+                    GPS_SUBMIT: 'TEST GPS PLUGIN SUBMIT',
+                    GPS_GEOLOC_TOOLTIP: 'TEST GPS PLUGIN GEOLOC TOOLTIP',
+                    GPS_NOGEOLOC_TOOLTIP: 'TEST GPS PLUGIN NOGEOLOC TOOLTIP',
+                },
+                true,
+            );
             controls = document.getElementsByClassName('gm-gps-controls')[0];
             map = document.getElementsByClassName('gm-gps-mapview')[0];
         });
@@ -54,7 +58,7 @@ describe('GPS Plugin', () => {
         });
 
         test('has an active map button when gmaps lib is setup', () => {
-            window.google = {maps:{ElevationService:jest.fn()}};
+            window.google = {maps: {ElevationService: jest.fn()}};
             instance = new Instance();
             gps = new GPS(instance, {});
             expect(document.getElementsByClassName('map')[0].disabled).toBeFalsy();
@@ -282,14 +286,15 @@ describe('GPS Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'gps', messages: [
+                channel: 'gps',
+                messages: [
                     'set altitude 0',
                     'set longitude 0',
                     'set latitude 0',
                     'set accuracy 0',
                     'set bearing 0',
                     'set speed 0',
-                    'enable'
+                    'enable',
                 ],
             });
         });
@@ -305,14 +310,15 @@ describe('GPS Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'gps', messages: [
+                channel: 'gps',
+                messages: [
                     'set altitude -10000',
                     'set longitude -180',
                     'set latitude -90',
                     'set accuracy 0',
                     'set bearing 0',
                     'set speed 0',
-                    'enable'
+                    'enable',
                 ],
             });
         });
@@ -328,14 +334,15 @@ describe('GPS Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'gps', messages: [
+                channel: 'gps',
+                messages: [
                     'set altitude 10000',
                     'set longitude 180',
                     'set latitude 90',
                     'set accuracy 200',
                     'set bearing 360',
                     'set speed 399.99',
-                    'enable'
+                    'enable',
                 ],
             });
         });
@@ -351,14 +358,15 @@ describe('GPS Plugin', () => {
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'gps', messages: [
+                channel: 'gps',
+                messages: [
                     'set altitude 420',
                     'set longitude 3.14',
                     'set latitude 69',
                     'set accuracy 42',
                     'set bearing 13',
                     'set speed 399',
-                    'enable'
+                    'enable',
                 ],
             });
         });

@@ -8,10 +8,10 @@ helping you finalize your pull requests.
 
 ## Ground Rules
 
-- Be welcoming to newcomers and encourage diverse new contributors from all backgrounds. See our [Code of Conduct](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CODE_OF_CONDUCT.md).
-- Each pull request should implement **ONE** feature or bugfix. If you want to add or fix more than one thing, submit more than one pull request.
-- Do not commit changes to files that are irrelevant to your feature or bugfix.
-- Do not add unnecessary dependencies.
+-   Be welcoming to newcomers and encourage diverse new contributors from all backgrounds. See our [Code of Conduct](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CODE_OF_CONDUCT.md).
+-   Each pull request should implement **ONE** feature or bugfix. If you want to add or fix more than one thing, submit more than one pull request.
+-   Do not commit changes to files that are irrelevant to your feature or bugfix.
+-   Do not add unnecessary dependencies.
 
 ## Getting started
 
@@ -24,7 +24,7 @@ request. It's not mandatory at all, but feel free to open an issue to present yo
 
 To start working on the Genymotion device web player, all you need if an HTML page to instanciate a player from your
 local copy of this repository.
-Build the player in dev mode: 
+Build the player in dev mode:
 
 ```sh
 yarn build:dev
@@ -33,7 +33,7 @@ yarn build:dev
 And import your local file directly
 
 ```html
-<link rel="stylesheet" href="file:///[...]/genymotion-device-web-player/dist/css/gm-player.min.css">
+<link rel="stylesheet" href="file:///[...]/genymotion-device-web-player/dist/css/gm-player.min.css" />
 <script src="file:///[...]/genymotion-device-web-player/dist/js/gm-player.min.js"></script>
 ```
 

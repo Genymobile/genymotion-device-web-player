@@ -44,11 +44,13 @@ module.exports = function templateCollector(options) {
         },
         function flush(done) {
             const templateBlob = JSON.stringify(templates);
-            this.push(new File({
-                path: options.file,
-                contents: Buffer.from(templateBlob),
-            }));
+            this.push(
+                new File({
+                    path: options.file,
+                    contents: Buffer.from(templateBlob),
+                }),
+            );
             done();
-        }
+        },
     );
 };

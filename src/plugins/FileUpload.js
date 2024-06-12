@@ -41,24 +41,25 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         if (window.Worker) {
             let fileUploaderWorker = require('../worker/FileUploaderWorker');
-            fileUploaderWorker = fileUploaderWorker.toString()
+            fileUploaderWorker = fileUploaderWorker
+                .toString()
                 .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
             const src = new Blob([fileUploaderWorker], {type: 'application/javascript'});
             this.loaderWorker = new Worker(URL.createObjectURL(src));
             this.loaderWorker.onmessage = (event) => {
                 const msg = event.data;
                 switch (msg.code) {
-                case 'SUCCESS':
-                    this.onUploadSuccess();
-                    break;
-                case 'FAIL':
-                    this.onUploadFailure();
-                    break;
-                case 'PROGRESS':
-                    this.setUploadProgress(msg.value);
-                    break;
-                default:
-                    break;
+                    case 'SUCCESS':
+                        this.onUploadSuccess();
+                        break;
+                    case 'FAIL':
+                        this.onUploadFailure();
+                        break;
+                    case 'PROGRESS':
+                        this.setUploadProgress(msg.value);
+                        break;
+                    default:
+                        break;
                 }
             };
         }
@@ -96,7 +97,8 @@ module.exports = class FileUpload extends OverlayPlugin {
         // Listen for events
         this.instance.registerEventCallback('SYSTEM_PATCHER_STATUS', this.onSystemPatcherStatusEvent.bind(this));
         this.instance.registerEventCallback(
-            'SYSTEM_PATCHER_LAST_RESULT', this.onSystemPatcherLastResultEvent.bind(this)
+            'SYSTEM_PATCHER_LAST_RESULT',
+            this.onSystemPatcherLastResultEvent.bind(this),
         );
 
         /*
@@ -177,9 +179,8 @@ module.exports = class FileUpload extends OverlayPlugin {
             // Force refresh upload screen content. Otherwise, installing status may not appear.
             if (this.currentStep === 'uploadScreen') {
                 const json = {
-                    channel: 'systempatcher', messages: [
-                        'notify status'
-                    ]
+                    channel: 'systempatcher',
+                    messages: ['notify status'],
                 };
                 this.instance.sendEvent(json);
             }
@@ -262,23 +263,22 @@ module.exports = class FileUpload extends OverlayPlugin {
         const progressPercent = document.getElementsByClassName('gm-upload-in-progress-percent')[0];
         const data = message.split(' ');
 
-        if (data[0] === 'downloading' && data.length >= 3 && textProgressPercent &&
-            textProgress && progressPercent) {
+        if (data[0] === 'downloading' && data.length >= 3 && textProgressPercent && textProgress && progressPercent) {
             const bytesDone = parseInt(data[1]);
             const totalBytes = parseInt(data[2]);
             if (totalBytes === 0 || Number.isNaN(totalBytes)) {
                 return;
             }
 
-            const percent = Math.round(100 * bytesDone / totalBytes);
+            const percent = Math.round((100 * bytesDone) / totalBytes);
             textProgressPercent.innerHTML = percent + '%';
             progressPercent.style.width = percent + '%';
 
             // Convert in Mb
             const Mb = 1024 * 1024;
-            const mbDone = Math.round(10 * bytesDone / Mb) / 10;
-            const totalMb = Math.round(10 * totalBytes / Mb) / 10;
-            const msg = 'Downloading '+ mbDone +' Mb/' + totalMb +' Mb';
+            const mbDone = Math.round((10 * bytesDone) / Mb) / 10;
+            const totalMb = Math.round((10 * totalBytes) / Mb) / 10;
+            const msg = 'Downloading ' + mbDone + ' Mb/' + totalMb + ' Mb';
             textProgress.innerHTML = msg;
         } else if (data[0] === 'installing' && textProgress) {
             textProgress.innerHTML = this.i18n.UPLOADER_INSTALLING || 'Installing...';
@@ -292,9 +292,8 @@ module.exports = class FileUpload extends OverlayPlugin {
             }
 
             const json = {
-                channel: 'systempatcher', messages: [
-                    'notify last_result'
-                ]
+                channel: 'systempatcher',
+                messages: ['notify last_result'],
             };
             this.instance.sendEvent(json);
         }
@@ -307,27 +306,27 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     onSystemPatcherLastResultEvent(message) {
         switch (message) {
-        case 'success':
-            this.displayStep('successScreen');
-            // On flashing success, force display success screen
-            if (this.flashing && this.widget.classList.contains('gm-hidden')) {
-                this.toggleWidget();
-            }
-            this.flashing = false;
-            break;
-        case 'unavailable':
-        case 'network_error':
-        case 'corrupted_archive':
-        case 'install_error':
-            this.displayStep('errorScreen');
-            // On flashing error, force display errorscreen
-            if (this.flashing && this.widget.classList.contains('gm-hidden')) {
-                this.toggleWidget();
-            }
-            this.flashing = false;
-            break;
-        default:
-            break;
+            case 'success':
+                this.displayStep('successScreen');
+                // On flashing success, force display success screen
+                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                    this.toggleWidget();
+                }
+                this.flashing = false;
+                break;
+            case 'unavailable':
+            case 'network_error':
+            case 'corrupted_archive':
+            case 'install_error':
+                this.displayStep('errorScreen');
+                // On flashing error, force display errorscreen
+                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                    this.toggleWidget();
+                }
+                this.flashing = false;
+                break;
+            default:
+                break;
         }
     }
 
@@ -429,12 +428,14 @@ module.exports = class FileUpload extends OverlayPlugin {
         headerHomeContent.appendChild(this.createIconDiv('gm-upload-main-img'));
 
         // Define small text zone on home view
-        headerHomeContent.appendChild(this.createTextDiv(
-            'gm-upload-main-txt',
-            '<p>You can install Open GApps, or upload a file: APK files will be installed, ' +
-            'flashable archives will be flashed, and other files types will be pushed ' +
-            'to the /sdcard/download folder on the device.</p>'
-        ));
+        headerHomeContent.appendChild(
+            this.createTextDiv(
+                'gm-upload-main-txt',
+                '<p>You can install Open GApps, or upload a file: APK files will be installed, ' +
+                    'flashable archives will be flashed, and other files types will be pushed ' +
+                    'to the /sdcard/download folder on the device.</p>',
+            ),
+        );
 
         // Slit in header and bottom part
         homeContent.appendChild(headerHomeContent);
@@ -456,16 +457,21 @@ module.exports = class FileUpload extends OverlayPlugin {
         const bottomButtonsContainer = document.createElement('div');
         bottomButtonsContainer.className = 'gm-upload-main-bottom-buttons';
 
-        const buttons = this.createButtonsGroup('Install Open GApps', (event) => {
-            event.preventDefault();
+        const buttons = this.createButtonsGroup(
+            'Install Open GApps',
+            (event) => {
+                event.preventDefault();
 
-            if (this.opengappsInstalled === false && this.capabilityAvailable) {
-                this.displayStep('disclaimerScreen');
-            }
-        }, 'Browse', (event) => {
-            event.preventDefault();
-            this.uploader.click();
-        });
+                if (this.opengappsInstalled === false && this.capabilityAvailable) {
+                    this.displayStep('disclaimerScreen');
+                }
+            },
+            'Browse',
+            (event) => {
+                event.preventDefault();
+                this.uploader.click();
+            },
+        );
 
         this.installButton = buttons[LEFT];
         this.updateOpenGAppsStatus(this.opengappsInstalled);
@@ -496,8 +502,8 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         if (!this.capabilityAvailable) {
             this.installButton.className =
-                'gm-upload-main-bottom-buttons-left gm-dont-close gm-uploader-install-opengapps '
-                + 'gm-upload-main-bottom-buttons-disabled';
+                'gm-upload-main-bottom-buttons-left gm-dont-close gm-uploader-install-opengapps ' +
+                'gm-upload-main-bottom-buttons-disabled';
             this.installButton.innerHTML = 'Install Open GApps';
             this.installButton.title = 'Open GApps are not available for this virtual device';
             return;
@@ -505,8 +511,8 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         if (installed) {
             this.installButton.className =
-                'gm-upload-main-bottom-buttons-left gm-dont-close gm-uploader-install-opengapps '
-                + 'gm-upload-main-bottom-buttons-disabled';
+                'gm-upload-main-bottom-buttons-left gm-dont-close gm-uploader-install-opengapps ' +
+                'gm-upload-main-bottom-buttons-disabled';
             this.installButton.innerHTML = 'Open GApps installed';
             this.installButton.title = 'Open GApps are already installed';
         } else {
@@ -530,7 +536,10 @@ module.exports = class FileUpload extends OverlayPlugin {
         headerHomeContent.className = 'gm-upload-disclaimer';
 
         // Define small text zone on home view
-        headerHomeContent.appendChild(this.createTextDiv('gm-upload-disclaimer-txt', '<p>PLEASE NOTE<br/>\
+        headerHomeContent.appendChild(
+            this.createTextDiv(
+                'gm-upload-disclaimer-txt',
+                '<p>PLEASE NOTE<br/>\
         GENYMOBILE INC., ASSUMES NO LIABILITY WHATSOEVER RESULTING FROM THE DOWNLOAD,\
         INSTALL AND USE OF GOOGLE PLAY SERVICES WITHIN YOUR VIRTUAL DEVICES. YOU ARE\
         SOLELY RESPONSIBLE FOR THE USE AND ASSUME ALL LIABILITY RELATED THERETO.\
@@ -545,7 +554,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         FROM ANY LIABILITY RELATED THERETO. YOU AGREE TO DEFEND, INDEMNIFY AND HOLD HARMLESS\
         GENYMOBILE INC. FOR ANY CLAIMS OR COSTS RELATED TO YOUR USE OR DOWNLOAD OF THE GOOGLE\
         PLAY SERVICES.\
-            </p>'));
+            </p>',
+            ),
+        );
 
         // Slit in header and bottom part
         homeContent.appendChild(headerHomeContent);
@@ -554,21 +565,25 @@ module.exports = class FileUpload extends OverlayPlugin {
         const bottomButtonsContainer = document.createElement('div');
         bottomButtonsContainer.className = 'gm-upload-main-bottom-buttons';
 
-        const buttons = this.createButtonsGroup('Back', (event) => {
-            event.preventDefault();
-            this.flashing = false;
-            this.displayStep('homeScreen');
-        }, 'Install', (event) => {
-            event.preventDefault();
-            this.flashing = true;
-            const json = {
-                channel: 'systempatcher', messages: [
-                    'install opengapps'
-                ]
-            };
-            this.instance.sendEvent(json);
-            this.displayStep('uploadScreen');
-        });
+        const buttons = this.createButtonsGroup(
+            'Back',
+            (event) => {
+                event.preventDefault();
+                this.flashing = false;
+                this.displayStep('homeScreen');
+            },
+            'Install',
+            (event) => {
+                event.preventDefault();
+                this.flashing = true;
+                const json = {
+                    channel: 'systempatcher',
+                    messages: ['install opengapps'],
+                };
+                this.instance.sendEvent(json);
+                this.displayStep('uploadScreen');
+            },
+        );
 
         bottomButtonsContainer.appendChild(buttons[LEFT]);
         bottomButtonsContainer.appendChild(buttons[RIGHT]);
@@ -616,9 +631,8 @@ module.exports = class FileUpload extends OverlayPlugin {
         const buttons = this.createButtonsGroup(null, null, 'Cancel', (event) => {
             event.preventDefault();
             const json = {
-                channel: 'systempatcher', messages: [
-                    'cancel'
-                ]
+                channel: 'systempatcher',
+                messages: ['cancel'],
             };
             this.instance.sendEvent(json);
             this.displayStep('disclaimerScreen');
@@ -653,23 +667,27 @@ module.exports = class FileUpload extends OverlayPlugin {
         headerHomeContent.appendChild(this.createTextDiv('gm-upload-success-caption', 'Congratulation!'));
 
         // Define small text zone on home view
-        headerHomeContent.appendChild(this.createTextDiv(
-            'gm-upload-success-txt', '<p>Open GApps have been successfully \
+        headerHomeContent.appendChild(
+            this.createTextDiv(
+                'gm-upload-success-txt',
+                '<p>Open GApps have been successfully \
             installed on the virtual device.<br/>Please restart the virtual device to complete the installation.<br/>\
-            You will be redirected to the Open GApps website.</p>'
-        ));
+            You will be redirected to the Open GApps website.</p>',
+            ),
+        );
 
         // Reboot button
-        headerHomeContent.appendChild(this.createButton('gm-upload-success-button', 'Reboot device', (event) => {
-            event.preventDefault();
-            const json = {
-                channel: 'systempatcher', messages: [
-                    'reboot'
-                ]
-            };
-            this.instance.sendEvent(json);
-            this.toggleWidget();
-        }));
+        headerHomeContent.appendChild(
+            this.createButton('gm-upload-success-button', 'Reboot device', (event) => {
+                event.preventDefault();
+                const json = {
+                    channel: 'systempatcher',
+                    messages: ['reboot'],
+                };
+                this.instance.sendEvent(json);
+                this.toggleWidget();
+            }),
+        );
 
         // Slit in header and bottom part
         homeContent.appendChild(headerHomeContent);
@@ -702,7 +720,7 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         return {
             body: homeContent,
-            title: this.i18n.UPLOADER_FAILURE || 'We\'ve got a problem…',
+            title: this.i18n.UPLOADER_FAILURE || "We've got a problem…",
         };
     }
 
@@ -720,13 +738,17 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         if (leftText) {
             buttons[LEFT] = this.createButton(
-                'gm-upload-main-bottom-buttons-left gm-dont-close', leftText, leftCallback
+                'gm-upload-main-bottom-buttons-left gm-dont-close',
+                leftText,
+                leftCallback,
             );
         }
 
         if (rightText) {
             buttons[RIGHT] = this.createButton(
-                'gm-upload-main-bottom-buttons-right gm-dont-close', rightText, rightCallback
+                'gm-upload-main-bottom-buttons-right gm-dont-close',
+                rightText,
+                rightCallback,
             );
         }
 

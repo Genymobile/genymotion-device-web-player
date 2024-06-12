@@ -32,7 +32,7 @@ describe('IOThrottling Plugin', () => {
                 IOTHROTTLING_READ_BYTERATE_EXAMPLE: 'TEST IOTHROTTLING PLUGIN READ BYTERATE EXAMPLE',
                 IOTHROTTLING_BYTERATE_UNIT: 'TEST IOTHROTTLING PLUGIN BYTERATE UNIT',
                 IOTHROTTLING_UPDATE: 'TEST IOTHROTTLING PLUGIN UPDATE BUTTON',
-                IOTHROTTLING_CLEAR_CACHE: 'TEST IOTHROTTLING PLUGIN CLEAR CACHE BUTTON'
+                IOTHROTTLING_CLEAR_CACHE: 'TEST IOTHROTTLING PLUGIN CLEAR CACHE BUTTON',
             });
             plugin = document.getElementsByClassName('gm-iothrottling-plugin')[0];
         });
@@ -120,10 +120,8 @@ describe('IOThrottling Plugin', () => {
                 diskio.submitBtn.click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(1);
                 expect(instance.outgoingMessages[0]).toEqual({
-                    channel: 'diskio', messages: [
-                        'set readbyterate ' + profile.readByteRate * 1024 * 1024,
-                        'clearcache'
-                    ]
+                    channel: 'diskio',
+                    messages: ['set readbyterate ' + profile.readByteRate * 1024 * 1024, 'clearcache'],
                 });
             });
 
@@ -135,10 +133,8 @@ describe('IOThrottling Plugin', () => {
             diskio.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'diskio', messages: [
-                    'set readbyterate ' + 69 * 1024 * 1024,
-                    'clearcache'
-                ]
+                channel: 'diskio',
+                messages: ['set readbyterate ' + 69 * 1024 * 1024, 'clearcache'],
             });
         });
 
@@ -148,7 +144,8 @@ describe('IOThrottling Plugin', () => {
             diskio.clearCacheBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
-                channel: 'diskio', messages: ['clearcache']
+                channel: 'diskio',
+                messages: ['clearcache'],
             });
         });
     });

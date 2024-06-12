@@ -68,7 +68,7 @@ module.exports = class Screencast extends OverlayPlugin {
             'video/3gpp2': '.3g2',
             'video/mp4': '.mp4',
             'video/x-matroska': '.mkv',
-            'video/x-flv': '.f4v'
+            'video/x-flv': '.f4v',
         };
 
         let extension = types[mime.toLowerCase()];
@@ -155,8 +155,7 @@ module.exports = class Screencast extends OverlayPlugin {
             'video/3gpp',
             'video/3gpp2',
             'video/mp4',
-            'video/x-flv'
-
+            'video/x-flv',
         ].forEach((mimeType) => {
             if (MediaRecorder.isTypeSupported(mimeType)) {
                 supportedMimeTypes.push(mimeType);
@@ -336,8 +335,7 @@ module.exports = class Screencast extends OverlayPlugin {
 
         // Render into the canvas the current state of video
         if (ctx && video instanceof HTMLVideoElement) {
-            ctx.drawImage(video, 0, 0, video.videoWidth,
-                video.videoHeight, 0, 0, video.videoWidth, video.videoHeight);
+            ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, video.videoWidth, video.videoHeight);
         } else {
             return;
         }

@@ -23,12 +23,12 @@ module.exports = class DeviceRenderer extends Original {
 
         window.adapter = {
             browserDetails: {
-                browser: 'test'
-            }
+                browser: 'test',
+            },
         };
 
         navigator.mediaDevices = {
-            getUserMedia: jest.fn().mockReturnValue(Promise.resolve(null))
+            getUserMedia: jest.fn().mockReturnValue(Promise.resolve(null)),
         };
 
         super(document.body, options || {});
@@ -53,22 +53,16 @@ module.exports = class DeviceRenderer extends Original {
     /**
      * Add a local stream and send it through SDP renegotiation.
      */
-    addLocalStream() {
-
-    }
+    addLocalStream() {}
 
     /**
      * Remove a local stream and stop sending it through SDP renegotiation.
      */
-    removeLocalStream() {
-
-    }
+    removeLocalStream() {}
 
     /**
      * Reconfigure & setup the peer-to-peer connection (SDP).
      * Can be used anytime to renegotiate the SDP if necessary.
      */
-    renegotiateWebRTCConnection() {
-
-    }
+    renegotiateWebRTCConnection() {}
 };

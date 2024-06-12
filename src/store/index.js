@@ -21,7 +21,7 @@ const createStore = (instance, reducer, state) => {
         const uid = generateUID();
         listeners.push({
             uid,
-            cb: () => listener(getState())
+            cb: () => listener(getState()),
         });
 
         const unsubscribe = () => {
@@ -39,10 +39,10 @@ const createStore = (instance, reducer, state) => {
 
 const reducer = (state, action) => {
     switch (action.type) {
-    case 'WEBRTC_CONNECTION_READY':
-        return {...state, isWebRTCConnectionReady: action.payload};
-    default:
-        return state;
+        case 'WEBRTC_CONNECTION_READY':
+            return {...state, isWebRTCConnectionReady: action.payload};
+        default:
+            return state;
     }
 };
 
@@ -51,4 +51,3 @@ const store = (instance) => {
 };
 
 module.exports = store;
-

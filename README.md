@@ -101,7 +101,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     };
 
     // Device renderer instanciation
-    const {DeviceRendererFactory} = window.index;
+    const {DeviceRendererFactory} = window.genyDeviceWebPlayer;
     const deviceRendererFactory = new DeviceRendererFactory();
     const rendererAPI = deviceRendererFactory.setupRenderer(
         container, // the container element or element ID to use

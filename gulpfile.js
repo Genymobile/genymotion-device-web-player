@@ -72,12 +72,12 @@ function getTemplatesStream() {
 }
 
 // Clean dist dir
-gulp.task('clean', function (cb) {
-    del([PATHS.DEST.BASE]).then(
-        function () {
+gulp.task('clean', function(cb) {
+    del([PATHS.DEST.BASE + ' --force']).then(
+        function() {
             cb();
         },
-        function (err) {
+        function(err) {
             cb(err);
         },
     );
@@ -134,7 +134,7 @@ function getBundler() {
 function setupBrowserify() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
-        standalone: 'index',
+        standalone: 'genyDeviceWebPlayer',
         debug: true,
     }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }

@@ -103,7 +103,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     // Device renderer instanciation
     const {DeviceRendererFactory} = window.index;
     const deviceRendererFactory = new DeviceRendererFactory();
-    const renderer = deviceRendererFactory.setupRenderer(
+    const rendererAPI = deviceRendererFactory.setupRenderer(
         container, // the container element or element ID to use
         webrtcAddress, // the websocket address of your instance connector
         options, // options object to enable or disable features
@@ -111,9 +111,39 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
     // Disconnect the device renderer, closing any open data channels.
     window.addEventListener('beforeunload', function () {
-        renderer.disconnect();
+        playerAPI.disconnect();
     });
 </script>
+```
+
+## Player API
+
+Plugin options and websocket communication can be handled through the API object returned by the `setupRenderer` function.
+
+Built-in exposed functions are
+
+### `getRegisteredFunctions`
+
+which returns the list of available functions with an optional description
+
+### `disconnect`
+
+which disconnects the player from the VM and cleanups the memory listener
+
+### `addEventListener`
+
+used to listen to messages emitted from the VM such as 'fingerprint', 'gps', 'BATTERY_LEVEL'
+
+```html
+addEventListener('fingerprint', (msg)=>{ console.log(msg) })
+```
+
+### `sendData`
+
+used to send messages to the VM.
+
+```html
+sendData({ channel: 'battery', messages: ['set state level 10', 'set state status true'], })
 ```
 
 ## Features & options

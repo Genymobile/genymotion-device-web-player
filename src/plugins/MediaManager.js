@@ -31,6 +31,16 @@ module.exports = class MediaManager {
         this.videoWidth = videoWidth;
         this.videoHeight = videoHeight;
         this.videoWithMicrophone = videoWithMicrophone;
+
+        // register mute/unmute to exposed API
+        this.instance.apiManager.registerFunction('mute', () => {
+            this.instance.video.isMuted = true;
+            this.instance.video.muted = true;
+        });
+        this.instance.apiManager.registerFunction('unmute', () => {
+            this.instance.video.isMuted = false;
+            this.instance.video.muted = false;
+        });
     }
 
     /**

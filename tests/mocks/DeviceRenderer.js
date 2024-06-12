@@ -39,6 +39,9 @@ module.exports = class DeviceRenderer extends Original {
             },
             subscribe: jest.fn(),
         };
+        this.apiManager = {
+            registerFunction: jest.fn(),
+        };
     }
 
     /**

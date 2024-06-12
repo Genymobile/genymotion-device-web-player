@@ -4,6 +4,7 @@ const DeviceRenderer = require('./DeviceRenderer');
 const defaultsDeep = require('lodash/defaultsDeep');
 
 const store = require('./store');
+const APIManager = require('./APIManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -118,7 +119,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.turn.default           Whether or not we should use the TURN servers by default. Default: false.
      * @param  {string}             options.giveFeedbackLink       URL to the feedback form. Default: 'https://github.com/orgs/Genymobile/discussions'
      * @param  {Object}             RendererClass                  Class to be instanciated. Defaults to DeviceRenderer.
-     * @return {DeviceRenderer}                                    The device renderer instance.
+     * @return {Array}                                             An array of API for device renderer instance, see return of APIManager.getExposedApiFunctions.
      */
     setupRenderer(dom, webRTCUrl, options, RendererClass = DeviceRenderer) {
         if (typeof dom === 'string') {
@@ -144,12 +145,14 @@ module.exports = class DeviceRendererFactory {
         const instance = new RendererClass(dom, options);
         store(instance);
 
+        instance.apiManager = new APIManager(instance);
+
         this.instances.push(instance);
 
         this.addPlugins(instance);
         instance.onWebRTCReady();
 
-        return instance;
+        return instance.apiManager.getExposedApiFunctions();
     }
 
     /**

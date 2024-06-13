@@ -311,8 +311,7 @@ module.exports = class GPS extends OverlayPlugin {
 
         this.checkForGeolocation();
 
-        // Toggle display
-        this.formWidget.classList.toggle('gm-hidden');
+        // TODO refacto this with 2 different overlay (gps and map)
         this.mapWidget.classList.add('gm-hidden');
         this.toolbarBtnImage.classList.toggle('gm-active');
     }

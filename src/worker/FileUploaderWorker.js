@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function() {
+module.exports = function () {
     const self = this;
     this.socket = null;
     this.token = null;
@@ -11,7 +11,7 @@ module.exports = function() {
     this.address = null;
     this.MEGABYTE = 1000 * 1000;
 
-    self.getChunkSize = function(fileSize) {
+    self.getChunkSize = function (fileSize) {
         /*
          * The minimum upload size of chunk is 5MB.
          * If we are uploading a "big" file, we are uploading 10% by 10%.
@@ -22,7 +22,7 @@ module.exports = function() {
         return Math.max(minimum, Math.min(0.1 * fileSize, maximum));
     };
 
-    self.onOpen = function() {
+    self.onOpen = function () {
         const tokenRequest = {
             type: 'token',
             token: self.token,
@@ -30,13 +30,13 @@ module.exports = function() {
         self.socket.send(JSON.stringify(tokenRequest));
     };
 
-    self.onClose = function() {
-        setTimeout(function() {
+    self.onClose = function () {
+        setTimeout(function () {
             self.connect(self.address);
         }, 1000);
     };
 
-    self.connect = function(address) {
+    self.connect = function (address) {
         self.socket = new WebSocket(address);
         self.socket.binaryType = 'arraybuffer';
         self.socket.onopen = self.onOpen;
@@ -45,7 +45,7 @@ module.exports = function() {
         self.socket.onclose = self.onClose;
     };
 
-    self.onFailure = function() {
+    self.onFailure = function () {
         const msg = {
             type: 'FILE_UPLOAD',
             code: 'FAIL',
@@ -54,13 +54,13 @@ module.exports = function() {
         postMessage(msg);
     };
 
-    self.uploadData = function(event) {
+    self.uploadData = function (event) {
         if (self.hasError === false) {
             self.socket.send(event.target.result, {binary: true});
         }
     };
 
-    self.onSocketMsg = function(evt) {
+    self.onSocketMsg = function (evt) {
         const msg = JSON.parse(evt.data);
 
         if (msg.type === 'FILE_UPLOAD') {
@@ -108,7 +108,7 @@ module.exports = function() {
         }
     };
 
-    self.onmessage = function(event) {
+    self.onmessage = function (event) {
         const msg = event.data;
 
         switch (msg.type) {

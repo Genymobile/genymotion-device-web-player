@@ -153,7 +153,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-fingerprint-button';
         this.toolbarBtnImage.title = this.i18n.FINGERPRINT_TITLE || 'Biometrics';
-        this.toolbarBtn.onclick = () => this.toggleWidget();
+        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         toolbar.appendChild(this.toolbarBtn);
     }
@@ -284,43 +284,16 @@ module.exports = class FingerPrint extends OverlayPlugin {
         // Add close button
         const close = document.createElement('div');
         close.className = 'gm-close-btn';
-        close.onclick = () => this.closeWidget();
+        close.onclick = this.toggleWidget.bind(this);
 
         this.widget.appendChild(close);
         this.widget.appendChild(this.container);
 
         // Render into document
-        this.overlays.push(this.widget);
         this.instance.root.appendChild(this.widget);
 
         // post setup
         this.disableBody();
-    }
-
-    /**
-     * Display or hide the widget.
-     */
-    toggleWidget() {
-        // Notify other callers
-        if (this.widget.classList.contains('gm-hidden')) {
-            this.instance.emit('close-overlays');
-            this.instance.emit('keyboard-disable');
-        } else {
-            this.instance.emit('keyboard-enable');
-        }
-
-        // Toggle display
-        this.widget.classList.toggle('gm-hidden');
-        this.toolbarBtnImage.classList.toggle('gm-active');
-    }
-
-    /**
-     * Close the widget.
-     */
-    closeWidget() {
-        this.instance.emit('keyboard-enable');
-        this.widget.classList.add('gm-hidden');
-        this.toolbarBtnImage.classList.remove('gm-active');
     }
 
     /**
@@ -379,7 +352,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                 Array.from(document.querySelectorAll('.gm-fingerprint-dialog-button')).forEach((btn) => {
                     btn.classList.remove('gm-loader');
                 });
-                this.closeWidget();
+                this.toggleWidget();
                 break;
             case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_SCANNING:
                 this.state.isScanning = true;

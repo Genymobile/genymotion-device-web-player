@@ -56,18 +56,12 @@ module.exports = class KeyboardEvents {
         this.instance.keyboardEvents = this;
         this.instance.keyboardEventsEnabled = true;
 
-        this.transmitKeys = true;
+        this.transmitKeys = this.instance.store.getState().isKeyboardEventsEnabled;
         this.isListenerAdded = false;
         this.currentlyPressedKeys = new Map();
 
-        // Listen for keyboard disable
-        this.instance.registerEventCallback('keyboard-disable', () => {
-            this.transmitKeys = false;
-        });
-
-        // Listen for keyboard enable
-        this.instance.registerEventCallback('keyboard-enable', () => {
-            this.transmitKeys = true;
+        this.instance.store.subscribe(({isKeyboardEventsEnabled}) => {
+            this.transmitKeys = isKeyboardEventsEnabled;
         });
     }
 

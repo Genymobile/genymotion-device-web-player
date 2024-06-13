@@ -386,25 +386,7 @@ module.exports = class Network extends OverlayPlugin {
         this.widget.appendChild(this.form);
 
         // Render into document
-        this.overlays.push(this.widget);
         this.instance.root.appendChild(this.widget);
-    }
-
-    /**
-     * Display or hide the widget.
-     */
-    toggleWidget() {
-        // Notify other callers
-        if (this.widget.classList.contains('gm-hidden')) {
-            this.instance.emit('close-overlays');
-            this.instance.emit('keyboard-disable');
-        } else {
-            this.instance.emit('keyboard-enable');
-        }
-
-        // Toggle display
-        this.widget.classList.toggle('gm-hidden');
-        this.toolbarBtnImage.classList.toggle('gm-active');
     }
 
     /**

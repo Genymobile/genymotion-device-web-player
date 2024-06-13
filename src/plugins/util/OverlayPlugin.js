@@ -1,9 +1,9 @@
 'use strict';
+const {generateUID} = require('../../utils/helpers');
 
 /**
  * OverlayPlugin
- * Extendable utility to auto-bind and handle genymotion 'closeOverlays' event.
- * Expects implementer to provide list of overlays
+ * Parent for widget (plugin)
  */
 module.exports = class OverlayPlugin {
     /**
@@ -11,32 +11,45 @@ module.exports = class OverlayPlugin {
      * @param {Object} instance device renderer instance
      */
     constructor(instance) {
-        this.overlays = [];
-        this.savedState = null;
+        // widget must be set on child class, it's the dialog element
+        this.widget = null;
+        this.overlayID = generateUID();
         this.toolbarBtnImage = null;
+        this.savedState = null;
         this.instance = instance;
 
         // Listen for close trigger
-        this.instance.registerEventCallback('close-overlays', this.closeOverlays.bind(this));
+        this.instance.store.subscribe(({overlay}) => {
+            if (overlay.widgetOpened.includes(this.overlayID)) {
+                this.openOverlay();
+            } else {
+                this.closeOverlay();
+            }
+        });
     }
 
     /**
-     * Closes all active overlays and updates toolbar button state
+     * Closes overlay and updates toolbar button state
      */
-    closeOverlays() {
-        this.overlays.forEach((overlay) => {
-            if (overlay && !overlay.classList.contains('gm-hidden')) {
-                overlay.classList.add('gm-hidden');
-                if (overlay.onclose) {
-                    overlay.onclose();
-                }
+    closeOverlay() {
+        if (this.widget && !this.widget.classList.contains('gm-hidden')) {
+            this.widget.classList.add('gm-hidden');
+            if (this.widget.onclose) {
+                this.widget.onclose();
             }
-        });
-
-        this.instance.emit('keyboard-enable');
-
+        }
         if (this.toolbarBtnImage) {
             this.toolbarBtnImage.classList.remove('gm-active');
+        }
+    }
+
+    openOverlay() {
+        if (this.widget && this.widget.classList.contains('gm-hidden')) {
+            this.widget.classList.remove('gm-hidden');
+        }
+
+        if (this.toolbarBtnImage) {
+            this.toolbarBtnImage.classList.add('gm-active');
         }
     }
 
@@ -90,5 +103,15 @@ module.exports = class OverlayPlugin {
         if (this.toolbarBtn && this.toolbarBtnImage) {
             this.restoreState();
         }
+    }
+
+    toggleWidget() {
+        this.instance.store.dispatch({
+            type: 'OVERLAY_OPEN',
+            payload: {
+                overlayID: this.overlayID,
+                toOpen: this.widget.classList.contains('gm-hidden'),
+            },
+        });
     }
 };

@@ -23,6 +23,7 @@ const defaultOptions = {
     navbar: true,
     power: true,
     keyboard: true,
+    keyboardMapping: true,
     fullscreen: true,
     camera: true,
     microphone: false,
@@ -87,6 +88,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.navbar                 Android navbar support activated. Default: true.
      * @param  {boolean}            options.power                  Power control support activated. Default: true.
      * @param  {boolean}            options.keyboard               Keyboad support activated. Default: true.
+     * @param  {boolean}            options.keyboardMapping        Keyboad mapping support activated. Default: true.
      * @param  {boolean}            options.fullscreen             Fullscreen support activated. Default: true.
      * @param  {boolean}            options.camera                 Camera support activated. Default: true.
      * @param  {boolean}            options.microphone             Microphone support activated. Default: false.

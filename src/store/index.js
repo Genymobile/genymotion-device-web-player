@@ -9,13 +9,11 @@ const initialState = {
         isOpen: false,
         widgetOpened: [],
     },
-    isKeyboardEventsEnabled: true,
+    isKeyboardEventsEnabled: false,
 };
 
 const createStore = (instance, reducer, state) => {
     const listeners = [];
-
-    const getState = () => instance.store.state;
 
     const getters = {
         isWidgetOpened: (overlayID) =>
@@ -33,7 +31,7 @@ const createStore = (instance, reducer, state) => {
         const uid = generateUID();
         listeners.push({
             uid,
-            cb: () => listener(getState()),
+            cb: () => listener(instance.store.state),
         });
 
         const unsubscribe = () => {
@@ -46,17 +44,18 @@ const createStore = (instance, reducer, state) => {
         return unsubscribe;
     };
 
-    instance.store = {state, getState, dispatch, subscribe, getters};
+    instance.store = {state, dispatch, subscribe, getters};
 };
 
 const reducer = (state, action) => {
-    log.debug('Store updated', action.type, action.payload);
-
+    let newState = state;
     switch (action.type) {
         case 'WEBRTC_CONNECTION_READY':
-            return {...state, isWebRTCConnectionReady: action.payload};
+            newState = {...state, isWebRTCConnectionReady: action.payload};
+            break;
         case 'KEYBOARD_EVENTS_ENABLED':
-            return {...state, isKeyboardEventsEnabled: action.payload};
+            newState = {...state, isKeyboardEventsEnabled: action.payload};
+            break;
         case 'OVERLAY_OPEN':
             // eslint-disable-next-line no-case-declarations
             const {overlayID, toOpen} = action.payload;
@@ -80,7 +79,7 @@ const reducer = (state, action) => {
              *  to open several widgets at the same time
              * const widgetOpened = state.overlay.widgetOpened.filter((widgetId) => widgetId !== overlayID);
              */
-            return {
+            newState = {
                 ...state,
                 overlay: {
                     isOpen: widgetOpened.length > 0,
@@ -88,10 +87,14 @@ const reducer = (state, action) => {
                 },
                 isKeyboardEventsEnabled: true,
             };
-
+            break;
         default:
-            return state;
+            break;
     }
+
+    log.debug('Store updated below type - payload - result', action.type, action.payload, newState);
+
+    return newState;
 };
 
 const store = (instance) => {

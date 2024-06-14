@@ -251,6 +251,14 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Enables or disables the keyboard widget. This widget can be used to transmit keyboard key strokes to the Android virtual device.
 
+### `keyboardMapping`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enables or disables the keyboardMapping. This widget can be used to map key with command (i.e. tap, swipe-left, tilt, ...).
+
 ### `volume`
 
 <img align="right" src="./doc/assets/ic_sound_active_black.svg" alt="..."></img>

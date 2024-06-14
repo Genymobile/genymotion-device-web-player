@@ -20,6 +20,7 @@ module.exports = class MouseEvents {
 
         this.leftButtonPressed = false;
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
+        this.removeMouseUpListener = () => {};
     }
 
     /**
@@ -87,9 +88,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        if (this.removeMouseUpListener) {
-            this.removeMouseUpListener();
-        }
+        this.removeMouseUpListener();
     }
 
     /**
@@ -113,7 +112,7 @@ module.exports = class MouseEvents {
         };
         this.instance.sendEvent(json);
 
-        this.instance.removeMouseUpListener();
+        this.removeMouseUpListener();
     }
 
     /**

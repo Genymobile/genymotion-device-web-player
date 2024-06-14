@@ -87,7 +87,9 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        this.removeMouseUpListener();
+        if (this.removeMouseUpListener) {
+            this.removeMouseUpListener();
+        }
     }
 
     /**

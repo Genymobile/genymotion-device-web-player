@@ -1,7 +1,6 @@
 'use strict';
 
 const Original = require('../../src/DeviceRenderer');
-
 module.exports = class DeviceRenderer extends Original {
     constructor(options) {
         document.body.innerHTML = `
@@ -38,6 +37,10 @@ module.exports = class DeviceRenderer extends Original {
                 return {};
             },
             subscribe: jest.fn(),
+            dispatch: jest.fn(),
+            getters: {
+                isWidgetOpened: () => false,
+            },
         };
         this.apiManager = {
             registerFunction: jest.fn(),

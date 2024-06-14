@@ -302,7 +302,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             case 'success':
                 this.displayStep('successScreen');
                 // On flashing success, force display success screen
-                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                if (this.flashing && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                     this.toggleWidget();
                 }
                 this.flashing = false;
@@ -313,7 +313,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             case 'install_error':
                 this.displayStep('errorScreen');
                 // On flashing error, force display errorscreen
-                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                if (this.flashing && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                     this.toggleWidget();
                 }
                 this.flashing = false;

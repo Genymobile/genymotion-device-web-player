@@ -113,7 +113,6 @@ module.exports = class GPS extends OverlayPlugin {
         this.mapWidget.appendChild(cancel);
 
         // Render into document
-        this.overlays.push(this.mapWidget);
         this.instance.root.appendChild(this.mapWidget);
     }
 
@@ -206,7 +205,7 @@ module.exports = class GPS extends OverlayPlugin {
      */
     renderGPSForm() {
         // Create elements
-        this.formWidget = document.createElement('div');
+        this.widget = document.createElement('div');
         this.form = document.createElement('form');
         const formWrap = document.createElement('div');
 
@@ -282,39 +281,29 @@ module.exports = class GPS extends OverlayPlugin {
         this.form.appendChild(button);
 
         // Setup
-        this.formWidget.className = 'gm-overlay gm-gps-controls gm-hidden';
+        this.widget.className = 'gm-overlay gm-gps-controls gm-hidden';
 
         // Add close button
         const close = document.createElement('div');
         close.className = 'gm-close-btn';
         close.onclick = this.toggleForm.bind(this);
 
-        this.formWidget.appendChild(close);
-        this.formWidget.appendChild(this.form);
+        this.widget.appendChild(close);
+        this.widget.appendChild(this.form);
 
         // Render into document
-        this.overlays.push(this.formWidget);
-        this.instance.root.appendChild(this.formWidget);
+        this.instance.root.appendChild(this.widget);
     }
 
     /**
      * Display or hide the controls view.
      */
     toggleForm() {
-        // Notify other callers
-        if (this.formWidget.classList.contains('gm-hidden')) {
-            this.instance.emit('close-overlays');
-            this.instance.emit('keyboard-disable');
-        } else {
-            this.instance.emit('keyboard-enable');
-        }
-
+        this.toggleWidget();
         this.checkForGeolocation();
 
-        // Toggle display
-        this.formWidget.classList.toggle('gm-hidden');
+        // TODO refacto this with 2 different overlay (gps and map)
         this.mapWidget.classList.add('gm-hidden');
-        this.toolbarBtnImage.classList.toggle('gm-active');
     }
 
     /**

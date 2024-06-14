@@ -163,7 +163,6 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.widget.appendChild(this.container);
 
         // Render into document
-        this.overlays.push(this.widget);
         this.instance.root.appendChild(this.widget);
     }
 
@@ -171,10 +170,9 @@ module.exports = class FileUpload extends OverlayPlugin {
      * Display or hide the widget.
      */
     toggleWidget() {
-        // Notify other callers
-        if (this.widget.classList.contains('gm-hidden')) {
-            this.instance.emit('close-overlays');
-            this.instance.emit('keyboard-disable');
+        super.toggleWidget();
+
+        if (this.instance.store.getters.isWidgetOpened(this.overlayID)) {
             this.displayStep(this.currentStep);
             // Force refresh upload screen content. Otherwise, installing status may not appear.
             if (this.currentStep === 'uploadScreen') {
@@ -189,12 +187,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             if (this.currentStep === 'successScreen' || this.currentStep === 'errorScreen') {
                 this.currentStep = 'homeScreen';
             }
-            this.instance.emit('keyboard-enable');
         }
-
-        // Toggle display
-        this.widget.classList.toggle('gm-hidden');
-        this.toolbarBtnImage.classList.toggle('gm-active');
     }
 
     /**
@@ -309,7 +302,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             case 'success':
                 this.displayStep('successScreen');
                 // On flashing success, force display success screen
-                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                if (this.flashing && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                     this.toggleWidget();
                 }
                 this.flashing = false;
@@ -320,7 +313,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             case 'install_error':
                 this.displayStep('errorScreen');
                 // On flashing error, force display errorscreen
-                if (this.flashing && this.widget.classList.contains('gm-hidden')) {
+                if (this.flashing && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                     this.toggleWidget();
                 }
                 this.flashing = false;

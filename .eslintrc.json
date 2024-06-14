@@ -1,5 +1,6 @@
 {
-    "extends": ["eslint:recommended"],
+    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+    "plugins": ["prettier"],
     "env": {
         "browser": true,
         "es6": true,
@@ -10,16 +11,18 @@
         "ecmaVersion": 2020
     },
     "rules": {
-        // Possible errors
-        "no-console": "error",
-        "no-extra-parens": [
+        "prettier/prettier": [
             "error",
-            "all",
             {
+                "insertPragma": true,
+                "requirePragma": true,
                 "nestedBinaryExpressions": false,
                 "enforceForArrowConditionals": false
             }
         ],
+        "comma-spacing": ["error", {"before": false, "after": true}],
+        "no-console": "warn",
+        "no-extra-parens": "off",
         "no-loss-of-precision": "error",
         "no-promise-executor-return": "error",
         "no-template-curly-in-string": "error",
@@ -71,7 +74,7 @@
         "multiline-comment-style": ["error", "starred-block"],
         "new-cap": ["error", {"properties": false}],
         "new-parens": "error",
-        "newline-per-chained-call": "error",
+        "newline-per-chained-call": "off",
         "no-multi-assign": "error",
         "no-multiple-empty-lines": ["error", {"max": 1}],
         "no-trailing-spaces": "error",
@@ -80,7 +83,14 @@
         "quotes": ["error", "single", {"avoidEscape": true}],
         "semi": ["error", "always"],
         "semi-style": ["error", "last"],
-        "space-before-function-paren": ["error", "never"],
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "never"
+            }
+        ],
         "space-in-parens": ["error", "never"],
         "spaced-comment": ["error", "always"],
         // ECMAScript 6

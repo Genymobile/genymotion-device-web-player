@@ -95,7 +95,7 @@ module.exports = class DeviceRenderer {
                 !event.target.classList.contains('gm-icon-button') &&
                 !event.target.classList.contains('gm-dont-close')
             ) {
-                this.emit('close-overlays');
+                this.store.dispatch({type: 'OVERLAY_OPEN', payload: {toOpen: false}});
             }
         };
         this.addListener(document, 'click', this.clickHandlerCloseOverlay);

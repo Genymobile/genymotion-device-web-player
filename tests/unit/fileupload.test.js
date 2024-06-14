@@ -1,7 +1,8 @@
 'use strict';
-
+jest.mock('loglevel');
 const FileUpload = require('../../src/plugins/FileUpload');
 const Instance = require('../mocks/DeviceRenderer');
+const store = require('../../src/store/index');
 
 let uploader;
 let instance;
@@ -10,6 +11,8 @@ let plugin;
 describe('FileUpload Plugin', () => {
     beforeEach(() => {
         instance = new Instance();
+        store(instance);
+
         uploader = new FileUpload(instance, {
             UPLOADER_INSTALLING: 'TEST UPLOADER PLUGIN INSTALLING...',
         });
@@ -31,6 +34,7 @@ describe('FileUpload Plugin', () => {
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
+            store(instance);
             uploader = new FileUpload(instance, {
                 UPLOADER_TITLE: 'TEST UPLOADER PLUGIN TITLE',
                 UPLOADER_HOME_TITLE: 'TEST UPLOADER PLUGIN HOME TITLE',

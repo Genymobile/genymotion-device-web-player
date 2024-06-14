@@ -107,7 +107,6 @@ module.exports = class Clipboard extends OverlayPlugin {
         };
 
         // Render into document
-        this.overlays.push(this.widget);
         this.instance.root.appendChild(this.widget);
     }
 
@@ -115,19 +114,10 @@ module.exports = class Clipboard extends OverlayPlugin {
      * Display or hide the widget.
      */
     toggleWidget() {
-        // Notify other callers
-        if (this.widget.classList.contains('gm-hidden')) {
-            this.instance.emit('close-overlays');
-            this.instance.emit('keyboard-disable');
+        super.toggleWidget();
+        if (this.instance.store.getters.isWidgetOpened(this.overlayID)) {
             this.clipboardInput.value = this.clipboard;
-        } else {
-            this.instance.emit('keyboard-enable');
-            this.widget.onclose();
         }
-
-        // Toggle display
-        this.widget.classList.toggle('gm-hidden');
-        this.toolbarBtnImage.classList.toggle('gm-active');
     }
 
     /**

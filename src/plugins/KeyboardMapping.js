@@ -1,179 +1,188 @@
 'use strict';
 
-// TODO voir videoWrapper pour remplacer parentElement !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const {generateUID} = require('../utils/helpers');
 
-const DEAULT_CONFIG = {
-    97: {
-        command: 'tap',
-        options: {
-            x: 50,
-            y: 50,
+const NEW_SOUL_KNIGHT = {
+    dPad: [
+        {
+            keys: {
+                z: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 0,
+                    distanceY: -10,
+                    description: 'move up',
+                },
+                s: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 0,
+                    distanceY: 10,
+                    description: 'move down',
+                },
+                q: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: -10,
+                    distanceY: 0,
+                    description: 'move left',
+                },
+                d: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 10,
+                    distanceY: 0,
+                    description: 'move right',
+                },
+            },
+            name: 'character movement',
+            description: 'dpad used for move the character',
         },
-    },
-    101: {
-        command: 'dtap',
-        options: {
-            x: 50,
-            y: 50,
+    ],
+    tap: [
+        {
+            keys: {
+                r: {
+                    x: 75,
+                    y: 85,
+                    description: 'special',
+                },
+            },
+            name: 'special',
+            description: 'special attack',
         },
-    },
-    114: {
-        command: 'tilt',
-        options: {
-            x: 0,
-            y: 0,
+        {
+            keys: {
+                p: {
+                    x: 85,
+                    y: 80,
+                    description: 'fire',
+                },
+            },
+            name: 'fire',
+            description: 'fire attack',
         },
-    },
-    113: {
-        command: 'left-swipe',
-        options: {
-            x: 50,
-            y: 50,
-            distance: 100,
+        {
+            keys: {
+                t: {
+                    x: 85,
+                    y: 55,
+                    description: 'change the weapon',
+                },
+            },
+            name: 'changeWeapon',
+            description: 'change the weapon',
         },
-    },
-    115: {
-        command: 'down-swipe',
-        options: {
-            x: 0,
-            y: 50,
-            distance: 100,
-        },
-    },
-    100: {
-        command: 'right-swipe',
-        options: {
-            x: 50,
-            y: 50,
-            distance: 100,
-        },
-    },
-    122: {
-        command: 'up-swipe',
-        options: {
-            x: 0,
-            y: 50,
-            distance: 100,
-        },
-    },
+    ],
 };
+
 const MINECRAFT = {
-    z: {
-        command: 'keepPressing',
-        options: {
-            initialX: 21,
-            initialY: 60,
-            x: 21,
-            y: 50,
+    dPad: [
+        {
+            keys: {
+                z: {
+                    initialX: 15,
+                    initialY: 64,
+                    distanceX: 0,
+                    distanceY: -15,
+                    description: 'move up',
+                },
+                s: {
+                    initialX: 15,
+                    initialY: 64,
+                    distanceX: 0,
+                    distanceY: 15,
+                    description: 'move down',
+                },
+                q: {
+                    initialX: 15,
+                    initialY: 64,
+                    distanceX: -15,
+                    distanceY: 0,
+                    description: 'move left',
+                },
+                d: {
+                    initialX: 15,
+                    initialY: 64,
+                    distanceX: 15,
+                    distanceY: 0,
+                    description: 'move right',
+                },
+            },
+            name: 'character movement',
+            description: 'dpad used for move the character',
         },
-        description: 'up',
-    },
-    s: {
-        command: 'keepPressing',
-        options: {
-            initialX: 21,
-            initialY: 60,
-            x: 21,
-            y: 70,
+    ],
+    swipe: [
+        {
+            keys: {
+                a: {
+                    x: 50,
+                    y: 50,
+                    distanceX: -10,
+                    distanceY: 0,
+                    description: 'swipe left',
+                },
+                e: {
+                    x: 50,
+                    y: 50,
+                    distanceX: 10,
+                    distanceY: 0,
+                    description: 'swipe right',
+                },
+            },
         },
-        description: 'down',
-    },
-    q: {
-        command: 'keepPressing',
-        options: {
-            initialX: 21,
-            initialY: 60,
-            x: 11,
-            y: 60,
+    ],
+    tap: [
+        {
+            keys: {
+                r: {
+                    x: 93,
+                    y: 30,
+                    description: 'jump',
+                },
+            },
+            name: 'jump',
+            description: 'jump',
         },
-        description: 'left',
-    },
-    d: {
-        command: 'keepPressing',
-        options: {
-            initialX: 21,
-            initialY: 60,
-            x: 31,
-            y: 60,
-        },
-        description: 'right',
-    },
-    r: {
-        command: 'tap',
-        options: {
-            x: 90,
-            y: 90,
-        },
-        description: 'jump',
-    },
-    t: {
-        command: 'keepPressing',
-        options: {
-            initialX: 30,
-            initialY: 60,
-            x: 21,
-            y: 70,
-        },
-    },
+    ],
 };
 
-const SOUL_KNIGHT = {
-    z: {
-        command: 'keepPressing',
-        options: {
-            initialX: 30,
-            initialY: 50,
-            x: 30,
-            y: 40,
+const SUBWAY_SURFERS = {
+    swipe: [
+        {
+            keys: {
+                q: {
+                    x: 50,
+                    y: 50,
+                    distanceX: -10,
+                    distanceY: 0,
+                    description: 'swipe left',
+                },
+                d: {
+                    x: 50,
+                    y: 50,
+                    distanceX: 10,
+                    distanceY: 0,
+                    description: 'swipe right',
+                },
+                z: {
+                    x: 50,
+                    y: 50,
+                    distanceX: 0,
+                    distanceY: -10,
+                    description: 'swipe up',
+                },
+                s: {
+                    x: 50,
+                    y: 50,
+                    distanceX: 0,
+                    distanceY: 10,
+                    description: 'swipe down',
+                },
+            },
         },
-        description: 'up',
-    },
-    s: {
-        command: 'keepPressing',
-        options: {
-            initialX: 30,
-            initialY: 50,
-            x: 30,
-            y: 60,
-        },
-        description: 'down',
-    },
-    q: {
-        command: 'keepPressing',
-        options: {
-            initialX: 30,
-            initialY: 50,
-            x: 20,
-            y: 50,
-        },
-        description: 'left',
-    },
-    d: {
-        command: 'keepPressing',
-        options: {
-            initialX: 30,
-            initialY: 50,
-            x: 40,
-            y: 50,
-        },
-        description: 'right',
-    },
-    r: {
-        command: 'tap',
-        options: {
-            x: 75,
-            y: 85,
-        },
-        description: 'special',
-    },
-    e: {
-        command: 'tap',
-        options: {
-            x: 85,
-            y: 80,
-        },
-        description: 'fire',
-    },
+    ],
 };
 
 /**
@@ -191,105 +200,135 @@ module.exports = class KeyboardMapping {
         // Reference instance
         this.instance = instance;
         this.i18n = i18n || {};
-        this.currentKeepPressing = [];
-
-        this.config = SOUL_KNIGHT; // DEAULT_CONFIG;
 
         // Register plugin
         this.instance.KeyboardMapping = this;
 
-        this.isActive = false;
-        this.isPaused = false;
         this.keyboardCallbacks = [];
-        this.currentlyPressedKeys = new Map();
 
-        // deactivate the plugin listening when dialog is open
+        this.dPadPushed = [];
+
+        this.state = new Proxy(
+            {
+                isActive: false,
+                isPaused: false,
+                currentlyPressedKeys: [],
+                mappedKeysConfig: {},
+                workingMappedKeysConfig: {},
+            },
+            {
+                set: (state, prop, value) => {
+                    const oldValue = state[prop];
+                    state[prop] = value;
+                    switch (prop) {
+                        case 'isActive':
+                            this.activatePlugin();
+                            break;
+                        case 'isPaused':
+                            if (value) {
+                                this.state.isActive = false;
+                            } else {
+                                this.state.isActive = true;
+                            }
+                            break;
+                        case 'mappedKeysConfig':
+                            this.setupMappedKeysConfig();
+                            break;
+                        case 'currentlyPressedKeys':
+                            // logic to handle key pressed / unpressed depending on the mappedKeysConfig
+                            if (!value.length) {
+                                // unpressed key
+                                const jsonForReleaseTouch = this.generateTouchEventForRelease(
+                                    oldValue.filter((key) => !value.includes(key)),
+                                );
+                                this.instance.sendEvent(jsonForReleaseTouch);
+                            } else {
+                                this.sendMultiTouch();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    return true;
+                },
+            },
+        );
+
+        // pause the listeners when dialog is open and plugin isActive
         this.instance.store.subscribe(({overlay: {isOpen}}) => {
-            // TODO passer par un proxy
-            if (isOpen) {
-                this.removeKeyboardCallbacks();
-                this.isPaused = true;
-            } else if (this.isActive && this.isPaused) {
-                this.isPaused = false;
-                this.activate();
+            if (isOpen && this.state.isActive) {
+                this.state.isPaused = true;
+            } else if (!isOpen && this.state.isPaused) {
+                this.state.isPaused = false;
             }
         });
 
-        // register setConfigFile for api
+        // Display widget
+        this.renderToolbarButton();
+
+        // activate plugin
+        this.state.isActive = true;
+
+        // register api function
+
+        // set config file
         this.instance.apiManager.registerFunction(
             'setConfigFile',
             (config) => {
                 // check it's a valid JSON
                 try {
-                    JSON.parse(JSON.stringify(config));
+                    this.state.mappedKeysConfig = JSON.parse(JSON.stringify(config));
                 } catch (err) {
                     throw new Error('Invalid JSON');
                 }
-                this.config = config;
-                this.resetMapping();
+                this.state.config = config;
             },
             'Submit a config for mapping keys',
         );
 
-        // Display widget
-        this.renderToolbarButton();
-
-        // activate plugin TODO passer par un proxy pour gerer isActive
-        this.activate();
-
-        // debug mode TODO en faire une option du widget
+        // active trace when click on screen
         this.instance.apiManager.registerFunction(
             'activeKeyMappingDebug',
-            (activate = true) => {
-                if (activate) {
-                    this.activateDebugMode();
+            (isTraceActivate = false, isGridActivate = false) => {
+                if (isTraceActivate) {
+                    this.activateTrace(true);
                 } else {
-                    this.activateDebugMode(false);
+                    this.activateTrace(false);
                 }
-            },
-            'Activate debug mode for key mapping. Click on screen add a div with x, y coordonates.',
-        );
-        // debug grid mode TODO en faire une option du widget
-        this.instance.apiManager.registerFunction(
-            'activeKeyMappingGridHelper',
-            (activate = true) => {
-                if (activate) {
-                    this.activateGrid();
+                if (isGridActivate) {
+                    this.activateGrid(true);
                 } else {
                     this.activateGrid(false);
                 }
             },
-            'Display a grid on the screen to help mapping keys. 10% of the screen width and height.',
+            `Activate debug mode for key mapping. the first parameter activate 
+            feature "click on screen add a div with x, y and x%, y%coordonates.\n
+            The second parameter activate a grid on the screen to help mapping keys. 
+            10% of the screen width and height.`,
         );
 
-        //TEST OK multi touch TODO en faire une option du widget OK
-        // setTimeout(async () => {
-        //     const json = {type: 'MULTI_TOUCH', nb: 2, mode: 0, points: []};
+        // load default config to test purpose TODO delete for production
+        this.state.mappedKeysConfig = NEW_SOUL_KNIGHT;
 
-        //     //click joystick
-        //     json.mode = 0;
-        //     json.nb = 2;
-        //     json.points = [];
-        //     const x = 393;
-        //     const y = 100;
+    }
 
-        //     json.points.push({x: x, y: y});
-        //     json.points.push({x: 1106, y: 589});
-        //     this.instance.sendEvent(json);
+    sendMultiTouch() {
+        const reversedCurrentlyPressedKeys = this.state.currentlyPressedKeys.reverse();
+        const {touchPoints, movePoints} = this.generateTouchEventForPush(reversedCurrentlyPressedKeys);
 
-        //     json.mode = 2;
-        //     json.nb = 2;
+        const json = {type: 'MULTI_TOUCH', nb: 0, mode: 0, points: []};
+        if (touchPoints.length) {
+            json.nb = touchPoints.length;
+            json.points = touchPoints;
+            this.instance.sendEvent(json);
+        }
 
-        //     // Move joystick
-        //     for (const i of Array.from(Array(1).keys())) {
-        //         json.points = [];
-        //         json.points.push({x: x, y: y + i + 100});
-        //         json.points.push({x: 1106, y: 589});
-
-        //         //json.points.push({x: 1038, y: 623});
-        //         this.instance.sendEvent(json);
-        //     }
-        // }, 1000);
+        if (movePoints.length) {
+            json.nb = movePoints.length;
+            json.points = movePoints;
+            json.mode = 2;
+            this.instance.sendEvent(json);
+        }
     }
 
     renderToolbarButton() {
@@ -303,22 +342,42 @@ module.exports = class KeyboardMapping {
         this.toolbarBtnImage = document.createElement('div');
         this.toolbarBtnImage.className = 'gm-icon-button gm-fingerprint-button';
         this.toolbarBtnImage.title = this.i18n.KEYMAPPING_TITLE || 'Key Mapping';
-        this.toolbarBtn.onclick = () => this.activate(!this.isActive);
+        this.toolbarBtn.onclick = () => (this.state.isActive = !this.state.isActive);
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
         toolbar.appendChild(this.toolbarBtn);
     }
 
-    activate(state = true) {
-        this.isActive = state;
-        if (this.isActive) {
+    activatePlugin() {
+        if (this.state.isActive) {
             this.toolbarBtnImage.classList.add('gm-active');
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
         } else {
             this.toolbarBtnImage.classList.remove('gm-active');
             this.removeKeyboardCallbacks();
-            this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: true});
+            this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
         }
+    }
+
+    setupMappedKeysConfig() {
+        // reset
+        this.state.workingMappedKeysConfig = {};
+
+        // Create a working version of the mappedKeysConfig, this will chane the structure to be more performant and avoid incepth loop
+        Object.entries(this.state.mappedKeysConfig).forEach(([gestureType, gestureConfig]) => {
+            gestureConfig.forEach((gesture) => {
+                const groupId = generateUID();
+                Object.entries(gesture.keys).forEach(([key, value]) => {
+                    this.state.workingMappedKeysConfig[key] = {
+                        ...value,
+                        key,
+                        type: gestureType,
+                        name: gesture.name,
+                        groupId,
+                    };
+                });
+            });
+        });
     }
 
     /**
@@ -327,7 +386,7 @@ module.exports = class KeyboardMapping {
      * or any other command that remove focus (blur) the page.
      */
     cancelAllPressedKeys() {
-        this.currentlyPressedKeys.forEach((value) => {
+        this.state.currentlyPressedKeys.forEach((value) => {
             const text = '';
             const json = {
                 type: 'KEYBOARD_RELEASE',
@@ -336,185 +395,149 @@ module.exports = class KeyboardMapping {
             };
             this.instance.sendEvent(json);
         });
-        this.currentlyPressedKeys.clear();
+        this.state.currentlyPressedKeys = [];
     }
 
-    /**
-     * Called when the user press a key. Handle special events like backspace.
-     *
-     * @param  {Event}   event Event.
-     * @return {boolean}  Whether or not the event must continue propagation.
-     */
     onKeyDown(event) {
         const key = event.key;
 
-        if (this.config[key]) {
-            const {options, command} = this.config[key];
+        if (this.state.workingMappedKeysConfig[key] && !this.state.currentlyPressedKeys.includes(key)) {
+            // we need to assign a new array to trigger the setter of the proxy (pass by the proxy's trap)
+            this.state.currentlyPressedKeys = [...this.state.currentlyPressedKeys, key];
+        }
+    }
 
-            switch (command) {
-                case 'keepPressing':
-                    if (-1 === this.currentKeepPressing.findIndex((keepPressingObject) => keepPressingObject[key])) {
-                        console.log('uuuuhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
-                        this.currentKeepPressing.push({
-                            [key]: this.keepPressing(options.x, options.y, options.initialX, options.initialY),
-                        });
-                    }
-                    break;
-                case 'tilt':
-                    this.tilt();
-                    break;
-                case 'tap':
-                    this.tap(options.x, options.y);
-                    break;
-                case 'dtap':
-                    this.doubleTap(options.x, options.y);
-                    break;
-                case 'left-swipe':
-                    this.slide(options.x, options.y, options.x - options.distance, options.y);
-                    break;
-                case 'right-swipe':
-                    this.slide(options.x, options.y, options.x + options.distance, options.y);
-                    break;
-                case 'down-swipe':
-                    this.slide(options.x, options.y, options.x, options.y + options.distance);
-                    break;
-                case 'up-swipe':
-                    this.slide(options.x, options.y, options.x, options.y - options.distance);
-                    break;
-                default:
-                    break;
+    onKeyUp(event) {
+        const key = event.key;
+
+        if (this.state.workingMappedKeysConfig[key]) {
+            // filter return a new array so the setter of the proxy while be triggered (pass by the proxy's trap)
+            this.state.currentlyPressedKeys = this.state.currentlyPressedKeys.filter(
+                (pressedKey) => pressedKey !== key,
+            );
+        }
+        // Remove the dPadPushed key if in dPadPushed
+
+        const keyConfig = this.state.workingMappedKeysConfig[key];
+        if (keyConfig && keyConfig.type === 'dPad') {
+            // check if another key of the same dPad is still pressed
+            const dPadGroupKeys = Object.values(this.state.workingMappedKeysConfig)
+                .filter((kConfig) => kConfig.groupId === keyConfig.groupId)
+                .map((kConfig) => kConfig.key);
+            const dPadGroupKeysPressed = dPadGroupKeys.filter((k) => this.state.currentlyPressedKeys.includes(k));
+            if (!dPadGroupKeysPressed.length) {
+            this.dPadPushed = this.dPadPushed.filter((groupId) => groupId !== keyConfig.groupId);
             }
         }
     }
 
     /**
-     * Called when the user release a key. Handle special events like backspace
-     *
-     * @param  {Event}   event Event.
-     * @return {boolean}       Whether or not the event must continue propagation.
+     * Generate the touch event when a key to send to the vm
+     * @returns {Object} - the json to send to the vm
      */
-    async onKeyUp(event) {
-        const key = event.key;
+    generateTouchEventForPush() {
+        const touchPointsBeforeMove = [];
+        const touchPoints = [];
+        const movePoints = [];
 
-        if (this.config[key]) {
-            const {options, command} = this.config[key];
+        // All keys in currentPressedKeys for a dPad must be address as a single touch event
+        const dPadAlreadyTriggered = [];
 
-            switch (command) {
-                case 'keepPressing':
-                    console.log(
-                        'onKeyUp****************************************************',
-                        key,
-                        this.currentKeepPressing,
-                    );
-                    this.currentKeepPressing = this.currentKeepPressing.filter((keyPressedObject) => {
-                        if (keyPressedObject[key]) {
-                            keyPressedObject[key]();
-                            return false;
-                        }
-                        return true;
-                    });
-                    console.log(
-                        'onKeyUp****************************************************FIN',
-                        key,
-                        this.currentKeepPressing,
-                    );
+        this.state.currentlyPressedKeys.forEach((key) => {
+            // All keys in currentPressedKeys for a given dPad are calculate once, as a single touch event
+            if (dPadAlreadyTriggered.includes(key)) {
+                return;
+            }
+            const keyConfig = this.state.workingMappedKeysConfig[key];
+            switch (keyConfig.type) {
+                case 'dPad':
+                    // eslint-disable-next-line no-case-declarations
+                    const dPadGroupKeys = Object.values(this.state.workingMappedKeysConfig)
+                        .filter((kConfig) => kConfig.groupId === keyConfig.groupId)
+                        .map((kConfig) => kConfig.key);
+                    dPadAlreadyTriggered.push(...dPadGroupKeys);
 
-                    // resend keydown always push release and resend key
-                    if (this.currentKeepPressing.length) {
-                        /*console.log(
-                            'resend keydown------------------------------',
-                            Object.keys(this.currentKeepPressing[this.currentKeepPressing.length - 1])[0],
-                        );*/
+                    // eslint-disable-next-line no-case-declarations
+                    const [dPadT, dPadM] = this.getDPADTouchEvent(keyConfig);
 
-                        const lastKeyPressed = Object.keys(
-                            this.currentKeepPressing[this.currentKeepPressing.length - 1],
-                        )[0];
-                        const {options} = this.config[lastKeyPressed];
-                        this.currentKeepPressing = this.currentKeepPressing.filter((keyPressedObject) => {
-                            if (keyPressedObject[lastKeyPressed]) {
-                                keyPressedObject[lastKeyPressed]();
-                                return false;
-                            }
-                            return true;
-                        });
-                        /*
-                         * delay with await promise setimeout
-                         * await cause event isn't already sent to the vm
-                         * ugly hack !!!!!!!!!
-                         */
-                        this.currentKeepPressing.push({[lastKeyPressed]: () => {}});
-                        await new Promise((resolve) => setTimeout(resolve, 25));
-                        console.log(
-                            'aaaaaaaaaaaaaaaaahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
-                            this.currentKeepPressing,
-                            options,
-                        );
-                        const lastKeyPressedIndex = this.currentKeepPressing.findIndex(
-                            (keepPressingObject) => keepPressingObject[lastKeyPressed],
-                        );
-                        if (this.currentKeepPressing[lastKeyPressedIndex]) {
-                            this.currentKeepPressing[lastKeyPressedIndex][lastKeyPressed] = this.keepPressing(
-                                options.x,
-                                options.y,
-                                options.initialX,
-                                options.initialY,
-                            );
-                        }
+                    if (this.dPadPushed.includes(keyConfig.groupId)) {
+                        touchPoints.push(dPadT);
+                    } else {
+                    touchPointsBeforeMove.push(dPadT);
+                    movePoints.push(dPadM);
+                        // also add the groupId to the dPadPushed array to keep track of the dPad pressed
+                        this.dPadPushed.push(keyConfig.groupId);
                     }
+                    break;
+                case 'tap':
+                    touchPoints.push(this.getTapTouchEvent(keyConfig));
+                    break;
+                case 'swipe':
+                    // eslint-disable-next-line no-case-declarations
+                    const [swipeT, swipeM] = this.getSwipeTouchEvent(keyConfig);
+
+                    touchPointsBeforeMove.push(swipeT);
+                    movePoints.push(swipeM);
+
                     break;
                 default:
                     break;
             }
-        }
+        });
+
+        // adding touchpoins to movePoints to keep static touch when moving
+        return {
+            touchPoints: [...touchPointsBeforeMove, ...touchPoints],
+            movePoints: movePoints.length ? [...touchPoints, ...movePoints] : [],
+        };
     }
 
-    // eslint-disable-next-line no-undefined
-    keepPressing(x, y, initialX = undefined, initialY = undefined) {
-        const videoSize = this.instance.video.getBoundingClientRect();
+    generateTouchEventForRelease() {
+        const json = {type: 'MULTI_TOUCH', nb: 0, mode: 1, points: []};
+        return json;
+    }
 
-        // const xFromPercent = (x / 100) * videoSize.width;
-        // const yFromPercent = (y / 100) * videoSize.height; /*+ this.instance.coordinateUtils.getTopBorder()*/
+    getDPADTouchEvent(keyConfig) {
+        // get all touch for this dPad
+        const dPadGroupedKeys = Object.values(this.state.workingMappedKeysConfig).filter(
+            (kConfig) => kConfig.groupId === keyConfig.groupId,
+        );
 
-        const xFromPercent = (x / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
-        const yFromPercent =
-            (y / 100) *
-            (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
-            this.instance.coordinateUtils.getYRatio();
+        const newPosition = {x: keyConfig.initialX, y: keyConfig.initialY};
 
-        if (initialX && initialY) {
-            // const initialXFromPercent = (initialX / 100) * videoSize.width;
-            // const initialYFromPercent =
-            //     (initialY / 100) * videoSize.height; /*+ this.instance.coordinateUtils.getTopBorder()*/
+        const pressedKeys = dPadGroupedKeys.filter((kConfig) => this.state.currentlyPressedKeys.includes(kConfig.key));
 
-            const initialXFromPercent = (initialX / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
-            const initialYFromPercent =
-                (initialY / 100) *
-                (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
-                this.instance.coordinateUtils.getYRatio();
+        // calculate the new position of the touch based on the dPad pressed keys
+        pressedKeys.forEach((pressedKeyConfig) => {
+            if (this.state.workingMappedKeysConfig[pressedKeyConfig.key]) {
+                newPosition.x += pressedKeyConfig.distanceX;
+                newPosition.y += pressedKeyConfig.distanceY;
+            }
+        });
 
-            this.instance.sendEvent({type: 'MOUSE_PRESS', x: initialXFromPercent, y: initialYFromPercent});
-            this.instance.sendEvent({type: 'MOUSE_MOVE', x: xFromPercent, y: yFromPercent});
-            console.log(
-                'xxxCONNECTkeepPressing',
-                this.instance.coordinateUtils.getXRatio(),
-                initialX,
-                initialY,
-                xFromPercent,
-                yFromPercent,
-                initialXFromPercent,
-                initialYFromPercent,
-                this.instance.coordinateUtils.getTopBorder(),
-            );
-        } else {
-            this.instance.sendEvent({type: 'MOUSE_PRESS', x: xFromPercent, y: yFromPercent});
+        const touchPointsBeforeMove = this.calculateCoorFromPercent(keyConfig.initialX, keyConfig.initialY);
+        const movePoints = this.calculateCoorFromPercent(newPosition.x, newPosition.y);
+
+        if (this.dPadPushed.includes(keyConfig.groupId)) {
+            return [movePoints];
         }
+        return [touchPointsBeforeMove, movePoints];
+    }
+    getTapTouchEvent(keyConfig) {
+        return this.calculateCoorFromPercent(keyConfig.x, keyConfig.y);
+    }
 
-        // this.displayDebugTrace(this.instance.video.parentElement, xFromPercent, yFromPercent);
+    getSwipeTouchEvent(keyConfig) {
+        const newPosition = {x: keyConfig.x, y: keyConfig.y};
 
-        return () => {
-            console.log('xxxRELEASEkeepPressing', x, y, xFromPercent, yFromPercent);
-            this.instance.sendEvent({type: 'MOUSE_RELEASE', x: xFromPercent, y: yFromPercent});
-        };
+        const touchPointsBeforeMove = this.calculateCoorFromPercent(keyConfig.x, keyConfig.y);
+
+        newPosition.x += keyConfig.distanceX;
+        newPosition.y += keyConfig.distanceY;
+
+        const movePoints = this.calculateCoorFromPercent(newPosition.x, newPosition.y);
+
+        return [touchPointsBeforeMove, movePoints];
     }
 
     /**
@@ -550,38 +573,6 @@ module.exports = class KeyboardMapping {
             item.removeListener();
         });
     }
-    slide(startX, startY, stopX, stopY) {
-        this.instance.sendEvent({type: 'MOUSE_PRESS', x: startX, y: startY});
-        this.instance.sendEvent({type: 'MOUSE_MOVE', x: stopX, y: stopY});
-        this.instance.sendEvent({type: 'MOUSE_RELEASE', x: stopX, y: stopY});
-    }
-
-    async tap(x, y) {
-        // this.instance.sendEvent({type: 'MOUSE_PRESS', x, y});
-        // this.instance.sendEvent({type: 'MOUSE_RELEASE', x, y});
-        const videoSize = this.instance.video.getBoundingClientRect();
-
-        let xFromPercent = (x / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
-        let yFromPercent =
-            (y / 100) *
-            (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
-            this.instance.coordinateUtils.getYRatio();
-
-        //xFromPercent = 1000; //min 31 max 96 delta 65
-        //yFromPercent = 25;
-
-        console.log('tap', xFromPercent, yFromPercent);
-        // this.displayDebugTrace(this.instance.video.parentElement, xFromPercent, yFromPercent);
-
-        this.instance.sendEvent({type: 'MOUSE_PRESS', x: xFromPercent, y: yFromPercent});
-        //await new Promise((resolve) => setTimeout(resolve, 100));
-        this.instance.sendEvent({type: 'MOUSE_RELEASE', x: xFromPercent, y: yFromPercent});
-    }
-
-    doubleTap(x, y) {
-        this.tap(x, y);
-        this.tap(x, y);
-    }
 
     tilt() {
         const json = {
@@ -603,7 +594,8 @@ module.exports = class KeyboardMapping {
             this.instance.sendEvent({type: 'ACCELEROMETER', x: 200, y: 0, z: 0});
         });
     }
-    activateDebugMode(isActive = true) {
+
+    activateTrace(isActive = true) {
         const debug = (event) => {
             // create div with x, y coordonates where this.instantce.root element is clicked
             const xCoor = this.instance.coordinateUtils.getXCoordinate(event);
@@ -618,7 +610,6 @@ module.exports = class KeyboardMapping {
             div.style.background = 'red';
 
             //adding x and y coordonates of this.instantce.root element to the div create above
-
             const videoSize = this.instance.video.getBoundingClientRect();
 
             const xPercent = 100 / ((videoSize.width * this.instance.coordinateUtils.getXRatio()) / xCoor);
@@ -630,7 +621,8 @@ module.exports = class KeyboardMapping {
 
             div.style.whiteSpace = 'pre-line';
             const text = document.createTextNode(
-                `x: ${xCoor}\ny: ${yCoor}\nx%: ${String(xPercent).substring(0, 5)}\ny%: ${String(yPercent).substring(0, 5)}`,
+                `x: ${xCoor}\ny: ${yCoor}\nx%: ${String(xPercent).substring(0, 5)}\n
+                y%: ${String(yPercent).substring(0, 5)}`,
             );
             div.appendChild(text);
 
@@ -645,18 +637,18 @@ module.exports = class KeyboardMapping {
         if (isActive) {
             this.removeDebugListener = this.instance.addListener(window, ['click'], debug.bind(this));
         } else {
-            this.removeDebugListener();
+            this.removeDebugListener && this.removeDebugListener();
             this.removeDebugListener = null;
         }
     }
 
     activateGrid(isActive = true) {
         if (isActive) {
-            const parentSize = this.instance.video.parentElement.getBoundingClientRect();
+            const parentSize = this.instance.videoWrapper.getBoundingClientRect();
             const videoSize = this.instance.video.getBoundingClientRect();
             videoSize.height = videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2;
 
-            //div vertical
+            // div vertical
             Array.from(Array(11).keys()).forEach((val, i) => {
                 const div = document.createElement('div');
                 div.style.position = 'absolute';
@@ -670,9 +662,9 @@ module.exports = class KeyboardMapping {
                 }
 
                 div.classList.add('keyMapping-helping-grid');
-                this.instance.video.parentElement.appendChild(div);
+                this.instance.videoWrapper.appendChild(div);
             });
-            //div horizontal
+            // div horizontal
             Array.from(Array(11).keys()).forEach((val, i) => {
                 const div = document.createElement('div');
                 div.style.position = 'absolute';
@@ -685,30 +677,22 @@ module.exports = class KeyboardMapping {
                     div.style.background = 'green';
                 }
                 div.classList.add('keyMapping-helping-grid');
-                this.instance.video.parentElement.appendChild(div);
+                this.instance.videoWrapper.appendChild(div);
             });
         } else {
-            this.instance.video.parentElement.querySelectorAll('.keyMapping-helping-grid').forEach((e) => e.remove());
+            this.instance.videoWrapper.querySelectorAll('.keyMapping-helping-grid').forEach((e) => e.remove());
         }
     }
 
-    displayDebugTrace(element, x, y) {
-        const div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.left = `${x}px`;
-        div.style.top = `${y}px`;
-        div.style.width = '100px';
-        div.style.height = '100px';
-        div.style.background = 'red';
+    calculateCoorFromPercent(x, y) {
+        const videoSize = this.instance.video.getBoundingClientRect();
 
-        const text = document.createTextNode(`x: ${x}, y: ${y}, x%: ${x}, y%: ${y}`);
-        div.appendChild(text);
+        const xFromPercent = (x / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
+        const yFromPercent =
+            (y / 100) *
+            (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
+            this.instance.coordinateUtils.getYRatio();
 
-        div.onclick = (e) => {
-            e.stopPropagation();
-            div.remove();
-        };
-
-        element.appendChild(div);
+        return {x: xFromPercent, y: yFromPercent};
     }
 };

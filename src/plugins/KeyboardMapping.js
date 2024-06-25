@@ -76,6 +76,7 @@ const NEW_SOUL_KNIGHT = {
     ],
 };
 
+// eslint-disable-next-line no-unused-vars
 const MINECRAFT = {
     dPad: [
         {
@@ -147,7 +148,7 @@ const MINECRAFT = {
         },
     ],
 };
-
+// eslint-disable-next-line no-unused-vars
 const SUBWAY_SURFERS = {
     swipe: [
         {
@@ -272,9 +273,10 @@ module.exports = class KeyboardMapping {
         // register api function
 
         // set config file
-        this.instance.apiManager.registerFunction(
-            'setConfigFile',
-            (config) => {
+        this.instance.apiManager.registerFunction({
+            name: 'setConfig',
+            category: 'keyMapping',
+            fn: (config) => {
                 // check it's a valid JSON
                 try {
                     this.state.mappedKeysConfig = JSON.parse(JSON.stringify(config));
@@ -283,33 +285,25 @@ module.exports = class KeyboardMapping {
                 }
                 this.state.config = config;
             },
-            'Submit a config for mapping keys',
-        );
+            description: 'Submit a config for mapping keys',
+        });
 
         // active trace when click on screen
-        this.instance.apiManager.registerFunction(
-            'activeKeyMappingDebug',
-            (isTraceActivate = false, isGridActivate = false) => {
-                if (isTraceActivate) {
-                    this.activateTrace(true);
-                } else {
-                    this.activateTrace(false);
-                }
-                if (isGridActivate) {
-                    this.activateGrid(true);
-                } else {
-                    this.activateGrid(false);
-                }
+        this.instance.apiManager.registerFunction({
+            name: 'activeKeyMappingDebug',
+            category: 'keyMapping',
+            fn: (isTraceActivate = false, isGridActivate = false) => {
+                this.activateTrace(isTraceActivate);
+                this.activateGrid(isGridActivate);
             },
-            `Activate debug mode for key mapping. the first parameter activate 
+            description: `Activate debug mode for key mapping. the first parameter activate 
             feature "click on screen add a div with x, y and x%, y%coordonates.\n
             The second parameter activate a grid on the screen to help mapping keys. 
             10% of the screen width and height.`,
-        );
+        });
 
         // load default config to test purpose TODO delete for production
         this.state.mappedKeysConfig = NEW_SOUL_KNIGHT;
-
     }
 
     sendMultiTouch() {
@@ -463,8 +457,8 @@ module.exports = class KeyboardMapping {
                     if (this.dPadPushed.includes(keyConfig.groupId)) {
                         touchPoints.push(dPadT);
                     } else {
-                    touchPointsBeforeMove.push(dPadT);
-                    movePoints.push(dPadM);
+                        touchPointsBeforeMove.push(dPadT);
+                        movePoints.push(dPadM);
                         // also add the groupId to the dPadPushed array to keep track of the dPad pressed
                         this.dPadPushed.push(keyConfig.groupId);
                     }
@@ -587,15 +581,17 @@ module.exports = class KeyboardMapping {
             ],
         };
         this.instance.sendEvent(json);
+        /*
+         * Array.from(Array(2).keys()).forEach(() => {
+         *     this.instance.sendEvent({type: 'ACCELEROMETER', x: -100, y: -10, z: 0});
+         *     this.instance.sendEvent({type: 'ACCELEROMETER', x: 100, y: -10, z: 0});
+         *     this.instance.sendEvent({type: 'ACCELEROMETER', x: 200, y: 0, z: 0});
+         * });
+         */
         return;
-        Array.from(Array(2).keys()).forEach(() => {
-            this.instance.sendEvent({type: 'ACCELEROMETER', x: -100, y: -10, z: 0});
-            this.instance.sendEvent({type: 'ACCELEROMETER', x: 100, y: -10, z: 0});
-            this.instance.sendEvent({type: 'ACCELEROMETER', x: 200, y: 0, z: 0});
-        });
     }
 
-    activateTrace(isActive = true) {
+    activateTrace(isActive) {
         const debug = (event) => {
             // create div with x, y coordonates where this.instantce.root element is clicked
             const xCoor = this.instance.coordinateUtils.getXCoordinate(event);
@@ -609,7 +605,7 @@ module.exports = class KeyboardMapping {
             div.style.padding = '10px';
             div.style.background = 'red';
 
-            //adding x and y coordonates of this.instantce.root element to the div create above
+            // adding x and y coordonates of this.instantce.root element to the div create above
             const videoSize = this.instance.video.getBoundingClientRect();
 
             const xPercent = 100 / ((videoSize.width * this.instance.coordinateUtils.getXRatio()) / xCoor);
@@ -637,12 +633,15 @@ module.exports = class KeyboardMapping {
         if (isActive) {
             this.removeDebugListener = this.instance.addListener(window, ['click'], debug.bind(this));
         } else {
-            this.removeDebugListener && this.removeDebugListener();
+            // eslint-disable-next-line no-unused-expressions
+            if (this.removeDebugListener) {
+                this.removeDebugListener();
+            }
             this.removeDebugListener = null;
         }
     }
 
-    activateGrid(isActive = true) {
+    activateGrid(isActive) {
         if (isActive) {
             const parentSize = this.instance.videoWrapper.getBoundingClientRect();
             const videoSize = this.instance.video.getBoundingClientRect();
@@ -680,7 +679,9 @@ module.exports = class KeyboardMapping {
                 this.instance.videoWrapper.appendChild(div);
             });
         } else {
-            this.instance.videoWrapper.querySelectorAll('.keyMapping-helping-grid').forEach((e) => e.remove());
+            this.instance.videoWrapper.querySelectorAll('.keyMapping-helping-grid').forEach((e) => {
+                e.remove();
+            });
         }
     }
 

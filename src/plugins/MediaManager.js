@@ -33,13 +33,21 @@ module.exports = class MediaManager {
         this.videoWithMicrophone = videoWithMicrophone;
 
         // register mute/unmute to exposed API
-        this.instance.apiManager.registerFunction('mute', () => {
-            this.instance.video.isMuted = true;
-            this.instance.video.muted = true;
+        this.instance.apiManager.registerFunction({
+            name: 'mute',
+            category: 'media',
+            fn: () => {
+                this.instance.video.isMuted = true;
+                this.instance.video.muted = true;
+            },
         });
-        this.instance.apiManager.registerFunction('unmute', () => {
-            this.instance.video.isMuted = false;
-            this.instance.video.muted = false;
+        this.instance.apiManager.registerFunction({
+            name: 'unmute',
+            category: 'media',
+            fn: () => {
+                this.instance.video.isMuted = false;
+                this.instance.video.muted = false;
+            },
         });
     }
 

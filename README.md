@@ -254,7 +254,7 @@ A device renderer instance can be configured using the `options` argument (objec
 ### `keyboardMapping`
 
 -   **Type:** `Boolean`
--   **Default:** `true`
+-   **Default:** `false`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the keyboardMapping. This widget can be used to map key with command (i.e. tap, swipe-left, tilt, ...).

@@ -23,7 +23,7 @@ const defaultOptions = {
     navbar: true,
     power: true,
     keyboard: true,
-    keyboardMapping: true,
+    keyboardMapping: false,
     fullscreen: true,
     camera: true,
     microphone: false,

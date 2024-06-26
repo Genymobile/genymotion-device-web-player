@@ -227,8 +227,10 @@ module.exports = class KeyboardMapping {
                             break;
                         case 'isPaused':
                             if (value) {
+                                this.toolbarBtnImage.classList.add('keymapping-paused');
                                 this.state.isActive = false;
                             } else {
+                                this.toolbarBtnImage.classList.remove('keymapping-paused');
                                 this.state.isActive = true;
                             }
                             break;
@@ -334,7 +336,7 @@ module.exports = class KeyboardMapping {
         const toolbar = toolbars.children[0];
         this.toolbarBtn = document.createElement('li');
         this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-fingerprint-button';
+        this.toolbarBtnImage.className = 'gm-icon-button gm-keymapping-button';
         this.toolbarBtnImage.title = this.i18n.KEYMAPPING_TITLE || 'Key Mapping';
         this.toolbarBtn.onclick = () => (this.state.isActive = !this.state.isActive);
         this.toolbarBtn.appendChild(this.toolbarBtnImage);
@@ -357,7 +359,7 @@ module.exports = class KeyboardMapping {
         // reset
         this.state.workingMappedKeysConfig = {};
 
-        // Create a working version of the mappedKeysConfig, this will chane the structure to be more performant and avoid incepth loop
+        // Create a working version of the mappedKeysConfig, this will change the structure to be more performant and avoid incepth loop
         Object.entries(this.state.mappedKeysConfig).forEach(([gestureType, gestureConfig]) => {
             gestureConfig.forEach((gesture) => {
                 const groupId = generateUID();
@@ -420,7 +422,7 @@ module.exports = class KeyboardMapping {
                 .map((kConfig) => kConfig.key);
             const dPadGroupKeysPressed = dPadGroupKeys.filter((k) => this.state.currentlyPressedKeys.includes(k));
             if (!dPadGroupKeysPressed.length) {
-            this.dPadPushed = this.dPadPushed.filter((groupId) => groupId !== keyConfig.groupId);
+                this.dPadPushed = this.dPadPushed.filter((groupId) => groupId !== keyConfig.groupId);
             }
         }
     }
@@ -566,6 +568,7 @@ module.exports = class KeyboardMapping {
         this.keyboardCallbacks.forEach((item) => {
             item.removeListener();
         });
+        this.keyboardCallbacks.length = 0;
     }
 
     tilt() {
@@ -694,6 +697,6 @@ module.exports = class KeyboardMapping {
             (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
             this.instance.coordinateUtils.getYRatio();
 
-        return {x: xFromPercent, y: yFromPercent};
+        return {x: Math.floor(xFromPercent), y: Math.floor(yFromPercent)};
     }
 };

@@ -10,6 +10,7 @@ const initialState = {
         widgetOpened: [],
     },
     isKeyboardEventsEnabled: false,
+    isMouseEventsEnabled: false,
 };
 
 const createStore = (instance, reducer, state) => {
@@ -55,6 +56,9 @@ const reducer = (state, action) => {
             break;
         case 'KEYBOARD_EVENTS_ENABLED':
             newState = {...state, isKeyboardEventsEnabled: action.payload};
+            break;
+        case 'MOUSE_EVENTS_ENABLED':
+            newState = {...state, isMouseEventsEnabled: action.payload};
             break;
         case 'OVERLAY_OPEN':
             // eslint-disable-next-line no-case-declarations

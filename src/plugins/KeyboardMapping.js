@@ -142,10 +142,12 @@ module.exports = class KeyboardMapping {
             this.toolbarBtnImage.classList.add('gm-active');
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
+            this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
         } else {
             this.toolbarBtnImage.classList.remove('gm-active');
             this.removeKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
+            this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: !this.state.isPaused});
         }
     }
 
@@ -236,7 +238,7 @@ module.exports = class KeyboardMapping {
 
         for (let i = 0; i < mergedSequences.length; i++) {
             // Don't await for the first event, games which no need too many data will be faster
-            if (i % 2 === 0 && i !== 0) {
+            if (i % 1 === 0 && i !== 0) {
                 await new Promise((resolve) => setTimeout(resolve, 1));
             }
             this.sendEvent(mergedSequences[i]);
@@ -446,6 +448,9 @@ module.exports = class KeyboardMapping {
     }
 
     async onMouseDown(event) {
+        if (!this.sequences.mouse) {
+            this.sequences.mouse = [];
+        }
         this.sequences.mouse.push({
             type: 'MULTI_TOUCH',
             mode: 0,
@@ -475,6 +480,9 @@ module.exports = class KeyboardMapping {
     }
 
     async onMouseMove(event) {
+        if (!this.sequences.mouse) {
+            this.sequences.mouse = [];
+        }
         if (event.buttons !== 1) {
             return;
         }
@@ -521,7 +529,6 @@ module.exports = class KeyboardMapping {
      * Bind all event listener callback.
      */
     addKeyboardCallbacks() {
-        this.instance.root.tabIndex = 0;
         if (!this.keyboardCallbacks.length) {
             // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
             this.removeBlurListener = this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));

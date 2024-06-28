@@ -54,7 +54,6 @@ module.exports = class DeviceRenderer {
         this.reconnecting = false;
 
         this.touchEventsEnabled = false;
-        this.mouseEventsEnabled = false;
         this.gamepadEventsEnabled = false;
 
         // Websocket
@@ -469,10 +468,6 @@ module.exports = class DeviceRenderer {
 
             if (this.touchEventsEnabled) {
                 this.touchEvents.addTouchCallbacks();
-            }
-
-            if (this.mouseEventsEnabled) {
-                this.mouseEvents.addMouseCallbacks();
             }
 
             if (this.gamepadEventsEnabled) {

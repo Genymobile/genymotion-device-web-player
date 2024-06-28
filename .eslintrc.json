@@ -24,7 +24,7 @@
         "no-console": "warn",
         "no-extra-parens": "off",
         "no-loss-of-precision": "error",
-        "no-promise-executor-return": "error",
+        "no-promise-executor-return": "off",
         "no-template-curly-in-string": "error",
         "no-unreachable-loop": "error",
         "require-atomic-updates": "error",

@@ -188,70 +188,20 @@ module.exports = class KeyboardMapping {
         });
     }
 
-    async generateSequences() {
-        const sequences = Object.values(this.sequences);
-
-        const biggestSequence = sequences
-            .map((seq) => {
-                return seq.length;
-            })
-            .sort()
-            .pop();
-
-        const sequencesToMerge = [];
-        Array.from(Array(biggestSequence).keys()).forEach((i) => {
-            sequences.forEach((seq) => {
-                // group sequences by index in order to merge sequences of same index into one sequence
-                if (!seq.length) {
-                    // no sequence for this key
-                    return;
-                }
-                if (seq[i]) {
-                    if (!sequencesToMerge[i]) {
-                        sequencesToMerge[i] = [];
-                    }
-                    sequencesToMerge[i].push(seq[i]);
-                } else {
-                    // if not found take the last element
-                    if (!sequencesToMerge[i]) {
-                        sequencesToMerge[i] = [];
-                    }
-                    sequencesToMerge[i].push(seq[seq.length - 1]);
-                }
-            });
-        });
-
-        // Group the sequences in same index of sequencesToMerge array
-        const mergedSequences = [];
-        sequencesToMerge.forEach((sequencesToGroup) => {
-            // TODO calculate mode
-            mergedSequences.push({
-                type: 'MULTI_TOUCH',
-                nb: sequencesToGroup.length,
-                mode: sequencesToGroup[0].mode, // TODO ?
-                points: sequencesToGroup.reduce((acc, val) => {
-                    acc = [...acc, ...val.points];
-                    return acc;
-                }, []),
-            });
-        });
-
-        for (let i = 0; i < mergedSequences.length; i++) {
-            // Don't await for the first event, games which no need too many data will be faster
-            if (i % 1 === 0 && i !== 0) {
-                await new Promise((resolve) => setTimeout(resolve, 1));
-            }
-            this.sendEvent(mergedSequences[i]);
+    generateSequences(key) {
+        switch (this.state.workingMappedKeysConfig[key].type) {
+            case 'dPad':
+                this.generateDPADSequence(key);
+                break;
+            case 'tap':
+                this.generateTouchSequence(key);
+                break;
+            case 'swipe':
+                this.generateSwipeSequence(key);
+                break;
+            default:
+                break;
         }
-
-        // keep only last sequence for each key
-        Object.entries(this.sequences).forEach(([key, value]) => {
-            if (value.length > 0) {
-                this.sequences[key] = [value[value.length - 1]];
-            } else {
-                this.sequences[key] = [];
-            }
-        });
     }
 
     generateDPADSequence(key) {
@@ -358,6 +308,72 @@ module.exports = class KeyboardMapping {
         });
     }
 
+    async mergeSequences() {
+        const sequences = Object.values(this.sequences);
+
+        const biggestSequence = sequences
+            .map((seq) => {
+                return seq.length;
+            })
+            .sort()
+            .pop();
+
+        const sequencesToMerge = [];
+        Array.from(Array(biggestSequence).keys()).forEach((i) => {
+            sequences.forEach((seq) => {
+                // group sequences by index in order to merge sequences of same index into one sequence
+                if (!seq.length) {
+                    // no sequence for this key
+                    return;
+                }
+                if (seq[i]) {
+                    if (!sequencesToMerge[i]) {
+                        sequencesToMerge[i] = [];
+                    }
+                    sequencesToMerge[i].push(seq[i]);
+                } else {
+                    // if not found take the last element
+                    if (!sequencesToMerge[i]) {
+                        sequencesToMerge[i] = [];
+                    }
+                    sequencesToMerge[i].push(seq[seq.length - 1]);
+                }
+            });
+        });
+
+        // Group the sequences in same index of sequencesToMerge array
+        const mergedSequences = [];
+        sequencesToMerge.forEach((sequencesToGroup) => {
+            // TODO calculate mode
+            mergedSequences.push({
+                type: 'MULTI_TOUCH',
+                nb: sequencesToGroup.length,
+                mode: sequencesToGroup[0].mode, // TODO ?
+                points: sequencesToGroup.reduce((acc, val) => {
+                    acc = [...acc, ...val.points];
+                    return acc;
+                }, []),
+            });
+        });
+
+        for (let i = 0; i < mergedSequences.length; i++) {
+            // Don't await for the first event, games which no need too many data will be faster
+            if (i % 1 === 0 && i !== 0) {
+                await new Promise((resolve) => setTimeout(resolve, 1));
+            }
+            this.sendEvent(mergedSequences[i]);
+        }
+
+        // keep only last sequence for each key
+        Object.entries(this.sequences).forEach(([key, value]) => {
+            if (value.length > 0) {
+                this.sequences[key] = [value[value.length - 1]];
+            } else {
+                this.sequences[key] = [];
+            }
+        });
+    }
+
     async onKeyDown(event) {
         const key = event.key;
         // if key not found in the config then return
@@ -373,35 +389,11 @@ module.exports = class KeyboardMapping {
 
         // generate the sequence for the key pressed
         if (this.state.workingMappedKeysConfig[key]) {
-            switch (this.state.workingMappedKeysConfig[key].type) {
-                case 'dPad':
-                    this.generateDPADSequence(key);
-                    break;
-                case 'tap':
-                    this.generateTouchSequence(key);
-                    break;
-                case 'swipe':
-                    this.generateSwipeSequence(key);
-                    break;
-                case 'dtap':
-                    // Todo better way to manage this ?
-                    this.generateTouchSequence(key);
-                    await Promise.all(this.requestToGenerate);
-                    this.requestToGenerate.push(this.generateSequences());
-                    await this.onKeyUp(event);
-                    this.generateTouchSequence(key);
-                    await Promise.all(this.requestToGenerate);
-                    this.requestToGenerate.push(this.generateSequences());
-                    await this.onKeyUp(event);
-                    break;
-                default:
-                    break;
-            }
+            this.generateSequences(key);
+            // wait for other sequence to be sent
+            await Promise.all(this.requestToGenerate);
+            this.requestToGenerate.push(this.mergeSequences());
         }
-
-        // wait for other sequence to be sent
-        await Promise.all(this.requestToGenerate);
-        this.requestToGenerate.push(this.generateSequences());
     }
 
     async onKeyUp(event) {
@@ -426,6 +418,7 @@ module.exports = class KeyboardMapping {
         }
 
         // If another key with the same groupId is pressed then generate new coordonate for dpad and return
+        // TODO find a better place for this
         if (
             this.currentlyPressedKeys.some(
                 (k) =>
@@ -437,14 +430,14 @@ module.exports = class KeyboardMapping {
             this.generateDPADSequence(key);
             await Promise.all(this.requestToGenerate);
             this.requestToGenerate = [];
-            this.requestToGenerate.push(this.generateSequences());
+            this.requestToGenerate.push(this.mergeSequences());
 
             return;
         }
 
         this.sequences[groupId] = [];
         await Promise.all(this.requestToGenerate);
-        this.requestToGenerate.push(this.generateSequences());
+        this.requestToGenerate.push(this.mergeSequences());
     }
 
     async onMouseDown(event) {
@@ -463,7 +456,7 @@ module.exports = class KeyboardMapping {
             ],
         });
         await Promise.all(this.requestToGenerate);
-        this.requestToGenerate.push(this.generateSequences());
+        this.requestToGenerate.push(this.mergeSequences());
     }
 
     async onMouseUp() {
@@ -476,7 +469,7 @@ module.exports = class KeyboardMapping {
         await Promise.all(this.requestToGenerate);
         this.sequences.mouse = [];
 
-        this.requestToGenerate.push(this.generateSequences());
+        this.requestToGenerate.push(this.mergeSequences());
     }
 
     async onMouseMove(event) {
@@ -499,7 +492,7 @@ module.exports = class KeyboardMapping {
             ],
         });
         await Promise.all(this.requestToGenerate);
-        this.requestToGenerate.push(this.generateSequences());
+        this.requestToGenerate.push(this.mergeSequences());
     }
 
     getTapTouchEvent(keyConfig) {

@@ -20,6 +20,18 @@ module.exports = class Fullscreen {
             this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
         }
 
+        this.instance.apiManager.registerFunction({
+            name: 'fullsreen',
+            category: 'video',
+            fn: () => {
+                if (this.fullscreenEnabled()) {
+                    this.exitFullscreen();
+                } else {
+                    this.goFullscreen(this.instance.root);
+                }
+            },
+            description: 'toggle fullscreen mode',
+        });
         // Display widget
         this.renderToolbarButton();
     }

@@ -6,52 +6,55 @@ module.exports = class APIManager {
         this.apiFunctions = {};
 
         // record fn to send data to instance
-        this.registerFunction(
-            'sendData',
-            (json) => {
+        this.registerFunction({
+            name: 'sendData',
+            category: 'VM_communication',
+            fn: (json) => {
                 this.instance.sendEvent(json);
             },
-            'send data to WS messages of player, must be a JSON object. Example: {type: "MOUSE_PRESS", x: 100, y: 100}',
-        );
+            description: `send data to WS messages of player, must be a JSON object. 
+                Example: {type: "MOUSE_PRESS", x: 100, y: 100}`,
+        });
 
         // record fn to get registered functions
-        this.registerFunction(
-            'getRegisteredFunctions',
-            () => this.getRegisteredFunctions(),
-            'list all registered functions',
-        );
+        this.registerFunction({
+            name: 'getRegisteredFunctions',
+            category: 'utils',
+            fn: () => this.getRegisteredFunctions(),
+            description: 'list all registered functions',
+        });
 
         // record fn to get registered functions
-        this.registerFunction(
-            'addEventListener',
-            (event, fn) => {
-                return this.addEventListener(event, fn);
+        this.registerFunction({
+            name: 'addEventListener',
+            category: 'VM_communication',
+            fn: (event, fn) => {
+                return this.instance.addEventListener(event, fn);
             },
-            'attach event listener to WS messages of player',
-        );
+            description: 'attach event listener to WS messages of player',
+        });
 
         // record fn to disconnect from the instance
-        this.registerFunction(
-            'disconnect',
-            () => {
+        this.registerFunction({
+            name: 'disconnect',
+            category: 'VM_communication',
+            fn: () => {
                 this.instance.disconnect();
             },
-            'disconnect from the instance',
-        );
+            description: 'disconnect from the instance',
+        });
     }
 
-    registerFunction(name, fn, description = '') {
-        if (this.apiFunctions[name]) {
-            throw new Error(`Function ${name} is already registered.`);
+    registerFunction({name, category = 'global', fn, description = ''}) {
+        if (this.apiFunctions[`${category}_${name}`]) {
+            throw new Error(`Function ${name} for category ${category} is already registered.`);
         }
-        this.apiFunctions[name] = {
+        this.apiFunctions[`${category}_${name}`] = {
             fn,
+            category,
             description,
+            name,
         };
-    }
-    addEventListener(event, fn) {
-        // expose listener to ws instance
-        this.instance.registerEventCallback(event, fn);
     }
 
     /**
@@ -60,7 +63,7 @@ module.exports = class APIManager {
      */
     getRegisteredFunctions() {
         const exposedFunctionsDescription = Object.entries(this.apiFunctions).reduce((acc, val) => {
-            acc[val[0]] = val[1].description;
+            acc[val[1].name] = val[1].description;
             return acc;
         }, {});
         return exposedFunctionsDescription;
@@ -72,7 +75,12 @@ module.exports = class APIManager {
      */
     getExposedApiFunctions() {
         const exposedFunctions = Object.entries(this.apiFunctions).reduce((acc, val) => {
-            acc[val[0]] = val[1].fn;
+            const {name, category, fn} = val[1];
+
+            if (!acc[category]) {
+                acc[category] = {};
+            }
+            acc[category][name] = fn;
             return acc;
         }, {});
         return exposedFunctions;

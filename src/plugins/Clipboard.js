@@ -117,6 +117,8 @@ module.exports = class Clipboard extends OverlayPlugin {
         super.toggleWidget();
         if (this.instance.store.getters.isWidgetOpened(this.overlayID)) {
             this.clipboardInput.value = this.clipboard;
+            // put focus on the input field
+            this.clipboardInput.focus();
         }
     }
 

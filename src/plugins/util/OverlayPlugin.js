@@ -5,7 +5,7 @@ const {generateUID} = require('../../utils/helpers');
  * OverlayPlugin
  * Parent for widget (plugin)
  */
-module.exports = class OverlayPlugin {
+class OverlayPlugin {
     /**
      * Plugin initialization
      * @param {Object} instance device renderer instance
@@ -26,6 +26,13 @@ module.exports = class OverlayPlugin {
                 this.closeOverlay();
             }
         });
+
+        // Attach listener for first object created only
+        if (!OverlayPlugin.hasBeenCalled) {
+            this.instance.addListener(document, 'click', this.clickHandlerCloseOverlay.bind(this));
+
+            OverlayPlugin.hasBeenCalled = true;
+        }
     }
 
     /**
@@ -105,6 +112,9 @@ module.exports = class OverlayPlugin {
         }
     }
 
+    /**
+     * Toggle widget visibility
+     */
     toggleWidget() {
         this.instance.store.dispatch({
             type: 'OVERLAY_OPEN',
@@ -114,4 +124,19 @@ module.exports = class OverlayPlugin {
             },
         });
     }
-};
+
+    clickHandlerCloseOverlay(event) {
+        if (
+            event.target.closest('.gm-overlay') === null &&
+            !event.target.classList.contains('gm-icon-button') &&
+            !event.target.classList.contains('gm-dont-close') &&
+            this.instance.store.state.overlay.isOpen
+        ) {
+            this.instance.store.dispatch({type: 'OVERLAY_OPEN', payload: {toOpen: false}});
+        }
+    }
+}
+
+OverlayPlugin.hasBeenCalled = false;
+
+module.exports = OverlayPlugin;

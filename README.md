@@ -24,7 +24,10 @@ For more information about Genymotion devices, please visit [genymotion website]
     1. [With NPM/Yarn](#with-npmyarn)
     2. [With CDN](#with-cdn)
 3. [Usage](#usage)
+3. [Player API](#player-api)
 4. [Features & options](#features--options)
+5. [Features notes](#features-notes)
+    1. [Key mapping](#keymapping-notes)
 
 ## Requirements
 
@@ -118,33 +121,123 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
 ## Player API
 
-Plugin options and websocket communication can be handled through the API object returned by the `setupRenderer` function.
+The Player API provides functionality for managing plugin options and websocket communication. These operations are handled through the API (categorized) object returned by the `setupRenderer` function.
 
-Built-in exposed functions are
+### `VM_communication`
 
-### `getRegisteredFunctions`
+- #### `disconnect`
+    Disconnects the player from the virtual machine (VM) and cleans up the memory listener.
 
-which returns the list of available functions with an optional description
+- #### `addEventListener`
+    Registers a listener for messages emitted from the VM.
 
-### `disconnect`
+    - Parameters:
+        - event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps', and 'BATTERY_LEVEL'...
+        - callback (function): The function to call when the event is emitted. The message from the VM will be passed as an argument to the callback function.
 
-which disconnects the player from the VM and cleanups the memory listener
+    - Example Usage
+    ```js
+    addEventListener('fingerprint', (msg)=>{ console.log(msg) })
+    ```
 
-### `addEventListener`
-
-used to listen to messages emitted from the VM such as 'fingerprint', 'gps', 'BATTERY_LEVEL'
-
-```html
-addEventListener('fingerprint', (msg)=>{ console.log(msg) })
+- #### `sendData`
+    Sends messages to the VM.
+    - Parameters:
+        - `data` (object): An object containing the channel and the messages to be sent.
+            - `channel` (string): The channel to send the messages to.
+            - `messages` (array): An array of messages to be sent.
+    - Example Usage
+```js
+sendData({ 
+    channel: 'battery',
+    messages: ['set state level 10', 'set state status true'], 
+    })
 ```
 
-### `sendData`
+### `utils`
+- #### `getRegisteredFunctions`
+    Returns a list of available functions with optional descriptions.
 
-used to send messages to the VM.
+### `keymapping`
+- #### `setConfig`
+    supply a config for keymapping
+    ```js
+    {
+        dpad:[{
+            keys: {
+                z: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 0,
+                    distanceY: -10,
+                    description: 'move up',
+                },
+                s: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 0,
+                    distanceY: 10,
+                    description: 'move down',
+                },
+                q: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: -10,
+                    distanceY: 0,
+                    description: 'move left',
+                },
+                d: {
+                    initialX: 20,
+                    initialY: 80,
+                    distanceX: 10,
+                    distanceY: 0,
+                    description: 'move right',
+                },
+            },
+            name: 'character movement',
+            description: 'left joystick used to move the character',
+        }],
+        tap:[{
+            keys: {
+                p: {
+                    initialX: 50,
+                    initialY: 50,
+                },
+            }
+            name:'Fire'
+        }],
+        swipe: [{
+            keys: {
+                u: {
+                    initialX: 50,
+                    initialY: 50,
+                    distanceX: -10,
+                    distanceY: 0,
+                    description: 'swipe left',
+                },
+            }
+            name:'Left dodge'
+            description: 'Dodge on the left'
+        }]
+    }
+    ```
+- #### `activeKeyMappingDebug`
+    helper to create the config mapping
+    - Parameters:
+        - `isTraceActivate` (boolean) : when true all click on video stream will print x and y coord over the video
+        - `isGridActivate` (boolean): when true display a grid over the video stream. Row and column have both a size of 10%.
 
-```html
-sendData({ channel: 'battery', messages: ['set state level 10', 'set state status true'], })
-```
+- #### `enable`
+    - Parameters:
+        - `isActive` (boolean) : **Optionnal** parameter to activate or desactivate keymapping, **default false**
+
+### `media`
+- #### `mute`
+- #### `unmute`
+
+### `video`
+- #### `fullsreen`
+Need to be call from an user action, in accordance with browser security rules
 
 ## Features & options
 
@@ -254,7 +347,7 @@ A device renderer instance can be configured using the `options` argument (objec
 ### `keyboardMapping`
 
 -   **Type:** `Boolean`
--   **Default:** `false`
+-   **Default:** `true`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the keyboardMapping. This widget can be used to map key with command (i.e. tap, swipe-left, tilt, ...).

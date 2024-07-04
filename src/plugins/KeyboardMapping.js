@@ -3,8 +3,79 @@
 const {generateUID} = require('../utils/helpers');
 
 /**
- * Instance keyboard plugin.KeyboardMapping
- * Translate and forward keyboard events to instance.
+ * This puglin send touch events to the instance when mapping keys are pressed.
+ * The mapping keys are defined in the config file.
+ * Beware that certain game
+ *  - need more points to trigger a move (like 5 points for move the dpad).
+ *  - need a delay between each point sendind (see new Promise((resolve) => setTimeout(resolve, 1));)
+ * This is an example of touch events needed to move 2 fingers from point A to point B:
+ * 1) send a touch for the first finger at point A
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   mode: 0, <-- 0: touch down, 1: touch up, 2: touch move
+ *   nb: 1,
+ *   points: [{x: 100, y: 100}],
+ * }
+ * 2) send a move (or a second touch, if no move was sent) for the first finger at point A
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   mode: 2,
+ *   nb: 1,
+ *   points: [{x: 110, y: 110}],
+ * }
+ * 3) send a move for the SECOND finger at point B
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   mode: 2, <-- even if we add a second finger, the mode is always 2 until we release all the touch
+ *   nb: 2,   <-- we have now 2 fingers, qo we need to send 2 points
+ *   points: [{x: 120, y: 110}, {x: 830, y: 520}],
+ * }
+ * 4) From now all touch (finger) position must be sent in the same event, or android will interpret the missing position as a release of the touch
+ * It's important to understand that android deduce the touch to release or to move from the previous event.
+ * It's for this reason that we always send the new position for a move (or the same position if finger didn't move)
+ * and not the start position and the end position.
+ * 5) adding a finger at point C, don't move the finger at point A and move the finger at point B
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   mode: 2,
+ *   nb: 3,
+ *   points: [{x: 120, y: 110}, {x: 830, y: 500}, {x: 400, y: 400}],
+ * }
+ * 6) release all the touch
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   nb: 0,
+ *   mode: 1,
+ *   points: [],
+ *}
+ * 7) for a new touch event, we need to send a new touch event (mode: 0). You can send multiple finger at the same time.
+ * {
+ *   type: 'MULTI_TOUCH',
+ *   mode: 0,
+ *   nb: 2,
+ *   points: [{x: 120, y: 110}, {x: 830, y: 500}],
+ * }
+ * The plugin generate the touch sequence (touch + move for dpad and swipe, touch for tap)
+ * for each 'plugin' (dpad, swipe, tap, ...) activated (by pressing the right key) and merge sequences of each plugin by index.
+ * for example if i push a key of a dpap and a key for a swipe, we generate the sequence for the dpad and the sequence for the swipe
+ * DPAD:
+ * [{x: 100, y: 100}] en mode 0
+ * [{x: 100, y: 110}] en mode 2
+ * [{x: 100, y: 120}] en mode 2
+ * SWIPE:
+ * [{x: 400, y: 400}] en mode 0
+ * [{x: 400, y: 440}] en mode 2
+ *
+ * 1) we merge the point of index 0 of each sequence and send it to the instance
+ * 2) we merge the point of index 1 of each sequence and send it to the instance
+ * 3) we send the last point for DPAP. No point is added for swipe, cause we release the touch.
+ * In case of finger must be still on the screen for the second plugin,we need to add the last point of the sequence (finger didn't move but still on the screen)
+ *
+ * Last point to keep in mind is the new Promise((resolve) => setTimeout(resolve, 1));
+ * Some games need a delay betwen each point (of a sequence) to trigger a move. But this introduce asynchrone,
+ * to simplify v1 we wait that previous sequence is sent before sending the next one.
+ * In a future version we will cancel move if a new one is triggered instead of waiting for the previous one to be sent.
+ *
  */
 module.exports = class KeyboardMapping {
     /**
@@ -417,8 +488,10 @@ module.exports = class KeyboardMapping {
             return;
         }
 
-        // If another key with the same groupId is pressed then generate new coordonate for dpad and return
-        // TODO find a better place for this
+        /*
+         * If another key with the same groupId is pressed then generate new coordonate for dpad and return
+         * TODO find a better place for this
+         */
         if (
             this.currentlyPressedKeys.some(
                 (k) =>

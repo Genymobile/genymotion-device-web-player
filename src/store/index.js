@@ -93,6 +93,7 @@ const reducer = (state, action) => {
             };
             break;
         default:
+            log.debug('Store not updated, action type :', action.type, ' unknown');
             break;
     }
 

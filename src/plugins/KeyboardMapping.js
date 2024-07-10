@@ -3,80 +3,99 @@
 const {generateUID} = require('../utils/helpers');
 
 /**
- * This puglin send touch events to the instance when mapping keys are pressed.
- * The mapping keys are defined in the config file.
- * Beware that certain game
- *  - need more points to trigger a move (like 5 points for move the dpad).
- *  - need a delay between each point sendind (see new Promise((resolve) => setTimeout(resolve, 1));)
- * This is an example of touch events needed to move 2 fingers from point A to point B:
- * 1) send a touch for the first finger at point A
+ * This plugin sends touch events to the instance when mapped keys are pressed.
+ * The mapped keys are defined in the config file.
+ * Be aware that some games:
+ *  - might need more points to trigger a move (e.g. 5 points for moving the dpad).
+ *  - might need a delay between each point sent (e.g., `new Promise((resolve) => setTimeout(resolve, 1));`).
+ *
+ * Here's an example of touch events needed to move two fingers from point A to point B:
+ *
+ * 1) Send a touch for the first finger at point A:
  * {
  *   type: 'MULTI_TOUCH',
- *   mode: 0, <-- 0: touch down, 1: touch up, 2: touch move
+ *   mode: 0,  // 0: touch down, 1: touch up, 2: touch move
  *   nb: 1,
  *   points: [{x: 100, y: 100}],
  * }
- * 2) send a move (or a second touch, if no move was sent) for the first finger at point A
+ *
+ * 2) Send a move (or a second touch, if no move was sent) for the first finger at point A:
  * {
  *   type: 'MULTI_TOUCH',
  *   mode: 2,
  *   nb: 1,
  *   points: [{x: 110, y: 110}],
  * }
- * 3) send a move for the SECOND finger at point B
+ *
+ * 3) Send a move for the second finger at point B:
  * {
  *   type: 'MULTI_TOUCH',
- *   mode: 2, <-- even if we add a second finger, the mode is always 2 until we release all the touch
- *   nb: 2,   <-- we have now 2 fingers, qo we need to send 2 points
+ *   mode: 2,  // Even if we add a second finger, the mode is always 2 until we release all the touches.
+ *   nb: 2,   // We have now two fingers, so we need to send two points.
  *   points: [{x: 120, y: 110}, {x: 830, y: 520}],
  * }
- * 4) From now all touch (finger) position must be sent in the same event, or android will interpret the missing position as a release of the touch
- * It's important to understand that android deduce the touch to release or to move from the previous event.
- * It's for this reason that we always send the new position for a move (or the same position if finger didn't move)
- * and not the start position and the end position.
- * 5) adding a finger at point C, don't move the finger at point A and move the finger at point B
+ *
+ * 4) From now on, all touch (finger) positions must be sent in the same event.
+ *    If Android doesn't receive all the positions, it will interpret the missing positions as a release of the touches.
+ *    It's important to understand that Android deduces which finger to release or move from the previous event.
+ *    It's for this reason that we always send the new position for a move (or the same position if the finger didn't move)
+ *    and not the start position and the end position.
+ *
+ * 5) Adding a finger at point C, don't move the finger at point A and move the finger at point B:
  * {
  *   type: 'MULTI_TOUCH',
  *   mode: 2,
  *   nb: 3,
  *   points: [{x: 120, y: 110}, {x: 830, y: 500}, {x: 400, y: 400}],
  * }
- * 6) release all the touch
+ *
+ * 6) Release all the touches:
  * {
  *   type: 'MULTI_TOUCH',
  *   nb: 0,
  *   mode: 1,
  *   points: [],
- *}
- * 7) for a new touch event, we need to send a new touch event (mode: 0). You can send multiple finger at the same time.
+ * }
+ *
+ * 7) For a new touch event, we need to send a new touch event (mode: 0). You can send multiple fingers at the same time.
  * {
  *   type: 'MULTI_TOUCH',
  *   mode: 0,
  *   nb: 2,
  *   points: [{x: 120, y: 110}, {x: 830, y: 500}],
  * }
- * The plugin generate the touch sequence (touch + move for dpad and swipe, touch for tap)
- * for each 'plugin' (dpad, swipe, tap, ...) activated (by pressing the right key) and merge sequences of each plugin by index.
- * for example if i push a key of a dpap and a key for a swipe, we generate the sequence for the dpad and the sequence for the swipe
- * DPAD:
- * [{x: 100, y: 100}] en mode 0
- * [{x: 100, y: 110}] en mode 2
- * [{x: 100, y: 120}] en mode 2
- * SWIPE:
- * [{x: 400, y: 400}] en mode 0
- * [{x: 400, y: 440}] en mode 2
  *
- * 1) we merge the point of index 0 of each sequence and send it to the instance
- * 2) we merge the point of index 1 of each sequence and send it to the instance
- * 3) we send the last point for DPAP. No point is added for swipe, cause we release the touch.
- * In case of finger must be still on the screen for the second plugin,we need to add the last point of the sequence (finger didn't move but still on the screen)
+ * The plugin generates touch sequences (touch + move for D-pad and swipe, touch for tap)
+ * for each plugin (D-pad, swipe, tap, etc.) activated (by pressing the right key).
+ * The plugin then merges sequences of each plugin by index into a new sequence to send to the instance.
+ * For example, if you press keys for a D-pad and a swipe, the plugin generates sequences
+ * for the D-pad and the swipe:
  *
- * Last point to keep in mind is the new Promise((resolve) => setTimeout(resolve, 1));
- * Some games need a delay betwen each point (of a sequence) to trigger a move. But this introduce asynchrone,
- * to simplify v1 we wait that previous sequence is sent before sending the next one.
- * In a future version we will cancel move if a new one is triggered instead of waiting for the previous one to be sent.
+ * D-pad:
+ * [{x: 100, y: 100}] in mode 0
+ * [{x: 100, y: 110}] in mode 2
+ * [{x: 100, y: 120}] in mode 2
+ *
+ * Swipe:
+ * [{x: 400, y: 400}] in mode 0
+ * [{x: 400, y: 440}] in mode 2
+ *
+ * 1) The plugin merges the first point of each sequence and sends it to the instance.
+ * 2) The plugin merges the second point of each sequence and sends it to the instance.
+ * 3) For D-pad, the plugin sends the last point and does not add a point for swipe because
+ *    the touch is released.
+ *    If instead we want to keep the finger on the screen for the second plugin,
+ *    we need to repeat the last point of the sequence: the finger didn't move but is still on the screen.
+ *
+ * Last point to keep in mind is the new Promise((resolve) => setTimeout(resolve, 1)).
+ * Some games need a delay between each point (of a sequence) to trigger a move.
+ * But this pause introduces asynchrone timing where we cannot cancel a sequence.
+ * To simplify the initial version, the plugin waits for the previous sequence to be sent
+ * before sending the next one. In a future version, the plugin cancels the current move if
+ * a new one is triggered instead of waiting for the previous one to be sent.
  *
  */
+
 module.exports = class KeyboardMapping {
     /**
      * Plugin initialization.
@@ -150,46 +169,7 @@ module.exports = class KeyboardMapping {
         this.renderToolbarButton();
 
         // register api function
-
-        // set config file
-        this.instance.apiManager.registerFunction({
-            name: 'setConfig',
-            category: 'keyMapping',
-            fn: (config) => {
-                // check it's a valid JSON
-                try {
-                    this.state.mappedKeysConfig = JSON.parse(JSON.stringify(config));
-                } catch (err) {
-                    throw new Error('Invalid JSON');
-                }
-                this.state.config = config;
-            },
-            description: 'Submit a config for mapping keys',
-        });
-
-        // active trace when click on screen
-        this.instance.apiManager.registerFunction({
-            name: 'activeKeyMappingDebug',
-            category: 'keyMapping',
-            fn: (isTraceActivate = false, isGridActivate = false) => {
-                this.activateTrace(isTraceActivate);
-                this.activateGrid(isGridActivate);
-            },
-            description: `Activate debug mode for key mapping. the first parameter activate 
-            feature "click on screen add a div with x, y and x%, y%coordonates.\n
-            The second parameter activate a grid on the screen to help mapping keys. 
-            10% of the screen width and height.`,
-        });
-
-        // active trace when click on screen
-        this.instance.apiManager.registerFunction({
-            name: 'enable',
-            category: 'keyMapping',
-            fn: (isActive = false) => {
-                this.state.isActive = isActive;
-            },
-            description: 'Activate the keyMapping plugin.',
-        });
+        this.exposedAPI();
     }
 
     renderToolbarButton() {
@@ -222,6 +202,12 @@ module.exports = class KeyboardMapping {
         }
     }
 
+    /**
+     * this function is called when the config is set for this.state.mappedKeysConfig
+     * the main goal is to create a new flattened object  of this.state.mappedKeysConfig
+     * like {k: {all data for k from this.state.mappedKeysConfig}}
+     * this is used to simplify all loops over the config (speed up code, simplify code and better readability)
+     */
     setupMappedKeysConfig() {
         // reset
         this.state.workingMappedKeysConfig = {};
@@ -301,11 +287,14 @@ module.exports = class KeyboardMapping {
             }
         });
 
-        // if another key is always pressed then initial coord must be from lastpoint
+        // if another key is already pressed then initial coord must be from lastpoint
         const lastDPADSequence = this.sequences[groupId]?.[this.sequences[groupId].length - 1];
         if (lastDPADSequence) {
             // get percent of screen from lastDPADSequence.points.x
-            const {x, y} = this.calculateCoorToPercent(lastDPADSequence.points[0].x, lastDPADSequence.points[0].y);
+            const {x, y} = this.instance.coordinateUtils.calculateCoorToPercent(
+                lastDPADSequence.points[0].x,
+                lastDPADSequence.points[0].y,
+            );
             // change initialX and initialY
             initialX = x;
             initialY = y;
@@ -322,7 +311,7 @@ module.exports = class KeyboardMapping {
                 type: 'MULTI_TOUCH',
                 mode: 0,
                 nb: 1,
-                points: [this.calculateCoorFromPercent(initialX, initialY)],
+                points: [this.instance.coordinateUtils.calculateCoorFromPercent(initialX, initialY)],
             });
         }
         // get the last sequence of previous dpad position
@@ -338,7 +327,7 @@ module.exports = class KeyboardMapping {
                 type: 'MULTI_TOUCH',
                 mode: 2,
                 nb: 1,
-                points: [this.calculateCoorFromPercent(x, y)],
+                points: [this.instance.coordinateUtils.calculateCoorFromPercent(x, y)],
             });
         }
     }
@@ -352,7 +341,7 @@ module.exports = class KeyboardMapping {
             type: 'MULTI_TOUCH',
             mode: 0,
             nb: 1,
-            points: [this.calculateCoorFromPercent(x, y)],
+            points: [this.instance.coordinateUtils.calculateCoorFromPercent(x, y)],
         });
     }
 
@@ -365,7 +354,7 @@ module.exports = class KeyboardMapping {
             type: 'MULTI_TOUCH',
             mode: 0,
             nb: 1,
-            points: [this.calculateCoorFromPercent(newPosition.x, newPosition.y)],
+            points: [this.instance.coordinateUtils.calculateCoorFromPercent(newPosition.x, newPosition.y)],
         });
 
         newPosition.x += keyConfig.distanceX;
@@ -375,7 +364,7 @@ module.exports = class KeyboardMapping {
             type: 'MULTI_TOUCH',
             mode: 2,
             nb: 1,
-            points: [this.calculateCoorFromPercent(newPosition.x, newPosition.y)],
+            points: [this.instance.coordinateUtils.calculateCoorFromPercent(newPosition.x, newPosition.y)],
         });
     }
 
@@ -569,7 +558,7 @@ module.exports = class KeyboardMapping {
     }
 
     getTapTouchEvent(keyConfig) {
-        return this.calculateCoorFromPercent(keyConfig.x, keyConfig.y);
+        return this.instance.coordinateUtils.calculateCoorFromPercent(keyConfig.x, keyConfig.y);
     }
 
     async releaseAllTouch() {
@@ -626,6 +615,51 @@ module.exports = class KeyboardMapping {
             item.removeListener();
         });
         this.keyboardCallbacks.length = 0;
+    }
+
+    /**
+     * Expose API functions.
+     */
+    exposedAPI() {
+        // set config file
+        this.instance.apiManager.registerFunction({
+            name: 'setConfig',
+            category: 'keyMapping',
+            fn: (config) => {
+                // check it's a valid JSON
+                try {
+                    this.state.mappedKeysConfig = JSON.parse(JSON.stringify(config));
+                } catch (err) {
+                    throw new Error('Invalid JSON');
+                }
+                this.state.config = config;
+            },
+            description: 'Submit a config for mapping keys (see keymapping > setConfig section of the README file).',
+        });
+
+        // active trace when click on screen
+        this.instance.apiManager.registerFunction({
+            name: 'activeKeyMappingDebug',
+            category: 'keyMapping',
+            fn: (isTraceActivate = false, isGridActivate = false) => {
+                this.activateTrace(isTraceActivate);
+                this.activateGrid(isGridActivate);
+            },
+            description: `Activate debug mode for key mapping. the first parameter activate 
+            feature "click on screen add a div with x, y and x%, y%coordonates.\n
+            The second parameter activate a grid on the screen to help mapping keys. 
+            10% of the screen width and height.`,
+        });
+
+        // active trace when click on screen
+        this.instance.apiManager.registerFunction({
+            name: 'enable',
+            category: 'keyMapping',
+            fn: (isActive = false) => {
+                this.state.isActive = isActive;
+            },
+            description: 'Activate the keyMapping plugin.',
+        });
     }
 
     activateTrace(isActive) {
@@ -720,29 +754,5 @@ module.exports = class KeyboardMapping {
                 e.remove();
             });
         }
-    }
-
-    calculateCoorFromPercent(x, y) {
-        const videoSize = this.instance.video.getBoundingClientRect();
-
-        const xFromPercent = (x / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
-        const yFromPercent =
-            (y / 100) *
-            (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
-            this.instance.coordinateUtils.getYRatio();
-
-        return {x: Math.floor(xFromPercent), y: Math.floor(yFromPercent)};
-    }
-
-    calculateCoorToPercent(x, y) {
-        const videoSize = this.instance.video.getBoundingClientRect();
-
-        const xPercent = 100 / ((videoSize.width * this.instance.coordinateUtils.getXRatio()) / x);
-        const yPercent =
-            100 /
-            (((videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
-                this.instance.coordinateUtils.getYRatio()) /
-                y);
-        return {x: Math.round(xPercent), y: Math.round(yPercent)};
     }
 };

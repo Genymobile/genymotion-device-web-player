@@ -196,4 +196,28 @@ module.exports = class CoordinateUtils {
         const videoRealSizeX = (this.video.videoWidth / this.video.videoHeight) * this.video.offsetHeight;
         return (this.video.offsetWidth - videoRealSizeX) / 2;
     }
+
+    calculateCoorFromPercent(x, y) {
+        const videoSize = this.instance.video.getBoundingClientRect();
+
+        const xFromPercent = (x / 100) * videoSize.width * this.instance.coordinateUtils.getXRatio();
+        const yFromPercent =
+            (y / 100) *
+            (videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
+            this.instance.coordinateUtils.getYRatio();
+
+        return {x: Math.floor(xFromPercent), y: Math.floor(yFromPercent)};
+    }
+
+    calculateCoorToPercent(x, y) {
+        const videoSize = this.instance.video.getBoundingClientRect();
+
+        const xPercent = 100 / ((videoSize.width * this.instance.coordinateUtils.getXRatio()) / x);
+        const yPercent =
+            100 /
+            (((videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2) *
+                this.instance.coordinateUtils.getYRatio()) /
+                y);
+        return {x: Math.round(xPercent), y: Math.round(yPercent)};
+    }
 };

@@ -64,7 +64,7 @@ const reducer = (state, action) => {
             // eslint-disable-next-line no-case-declarations
             const {overlayID, toOpen} = action.payload;
             if (toOpen) {
-                return {
+                newState = {
                     ...state,
                     overlay: {
                         isOpen: true,
@@ -75,7 +75,9 @@ const reducer = (state, action) => {
                          */
                     },
                     isKeyboardEventsEnabled: false,
+                    isMouseEventsEnabled: false,
                 };
+                break;
             }
             // eslint-disable-next-line no-case-declarations
             const widgetOpened = [];
@@ -90,6 +92,7 @@ const reducer = (state, action) => {
                     widgetOpened,
                 },
                 isKeyboardEventsEnabled: true,
+                isMouseEventsEnabled: true,
             };
             break;
         default:

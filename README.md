@@ -24,9 +24,9 @@ For more information about Genymotion devices, please visit [genymotion website]
     1. [With NPM/Yarn](#with-npmyarn)
     2. [With CDN](#with-cdn)
 3. [Usage](#usage)
-3. [Player API](#player-api)
-4. [Features & options](#features--options)
-5. [Features notes](#features-notes)
+4. [Player API](#player-api)
+5. [Features & options](#features--options)
+6. [Features notes](#features-notes)
     1. [Key mapping](#keymapping-notes)
 
 ## Requirements
@@ -125,41 +125,50 @@ The Player API provides functionality for managing plugin options and websocket 
 
 ### `VM_communication`
 
-- #### `disconnect`
+-   #### `disconnect`
+
     Disconnects the player from the virtual machine (VM) and cleans up the memory listener.
 
-- #### `addEventListener`
+-   #### `addEventListener`
+
     Registers a listener for messages emitted from the VM.
 
-    - Parameters:
-        - event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps', and 'BATTERY_LEVEL'...
-        - callback (function): The function to call when the event is emitted. The message from the VM will be passed as an argument to the callback function.
+    -   Parameters:
 
-    - Example Usage
+        -   event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps', and 'BATTERY_LEVEL'...
+        -   callback (function): The function to call when the event is emitted. The message from the VM will be passed as an argument to the callback function.
+
+    -   Example Usage
+
     ```js
-    addEventListener('fingerprint', (msg)=>{ console.log(msg) })
+    addEventListener('fingerprint', (msg) => {
+        console.log(msg);
+    });
     ```
 
-- #### `sendData`
+-   #### `sendData`
     Sends messages to the VM.
-    - Parameters:
-        - `data` (object): An object containing the channel and the messages to be sent.
-            - `channel` (string): The channel to send the messages to.
-            - `messages` (array): An array of messages to be sent.
-    - Example Usage
+    -   Parameters:
+        -   `data` (object): An object containing the channel and the messages to be sent.
+            -   `channel` (string): The channel to send the messages to.
+            -   `messages` (array): An array of messages to be sent.
+    -   Example Usage
+
 ```js
-sendData({ 
+sendData({
     channel: 'battery',
-    messages: ['set state level 10', 'set state status true'], 
-    })
+    messages: ['set state level 10', 'set state status true'],
+});
 ```
 
 ### `utils`
-- #### `getRegisteredFunctions`
+
+-   #### `getRegisteredFunctions`
     Returns a list of available functions with optional descriptions.
 
 ### `keymapping`
-- #### `setConfig`
+
+-   #### `setConfig`
     supply a config for keymapping
     ```js
     {
@@ -221,23 +230,27 @@ sendData({
         }]
     }
     ```
-- #### `activeKeyMappingDebug`
-    helper to create the config mapping
-    - Parameters:
-        - `isTraceActivate` (boolean) : when true all click on video stream will print x and y coord over the video
-        - `isGridActivate` (boolean): when true display a grid over the video stream. Row and column have both a size of 10%.
+-   #### `activeKeyMappingDebug`
 
-- #### `enable`
-    - Parameters:
-        - `isActive` (boolean) : **Optionnal** parameter to activate or desactivate keymapping, **default false**
+    helper to create the config mapping
+
+    -   Parameters:
+        -   `isTraceActivate` (boolean) : when true all click on video stream will print x and y coord over the video
+        -   `isGridActivate` (boolean): when true display a grid over the video stream. Row and column have both a size of 10%.
+
+-   #### `enable`
+    -   Parameters:
+        -   `isActive` (boolean) : **Optionnal** parameter to activate or desactivate keymapping, **default false**
 
 ### `media`
-- #### `mute`
-- #### `unmute`
+
+-   #### `mute`
+-   #### `unmute`
 
 ### `video`
-- #### `fullsreen`
-Need to be call from an user action, in accordance with browser security rules
+
+-   #### `fullscreen`
+    Need to be call from an user action, in accordance with browser security rules
 
 ## Features & options
 

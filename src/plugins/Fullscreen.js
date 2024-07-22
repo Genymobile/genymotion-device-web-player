@@ -21,7 +21,7 @@ module.exports = class Fullscreen {
         }
 
         this.instance.apiManager.registerFunction({
-            name: 'fullsreen',
+            name: 'fullscreen',
             category: 'video',
             fn: () => {
                 if (this.fullscreenEnabled()) {

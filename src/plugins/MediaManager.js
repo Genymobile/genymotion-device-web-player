@@ -32,22 +32,32 @@ module.exports = class MediaManager {
         this.videoHeight = videoHeight;
         this.videoWithMicrophone = videoWithMicrophone;
 
-        // register mute/unmute to exposed API
+        // Register a function to mute the video in the exposed API
         this.instance.apiManager.registerFunction({
             name: 'mute',
             category: 'media',
             fn: () => {
-                this.instance.video.isMuted = true;
-                this.instance.video.muted = true;
+                // Set the video to muted state
+                this.instance.video.isMuted = true; // Custom flag for muted status
+                this.instance.video.muted = true; // HTMLMediaElement property to mute audio
             },
+            description:
+                // eslint-disable-next-line max-len
+                'Mute the video by setting the muted property to true. This function silences the audio of the current video instance.',
         });
+
+        // Register a function to unmute the video in the exposed API
         this.instance.apiManager.registerFunction({
             name: 'unmute',
             category: 'media',
             fn: () => {
-                this.instance.video.isMuted = false;
-                this.instance.video.muted = false;
+                // Set the video to unmuted state
+                this.instance.video.isMuted = false; // Custom flag for muted status
+                this.instance.video.muted = false; // HTMLMediaElement property to unmute audio
             },
+            description:
+                // eslint-disable-next-line max-len
+                'Unmute the video by setting the muted property to false. This function restores the audio of the current video instance.',
         });
     }
 

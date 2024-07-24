@@ -5,46 +5,86 @@ module.exports = class APIManager {
         this.instance = instance;
         this.apiFunctions = {};
 
-        // record fn to send data to instance
+        // Register a function to send data to the instance
         this.registerFunction({
             name: 'sendData',
             category: 'VM_communication',
             fn: (json) => {
                 this.instance.sendEvent(json);
             },
-            description: `send data to WS messages of player, must be a JSON object. 
-                Example: {type: "MOUSE_PRESS", x: 100, y: 100}`,
+            description:
+                // eslint-disable-next-line max-len
+                'Send data to the instance using WebSocket messages. The data must be a JSON object. Example usage: {type: "MOUSE_PRESS", x: 100, y: 100}',
         });
 
-        // record fn to get registered functions
-        this.registerFunction({
-            name: 'getRegisteredFunctions',
-            category: 'utils',
-            fn: () => this.getRegisteredFunctions(),
-            description: 'list all registered functions',
-        });
-
-        // record fn to get registered functions
+        // Register a function to add an event listener
         this.registerFunction({
             name: 'addEventListener',
             category: 'VM_communication',
             fn: (event, fn) => {
                 return this.instance.addEventListener(event, fn);
             },
-            description: 'attach event listener to WS messages of player',
+            description:
+                // eslint-disable-next-line max-len
+                'Add an event listener for WebSocket messages from the instance. The listener will be triggered whenever the specified event occurs.',
         });
 
-        // record fn to disconnect from the instance
+        // Register a function to disconnect from the instance
         this.registerFunction({
             name: 'disconnect',
             category: 'VM_communication',
             fn: () => {
                 this.instance.disconnect();
             },
-            description: 'disconnect from the instance',
+            description: 'Disconnect from the current instance, ending the WebSocket communication.',
+        });
+
+        // Register a function to get all registered functions
+        this.registerFunction({
+            name: 'getRegisteredFunctions',
+            category: 'utils',
+            fn: () => this.getRegisteredFunctions(),
+            description: 'Retrieve a list of all registered API functions with their descriptions.',
+        });
+
+        // Register a function to enable or disable tracking of events
+        this.registerFunction({
+            name: 'enableTrackEvents',
+            category: 'analytics',
+            fn: (isActive) => {
+                this.instance.store.dispatch({type: 'ENABLE_TRACKED_EVENTS', payload: isActive});
+                if (!isActive) {
+                    this.instance.store.dispatch({type: 'FLUSH_TRACKED_EVENTS'});
+                }
+            },
+            description:
+                'Enable or disable the tracking of analytic events. If disabled, all tracked events will be cleared.',
+        });
+
+        // Register a function to process tracked events
+        this.registerFunction({
+            name: 'trackEvents',
+            category: 'analytics',
+            fn: (cb) => {
+                // Subscribe to store's TRACKEVENT changes
+                this.instance.store.subscribe(
+                    ({trackedEvents}) => {
+                        if (this.instance.store.state.trackedEvents.events.length) {
+                            cb([...trackedEvents.events]);
+                            // Flush the tracked events
+                            this.instance.store.dispatch({type: 'FLUSH_TRACKED_EVENTS'});
+                        }
+                    },
+                    ['trackedEvents.events'],
+                );
+            },
+            description:
+                // eslint-disable-next-line max-len
+                'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
         });
     }
 
+    // Register a new API function with its name, category, function, and description
     registerFunction({name, category = 'global', fn, description = ''}) {
         if (this.apiFunctions[`${category}_${name}`]) {
             throw new Error(`Function ${name} for category ${category} is already registered.`);
@@ -58,8 +98,8 @@ module.exports = class APIManager {
     }
 
     /**
-     * Get exposed API description
-     * @returns {Array} list of api description {apiName: string, apiDescription: string}
+     * Get the description of exposed API functions
+     * @returns {Array} List of API descriptions {apiName: string, apiDescription: string}
      */
     getRegisteredFunctions() {
         const exposedFunctionsDescription = Object.entries(this.apiFunctions).reduce((acc, val) => {
@@ -71,7 +111,7 @@ module.exports = class APIManager {
 
     /**
      * Get exposed API functions
-     * @returns {Array} list of api fn {apiName: fn}
+     * @returns {Array} List of API functions {apiName: fn}
      */
     getExposedApiFunctions() {
         const exposedFunctions = Object.entries(this.apiFunctions).reduce((acc, val) => {

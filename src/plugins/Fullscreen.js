@@ -30,7 +30,9 @@ module.exports = class Fullscreen {
                     this.goFullscreen(this.instance.root);
                 }
             },
-            description: 'toggle fullscreen mode',
+            description:
+                // eslint-disable-next-line max-len
+                'Toggle fullscreen mode for the video player. If the player is currently in fullscreen, it will exit fullscreen; otherwise, it will enter fullscreen mode.',
         });
         // Display widget
         this.renderToolbarButton();

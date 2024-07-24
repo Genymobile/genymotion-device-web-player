@@ -634,7 +634,9 @@ module.exports = class KeyboardMapping {
                 }
                 this.state.config = config;
             },
-            description: 'Submit a config for mapping keys (see keymapping > setConfig section of the README file).',
+            description:
+                // eslint-disable-next-line max-len
+                'Submit a config for mapping keys. Please refer to the keyMapping > setConfig section of the README file for details.',
         });
 
         // active trace when click on screen
@@ -645,20 +647,19 @@ module.exports = class KeyboardMapping {
                 this.activateTrace(isTraceActivate);
                 this.activateGrid(isGridActivate);
             },
-            description: `Activate debug mode for key mapping. the first parameter activate 
-            feature "click on screen add a div with x, y and x%, y%coordonates.\n
-            The second parameter activate a grid on the screen to help mapping keys. 
-            10% of the screen width and height.`,
+            description:
+                // eslint-disable-next-line max-len
+                'Activate debug mode for key mapping. The first parameter enables a feature that shows a div with x, y and x%, y% coordinates on click. The second parameter activates a grid overlay on the screen to assist with key mapping, showing 10% increments of the screen width and height.',
         });
 
-        // active trace when click on screen
+        // Register a function to enable or disable the keyMapping plugin
         this.instance.apiManager.registerFunction({
             name: 'enable',
             category: 'keyMapping',
             fn: (isActive = false) => {
                 this.state.isActive = isActive;
             },
-            description: 'Activate the keyMapping plugin.',
+            description: 'Enable or disable the keyMapping plugin. Pass true to activate and false to deactivate.',
         });
     }
 

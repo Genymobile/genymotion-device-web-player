@@ -19,13 +19,16 @@ class OverlayPlugin {
         this.instance = instance;
 
         // Listen for close trigger
-        this.instance.store.subscribe(({overlay}) => {
-            if (overlay.widgetOpened.includes(this.overlayID)) {
-                this.openOverlay();
-            } else {
-                this.closeOverlay();
-            }
-        });
+        this.instance.store.subscribe(
+            ({overlay}) => {
+                if (overlay.widgetOpened.includes(this.overlayID)) {
+                    this.openOverlay();
+                } else {
+                    this.closeOverlay();
+                }
+            },
+            ['overlay.widgetOpened'],
+        );
 
         // Attach listener for first object created only
         if (!OverlayPlugin.hasBeenCalled) {

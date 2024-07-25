@@ -22,13 +22,16 @@ module.exports = class MouseEvents {
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
         this.removeMouseUpListener = () => {};
 
-        this.instance.store.subscribe(({isMouseEventsEnabled}) => {
-            if (isMouseEventsEnabled) {
-                this.addMouseCallbacks();
-            } else {
-                this.removeMouseCallbacks();
-            }
-        });
+        this.instance.store.subscribe(
+            ({isMouseEventsEnabled}) => {
+                if (isMouseEventsEnabled) {
+                    this.addMouseCallbacks();
+                } else {
+                    this.removeMouseCallbacks();
+                }
+            },
+            ['isMouseEventsEnabled'],
+        );
 
         this.mouseCallbacks = [];
 

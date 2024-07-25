@@ -157,13 +157,16 @@ module.exports = class KeyboardMapping {
         );
 
         // pause the listeners when dialog is open and plugin isActive
-        this.instance.store.subscribe(({overlay: {isOpen}}) => {
-            if (isOpen && this.state.isActive) {
-                this.state.isPaused = true;
-            } else if (!isOpen && this.state.isPaused) {
-                this.state.isPaused = false;
-            }
-        });
+        this.instance.store.subscribe(
+            ({overlay: {isOpen}}) => {
+                if (isOpen && this.state.isActive) {
+                    this.state.isPaused = true;
+                } else if (!isOpen && this.state.isPaused) {
+                    this.state.isPaused = false;
+                }
+            },
+            ['overlay.isOpen'],
+        );
 
         // Display widget
         this.renderToolbarButton();

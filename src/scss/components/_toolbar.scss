@@ -238,6 +238,22 @@
             }
         }
 
+        &-keymapping-button {
+            background-image: url('../assets/images/ic_keymapping_desactivate.svg');
+            &:hover {
+                background-image: url('../assets/images/ic_keymapping_desactivate_hover.svg');
+            }
+            &.gm-active {
+                background-image: url('../assets/images/ic_keymapping.svg');
+            }
+            &.gm-active:hover {
+                background-image: url('../assets/images/ic_keymapping_hover.svg');
+            }
+            &.keymapping-paused {
+                background-image: url('../assets/images/ic_keymapping_paused.svg');
+            }
+        }
+
         &-default-turn-button {
             background-image: url('../assets/images/ic_warning.svg');
         }

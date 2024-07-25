@@ -127,7 +127,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
         // register callback
         this.instance.registerEventCallback('fingerprint', (message) => this.handleFingerprintEvent(message));
-        if (this.instance.store.getState().isWebRTCConnectionReady) {
+        if (this.instance.store.state.isWebRTCConnectionReady) {
             this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL);
         } else {
             const unSubscribe = this.instance.store.subscribe(({isWebRTCConnectionReady}) => {

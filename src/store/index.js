@@ -9,13 +9,12 @@ const initialState = {
         isOpen: false,
         widgetOpened: [],
     },
-    isKeyboardEventsEnabled: true,
+    isKeyboardEventsEnabled: false,
+    isMouseEventsEnabled: false,
 };
 
 const createStore = (instance, reducer, state) => {
     const listeners = [];
-
-    const getState = () => instance.store.state;
 
     const getters = {
         isWidgetOpened: (overlayID) =>
@@ -33,7 +32,7 @@ const createStore = (instance, reducer, state) => {
         const uid = generateUID();
         listeners.push({
             uid,
-            cb: () => listener(getState()),
+            cb: () => listener(instance.store.state),
         });
 
         const unsubscribe = () => {
@@ -46,22 +45,26 @@ const createStore = (instance, reducer, state) => {
         return unsubscribe;
     };
 
-    instance.store = {state, getState, dispatch, subscribe, getters};
+    instance.store = {state, dispatch, subscribe, getters};
 };
 
 const reducer = (state, action) => {
-    log.debug('Store updated', action.type, action.payload);
-
+    let newState = state;
     switch (action.type) {
         case 'WEBRTC_CONNECTION_READY':
-            return {...state, isWebRTCConnectionReady: action.payload};
+            newState = {...state, isWebRTCConnectionReady: action.payload};
+            break;
         case 'KEYBOARD_EVENTS_ENABLED':
-            return {...state, isKeyboardEventsEnabled: action.payload};
+            newState = {...state, isKeyboardEventsEnabled: action.payload};
+            break;
+        case 'MOUSE_EVENTS_ENABLED':
+            newState = {...state, isMouseEventsEnabled: action.payload};
+            break;
         case 'OVERLAY_OPEN':
             // eslint-disable-next-line no-case-declarations
             const {overlayID, toOpen} = action.payload;
             if (toOpen) {
-                return {
+                newState = {
                     ...state,
                     overlay: {
                         isOpen: true,
@@ -72,7 +75,9 @@ const reducer = (state, action) => {
                          */
                     },
                     isKeyboardEventsEnabled: false,
+                    isMouseEventsEnabled: false,
                 };
+                break;
             }
             // eslint-disable-next-line no-case-declarations
             const widgetOpened = [];
@@ -80,18 +85,24 @@ const reducer = (state, action) => {
              *  to open several widgets at the same time
              * const widgetOpened = state.overlay.widgetOpened.filter((widgetId) => widgetId !== overlayID);
              */
-            return {
+            newState = {
                 ...state,
                 overlay: {
                     isOpen: widgetOpened.length > 0,
                     widgetOpened,
                 },
                 isKeyboardEventsEnabled: true,
+                isMouseEventsEnabled: true,
             };
-
+            break;
         default:
-            return state;
+            log.debug('Store not updated, action type :', action.type, ' unknown');
+            break;
     }
+
+    log.debug('Store updated below type - payload - result', action.type, action.payload, newState);
+
+    return newState;
 };
 
 const store = (instance) => {

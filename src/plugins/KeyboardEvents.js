@@ -54,15 +54,20 @@ module.exports = class KeyboardEvents {
 
         // Register plugin
         this.instance.keyboardEvents = this;
-        this.instance.keyboardEventsEnabled = true;
 
-        this.transmitKeys = this.instance.store.getState().isKeyboardEventsEnabled;
         this.isListenerAdded = false;
         this.currentlyPressedKeys = new Map();
 
         this.instance.store.subscribe(({isKeyboardEventsEnabled}) => {
-            this.transmitKeys = isKeyboardEventsEnabled;
+            if (isKeyboardEventsEnabled) {
+                this.addKeyboardCallbacks();
+            } else {
+                this.removeKeyboardCallbacks();
+            }
         });
+
+        // activate the plugin listening
+        this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: true});
     }
 
     /**
@@ -89,9 +94,6 @@ module.exports = class KeyboardEvents {
      * @param {Event} event Event.
      */
     onKeyPress(event) {
-        if (!this.transmitKeys) {
-            return;
-        }
         const key = event.charCode;
         let text = event.key || String.fromCharCode(key);
         if (text === 'Spacebar') {
@@ -118,10 +120,6 @@ module.exports = class KeyboardEvents {
      * @return {boolean}       Whether or not the event must continue propagation.
      */
     onKeyDown(event) {
-        if (!this.transmitKeys) {
-            return true;
-        }
-
         let key;
         /**
          * Convert invisible key or shortcut keys when ctrl/meta are pressed
@@ -176,10 +174,6 @@ module.exports = class KeyboardEvents {
      * @return {boolean}       Whether or not the event must continue propagation.
      */
     onKeyUp(event) {
-        if (!this.transmitKeys) {
-            return true;
-        }
-
         let key;
         /**
          * Convert invisible key or shortcut keys when ctrl/meta are pressed

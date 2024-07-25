@@ -10,6 +10,7 @@ const Screencast = require('./plugins/Screencast');
 const StreamResolution = require('./plugins/StreamResolution');
 const CoordinateUtils = require('./plugins/CoordinateUtils');
 const KeyboardEvents = require('./plugins/KeyboardEvents');
+const KeyboardMapping = require('./plugins/KeyboardMapping');
 const MouseEvents = require('./plugins/MouseEvents');
 const PeerConnectionStats = require('./plugins/PeerConnectionStats');
 const Gamepad = require('./plugins/Gamepad');
@@ -52,10 +53,7 @@ module.exports = class DeviceRenderer {
         this.initialized = false;
         this.reconnecting = false;
 
-        // Enabled features
-        this.keyboardEventsEnabled = false;
         this.touchEventsEnabled = false;
-        this.mouseEventsEnabled = false;
         this.gamepadEventsEnabled = false;
 
         // Websocket
@@ -88,17 +86,6 @@ module.exports = class DeviceRenderer {
         // last accessed x/y position
         this.x = 0;
         this.y = 0;
-
-        this.clickHandlerCloseOverlay = (event) => {
-            if (
-                event.target.closest('.gm-overlay') === null &&
-                !event.target.classList.contains('gm-icon-button') &&
-                !event.target.classList.contains('gm-dont-close')
-            ) {
-                this.store.dispatch({type: 'OVERLAY_OPEN', payload: {toOpen: false}});
-            }
-        };
-        this.addListener(document, 'click', this.clickHandlerCloseOverlay);
     }
 
     /**
@@ -119,6 +106,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.streamResolution, class: StreamResolution},
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
+            {enabled: this.options.keyboardMapping, class: KeyboardMapping},
             {enabled: this.options.mouse, class: MouseEvents},
             {
                 enabled: this.options.gamepad,
@@ -480,14 +468,6 @@ module.exports = class DeviceRenderer {
 
             if (this.touchEventsEnabled) {
                 this.touchEvents.addTouchCallbacks();
-            }
-
-            if (this.mouseEventsEnabled) {
-                this.mouseEvents.addMouseCallbacks();
-            }
-
-            if (this.keyboardEventsEnabled) {
-                this.keyboardEvents.addKeyboardCallbacks();
             }
 
             if (this.gamepadEventsEnabled) {

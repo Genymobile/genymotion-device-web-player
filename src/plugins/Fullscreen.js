@@ -20,6 +20,20 @@ module.exports = class Fullscreen {
             this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
         }
 
+        this.instance.apiManager.registerFunction({
+            name: 'fullscreen',
+            category: 'video',
+            fn: () => {
+                if (this.fullscreenEnabled()) {
+                    this.exitFullscreen();
+                } else {
+                    this.goFullscreen(this.instance.root);
+                }
+            },
+            description:
+                // eslint-disable-next-line max-len
+                'Toggle fullscreen mode for the video player. If the player is currently in fullscreen, it will exit fullscreen; otherwise, it will enter fullscreen mode.',
+        });
         // Display widget
         this.renderToolbarButton();
     }

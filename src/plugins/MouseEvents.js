@@ -20,6 +20,20 @@ module.exports = class MouseEvents {
 
         this.leftButtonPressed = false;
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
+        this.removeMouseUpListener = () => {};
+
+        this.instance.store.subscribe(({isMouseEventsEnabled}) => {
+            if (isMouseEventsEnabled) {
+                this.addMouseCallbacks();
+            } else {
+                this.removeMouseCallbacks();
+            }
+        });
+
+        this.mouseCallbacks = [];
+
+        // activate the plugin listening
+        this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: true});
     }
 
     /**
@@ -87,9 +101,7 @@ module.exports = class MouseEvents {
         }
         this.instance.sendEvent(json);
 
-        if (this.removeMouseUpListener) {
-            this.removeMouseUpListener();
-        }
+        this.removeMouseUpListener();
     }
 
     /**
@@ -113,7 +125,7 @@ module.exports = class MouseEvents {
         };
         this.instance.sendEvent(json);
 
-        this.instance.removeMouseUpListener();
+        this.removeMouseUpListener();
     }
 
     /**
@@ -164,13 +176,39 @@ module.exports = class MouseEvents {
      * Bind all event handlers to the video wrapper.
      */
     addMouseCallbacks() {
-        this.instance.addListener(this.instance.videoWrapper, 'mousedown', this.onMousePressEvent.bind(this), false);
-        this.instance.addListener(this.instance.videoWrapper, 'mouseup', this.onMouseReleaseEvent.bind(this), false);
-        this.instance.addListener(this.instance.videoWrapper, 'mousemove', this.onMouseMoveEvent.bind(this), false);
-        this.instance.addListener(this.instance.videoWrapper, 'wheel', this.onMouseWheelEvent.bind(this), {
-            passive: false,
+        if (!this.mouseCallbacks.length) {
+            this.mouseCallbacks = [
+                {event: 'mousedown', handler: this.onMousePressEvent.bind(this), removeListener: null},
+                {event: 'mouseup', handler: this.onMouseReleaseEvent.bind(this), removeListener: null},
+                {event: 'mousemove', handler: this.onMouseMoveEvent.bind(this), removeListener: null},
+                {
+                    event: 'wheel',
+                    handler: this.onMouseWheelEvent.bind(this),
+                    removeListener: null,
+                    options: {passive: false},
+                },
+                {event: 'contextmenu', handler: this.onMouseWheelEvent.bind(this), removeListener: null},
+            ];
+
+            this.mouseCallbacks.forEach((item, index, array) => {
+                array[index].removeListener = this.instance.addListener(
+                    this.instance.root,
+                    item.event,
+                    item.handler,
+                    item.options,
+                );
+            });
+        }
+    }
+
+    removeMouseCallbacks() {
+        if (!this.mouseCallbacks.length) {
+            return;
+        }
+        this.mouseCallbacks.forEach((item) => {
+            item.removeListener();
         });
-        this.instance.addListener(this.instance.videoWrapper, 'contextmenu', this.cancelContextMenu.bind(this), false);
+        this.mouseCallbacks.length = 0;
     }
 
     getWheelDeltaPixels(delta, mode) {

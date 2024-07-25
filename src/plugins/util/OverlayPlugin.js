@@ -61,6 +61,14 @@ class OverlayPlugin {
         if (this.toolbarBtnImage) {
             this.toolbarBtnImage.classList.add('gm-active');
         }
+        this.instance.store.dispatch({
+            type: 'ADD_TRACKED_EVENT',
+            payload: {
+                category: 'widget',
+                action: 'open',
+                name: this.constructor.name,
+            },
+        });
     }
 
     /**

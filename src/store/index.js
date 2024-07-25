@@ -11,6 +11,10 @@ const initialState = {
     },
     isKeyboardEventsEnabled: false,
     isMouseEventsEnabled: false,
+    trackedEvents: {
+        isActive: false,
+        events: [],
+    },
 };
 
 const createStore = (instance, reducer) => {
@@ -29,31 +33,31 @@ const createStore = (instance, reducer) => {
         });
     };
 
+    const arraysAreEqual = (firstArray, secondArray) => {
+        if (firstArray.length !== secondArray.length) {
+            return true;
+        }
+        for (let i = 0; i < firstArray.length; i++) {
+            if (firstArray[i] !== secondArray[i]) {
+                return true;
+            }
+        }
+        return false;
+    };
     const findChangedKeys = (newState, oldState, path = []) => {
         let changedKeys = [];
-
         const isObject = (obj) => obj && typeof obj === 'object';
-
         for (const key in newState) {
             const fullPath = [...path, key].join('.');
-
             if (!Object.prototype.hasOwnProperty.call(oldState, key)) {
                 changedKeys.push(fullPath);
             } else if (isObject(newState[key]) && isObject(oldState[key])) {
-                if (Array.isArray(newState[key]) && Array.isArray(oldState[key])) {
-                    if (newState[key].length !== oldState[key].length) {
-                        changedKeys.push(fullPath);
-                    } else {
-                        let arrayHasChanged = false;
-                        for (let i = 0; i < newState[key].length; i++) {
-                            if (newState[key][i] !== oldState[key][i]) {
-                                arrayHasChanged = true;
-                            }
-                        }
-                        if (arrayHasChanged) {
-                            changedKeys.push(fullPath);
-                        }
-                    }
+                if (
+                    Array.isArray(newState[key]) &&
+                    Array.isArray(oldState[key]) &&
+                    !arraysAreEqual(newState[key], oldState[key])
+                ) {
+                    changedKeys.push(fullPath);
                 } else {
                     changedKeys = changedKeys.concat(findChangedKeys(newState[key], oldState[key], [...path, key]));
                 }
@@ -61,14 +65,14 @@ const createStore = (instance, reducer) => {
                 changedKeys.push(fullPath);
             }
         }
-
         return changedKeys;
     };
 
     const notifyListeners = (changedKeys) => {
         listeners.forEach(({keys, cb}) => {
             if (keys.length === 0 || keys.some((key) => hasChanged(changedKeys, key))) {
-                cb(instance.store.state);
+                // send a copy of the store's state, in order to avoid mutation of the store
+                cb({...instance.store.state});
             }
         });
     };
@@ -130,6 +134,19 @@ const reducer = (state, action) => {
                 state.isKeyboardEventsEnabled = true;
                 state.isMouseEventsEnabled = true;
             }
+            break;
+        case 'ENABLE_TRACKED_EVENTS':
+            state.trackedEvents.isActive = action.payload;
+            break;
+        case 'ADD_TRACKED_EVENT':
+            if (!state.trackedEvents.isActive) {
+                return state;
+            }
+            state.trackedEvents.events.push(action.payload);
+
+            break;
+        case 'FLUSH_TRACKED_EVENTS':
+            state.trackedEvents.events.length = 0;
             break;
         default:
             log.debug('Store not updated, action type :', action.type, ' unknown');

@@ -19,13 +19,16 @@ class OverlayPlugin {
         this.instance = instance;
 
         // Listen for close trigger
-        this.instance.store.subscribe(({overlay}) => {
-            if (overlay.widgetOpened.includes(this.overlayID)) {
-                this.openOverlay();
-            } else {
-                this.closeOverlay();
-            }
-        });
+        this.instance.store.subscribe(
+            ({overlay}) => {
+                if (overlay.widgetOpened.includes(this.overlayID)) {
+                    this.openOverlay();
+                } else {
+                    this.closeOverlay();
+                }
+            },
+            ['overlay.widgetOpened'],
+        );
 
         // Attach listener for first object created only
         if (!OverlayPlugin.hasBeenCalled) {
@@ -58,6 +61,14 @@ class OverlayPlugin {
         if (this.toolbarBtnImage) {
             this.toolbarBtnImage.classList.add('gm-active');
         }
+        this.instance.store.dispatch({
+            type: 'ADD_TRACKED_EVENT',
+            payload: {
+                category: 'widget',
+                action: 'open',
+                name: this.constructor.name,
+            },
+        });
     }
 
     /**

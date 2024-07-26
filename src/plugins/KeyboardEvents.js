@@ -58,13 +58,16 @@ module.exports = class KeyboardEvents {
         this.isListenerAdded = false;
         this.currentlyPressedKeys = new Map();
 
-        this.instance.store.subscribe(({isKeyboardEventsEnabled}) => {
-            if (isKeyboardEventsEnabled) {
-                this.addKeyboardCallbacks();
-            } else {
-                this.removeKeyboardCallbacks();
-            }
-        });
+        this.instance.store.subscribe(
+            ({isKeyboardEventsEnabled}) => {
+                if (isKeyboardEventsEnabled) {
+                    this.addKeyboardCallbacks();
+                } else {
+                    this.removeKeyboardCallbacks();
+                }
+            },
+            ['isKeyboardEventsEnabled'],
+        );
 
         // activate the plugin listening
         this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: true});

@@ -157,13 +157,16 @@ module.exports = class KeyboardMapping {
         );
 
         // pause the listeners when dialog is open and plugin isActive
-        this.instance.store.subscribe(({overlay: {isOpen}}) => {
-            if (isOpen && this.state.isActive) {
-                this.state.isPaused = true;
-            } else if (!isOpen && this.state.isPaused) {
-                this.state.isPaused = false;
-            }
-        });
+        this.instance.store.subscribe(
+            ({overlay: {isOpen}}) => {
+                if (isOpen && this.state.isActive) {
+                    this.state.isPaused = true;
+                } else if (!isOpen && this.state.isPaused) {
+                    this.state.isPaused = false;
+                }
+            },
+            ['overlay.isOpen'],
+        );
 
         // Display widget
         this.renderToolbarButton();
@@ -190,12 +193,16 @@ module.exports = class KeyboardMapping {
 
     activatePlugin() {
         if (this.state.isActive) {
-            this.toolbarBtnImage.classList.add('gm-active');
+            if (this.toolbarBtnImage) {
+                this.toolbarBtnImage.classList.add('gm-active');
+            }
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
         } else {
-            this.toolbarBtnImage.classList.remove('gm-active');
+            if (this.toolbarBtnImage) {
+                this.toolbarBtnImage.classList.remove('gm-active');
+            }
             this.removeKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: !this.state.isPaused});

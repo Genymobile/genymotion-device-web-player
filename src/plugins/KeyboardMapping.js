@@ -193,12 +193,16 @@ module.exports = class KeyboardMapping {
 
     activatePlugin() {
         if (this.state.isActive) {
-            this.toolbarBtnImage.classList.add('gm-active');
+            if (this.toolbarBtnImage) {
+                this.toolbarBtnImage.classList.add('gm-active');
+            }
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
         } else {
-            this.toolbarBtnImage.classList.remove('gm-active');
+            if (this.toolbarBtnImage) {
+                this.toolbarBtnImage.classList.remove('gm-active');
+            }
             this.removeKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: !this.state.isPaused});

@@ -72,12 +72,12 @@ function getTemplatesStream() {
 }
 
 // Clean dist dir
-gulp.task('clean', function(cb) {
+gulp.task('clean', function (cb) {
     del([PATHS.DEST.BASE + ' --force']).then(
-        function() {
+        function () {
             cb();
         },
-        function(err) {
+        function (err) {
             cb(err);
         },
     );
@@ -105,6 +105,11 @@ gulp.task('app-styles', function () {
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
 });
 
+// TS declaration files
+gulp.task('app-dts', function () {
+    return gulp.src(PATHS.SRC.BASE + './../*.d.ts').pipe(gulp.dest(PATHS.DEST.BASE));
+});
+
 gulp.task('app-templates', function () {
     return getTemplatesStream().pipe(
         tap(function (file) {
@@ -119,6 +124,14 @@ gulp.task('app-templates', function () {
     );
 });
 
+function setupBrowserify() {
+    return browserify({
+        entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
+        standalone: 'genyDeviceWebPlayer',
+        debug: true,
+    }).transform(graspify, ['#GEN_TEMPLATES', templates]);
+}
+
 function getBundler() {
     return new Promise((resolve) => {
         if (!templates) {
@@ -129,14 +142,6 @@ function getBundler() {
             resolve(setupBrowserify());
         }
     });
-}
-
-function setupBrowserify() {
-    return browserify({
-        entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
-        standalone: 'genyDeviceWebPlayer',
-        debug: true,
-    }).transform(graspify, ['#GEN_TEMPLATES', templates]);
 }
 
 gulp.task('app-js', async function () {
@@ -196,7 +201,7 @@ gulp.task(
     gulp.series(
         'clean',
         'app-templates',
-        gulp.parallel('app-partials', 'app-styles', 'app-js'),
+        gulp.parallel('app-partials', 'app-styles', 'app-js', 'app-dts'),
         'inject',
         function (cb) {
             cb();

@@ -1,4 +1,4 @@
-type Distance = {
+type KeyEffectDistance = {
   distanceX: number;
   distanceY: number;
 };
@@ -17,32 +17,41 @@ interface KeyMap<E> {
 }
 
 interface KeyMappingConfig {
-  dpad?: KeyMap<KeyEffect & Distance>[];
+  dpad?: KeyMap<KeyEffect & KeyEffectDistance>[];
   tap?: KeyMap<KeyEffect>[];
-  swipe?: KeyMap<KeyEffect & Distance>[];
+  swipe?: KeyMap<KeyEffect & KeyEffectDistance>[];
 }
 
 type DeviceRendererKeyMapping = {
   enable(isEnable: boolean): void;
   setConfig(config: KeyMappingConfig): void;
-  activeKeyMappingDebug(isTraceActivate: boolean, isGridActivate: boolean): void;
+  activeKeyMappingDebug(isTraceActivate?: boolean, isGridActivate?: boolean): void;
 };
 
-type VmEvent = 'beforeunload' | 'fingerprint' | 'gps' | 'BATTERY_LEVEL'
+type VmEvent = 'beforeunload' | 'fingerprint' | 'gps' | 'BATTERY_LEVEL' | string // TODO Provide an exhaustive list
 
 type VmCommunication = {
   disconnect(): void;
-  addEventListener(event: VmEvent, callback: (msg: unknown) => void): void;
-  sendData(data: { channel: string; messages: string[] });
+  addEventListener(event: VmEvent, callback: (msg: string) => void): void; // TODO Verify if msg is always string
+  sendData(data: { channel: string; messages: string[] }): void; // TODO Verify typing
 };
 
+type RegisteredFunctionDoc = {
+  apiName: string,
+  apiDescription: string,
+}
+
 type Utils = {
-  getRegisteredFunctions(): unknown[];
+  getRegisteredFunctions(): RegisteredFunctionDoc[];
 };
 
 type Media = {
   mute(): void;
   unmute(): void;
+};
+
+type Video = {
+  fullscreen: () => void;
 };
 
 type Template = 'bootstrap'
@@ -54,58 +63,60 @@ type Template = 'bootstrap'
   | 'renderer_partial';
 
 interface Options {
-  token?: string;
+  baseband?: boolean; // Default: false
+  battery?: boolean; // Default: true
+  biometrics?: boolean; // Default: true
+  camera?: boolean; // Default: true
+  capture?: boolean; // Default: true
+  clipboard?: boolean; // Default: true
+  connectionFailedURL?: string;
+  diskIO?: boolean; // Default: true
+  fileUpload?: boolean; // Default: true
+  fileUploadUrl?: string;
+  fullscreen?: boolean; // Default: true
+  gamepad?: boolean; // Default: true
+  giveFeedbackLink?: string;
+  gps?: boolean; // Default: true
+  gpsSpeedSupport?: boolean; // Default: false
+  i18n?: Record<string, string>;
+  identifiers?: boolean; // Default: true
+  keyboard?: boolean; // Default: true
+  keyboardMapping?: boolean; // Default: true
+  microphone?: boolean; // Default: false
+  mobilethrottling?: boolean; // Default: false
+  mouse?: boolean; // Default: true
+  navbar?: boolean; // Default: true
+  network?: boolean; // Default: true
+  phone?: boolean; // Default: true
+  power?: boolean; // Default: true
+  rotation?: boolean; // Default: true
+  streamBitrate?: boolean; // Default: false
+  streamResolution?: boolean; // Default: true
+  stun?: { urls?: string[] };
   template?: Template; // Default: 'renderer'
-  i18n?: Record<string, unknown>;
-  stun?: { urls?: Record<string, string> };
+  token?: string;
+  touch?: boolean; // Default: true
+  translateHomeKey?: boolean; // Default: false
   turn?: {
     urls?: string[];
     username?: string;
     credential?: string;
     default?: boolean; // Default: false
   };
-  streamResolution?: boolean; // Default: true
-  streamBitrate?: boolean; // Default: false
-  touch?: boolean; // Default: true
-  mouse?: boolean; // Default: true
-  keyboard?: boolean; // Default: true
   volume?: boolean; // Default: true
-  rotation?: boolean; // Default: true
-  navbar?: boolean; // Default: true
-  power?: boolean; // Default: true
-  fullscreen?: boolean; // Default: true
-  camera?: boolean; // Default: true
-  microphone?: boolean; // Default: false
-  fileUpload?: boolean; // Default: true
-  fileUploadUrl?: string;
-  clipboard?: boolean; // Default: true
-  battery?: boolean; // Default: true
-  gps?: boolean; // Default: true
-  gpsSpeedSupport?: boolean; // Default: false
-  capture?: boolean; // Default: true
-  identifiers?: boolean; // Default: true
-  network?: boolean; // Default: true
-  phone?: boolean; // Default: true
-  Baseband?: boolean; // Default: false
-  diskIO?: boolean; // Default: true
-  gamepad?: boolean; // Default: true
-  biometrics?: boolean; // Default: true
-  translateHomeKey?: boolean; // Default: false
-  connectionFailedURL?: string;
-  giveFeedbackLink?: string;
 }
 
-type DeviceRenderer = {
-  VM_communication: VmCommunication;
-  utils: Utils;
-  keyMapping: DeviceRendererKeyMapping;
+type DeviceRendererApi<O extends Options> = {
+  keyMapping: true extends O['keyboardMapping'] ? DeviceRendererKeyMapping : undefined; // TODO Check
   media: Media;
-  video: HTMLVideoElement;
+  utils: Utils;
+  video?: Video; // Available if any plugin (e.g. fullscreen) using it is enabled.
+  VM_communication: VmCommunication;
 };
 
 declare class DeviceRendererFactory {
   constructor();
-  setupRenderer(targetElement: HTMLDivElement, webrtcAddress: string, options?: Options): DeviceRenderer;
+  setupRenderer<O extends Options>(targetElement: HTMLDivElement, webrtcAddress: string, options?: O): DeviceRendererApi;
 }
 
-export { DeviceRenderer, DeviceRendererFactory, KeyMappingConfig }
+export { DeviceRendererApi, DeviceRendererFactory, KeyMappingConfig }

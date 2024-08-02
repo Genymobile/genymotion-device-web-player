@@ -544,7 +544,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 Enables or disables the phone widget. This widget can be used to send SMS or phone call the Android virtual device.
 
-### `Baseband`
+### `baseband`
 
 <img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
 

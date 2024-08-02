@@ -107,7 +107,7 @@ interface Options {
 }
 
 type DefaultTrue<B, T> = B extends void
-? T // Key is not presnet
+? T // Key is not present
 : B extends true | undefined
   ? T // Key is true or undefined
   : B extends false

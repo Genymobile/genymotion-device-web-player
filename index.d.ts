@@ -138,20 +138,20 @@ type DefaultTrue<B, T> = B extends void
 type ExtractKey<O, K extends keyof O> = O extends { [P in K]: infer T } ? T : void;
 
 type DeviceRendererApi<O extends RendererSetupOptions = RendererSetupOptions> = {
-keyMapping: DefaultTrue<ExtractKey<O, 'keyboardMapping'>, DeviceRendererKeyMapping>;
-media: Media;
-utils: Utils;
-video?: Video; // Available if any plugin (e.g. fullscreen) using it is enabled.
-VM_communication: VmCommunication;
+  keyMapping: DefaultTrue<ExtractKey<O, 'keyboardMapping'>, DeviceRendererKeyMapping>;
+  media: Media;
+  utils: Utils;
+  video?: Video; // Available if any plugin (e.g. fullscreen) using it is enabled.
+  VM_communication: VmCommunication;
 };
 
 declare class DeviceRendererFactory {
-constructor();
-setupRenderer<O extends RendererSetupOptions>(
-  targetElement: HTMLDivElement,
-  webrtcAddress: string,
-  options?: O,
-): DeviceRendererApi<O>;
+  constructor();
+  setupRenderer<O extends RendererSetupOptions>(
+    targetElement: HTMLDivElement,
+    webrtcAddress: string,
+    options?: O,
+  ): DeviceRendererApi<O>;
 }
 
 export { DeviceRendererApi, DeviceRendererFactory, RendererSetupOptions, KeyMappingConfig }

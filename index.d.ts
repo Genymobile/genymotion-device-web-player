@@ -62,7 +62,7 @@ type Template = 'bootstrap'
   | 'renderer_no_toolbar'
   | 'renderer_partial';
 
-interface Options {
+export interface RendererSetupOptions {
   baseband?: boolean; // Default: false
   battery?: boolean; // Default: true
   biometrics?: boolean; // Default: true
@@ -116,7 +116,7 @@ type DefaultTrue<B, T> = B extends void
 
 type ExtractKey<O, K extends keyof O> = O extends { [P in K]: infer T } ? T : void;
 
-type DeviceRendererApi<O extends Options = Options> = {
+type DeviceRendererApi<O extends RendererSetupOptions = RendererSetupOptions> = {
 keyMapping: DefaultTrue<ExtractKey<O, 'keyboardMapping'>, DeviceRendererKeyMapping>;
 media: Media;
 utils: Utils;
@@ -126,7 +126,7 @@ VM_communication: VmCommunication;
 
 declare class DeviceRendererFactory {
 constructor();
-setupRenderer<O extends Options>(
+setupRenderer<O extends RendererSetupOptions>(
   targetElement: HTMLDivElement,
   webrtcAddress: string,
   options?: O,

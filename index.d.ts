@@ -62,7 +62,7 @@ type Template = 'bootstrap'
   | 'renderer_no_toolbar'
   | 'renderer_partial';
 
-export interface RendererSetupOptions {
+interface RendererSetupOptions {
   baseband?: boolean; // Default: false
   battery?: boolean; // Default: true
   biometrics?: boolean; // Default: true
@@ -133,4 +133,4 @@ setupRenderer<O extends RendererSetupOptions>(
 ): DeviceRendererApi<O>;
 }
 
-export { DeviceRendererApi, DeviceRendererFactory, KeyMappingConfig }
+export { DeviceRendererApi, DeviceRendererFactory, RendererSetupOptions, KeyMappingConfig }

@@ -28,12 +28,36 @@ type DeviceRendererKeyMapping = {
   activeKeyMappingDebug(isTraceActivate?: boolean, isGridActivate?: boolean): void;
 };
 
-type VmEvent = 'beforeunload' | 'fingerprint' | 'gps' | 'BATTERY_LEVEL' | string // TODO Provide an exhaustive list
+type VmEvent =
+  | 'ANDROID_ID'
+  | 'baseband'
+  | 'BATTERY_LEVEL'
+  | 'BATTERY_LEVEL'
+  | 'BATTERY_STATUS'
+  | 'battery'
+  | 'beforeunload'
+  | 'BLK'
+  | 'CLIPBOARD'
+  | 'diskio'
+  | 'fingerprint'
+  | 'fingerprint'
+  | 'framework'
+  | 'gps'
+  | 'gps'
+  | 'IMEI'
+  | 'network_profile'
+  | 'NETWORK'
+  | 'settings'
+  | 'SYSTEM_PATCHER_LAST_RESULT'
+  | 'SYSTEM_PATCHER_STATUS'
+  | 'systempatcher'
+  | 'vinput'
+  | string // This list is not exhaustive and should be completed
 
 type VmCommunication = {
   disconnect(): void;
-  addEventListener(event: VmEvent, callback: (msg: string) => void): void; // TODO Verify if msg is always string
-  sendData(data: { channel: string; messages: string[] }): void; // TODO Verify typing
+  addEventListener(event: VmEvent, callback: (msg: string) => void): void;
+  sendData(data: { channel: string; messages: string[] }): void;
 };
 
 type RegisteredFunctionDoc = {

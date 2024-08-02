@@ -116,7 +116,7 @@ type DefaultTrue<B, T> = B extends void
 
 type ExtractKey<O, K extends keyof O> = O extends { [P in K]: infer T } ? T : void;
 
-type DeviceRendererApi<O extends Options | undefined = Options> = {
+type DeviceRendererApi<O extends Options = Options> = {
 keyMapping: DefaultTrue<ExtractKey<O, 'keyboardMapping'>, DeviceRendererKeyMapping>;
 media: Media;
 utils: Utils;

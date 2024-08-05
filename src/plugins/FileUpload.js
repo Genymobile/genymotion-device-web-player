@@ -277,13 +277,6 @@ module.exports = class FileUpload extends OverlayPlugin {
             textProgress.innerHTML = this.i18n.UPLOADER_INSTALLING || 'Installing...';
         } else if (data[0] === 'ready' && data.length >= 2) {
             if (data[1].indexOf('opengapps') !== -1) {
-                this.instance.store.dispatch({
-                    type: 'ADD_TRACKED_EVENT',
-                    payload: {
-                        category: 'opengapps',
-                        type: 'installed',
-                    },
-                });
                 this.updateOpenGAppsStatus(true);
             }
 
@@ -313,6 +306,13 @@ module.exports = class FileUpload extends OverlayPlugin {
                     this.toggleWidget();
                 }
                 this.flashing = false;
+                this.instance.store.dispatch({
+                    type: 'ADD_TRACKED_EVENT',
+                    payload: {
+                        category: 'opengapps',
+                        action: 'installed',
+                    },
+                });
                 break;
             case 'unavailable':
             case 'network_error':

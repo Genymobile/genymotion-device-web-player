@@ -22,7 +22,7 @@ module.exports = class APIManager {
             name: 'addEventListener',
             category: 'VM_communication',
             fn: (event, fn) => {
-                return this.instance.addEventListener(event, fn);
+                return this.instance.registerEventCallback(event, fn);
             },
             description:
                 // eslint-disable-next-line max-len

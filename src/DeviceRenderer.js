@@ -241,9 +241,13 @@ module.exports = class DeviceRenderer {
      * This will poll the WebRTC sequence until the WebSocket stops throwing the onclose event (unexpected quit).
      */
     onConnectionClosed() {
+        // closure to expose the right video and store context to onclose event
+        const video = this.video;
+        const store = this.store;
+
         this.webRTCWebsocket.onclose = (event) => {
-            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
-            this.video.style.background = this.videoBackupStyleBackground;
+            store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
+            video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 

@@ -22,7 +22,7 @@ module.exports = class APIManager {
             name: 'addEventListener',
             category: 'VM_communication',
             fn: (event, fn) => {
-                return this.instance.addEventListener(event, fn);
+                return this.instance.registerEventCallback(event, fn);
             },
             description:
                 // eslint-disable-next-line max-len
@@ -34,7 +34,7 @@ module.exports = class APIManager {
             name: 'disconnect',
             category: 'VM_communication',
             fn: () => {
-                this.instance.disconnect();
+                this.instance.destroy();
             },
             description: 'Disconnect from the current instance, ending the WebSocket communication.',
         });

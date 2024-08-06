@@ -278,13 +278,6 @@ module.exports = class GamepadManager {
      * @param {GamepadEvent} event raw event coming from the browser Gamepad API
      */
     onGamepadDisconnected(event) {
-        this.instance.store.dispatch({
-            type: 'ADD_TRACKED_EVENT',
-            payload: {
-                category: 'gamepad',
-                action: 'unplugged',
-            },
-        });
         const customEvent = new CustomEvent('gm-gamepadDisconnected', {detail: this.parseGamepad(event.gamepad)});
         window.dispatchEvent(customEvent);
         this.stopListeningInputs(event.gamepad.index);

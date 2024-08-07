@@ -207,7 +207,7 @@ sendData({
             description: 'left joystick used to move the character',
         }],
         tap:[{
-            keys: {
+            key: {
                 p: {
                     initialX: 50,
                     initialY: 50,
@@ -216,7 +216,7 @@ sendData({
             name:'Fire'
         }],
         swipe: [{
-            keys: {
+            key: {
                 u: {
                     initialX: 50,
                     initialY: 50,

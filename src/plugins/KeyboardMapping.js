@@ -724,7 +724,14 @@ module.exports = class KeyboardMapping {
         if (isActive) {
             const parentSize = this.instance.videoWrapper.getBoundingClientRect();
             const videoSize = this.instance.video.getBoundingClientRect();
-            videoSize.height = videoSize.height - this.instance.coordinateUtils.getTopBorder() * 2;
+
+            if (!this.instance.coordinateUtils.hasLeftAndRightBorders()) {
+                // landscape: border top
+                videoSize.height = (this.instance.video.videoHeight / this.instance.video.videoWidth) * videoSize.width;
+            } else {
+                // portrait: border left
+                videoSize.width = (this.instance.video.videoWidth / this.instance.video.videoHeight) * videoSize.height;
+            }
 
             // div vertical
             Array.from(Array(11).keys()).forEach((val, i) => {

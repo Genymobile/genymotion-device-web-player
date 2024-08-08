@@ -30,6 +30,7 @@ const templateCollector = require('./gulp/gulp-template-collector');
 const uglify = require('gulp-uglify-es').default;
 const using = require('gulp-using');
 const util = require('gulp-util');
+const replace = require('gulp-replace');
 
 const PATHS = {
     SRC: {
@@ -92,6 +93,31 @@ gulp.task('app-partials', function () {
         .pipe(gulp.dest(PATHS.DEST.BASE));
 });
 
+// HTML templates
+gulp.task('app-geny-window', function () {
+    const version = getVersion(); // Fetch the version from package.json
+
+    gulp.src(['./example/geny-window.html'])
+        .pipe(
+            replace(
+                /https:\/\/cdn\.jsdelivr\.net\/npm\/@genymotion\/device-web-player@[\d\.]+/g,
+                `https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@${version}`,
+            ),
+        )
+        .pipe(gulp.dest('./example/'));
+
+    return gulp
+        .src(['./example/*'])
+        .pipe(gulpif(util.env.debug, using({prefix: 'Processing example files:', color: 'cyan'})))
+        .pipe(
+            replace(
+                /https:\/\/cdn\.jsdelivr\.net\/npm\/@genymotion\/device-web-player@[\d\.]+/g,
+                `https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@${version}`,
+            ),
+        )
+        .pipe(gulp.dest(PATHS.DEST.BASE + '/example'));
+});
+
 // SASS styles
 gulp.task('app-styles', function () {
     return gulp
@@ -148,6 +174,7 @@ gulp.task('app-js', async function () {
     const bundler = await getBundler();
     return merge2(bundler.bundle().pipe(source(PATHS.SRC.APP)), {end: true})
         .pipe(gulpif(util.env.debug, using()))
+        .pipe(gulpif(util.env.production, replace("log.setDefaultLevel('debug');", "log.setDefaultLevel('error');")))
         .pipe(
             gulpif(
                 util.env.production,
@@ -201,7 +228,7 @@ gulp.task(
     gulp.series(
         'clean',
         'app-templates',
-        gulp.parallel('app-partials', 'app-styles', 'app-js', 'app-dts'),
+        gulp.parallel('app-partials', 'app-styles', 'app-js', 'app-dts', 'app-geny-window'),
         'inject',
         function (cb) {
             cb();
@@ -246,3 +273,9 @@ gulp.task(
         );
     }),
 );
+
+// Function to fetch version from package.json
+function getVersion() {
+    const packageJson = require('./package.json');
+    return packageJson.version;
+}

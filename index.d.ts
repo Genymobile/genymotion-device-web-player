@@ -10,8 +10,8 @@ interface KeyEffect {
     description?: string;
 }
 
-interface KeysMap<E> {
-    keys: Record<string, E>;
+interface KeyList<E> {
+    keys: Key<E>[];
     name?: string;
     description?: string;
 }
@@ -24,7 +24,7 @@ interface Key<E> {
 }
 
 interface KeyMappingConfig {
-    dpad?: KeysMap<KeyEffect & KeyEffectDistance>[];
+    dpad?: KeyList<KeyEffect & KeyEffectDistance>[];
     tap?: Key<KeyEffect>[];
     swipe?: Key<KeyEffect & KeyEffectDistance>[];
 }

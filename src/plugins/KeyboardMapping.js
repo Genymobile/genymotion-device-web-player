@@ -225,7 +225,8 @@ module.exports = class KeyboardMapping {
             gestureConfig.forEach((gesture) => {
                 const groupId = generateUID();
                 this.sequences[groupId] = [];
-                Object.entries(gesture.keys).forEach(([key, value]) => {
+                const keyName = gestureType === 'dPad' ? 'keys' : 'key';
+                Object.entries(gesture[keyName]).forEach(([key, value]) => {
                     this.state.workingMappedKeysConfig[key] = {
                         ...value,
                         key,

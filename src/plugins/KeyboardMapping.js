@@ -225,11 +225,11 @@ module.exports = class KeyboardMapping {
             gestureConfig.forEach((gesture) => {
                 const groupId = generateUID();
                 this.sequences[groupId] = [];
-                const keyName = gestureType === 'dPad' ? 'keys' : 'key';
-                Object.entries(gesture[keyName]).forEach(([key, value]) => {
-                    this.state.workingMappedKeysConfig[key] = {
-                        ...value,
-                        key,
+                const gestureObject = gestureType === 'dPad' ? gesture.keys : gestureConfig;
+                Object.values(gestureObject).forEach((value) => {
+                    this.state.workingMappedKeysConfig[value.key] = {
+                        ...value.effect,
+                        key: value.key,
                         type: gestureType,
                         name: gesture.name,
                         groupId,
@@ -342,8 +342,8 @@ module.exports = class KeyboardMapping {
 
     generateTouchSequence(key) {
         const groupId = this.state.workingMappedKeysConfig[key].groupId;
-        const x = this.state.workingMappedKeysConfig[key].x;
-        const y = this.state.workingMappedKeysConfig[key].y;
+        const x = this.state.workingMappedKeysConfig[key].initialX;
+        const y = this.state.workingMappedKeysConfig[key].initialY;
 
         this.sequences[groupId].push({
             type: 'MULTI_TOUCH',

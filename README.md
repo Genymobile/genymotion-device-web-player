@@ -169,67 +169,85 @@ sendData({
 ### `keymapping`
 
 -   #### `setConfig`
+
     supply a config for keymapping
+
     ```js
     {
-        dpad:[{
-            keys: {
-                z: {
-                    initialX: 20,
-                    initialY: 80,
-                    distanceX: 0,
-                    distanceY: -10,
+        dPad:[{
+            keys:[
+                {
+                    key: 'w',
+                    effect: {
+                        initialX: 20,
+                        initialY: 80,
+                        distanceX: 0,
+                        distanceY: -10,
+                    },
+                    name: 'up',
                     description: 'move up',
                 },
-                s: {
-                    initialX: 20,
-                    initialY: 80,
-                    distanceX: 0,
-                    distanceY: 10,
+                {
+                    key: 's',
+                    effect: {
+                        initialX: 20,
+                        initialY: 80,
+                        distanceX: 0,
+                        distanceY: 10,
+                    },
+                    name: 'down',
                     description: 'move down',
                 },
-                q: {
-                    initialX: 20,
-                    initialY: 80,
-                    distanceX: -10,
-                    distanceY: 0,
+                {
+                    key: 'a',
+                    effect: {
+                        initialX: 20,
+                        initialY: 80,
+                        distanceX: -10,
+                        distanceY: 0,
+                    },
+                    name: 'left',
                     description: 'move left',
                 },
-                d: {
-                    initialX: 20,
-                    initialY: 80,
-                    distanceX: 10,
-                    distanceY: 0,
+                {
+                    key: 'd',
+                    effect: {
+                        initialX: 20,
+                        initialY: 80,
+                        distanceX: 10,
+                        distanceY: 0,
+                    },
+                    name: 'up',
                     description: 'move right',
                 },
-            },
+
+            ],
             name: 'character movement',
             description: 'left joystick used to move the character',
         }],
         tap:[{
-            keys: {
-                p: {
-                    initialX: 50,
-                    initialY: 50,
-                },
-            }
+            key: 'p',
+            effect: {
+                initialX: 50,
+                initialY: 50,
+            },
             name:'Fire'
         }],
         swipe: [{
-            keys: {
-                u: {
-                    initialX: 50,
-                    initialY: 50,
-                    distanceX: -10,
-                    distanceY: 0,
-                    description: 'swipe left',
-                },
-            }
-            name:'Left dodge'
+            key: 'u',
+            effect: {
+                initialX: 50,
+                initialY: 50,
+                distanceX: -10,
+                distanceY: 0,
+                description: 'swipe left',
+            },
+            name:'Left dodge',
             description: 'Dodge on the left'
         }]
     }
     ```
+
 -   #### `activeKeyMappingDebug`
 
     helper to create the config mapping

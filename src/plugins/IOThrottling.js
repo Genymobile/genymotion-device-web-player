@@ -33,9 +33,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
-        // Listen for initial diskio
-        this.instance.registerEventCallback('BLK', this.setActive.bind(this));
-
         // Listen for diskio messages: "readbyterate <value>" (or "cachecleared")
         this.instance.registerEventCallback('diskio', (message) => {
             const values = message.split(' ');

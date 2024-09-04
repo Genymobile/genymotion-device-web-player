@@ -46,11 +46,6 @@ module.exports = class Clipboard extends OverlayPlugin {
                 log.warn('Malformed clipboard content');
             }
         });
-
-        // Listen for initial clipboard status
-        this.instance.registerEventCallback('CLIPBOARD', (text) => {
-            this.clipboard = text;
-        });
     }
 
     /**

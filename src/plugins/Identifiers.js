@@ -34,14 +34,6 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
-        // Listen for IDs from renderer
-        this.instance.registerEventCallback('ANDROID_ID', (payload) => {
-            this.androidInput.value = payload;
-        });
-        this.instance.registerEventCallback('IMEI', (payload) => {
-            this.deviceInput.value = payload;
-        });
-
         // Listen for settings messages: "parameter <device_id/android_id>:<id>"
         this.instance.registerEventCallback('settings', (message) => {
             const values = message.split(' ');

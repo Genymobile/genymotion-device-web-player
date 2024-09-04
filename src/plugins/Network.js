@@ -51,9 +51,6 @@ module.exports = class Network extends OverlayPlugin {
         // Listen for settings messages: "if wifi:on|off mobile:on|off"
         this.instance.registerEventCallback('settings', this.handleSettings.bind(this));
 
-        // Listen for initial network
-        this.instance.registerEventCallback('NETWORK', this.setActiveProfile.bind(this));
-
         /*
          * Listen for network messages:
          * state wifi up_rate:<enabled/disabled>:<value>

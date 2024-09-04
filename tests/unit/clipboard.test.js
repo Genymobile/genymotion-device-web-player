@@ -59,11 +59,6 @@ describe('Clipboard Plugin', () => {
     });
 
     describe('incoming events', () => {
-        test('CLIPBOARD', () => {
-            instance.emit('CLIPBOARD', 'test value');
-            expect(clipboard.clipboard).toBe('test value');
-        });
-
         test('framework', () => {
             instance.emit('framework', 'clipboard too many arguments');
             expect(clipboard.clipboard).toBe('');

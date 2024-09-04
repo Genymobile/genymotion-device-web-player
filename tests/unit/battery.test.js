@@ -65,35 +65,6 @@ describe('Battery Plugin', () => {
             levelMock.mockRestore();
         });
 
-        test('BATTERY_STATUS', () => {
-            instance.emit('BATTERY_STATUS', 'jean-michel'); // Invalid value (=== charging)
-            expect(battery.chargingInput.checked).toBeTruthy();
-
-            instance.emit('BATTERY_STATUS', 'false'); // Discharging
-            expect(battery.chargingInput.checked).toBeFalsy();
-
-            instance.emit('BATTERY_STATUS', 'true'); // Charging
-            expect(battery.chargingInput.checked).toBeTruthy();
-        });
-
-        test('BATTERY_LEVEL', () => {
-            instance.emit('BATTERY_LEVEL', 'jean-michel'); // Invalid value
-            expect(Number(battery.chargeSlider.value)).toBe(50);
-            expect(Number(battery.chargeInput.value)).toBe(50);
-
-            instance.emit('BATTERY_LEVEL', '69'); // Nice
-            expect(Number(battery.chargeSlider.value)).toBe(69);
-            expect(Number(battery.chargeInput.value)).toBe(69);
-
-            instance.emit('BATTERY_LEVEL', '666'); // Overflow
-            expect(Number(battery.chargeSlider.value)).toBe(100);
-            expect(Number(battery.chargeInput.value)).toBe(100);
-
-            instance.emit('BATTERY_LEVEL', '-420'); // Underflow
-            expect(Number(battery.chargeSlider.value)).toBe(0);
-            expect(Number(battery.chargeInput.value)).toBe(0);
-        });
-
         test('battery', () => {
             instance.emit('battery', 'jean-michel'); // Bad format
             expect(levelMock).not.toHaveBeenCalled();

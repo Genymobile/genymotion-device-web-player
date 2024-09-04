@@ -36,24 +36,15 @@ type DeviceRendererKeyMapping = {
 };
 
 type VmEvent =
-    | 'ANDROID_ID'
     | 'baseband'
-    | 'BATTERY_LEVEL'
-    | 'BATTERY_STATUS'
     | 'battery'
     | 'beforeunload'
-    | 'BLK'
-    | 'CLIPBOARD'
     | 'diskio'
     | 'fingerprint'
     | 'framework'
     | 'gps'
-    | 'IMEI'
     | 'network_profile'
-    | 'NETWORK'
     | 'settings'
-    | 'SYSTEM_PATCHER_LAST_RESULT'
-    | 'SYSTEM_PATCHER_STATUS'
     | 'systempatcher'
     | 'vinput'
     | string; // This list is not exhaustive and should be completed

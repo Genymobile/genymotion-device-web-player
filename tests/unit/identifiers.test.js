@@ -60,34 +60,6 @@ describe('Identifiers Plugin', () => {
     });
 
     describe('incoming events', () => {
-        test('ANDROID_ID', () => {
-            ['jean-michel', '123', '0123456789abcdef0', ''].forEach((invalidValue) => {
-                instance.emit('ANDROID_ID', invalidValue);
-                identifiers.validateAndroidId();
-                expect(identifiers.invalidAndroidId).toBeTruthy();
-            });
-
-            ['0123456789abcdef'].forEach((validValue) => {
-                instance.emit('ANDROID_ID', validValue);
-                identifiers.validateAndroidId();
-                expect(identifiers.invalidAndroidId).toBeFalsy();
-            });
-        });
-
-        test('IMEI', () => {
-            ['jean-michel', '123', '', '0123456789abcdef'].forEach((invalidValue) => {
-                instance.emit('IMEI', invalidValue);
-                identifiers.validateDeviceId();
-                expect(identifiers.invalidDeviceId).toBeTruthy();
-            });
-
-            ['0123456789abcd', '0123456789abcde'].forEach((validValue) => {
-                instance.emit('IMEI', validValue);
-                identifiers.validateDeviceId();
-                expect(identifiers.invalidDeviceId).toBeFalsy();
-            });
-        });
-
         describe('settings', () => {
             test('unrelevant topics', () => {
                 ['unrelevant', 'parameters unrelevant:value', ''].forEach((invalidValue) => {

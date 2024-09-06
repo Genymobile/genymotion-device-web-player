@@ -57,29 +57,6 @@ describe('IOThrottling Plugin', () => {
     });
 
     describe('incoming events', () => {
-        test('BLK', () => {
-            ['jean-michel', '-123', ''].forEach((invalidValue) => {
-                instance.emit('BLK', invalidValue);
-                expect(diskio.select.value).toBe('None');
-            });
-
-            [69, 420].forEach((customValue) => {
-                instance.emit('BLK', customValue * 1024);
-                expect(diskio.select.value).toBe('Custom');
-                expect(Number(diskio.readByteRate.value)).toBe(customValue);
-            });
-
-            IOThrottlingProfiles.forEach((profile) => {
-                if (!profile.readByteRate) {
-                    return;
-                }
-
-                instance.emit('BLK', profile.readByteRate * 1024);
-                expect(diskio.select.value).toBe(profile.name);
-                expect(Number(diskio.readByteRate.value)).toBe(profile.readByteRate);
-            });
-        });
-
         test('diskio', () => {
             ['jean-michel', 'readbyterate -123', '', 'readbyterate invalid'].forEach((invalidValue) => {
                 instance.emit('diskio', invalidValue);

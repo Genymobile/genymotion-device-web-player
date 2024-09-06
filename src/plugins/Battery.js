@@ -23,17 +23,9 @@ module.exports = class Battery extends OverlayPlugin {
         // Register plugin
         this.instance.battery = this;
 
-        // Listen for initial battery charging status
-        this.instance.registerEventCallback('BATTERY_STATUS', (value) => {
-            this.updateUIBatteryChargingState(value !== 'false');
-        });
-
         // Display widget
         this.renderToolbarButton();
         this.renderWidget();
-
-        // Listen for initial battery level
-        this.instance.registerEventCallback('BATTERY_LEVEL', this.onBatteryLevelChange.bind(this));
 
         // Listen for battery messages: "state mode <discharging/charging/full> <value>"
         this.instance.registerEventCallback('battery', (message) => {

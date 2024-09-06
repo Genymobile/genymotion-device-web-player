@@ -135,7 +135,7 @@ The Player API provides functionality for managing plugin options and websocket 
 
     -   Parameters:
 
-        -   event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps', and 'BATTERY_LEVEL'...
+        -   event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps'...
         -   callback (function): The function to call when the event is emitted. The message from the VM will be passed as an argument to the callback function.
 
     -   Example Usage

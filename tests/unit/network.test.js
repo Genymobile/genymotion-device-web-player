@@ -54,20 +54,6 @@ describe('Network Plugin', () => {
             // render default widget
             network.disableMobileThrottling();
         });
-        test('NETWORK', () => {
-            const loadDetails = jest.spyOn(network, 'loadDetails');
-
-            ['jean-michel', '-123', '', '9'].forEach((invalidValue) => {
-                instance.emit('NETWORK', invalidValue);
-                expect(loadDetails).not.toHaveBeenCalled();
-            });
-
-            NetworkProfiles.forEach((profile) => {
-                instance.emit('NETWORK', profile.id);
-                expect(loadDetails).toHaveBeenCalledWith(NetworkProfiles[NetworkProfiles.length - 1 - profile.id]);
-                loadDetails.mockReset();
-            });
-        });
 
         test('network_profile', () => {
             const loadDetails = jest.spyOn(network, 'loadDetails');

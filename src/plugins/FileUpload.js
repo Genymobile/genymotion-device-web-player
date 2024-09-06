@@ -94,13 +94,6 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.renderToolbarButton();
         this.renderWidget();
 
-        // Listen for events
-        this.instance.registerEventCallback('SYSTEM_PATCHER_STATUS', this.onSystemPatcherStatusEvent.bind(this));
-        this.instance.registerEventCallback(
-            'SYSTEM_PATCHER_LAST_RESULT',
-            this.onSystemPatcherLastResultEvent.bind(this),
-        );
-
         /*
          * Listen for systempatcher messages: "status <ready/downloading/installing> <opengapps>"
          * or "last_result <success/cancelled/unavailable/network_error/corrupted_archive/install>_error <error message>"

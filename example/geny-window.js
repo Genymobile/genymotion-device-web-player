@@ -8,8 +8,10 @@ let apiToken = null;
 // JWT token to authenticate to the ws
 let jwtToken = null;
 
+// Advanced settings
 // Endpoint used to fetch recipes list, generate JWT token, start/stop instances, ...
-const baseUrlToFetch = 'https://api.geny.io/cloud';
+const defaultBaseUrlToFetch = 'https://api.geny.io/cloud';
+let baseUrlToFetch = localStorage.getItem('baseUrlToFetch') ?? defaultBaseUrlToFetch;
 const requestInit = {
     headers: {
         'Content-Type': 'application/json',
@@ -50,6 +52,15 @@ const start = async (recipeUuid) => {
     try {
         // start an isntance and get the instance information
         const recipe = await startInstance(recipeUuid);
+
+        // if advanced settings are set to save instance history, save the instance uuid in the local storage
+        if (localStorage.getItem('hasSaveInstanceHistory') === 'true') {
+            const instanceHistory = JSON.parse(localStorage.getItem('instanceHistory')) ?? [];
+            console.log(recipe.webrtc_url);
+            instanceHistory.push(recipe.webrtc_url);
+            localStorage.setItem('instanceHistory', JSON.stringify(instanceHistory));
+            generateInstanceHistoryList();
+        }
 
         // init player
         const webrtcAddress = recipe.webrtc_url;
@@ -204,13 +215,34 @@ const snackbar = (error) => {
     }, 3000);
 };
 
+const generateInstanceHistoryList = () => {
+    const instanceHistory = JSON.parse(localStorage.getItem('instanceHistory')) ?? [];
+    const datalist = document.querySelector('#instances-history');
+    datalist.innerHTML = '';
+    instanceHistory.forEach((instance) => {
+        const option = document.createElement('option');
+        option.value = instance;
+        datalist.appendChild(option);
+    }
+    );
+};
+
+        
+
+
 document.addEventListener(
     'DOMContentLoaded',
     () => {
         // get apiToken and JWT token + fetch the recipes list on load if input is filled
+        if (localStorage.getItem('hasSaveToken') === 'true') {
+            document.querySelector('#apiToken').value = localStorage.getItem('apiToken');
+        }
         getApiToken();
         // get apiToken when user leave the input field
         document.querySelector('#apiToken').addEventListener('focusout', () => {
+            if (localStorage.getItem('hasSaveToken') === 'true') {
+                localStorage.setItem('apiToken', document.querySelector('#apiToken').value);
+            }
             getApiToken();
         });
 
@@ -239,6 +271,41 @@ document.addEventListener(
                 return;
             }
             await connectInstance(wsAddress);
+        });
+
+        // binding advanced settings 
+            // fill ui with localstorage values if they exist
+        document.querySelector('#saveToken').checked = localStorage.getItem('hasSaveToken') === 'true';
+        document.querySelector('#apiToken').value = localStorage.getItem('apiToken');
+        document.querySelector('#saveInstanceHistory').checked =  localStorage.getItem('hasSaveInstanceHistory') === 'true';
+        generateInstanceHistoryList();
+        document.querySelector('#apiBaseUrl').value = baseUrlToFetch;
+
+            // save values on change
+        document.querySelector('#saveToken').addEventListener('click', (event) => {
+            localStorage.setItem('hasSaveToken', event.target.checked);
+            if (event.target.checked) {
+                localStorage.setItem('apiToken', document.querySelector('#apiToken').value);
+            } else {
+                localStorage.removeItem('apiToken');
+            }
+        });
+        document.querySelector('#saveInstanceHistory').addEventListener('click', (event) => {
+            localStorage.setItem('hasSaveInstanceHistory', event.target.checked);
+            if (event.target.checked) {
+                localStorage.setItem('instanceHistory', JSON.stringify([]));
+            } else {
+                localStorage.removeItem('instanceHistory');
+            }
+        }); 
+        document.querySelector('#saveAPIBaseUrl').addEventListener('click', (event) => {
+            if (document.querySelector('#apiBaseUrl').value.trim().length) {
+                localStorage.setItem('baseUrlToFetch', document.querySelector('#apiBaseUrl').value);
+                baseUrlToFetch = document.querySelector('#apiBaseUrl').value;
+            } else {
+                localStorage.setItem('baseUrlToFetch', defaultBaseUrlToFetch);
+                baseUrlToFetch = defaultBaseUrlToFetch;
+            }
         });
     },
     {once: true},

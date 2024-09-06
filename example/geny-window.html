@@ -56,7 +56,9 @@
                     placeholder="Instance uuid or Websocket address"
                     value=""
                     class="mb-3"
+                    list="instances-history"
                 />
+                <datalist id="instances-history"></datalist>
                 <div class="note" id="input-note">
                     <ul>
                         <li><strong>Instance uuid:</strong> the uuid of a launched device.</li>
@@ -69,6 +71,31 @@
                 <div class="actions">
                     <button id="connectExistingInstance">🔌</button>
                 </div>
+                <hr />
+                <h3>Advanced settings</h3>
+                <details id="advancedSettings">
+                    <summary>⚡⚙️</summary>
+                    <div class="d-flex justify-content-between">
+                        <label for="saveToken">
+                            Save the token 
+                        </label> 
+                        <input name="saveToken" id="saveToken" type="checkbox" />
+                    </div>
+                    <div class="note">⚠️ can be read by anyone with access to local storage</div>
+
+                    <div class="d-flex justify-content-between">
+                        <label for="saveInstanceHistory">
+                            Save instances history
+                        </label> 
+                        <input name="saveInstanceHistory" id="saveInstanceHistory" type="checkbox" />
+                    </div>
+                    <div class="d-flex justify-content-between  align-items-baseline">
+                        <input name="apiBaseUrl" id="apiBaseUrl" type="text" placeholder="API base url (empty to fallback default)" />
+                        <div class="actions ml-1 ">
+                            <button id="saveAPIBaseUrl">💾</button>
+                        </div>
+                    </div>
+                </details>
                 <hr />
                 <h3>More about geny's products and integration</h3>
                 <a href="https://www.genymotion.com" target="_blank" class="mb-1"> 👉 Our products </a>

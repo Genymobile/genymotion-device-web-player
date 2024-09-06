@@ -56,7 +56,6 @@ const start = async (recipeUuid) => {
         // if advanced settings are set to save instance history, save the instance uuid in the local storage
         if (localStorage.getItem('hasSaveInstanceHistory') === 'true') {
             const instanceHistory = JSON.parse(localStorage.getItem('instanceHistory')) ?? [];
-            console.log(recipe.webrtc_url);
             instanceHistory.push(recipe.webrtc_url);
             localStorage.setItem('instanceHistory', JSON.stringify(instanceHistory));
             generateInstanceHistoryList();

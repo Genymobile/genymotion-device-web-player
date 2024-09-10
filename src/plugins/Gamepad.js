@@ -96,6 +96,7 @@ module.exports = class Gamepad extends OverlayPlugin {
      */
     generateContent() {
         this.content.replaceChildren();
+        console.log('Gamepadmanager:--------------------', this.instance.gamepadManager);
         const gamepads = this.instance.gamepadManager.getGamepads();
         if (gamepads.length === 0) {
             this.content.innerHTML = 'No gamepad detected, please plug one or press a button';

@@ -220,11 +220,15 @@ module.exports = class DeviceRendererFactory {
                         if (dependenciesLoaded.indexOf(Dep.name) !== -1) {
                             return;
                         }
+                        console.log('Load dependence :--------------------',Dep,Dep.name);
+
                         new Dep(instance);
                         dependenciesLoaded.push(Dep.name);
                     });
                 }
                 // eslint-disable-next-line no-unused-expressions
+                console.log('Load plugin :--------------------',plugin, plugin.class.name);
+
                 plugin.class && new plugin.class(instance, ...args);
             }
         });

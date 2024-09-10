@@ -12,6 +12,8 @@ const ControllerType = Object.freeze({
 module.exports = class GamepadManager {
     constructor(instance) {
         this.instance = instance;
+        console.log('inbstantiate Gamepadmanager :--------------------',this);
+
         this.instance.gamepadManager = this;
         this.instance.gamepadEventsEnabled = true;
         this.isRunning = false;

@@ -172,31 +172,33 @@ function getBundler() {
 
 gulp.task('app-js', async function () {
     const bundler = await getBundler();
-    return merge2(bundler.bundle().pipe(source(PATHS.SRC.APP)), {end: true})
-        .pipe(gulpif(util.env.debug, using()))
-        .pipe(gulpif(util.env.production, replace("log.setDefaultLevel('debug');", "log.setDefaultLevel('error');")))
-        .pipe(
-            gulpif(
-                util.env.production,
-                streamify(
-                    babel({
-                        compact: false,
-                        presets: [
-                            [
-                                '@babel/env',
-                                {
-                                    targets:
-                                        'last 2 versions, not dead, not ie 11, not ie_mob 11, not op_mini all, not and_uc 12',
-                                },
+    return (
+        merge2(bundler.bundle().pipe(source(PATHS.SRC.APP)), {end: true})
+            .pipe(gulpif(util.env.debug, using()))
+            //.pipe(gulpif(util.env.production, replace("log.setDefaultLevel('debug');", "log.setDefaultLevel('error');")))
+            .pipe(
+                gulpif(
+                    util.env.production,
+                    streamify(
+                        babel({
+                            compact: false,
+                            presets: [
+                                [
+                                    '@babel/env',
+                                    {
+                                        targets:
+                                            'last 2 versions, not dead, not ie 11, not ie_mob 11, not op_mini all, not and_uc 12',
+                                    },
+                                ],
                             ],
-                        ],
-                    }),
+                        }),
+                    ),
                 ),
-            ),
-        )
-        .pipe(streamify(concat('device-renderer.min.js')))
-        .pipe(gulpif(util.env.production, streamify(uglify({keep_fnames: true}))))
-        .pipe(gulp.dest(PATHS.DEST.LIB.JS));
+            )
+            .pipe(streamify(concat('device-renderer.min.js')))
+            .pipe(gulpif(util.env.production, streamify(uglify({keep_fnames: true}))))
+            .pipe(gulp.dest(PATHS.DEST.LIB.JS))
+    );
 });
 
 // Dependencies injection

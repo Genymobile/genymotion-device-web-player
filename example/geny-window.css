@@ -14,6 +14,20 @@
     margin-bottom: 15px;
 }
 
+.ml-1 {
+    margin-left: 5px;
+}
+
+.d-flex{
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+.align-items-baseline {
+    align-items: baseline;
+}
 /* global */
 * {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -40,6 +54,20 @@ hr {
     width: 100%;
 }
 
+summary, label {
+    cursor: pointer;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
+}
 .note {
     font-size: 14px;
     color: #110f0f;
@@ -123,6 +151,10 @@ header {
     width: 30px;
     height: 30px;
     cursor: pointer;
+}
+
+#advancedSettings > * {
+ margin-bottom: 10px;
 }
 
 #player {

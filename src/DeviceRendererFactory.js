@@ -151,7 +151,7 @@ module.exports = class DeviceRendererFactory {
 
         this.instances.push(instance);
 
-        this.addPlugins(instance);
+        this.loadPlugins(instance);
         instance.onWebRTCReady();
 
         return instance.apiManager.getExposedApiFunctions();
@@ -195,7 +195,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {DeviceRenderer}     instance The DeviceRenderer instance reference to link into each plugin.
      * @param  {Object}             options  Various configuration options.
      */
-    addPlugins(instance) {
+    loadPlugins(instance) {
         /*
          * Load instance dedicated plugins
          */
@@ -209,7 +209,7 @@ module.exports = class DeviceRendererFactory {
             }
         }
 
-        const dependenciesLoaded = [];
+        const dependenciesLoaded = new Map();
         pluginInitMap.forEach((plugin) => {
             const args = plugin.params || [];
 
@@ -217,18 +217,15 @@ module.exports = class DeviceRendererFactory {
                 // load dependencies
                 if (plugin.dependencies) {
                     plugin.dependencies.forEach((Dep) => {
-                        if (dependenciesLoaded.indexOf(Dep.name) !== -1) {
+                        if (dependenciesLoaded.has(Dep)) {
                             return;
                         }
-                        console.log('Load dependence :--------------------',Dep,Dep.name);
 
                         new Dep(instance);
-                        dependenciesLoaded.push(Dep.name);
+                        dependenciesLoaded.set(Dep, true);
                     });
                 }
                 // eslint-disable-next-line no-unused-expressions
-                console.log('Load plugin :--------------------',plugin, plugin.class.name);
-
                 plugin.class && new plugin.class(instance, ...args);
             }
         });

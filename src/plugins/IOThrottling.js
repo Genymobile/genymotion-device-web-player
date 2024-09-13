@@ -11,6 +11,9 @@ const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE << 10;
  * Provides disk I/O control.
  */
 module.exports = class IOThrottling extends OverlayPlugin {
+    static get name() {
+        return 'IOThrottling';
+    }
     /**
      * Plugin initialization.
      *

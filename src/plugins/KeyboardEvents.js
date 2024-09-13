@@ -43,6 +43,10 @@ const CTRL_SHORTCUT_KEYS = {
  * Translate and forward keyboard events to instance.
  */
 module.exports = class KeyboardEvents {
+    static get name() {
+        return 'KeyboardEvents';
+    }
+
     /**
      * Plugin initialization.
      *

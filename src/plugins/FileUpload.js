@@ -13,6 +13,9 @@ const QUART = Math.PI / 2;
  * Provides file upload support and Open GApps installation control.
  */
 module.exports = class FileUpload extends OverlayPlugin {
+    static get name() {
+        return 'FileUpload';
+    }
     /**
      * Plugin initialization.
      *
@@ -137,7 +140,7 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         // Generate title
         this.title = document.createElement('div');
-        this.title.className = 'gm-upload-title';
+        this.title.className = 'gm-title';
         this.container.appendChild(this.title);
 
         // Generate input rows

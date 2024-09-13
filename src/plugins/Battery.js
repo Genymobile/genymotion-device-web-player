@@ -7,6 +7,9 @@ const OverlayPlugin = require('./util/OverlayPlugin');
  * Provides battery level and state control.
  */
 module.exports = class Battery extends OverlayPlugin {
+    static get name() {
+        return 'Battery';
+    }
     /**
      * Plugin initialization.
      *

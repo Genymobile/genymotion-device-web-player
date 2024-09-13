@@ -5,6 +5,9 @@
  * Gives the ability to display the renderer on the whole screen.
  */
 module.exports = class Fullscreen {
+    static get name() {
+        return 'Fullscreen';
+    }
     /**
      * Plugin initialization.
      *

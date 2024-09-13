@@ -12,6 +12,9 @@ log.setDefaultLevel('debug');
  * Provides GPS control.
  */
 module.exports = class GPS extends OverlayPlugin {
+    static get name() {
+        return 'GPS';
+    }
     /**
      * Plugin initialization.
      *

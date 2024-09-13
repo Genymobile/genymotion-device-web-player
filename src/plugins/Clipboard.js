@@ -10,6 +10,9 @@ log.setDefaultLevel('debug');
  * Provides clipboard data exchange capability between client and instance.
  */
 module.exports = class Clipboard extends OverlayPlugin {
+    static get name() {
+        return 'Clipboard';
+    }
     /**
      * Plugin initialization.
      *

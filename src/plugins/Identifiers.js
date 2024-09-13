@@ -10,6 +10,9 @@ const DIGITS = '0123456789';
  * Provides device ID (IMEI) and Android ID control.
  */
 module.exports = class Identifiers extends OverlayPlugin {
+    static get name() {
+        return 'Identifiers';
+    }
     /**
      * Plugin initialization.
      *

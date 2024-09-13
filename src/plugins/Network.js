@@ -14,6 +14,9 @@ const MOBILE_SIGNAL_STRENGTH = require('./util/mobile-signal-strength');
  * Provides network I/O control.
  */
 module.exports = class Network extends OverlayPlugin {
+    static get name() {
+        return 'Network';
+    }
     /**
      * Plugin initialization.
      *

@@ -5,6 +5,10 @@
  * Forward touch events to instance.
  */
 module.exports = class MouseEvents {
+    static get name() {
+        return 'MouseEvents';
+    }
+
     /**
      * Plugin initialization.
      *

@@ -14,6 +14,9 @@ const RESOLUTIONS = [
  * Provides video stream resolution control.
  */
 module.exports = class StreamResolution {
+    static get name() {
+        return 'StreamResolution';
+    }
     /**
      * Plugin initialization.
      *

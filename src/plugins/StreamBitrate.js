@@ -5,6 +5,9 @@
  * Provides video stream quality (audio and video bitrates) control.
  */
 module.exports = class StreamBitrate {
+    static get name() {
+        return 'StreamBitrate';
+    }
     /**
      * Plugin initialization.
      *

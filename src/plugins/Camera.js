@@ -11,6 +11,9 @@ log.setDefaultLevel('debug');
  * Provides client webcam and camera control.
  */
 module.exports = class Camera extends OverlayPlugin {
+    static get name() {
+        return 'Camera';
+    }
     /**
      * Plugin initialization.
      *

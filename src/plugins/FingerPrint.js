@@ -35,6 +35,9 @@ const FINGERPRINT_MESSAGES = {
     },
 };
 module.exports = class FingerPrint extends OverlayPlugin {
+    static get name() {
+        return 'FingerPrint';
+    }
     /**
      * Plugin initialization.
      *

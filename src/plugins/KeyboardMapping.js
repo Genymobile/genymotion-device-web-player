@@ -97,6 +97,9 @@ const {generateUID} = require('../utils/helpers');
  */
 
 module.exports = class KeyboardMapping {
+    static get name() {
+        return 'KeyboardMapping';
+    }
     /**
      * Plugin initialization.
      *

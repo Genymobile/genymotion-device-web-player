@@ -5,6 +5,9 @@
  * Forward multi touch events to instance.
  */
 module.exports = class MultiTouchEvents {
+    static get name() {
+        return 'MultiTouchEvents';
+    }
     /**
      * Plugin initialization.
      *

@@ -9,6 +9,9 @@ const OverlayPlugin = require('./util/OverlayPlugin');
  * Instance gamepad plugin.
  */
 module.exports = class Gamepad extends OverlayPlugin {
+    static get name() {
+        return 'Gamepad';
+    }
     /**
      * Plugin initialization.
      *

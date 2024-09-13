@@ -7,6 +7,9 @@ const OverlayPlugin = require('./util/OverlayPlugin');
  * Provides Baseband and RIL informations control.
  */
 module.exports = class BasebandRIL extends OverlayPlugin {
+    static get name() {
+        return 'BasebandRIL';
+    }
     /**
      * Plugin initialization.
      *

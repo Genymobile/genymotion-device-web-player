@@ -13,6 +13,9 @@ const CAPTURE_INTERVAL_MS = 50;
  * Provides screenshot and video capture.
  */
 module.exports = class Screencast extends OverlayPlugin {
+    static get name() {
+        return 'Screencast';
+    }
     /**
      * Plugin initialization.
      *

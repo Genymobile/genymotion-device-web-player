@@ -7,6 +7,9 @@ const OverlayPlugin = require('./util/OverlayPlugin');
  * Provides phone call and SMS support.
  */
 module.exports = class Phone extends OverlayPlugin {
+    static get name() {
+        return 'Phone';
+    }
     /**
      * Plugin initialization.
      *

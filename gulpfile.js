@@ -31,6 +31,7 @@ const uglify = require('gulp-uglify-es').default;
 const using = require('gulp-using');
 const util = require('gulp-util');
 const replace = require('gulp-replace');
+const header = require('gulp-header');
 
 const PATHS = {
     SRC: {
@@ -97,15 +98,6 @@ gulp.task('app-partials', function () {
 gulp.task('app-geny-window', function () {
     const version = getVersion(); // Fetch the version from package.json
 
-    gulp.src(['./example/geny-window.html'])
-        .pipe(
-            replace(
-                /https:\/\/cdn\.jsdelivr\.net\/npm\/@genymotion\/device-web-player@[\d\.]+/g,
-                `https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@${version}`,
-            ),
-        )
-        .pipe(gulp.dest('./example/'));
-
     return gulp
         .src(['./example/*'])
         .pipe(gulpif(util.env.debug, using({prefix: 'Processing example files:', color: 'cyan'})))
@@ -120,6 +112,7 @@ gulp.task('app-geny-window', function () {
 
 // SASS styles
 gulp.task('app-styles', function () {
+    const version = `/*! Version: ${getVersion()} */\n`;
     return gulp
         .src(PATHS.SRC.ASSETS.STYLES + '/**/*.scss')
         .pipe(gulpif(util.env.debug, using()))
@@ -128,6 +121,7 @@ gulp.task('app-styles', function () {
         .pipe(autoprefixer())
         .pipe(gulpif(util.env.production, minifyCss()))
         .pipe(concat('device-renderer.min.css'))
+        .pipe(header(version))
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
 });
 
@@ -171,6 +165,7 @@ function getBundler() {
 }
 
 gulp.task('app-js', async function () {
+    const version = `/*! Version: ${getVersion()} */\n`;
     const bundler = await getBundler();
     return merge2(bundler.bundle().pipe(source(PATHS.SRC.APP)), {end: true})
         .pipe(gulpif(util.env.debug, using()))
@@ -195,7 +190,8 @@ gulp.task('app-js', async function () {
             ),
         )
         .pipe(streamify(concat('device-renderer.min.js')))
-        .pipe(gulpif(util.env.production, streamify(uglify({keep_fnames: true}))))
+        .pipe(gulpif(util.env.production, streamify(uglify())))
+        .pipe(header(version))
         .pipe(gulp.dest(PATHS.DEST.LIB.JS));
 });
 

@@ -30,6 +30,7 @@
     },
     "homepage": "https://github.com/Genymobile/genymotion-device-web-player#readme",
     "dependencies": {
+        "gulp-header": "^2.0.9",
         "gulp-replace": "^1.1.4",
         "lodash": "^4.17.21",
         "loglevel": "^1.8.0",

@@ -247,6 +247,8 @@ module.exports = class DeviceRenderer {
 
         this.webRTCWebsocket.onclose = (event) => {
             store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
+            store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
+            store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
             video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
@@ -477,6 +479,9 @@ module.exports = class DeviceRenderer {
             if (this.gamepadEventsEnabled) {
                 this.gamepadManager.addGamepadCallbacks();
             }
+
+            this.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: true});
+            this.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: true});
 
             const playWithSound = this.video.play(); // needed on Safari (web & iOs)
             if (!playWithSound) {

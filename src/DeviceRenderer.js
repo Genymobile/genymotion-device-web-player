@@ -352,6 +352,27 @@ module.exports = class DeviceRenderer {
     }
 
     /**
+     * Reconnect the instance. Disconnect the current instance, and then
+     * attempt to reconnect.
+     *
+     * When reconnecting, it will attempt to add the previous keyboard and mouse
+     * callbacks. (including keyboard mapping if applicable)
+     */
+    reconnect() {
+        this.disconnect();
+        this.onWebRTCReady();
+        if (this.store.state.isKeyboardEventsEnabled) {
+            this.keyboardEvents.addKeyboardCallbacks();
+        }
+        if (this.store.state.isMouseEventsEnabled) {
+            this.mouseEvents.addMouseCallbacks();
+        }
+        if (!this.store.state.isKeyboardEventsEnabled && !this.store.state.isMouseEventsEnabled) {
+            this.keyboardMapping.addKeyboardCallbacks();
+        }
+    }
+
+    /**
      * Send event to the instance through the Websocket connection.
      *
      * @param {Object} event Event to send.

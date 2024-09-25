@@ -598,14 +598,6 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 -   **Details:**
     Enable or disable fingerprints widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above
 
-### `translateHomeKey`
-
--   **Type:** `Boolean`
--   **Default:** `false`
--   **Compatibility:** `PaaS`
--   **Details:**
-    Translate home key to `META` + `ENTER`
-
 ### `connectionFailedURL`
 
 -   **Type:** `String`

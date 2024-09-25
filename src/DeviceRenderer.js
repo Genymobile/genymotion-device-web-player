@@ -124,7 +124,7 @@ module.exports = class DeviceRenderer {
             {
                 enabled: this.options.buttons,
                 class: ButtonsEvents,
-                params: [this.options.i18n, this.options.translateHomeKey],
+                params: [this.options.i18n],
             },
         ];
 

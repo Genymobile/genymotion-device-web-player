@@ -5,7 +5,7 @@ const ENTER_KEYCODE = '0x01000005';
 const VOLUME_DOWN_KEYCODE = '0x01000070';
 const VOLUME_UP_KEYCODE = '0x01000072';
 const RECENT_APP_KEYCODE = '0x010000be';
-const HOME_KEYCODE = '0x01000010';
+const HOMEPAGE_KEYCODE = '0x01000090';
 const BACK_KEYCODE = '0x01000061';
 const POWER_KEYCODE = '0x0100010b';
 const ROTATE_KEYCODE = 'gm-rotation';
@@ -20,12 +20,10 @@ module.exports = class ButtonsEvents {
      *
      * @param {Object} instance         Associated instance.
      * @param {Object} i18n             Translations keys for the UI.
-     * @param {Object} translateHomeKey Translate HOME key press for the instance.
      */
-    constructor(instance, i18n, translateHomeKey) {
+    constructor(instance, i18n) {
         // Reference instance
         this.instance = instance;
-        this.translateHomeKey = translateHomeKey;
 
         // Register plugin
         this.instance.buttonsEvents = this;
@@ -51,7 +49,7 @@ module.exports = class ButtonsEvents {
                 i18n.BUTTONS_RECENT_APPS || 'Recent applications',
                 true,
             );
-            this.renderToolbarButton(HOME_KEYCODE, 'gm-home', i18n.BUTTONS_HOME || 'Home', true);
+            this.renderToolbarButton(HOMEPAGE_KEYCODE, 'gm-home', i18n.BUTTONS_HOME || 'Home', true);
             this.renderToolbarButton(BACK_KEYCODE, 'gm-back', i18n.BUTTONS_BACK || 'Back', true);
         }
 
@@ -103,8 +101,12 @@ module.exports = class ButtonsEvents {
             return;
         }
 
-        if (id === HOME_KEYCODE && this.translateHomeKey) {
-            // home is meta + enter
+        if (id === HOMEPAGE_KEYCODE) {
+            /**
+             * Translate homepage into meta + enter
+             * Note we could send the homepage keycode directly, see https://source.android.com/docs/core/interaction/input/keyboard-devices#hid-keyboard-and-keypad-page-0x07
+             * but geny's webrtcd doesn't know how to map it yet.
+             */
             this.keyPressEvent(parseInt(META_KEYCODE), '');
             this.keyPressEvent(parseInt(ENTER_KEYCODE), '');
         } else if (id.substring(0, 2) === '0x') {
@@ -126,8 +128,8 @@ module.exports = class ButtonsEvents {
             return;
         }
 
-        if (id === HOME_KEYCODE && this.translateHomeKey) {
-            // "home" is "meta + enter" on PaaS, "move_home" on SaaS
+        if (id === HOMEPAGE_KEYCODE) {
+            // Translate homepage into meta + enter
             this.keyReleaseEvent(parseInt(ENTER_KEYCODE), '');
             this.keyReleaseEvent(parseInt(META_KEYCODE), '');
         } else if (id === ROTATE_KEYCODE) {

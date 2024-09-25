@@ -116,7 +116,6 @@ interface RendererSetupOptions {
     template?: Template; // Default: 'renderer'
     token?: string;
     touch?: boolean; // Default: true
-    translateHomeKey?: boolean; // Default: false
     turn?: {
         urls?: string[];
         username?: string;

@@ -43,7 +43,6 @@ const defaultOptions = {
     diskIO: true,
     gamepad: true,
     biometrics: true,
-    translateHomeKey: false,
     token: '',
     i18n: {},
     stun: {
@@ -108,7 +107,6 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.streamResolution       Stream resolution control support activated. Default: true.
      * @param  {boolean}            options.diskIO                 Disk I/O throttling support activated. Default: true.
      * @param  {boolean}            options.gamepad                Experimental gamepad support activated. Default: false.
-     * @param  {boolean}            options.translateHomeKey       Whether or not the HOME key button should be decompose to META + ENTER. Default: false.
      * @param  {string}             options.token                  Instance access token (JWT). Default: ''.
      * @param  {Object}             options.i18n                   Translations keys for the UI. Default: {}.
      * @param  {Object}             options.stun                   WebRTC STUN servers configuration.

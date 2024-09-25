@@ -593,7 +593,7 @@ module.exports = class DeviceRenderer {
         this.onConnectionStateChange = () => {
             log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
             if (this.peerConnection.iceConnectionState === 'disconnected') {
-                this.onWebRTCReady();
+                this.reconnect();
             }
         };
         this.addListener(this.peerConnection, 'connectionstatechange', this.onConnectionStateChange);

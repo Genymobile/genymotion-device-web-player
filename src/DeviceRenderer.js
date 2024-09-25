@@ -361,15 +361,7 @@ module.exports = class DeviceRenderer {
     reconnect() {
         this.disconnect();
         this.onWebRTCReady();
-        if (this.store.state.isKeyboardEventsEnabled) {
-            this.keyboardEvents.addKeyboardCallbacks();
-        }
-        if (this.store.state.isMouseEventsEnabled) {
-            this.mouseEvents.addMouseCallbacks();
-        }
-        if (!this.store.state.isKeyboardEventsEnabled && !this.store.state.isMouseEventsEnabled) {
-            this.keyboardMapping.addKeyboardCallbacks();
-        }
+        this.store.reconnect();
     }
 
     /**

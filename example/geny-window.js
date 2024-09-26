@@ -29,11 +29,14 @@ const getApiToken = async () => {
 };
 
 // get jwt token
-const getJWTToken = async () => {
+const getJWTToken = async (instanceUuid) => {
     try {
         const response = await fetch(baseUrlToFetch + `/v1/instances/access-token`, {
             ...requestInit,
             method: 'POST',
+            body: JSON.stringify({
+              instance_uuid: instanceUuid,
+            }),
         });
 
         if (response.status !== 200) {
@@ -95,7 +98,7 @@ const startInstance = async (recipeUuid) => {
 
     instanceUuid = recipe.uuid;
 
-    await getJWTToken();
+    await getJWTToken(instanceUuid);
 
     return recipe;
 };
@@ -202,7 +205,7 @@ const connectInstance = async (wsAddress) => {
     });
     const instance = await response.json();
     instanceUuid = instance.uuid;
-    await getJWTToken();
+    await getJWTToken(instanceUuid);
     initPlayer(instance.publicWebrtcUrl);
 };
 

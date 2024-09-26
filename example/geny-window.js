@@ -146,14 +146,14 @@ const stopInstance = async () => {
 // Fetch recipe and add them to the select
 const fetchRecipes = async () => {
     try {
-        const response = await fetch(baseUrlToFetch + `/v1/recipes?limit=1000`, {
+        const response = await fetch(baseUrlToFetch + `/v3/recipes/?arch=x86_64&arch=x86&arch=arm64&limit=1000`, {
             ...requestInit,
             method: 'GET',
         });
-        const recipes = await response.json();
+        const recipesResult = await response.json();
 
         if (response.status !== 200) {
-            alert(recipes.message);
+            alert(recipesResult.message);
             return;
         }
 
@@ -166,30 +166,20 @@ const fetchRecipes = async () => {
         placeholderOption.disabled = true;
         placeholderOption.selected = true;
         selectElement.add(placeholderOption, selectElement.firstChild);
+        const recipes = recipesResult.results;
 
-        for (const recipeType in recipes) {
-            addOptionsToGroup(recipeType, recipes[recipeType]);
+        for (let i = 0; i < recipes.length; i++) {
+            const recipe = recipes[i];
+            const optionElement = document.createElement('option');
+            optionElement.value = recipe.uuid;
+            optionElement.textContent = recipe.name;
+            selectElement.appendChild(optionElement);
         }
     } catch (error) {
         alert(error);
     }
 };
 
-const addOptionsToGroup = (recipeType, recipes) => {
-    const selectElement = document.querySelector('#listRecipes');
-
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = recipeType;
-
-    recipes.forEach((recipe) => {
-        const optionElement = document.createElement('option');
-        optionElement.value = recipe.uuid;
-        optionElement.textContent = recipe.name;
-        optgroup.appendChild(optionElement);
-    });
-
-    selectElement.appendChild(optgroup);
-};
 
 // connect to an existing instance through an instance Uuid or an instance ws address
 const connectInstance = async (wsAddress) => {

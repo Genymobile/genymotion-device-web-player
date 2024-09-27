@@ -39,6 +39,16 @@ module.exports = class APIManager {
             description: 'Disconnect from the current instance, ending the WebSocket communication.',
         });
 
+        // Register a function to restart the webrtc connection
+        this.registerFunction({
+            name: 'reconnect',
+            category: 'VM_communication',
+            fn: () => {
+                this.instance.reconnect();
+            },
+            description: 'Disconnect and recreate the webrtc connection.',
+        });
+
         // Register a function to get all registered functions
         this.registerFunction({
             name: 'getRegisteredFunctions',

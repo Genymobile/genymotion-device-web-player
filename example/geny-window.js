@@ -155,6 +155,8 @@ const fetchRecipes = async () => {
         }
 
         const selectElement = document.querySelector('#listRecipes');
+        // Empty the select before adding new options.
+        selectElement.innerHTML = '';
         const placeholderOption = document.createElement('option');
         placeholderOption.textContent = 'Select a recipe';
         placeholderOption.value = '';

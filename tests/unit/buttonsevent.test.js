@@ -174,33 +174,8 @@ describe('ButtonsEvents Plugin', () => {
             });
         });
 
-        test('home - default', () => {
+        test('home', () => {
             const button = document.getElementsByClassName('gm-home')[0];
-
-            button.dispatchEvent(new Event('mousedown'));
-            expect(sendEventSpy).toHaveBeenCalledTimes(1);
-            expect(instance.outgoingMessages[0]).toEqual({
-                type: 'KEYBOARD_PRESS',
-                keycode: parseInt('0x01000010'),
-                keychar: '0\n',
-            });
-
-            button.dispatchEvent(new Event('mouseup'));
-            expect(sendEventSpy).toHaveBeenCalledTimes(2);
-            expect(instance.outgoingMessages[1]).toEqual({
-                type: 'KEYBOARD_RELEASE',
-                keycode: parseInt('0x01000010'),
-                keychar: '0\n',
-            });
-        });
-
-        test('home - translated', () => {
-            instance = new Instance({
-                navbar: true,
-            });
-            new ButtonsEvents(instance, {}, true);
-            const button = document.getElementsByClassName('gm-home')[0];
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
             button.dispatchEvent(new Event('mousedown'));
             expect(sendEventSpy).toHaveBeenCalledTimes(2);

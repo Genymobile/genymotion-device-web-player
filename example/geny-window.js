@@ -35,7 +35,7 @@ const getJWTToken = async (instanceUuid) => {
             ...requestInit,
             method: 'POST',
             body: JSON.stringify({
-              instance_uuid: instanceUuid,
+                instance_uuid: instanceUuid,
             }),
         });
 
@@ -112,8 +112,8 @@ const initPlayer = (webrtcAddress) => {
     }
 
     const options = {
-        template: 'renderer_partial',
         token: jwtToken || apiToken,
+        showPhoneBorder: true,
     };
 
     const {DeviceRendererFactory} = window.genyDeviceWebPlayer;
@@ -180,7 +180,6 @@ const fetchRecipes = async () => {
     }
 };
 
-
 // connect to an existing instance through an instance Uuid or an instance ws address
 const connectInstance = async (wsAddress) => {
     if (wsAddress.includes('wss://')) {
@@ -217,12 +216,8 @@ const generateInstanceHistoryList = () => {
         const option = document.createElement('option');
         option.value = instance;
         datalist.appendChild(option);
-    }
-    );
+    });
 };
-
-        
-
 
 document.addEventListener(
     'DOMContentLoaded',
@@ -241,7 +236,7 @@ document.addEventListener(
         });
 
         // change recipeUuid when the user select a recipe
-        document.querySelector('#listRecipes').addEventListener('change', function (event) {
+        document.querySelector('#listRecipes').addEventListener('change', function () {
             const selectedValue = document.querySelector('#listRecipes').value;
             document.querySelector('#recipeUuid').value = selectedValue;
         });
@@ -267,15 +262,16 @@ document.addEventListener(
             await connectInstance(wsAddress);
         });
 
-        // binding advanced settings 
-            // fill ui with localstorage values if they exist
+        // binding advanced settings
+        // fill ui with localstorage values if they exist
         document.querySelector('#saveToken').checked = localStorage.getItem('hasSaveToken') === 'true';
         document.querySelector('#apiToken').value = localStorage.getItem('apiToken');
-        document.querySelector('#saveInstanceHistory').checked =  localStorage.getItem('hasSaveInstanceHistory') === 'true';
+        document.querySelector('#saveInstanceHistory').checked =
+            localStorage.getItem('hasSaveInstanceHistory') === 'true';
         generateInstanceHistoryList();
         document.querySelector('#apiBaseUrl').value = baseUrlToFetch;
 
-            // save values on change
+        // save values on change
         document.querySelector('#saveToken').addEventListener('click', (event) => {
             localStorage.setItem('hasSaveToken', event.target.checked);
             if (event.target.checked) {
@@ -291,8 +287,8 @@ document.addEventListener(
             } else {
                 localStorage.removeItem('instanceHistory');
             }
-        }); 
-        document.querySelector('#saveAPIBaseUrl').addEventListener('click', (event) => {
+        });
+        document.querySelector('#saveAPIBaseUrl').addEventListener('click', () => {
             if (document.querySelector('#apiBaseUrl').value.trim().length) {
                 localStorage.setItem('baseUrlToFetch', document.querySelector('#apiBaseUrl').value);
                 baseUrlToFetch = document.querySelector('#apiBaseUrl').value;

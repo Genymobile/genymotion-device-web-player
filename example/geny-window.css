@@ -18,7 +18,7 @@
     margin-left: 5px;
 }
 
-.d-flex{
+.d-flex {
     display: flex;
 }
 
@@ -54,18 +54,19 @@ hr {
     width: 100%;
 }
 
-summary, label {
+summary,
+label {
     cursor: pointer;
 }
 
-input[type="text"] {
+input[type='text'] {
     width: 100%;
     padding: 5px;
     margin: 5px 0;
     box-sizing: border-box;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
     cursor: pointer;
 }
 .note {
@@ -138,8 +139,14 @@ header {
     color: #fff;
     padding: 10px;
     box-sizing: border-box;
-    margin-right: 20px;
     padding-top: 20px;
+    height: calc(100vh - 84px);
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 #sidebar .actions {
@@ -154,41 +161,21 @@ header {
 }
 
 #advancedSettings > * {
- margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 #player {
-    background-color: #000;
+    background-color: #1a1a1a;
     color: #fff;
-    padding: 10px;
     box-sizing: border-box;
-    margin-right: 20px;
     margin: 0 auto;
-    max-width: 90%;
-    max-height: 95vh;
-}
-
-#fe-player {
-    margin: 10px;
-    margin: 0;
-    color: #fff;
-    font-size: 14px;
-    font-family: 'Roboto', sans-serif;
-}
-
-#fe-player .gm-wrapper {
-    display: flex !important;
+    flex-grow: 1;
+    max-height: calc(100vh - 84px);
 }
 
 #fe-player .gm-toolbar {
-    top: 0;
-    height: 100%;
     background-color: #1e1e1e;
 }
-
-@media screen and (max-width: 800px) {
-    #fe-player.landscape {
-        max-width: 400px;
-        width: auto;
-    }
+#fe-player .gm-video-wrapper {
+    padding: 10px 0 10px 10px;
 }

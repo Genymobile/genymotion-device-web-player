@@ -9,13 +9,8 @@ const APIManager = require('./APIManager');
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
-// Templates are loaded dynamically from the `templates` folder
-const TEMPLATE_JS = 'device-renderer-js';
-const TEMPLATE_CSS = 'device-renderer-css';
-
 // Default options
 const defaultOptions = {
-    template: 'renderer',
     touch: true,
     mouse: true,
     volume: true,
@@ -69,8 +64,6 @@ const defaultOptions = {
 module.exports = class DeviceRendererFactory {
     constructor() {
         this.instances = [];
-        /* global GEN_TEMPLATES */
-        this.templates = GEN_TEMPLATES;
     }
 
     /**
@@ -79,7 +72,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {HTMLElement|string} dom                            The DOM element (or its ID) to setup the device renderer into.
      * @param  {string}             webRTCUrl                      WebRTC URL of the instance.
      * @param  {Object}             options                        Various configuration options.
-     * @param  {string}             options.template               Template to use. Default: 'renderer'.
+     * @param  {boolean}            options.showPhoneBorder        Show phone border. Default: false.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
      * @param  {boolean}            options.volume                 Audio volume control support activated. Default: true.
@@ -136,14 +129,19 @@ module.exports = class DeviceRendererFactory {
 
         log.debug('Creating genymotion display on ' + webRTCUrl);
         dom.classList.add('device-renderer-instance');
-        dom.classList.add('gm-template-' + options.template);
-        document.body.classList.add('gm-template-' + options.template + '-body');
-
-        // Load template before creating the Device Renderer that is using HTML elements
-        this.loadTemplate(dom, this.templates[options.template], options);
+        this.loadTemplate(dom, options);
 
         const instance = new RendererClass(dom, options);
         store(instance);
+
+        // Add a class to the wrapper when we are waiting for the stream to be ready in order to display a loader
+        instance.store.subscribe(({isWebRTCConnectionReady}) => {
+            if (isWebRTCConnectionReady) {
+                instance.wrapper.classList.remove('waitingForStream');
+            } else {
+                instance.wrapper.classList.add('waitingForStream');
+            }
+        });
 
         instance.apiManager = new APIManager(instance);
 
@@ -156,35 +154,25 @@ module.exports = class DeviceRendererFactory {
     }
 
     /**
-     * Loads the selected template.
+     * Loads HTML template.
      *
      * @param  {HTMLElement}        dom       The DOM element to setup the device renderer into.
-     * @param  {string}             template  Template to use.
      * @param  {Object}             options   Various configuration options.
      */
-    loadTemplate(dom, template, options) {
-        const head = document.getElementsByTagName('head')[0];
-        const scriptId = TEMPLATE_JS + '-' + options.template;
-        const styleId = TEMPLATE_CSS + '-' + options.template;
-
-        // Handle template JS
-        if (!document.getElementById(scriptId)) {
-            const script = document.createElement('script');
-            script.id = scriptId;
-            script.text = template.js;
-            head.appendChild(script);
-        }
-
-        // Handle template CSS
-        if (!document.getElementById(styleId)) {
-            const style = document.createElement('style');
-            style.id = styleId;
-            style.appendChild(document.createTextNode(template.css));
-            head.appendChild(style);
-        }
-
-        // Handle template dom
-        dom.innerHTML = template.html;
+    loadTemplate(dom, options) {
+        dom.innerHTML = `
+        <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''}">
+            <div class="gm-video-wrapper">
+                <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag
+                </video>
+            </div>
+            <div class="gm-toolbar-wrapper">
+                <div class="gm-toolbar">
+                    <ul></ul>
+                    </div>
+            </div>
+        </div>
+        `;
     }
 
     /**

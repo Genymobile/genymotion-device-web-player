@@ -6,7 +6,6 @@
  */
 
 // This variable is used to store templates generated from the template folder
-let templates;
 
 const autoprefixer = require('gulp-autoprefixer');
 const babel = require('gulp-babel');
@@ -15,18 +14,14 @@ const browserify = require('browserify');
 const browserSync = require('browser-sync').create();
 const concat = require('gulp-concat');
 const del = require('del');
-const graspify = require('./gulp/graspify-squery');
 const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const inject = require('gulp-inject');
 const merge2 = require('merge2');
 const minifyCss = require('gulp-clean-css');
-const minifyHtml = require('gulp-htmlmin');
 const sass = require('gulp-sass')(require('sass'));
 const source = require('vinyl-source-stream');
 const streamify = require('gulp-streamify');
-const tap = require('gulp-tap');
-const templateCollector = require('./gulp/gulp-template-collector');
 const uglify = require('gulp-uglify-es').default;
 const using = require('gulp-using');
 const util = require('gulp-util');
@@ -38,14 +33,12 @@ const PATHS = {
         APP: 'index.js',
         BASE: './src',
         WORKER: './src/worker',
-        TEMPLATES: './src/templates',
         ASSETS: {
             STYLES: './src/scss',
         },
     },
     DEST: {
         BASE: 'dist',
-        TEMPLATES: 'dist/templates',
         ASSETS: {
             CSS: 'dist/css',
         },
@@ -61,18 +54,6 @@ const PATHS = {
     },
 };
 
-function getTemplateStylesStream() {
-    return gulp.src([PATHS.SRC.TEMPLATES + '/**/*.css']).pipe(base64());
-}
-
-function getTemplatesStream() {
-    return merge2(
-        gulp.src([PATHS.SRC.TEMPLATES + '/**/*.html']),
-        gulp.src([PATHS.SRC.TEMPLATES + '/**/*.js']),
-        getTemplateStylesStream(),
-    ).pipe(templateCollector());
-}
-
 // Clean dist dir
 gulp.task('clean', function (cb) {
     del([PATHS.DEST.BASE + ' --force']).then(
@@ -85,16 +66,7 @@ gulp.task('clean', function (cb) {
     );
 });
 
-// HTML templates
-gulp.task('app-partials', function () {
-    return gulp
-        .src(['*.html'])
-        .pipe(gulpif(util.env.debug, using()))
-        .pipe(gulpif(util.env.production, minifyHtml({empty: true})))
-        .pipe(gulp.dest(PATHS.DEST.BASE));
-});
-
-// HTML templates
+// Integration Example
 gulp.task('app-geny-window', function () {
     const version = getVersion(); // Fetch the version from package.json
 
@@ -117,9 +89,9 @@ gulp.task('app-styles', function () {
         .src(PATHS.SRC.ASSETS.STYLES + '/**/*.scss')
         .pipe(gulpif(util.env.debug, using()))
         .pipe(sass().on('error', sass.logError))
-        .pipe(base64())
         .pipe(autoprefixer())
         .pipe(gulpif(util.env.production, minifyCss()))
+        .pipe(base64())
         .pipe(concat('device-renderer.min.css'))
         .pipe(header(version))
         .pipe(gulp.dest(PATHS.DEST.ASSETS.CSS));
@@ -130,37 +102,17 @@ gulp.task('app-dts', function () {
     return gulp.src(PATHS.SRC.BASE + './../*.d.ts').pipe(gulp.dest(PATHS.DEST.BASE));
 });
 
-gulp.task('app-templates', function () {
-    return getTemplatesStream().pipe(
-        tap(function (file) {
-            // After getting the templates to a JSON form, we need to transform it to a javascript string
-            templates = file.contents.toString();
-            templates = templates.replace(/\\n/g, ''); // we remove \n
-            templates = templates.replace(/\\"/g, 'xFic1RoIH8'); // we change \" to a tmp replacement string
-            templates = templates.replace(/'/g, "\\'"); // we change all ' to \'
-            templates = templates.replace(/"/g, "'"); // we replace all " by '
-            templates = templates.replace(/xFic1RoIH8/g, '\\"'); // we change back the tmp replacement string to \"
-        }),
-    );
-});
-
 function setupBrowserify() {
     return browserify({
         entries: [PATHS.SRC.BASE + '/' + PATHS.SRC.APP],
         standalone: 'genyDeviceWebPlayer',
         debug: true,
-    }).transform(graspify, ['#GEN_TEMPLATES', templates]);
+    });
 }
 
 function getBundler() {
     return new Promise((resolve) => {
-        if (!templates) {
-            gulp.series('app-templates')(() => {
-                resolve(setupBrowserify());
-            });
-        } else {
-            resolve(setupBrowserify());
-        }
+        resolve(setupBrowserify());
     });
 }
 
@@ -221,15 +173,9 @@ gulp.task('connect', function () {
 // Build project
 gulp.task(
     'build',
-    gulp.series(
-        'clean',
-        'app-templates',
-        gulp.parallel('app-partials', 'app-styles', 'app-js', 'app-dts', 'app-geny-window'),
-        'inject',
-        function (cb) {
-            cb();
-        },
-    ),
+    gulp.series('clean', gulp.parallel('app-styles', 'app-js', 'app-dts', 'app-geny-window'), 'inject', function (cb) {
+        cb();
+    }),
 );
 
 // Watch project update

@@ -98,7 +98,6 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
     // See "Features & options" section for more details about options
     const options = {
-        template: 'renderer', // template defines how renderer is displayed
         token: 'i-XXXXXXXXXX', // token is the shared secret to connect to your VM
         fileUpload: false, // requires fileUploadUrl
     };
@@ -274,14 +273,6 @@ sendData({
 
 A device renderer instance can be configured using the `options` argument (object). Possible configuration key / value are described below.
 
-### `template`
-
--   **Type:** `String`
--   **Default:** `renderer`
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Defines the layout of the renderer. Can be one of the following: `bootstrap`, `fullscreen`, `fullwindow`, `renderer`, `renderer_minimal`, `renderer_no_toolbar`, `renderer_partial`.
-
 ### `token`
 
 -   **Type:** `String`
@@ -332,6 +323,13 @@ A device renderer instance can be configured using the `options` argument (objec
     default: false  // Whether or not we should use the TURN servers by default. Default: false.
 }
 ```
+
+### `showPhoneBorder`
+
+-   **Type:** `Boolean`
+-   **Default:** `false`
+-   **Details:**
+    Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
 
 ### `streamResolution`
 

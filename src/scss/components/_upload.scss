@@ -3,15 +3,6 @@
  */
 .device-renderer-instance {
     .gm {
-        &-wrapper {
-            display: inline-block;
-            border: 10px solid transparent;
-        }
-
-        &-dragover {
-            border: 10px solid $accent-color-light;
-        }
-
         &-upload-progress {
             display: block;
             position: absolute;

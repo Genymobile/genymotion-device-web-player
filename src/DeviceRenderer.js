@@ -44,8 +44,6 @@ module.exports = class DeviceRenderer {
      */
     constructor(domRoot, options) {
         this.timeoutCallbacks = [];
-        this.videoBackupStyleBackground = '';
-
         // Options associated with this instance
         this.options = options;
 
@@ -242,12 +240,10 @@ module.exports = class DeviceRenderer {
      */
     onConnectionClosed() {
         // closure to expose the right video and store context to onclose event
-        const video = this.video;
         const store = this.store;
 
         this.webRTCWebsocket.onclose = (event) => {
             store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
-            video.style.background = this.videoBackupStyleBackground;
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
@@ -466,9 +462,6 @@ module.exports = class DeviceRenderer {
 
             // Get the PeerConnection Statistics after 3 seconds
             new PeerConnectionStats(this, this.peerConnection, 3000);
-
-            this.videoBackupStyleBackground = this.video.style.background;
-            this.video.style.background = 'transparent';
 
             if (this.touchEventsEnabled) {
                 this.touchEvents.addTouchCallbacks();

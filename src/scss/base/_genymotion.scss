@@ -3,6 +3,7 @@
  */
 .device-renderer-instance {
     text-align: center;
+    height: 100%;
 
     *,
     *::after,
@@ -38,16 +39,10 @@
     }
 
     .gm {
-        &-video {
-            margin: 0;
-            max-width: 100%;
-        }
-
         &-icon-button {
             display: block;
             width: 32px;
             height: 26px;
-            margin: 16px auto 16px auto;
         }
 
         &-video-overlay {
@@ -90,12 +85,8 @@
             width: 80%;
             max-width: 380px;
             min-height: 66px;
-            left: calc(10% - 30px);
             top: calc(86% - 34px);
             cursor: pointer;
-            @media screen and (min-width: 475px) {
-                left: calc(50% - 220px);
-            }
         }
 
         &-overlay-cant-connect {
@@ -120,6 +111,72 @@
 
             a {
                 color: $btn-background-color;
+            }
+        }
+    }
+
+    .gm-wrapper {
+        background-color: #1a1a1a;
+        height: 100%;
+        display: grid;
+        grid-template-columns: auto min-content;
+        grid-template-rows: 100%;
+        grid-gap: 10px;
+
+        > * {
+            transition: opacity 0.5s;
+        }
+        &.waitingForStream {
+            background: transparent url('../assets/images/loader.svg') center no-repeat;
+            background-size: 40%;
+            > * {
+                opacity: 0;
+            }
+        }
+
+        &.phoneBorder {
+            .gm-video {
+                border: 8px solid #cbcecb;
+                border-radius: 27px;
+                outline: 7px solid #242424;
+                outline-offset: -13px;
+            }
+        }
+
+        .gm-video-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            .gm-video {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: fit-content;
+                align-self: center;
+            }
+        }
+        .gm-toolbar-wrapper {
+            background-color: #292929;
+            min-width: 50px;
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .gm-toolbar-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gm-toolbar {
+            display: flex;
+            min-height: 100%;
+            flex-direction: column;
+            align-items: center;
+
+            ul {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
         }
     }

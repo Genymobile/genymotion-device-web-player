@@ -61,9 +61,13 @@
                 <datalist id="instances-history"></datalist>
                 <div class="note" id="input-note">
                     <ul>
-                        <li><strong>Instance uuid:</strong> the uuid of a launched device. <strong>(Genymotion SaaS only)</strong></li>
                         <li>
-                            <strong>WebSocket address:</strong> the WebSocket address ("<i>wss://public ip address</i>") of the device. <strong>(Genymotion Device Image only)</strong>
+                            <strong>Instance uuid:</strong> the uuid of a launched device.
+                            <strong>(Genymotion SaaS only)</strong>
+                        </li>
+                        <li>
+                            <strong>WebSocket address:</strong> the WebSocket address ("<i>wss://public ip address</i>")
+                            of the device. <strong>(Genymotion Device Image only)</strong>
                         </li>
                     </ul>
                 </div>
@@ -71,37 +75,38 @@
                     <button id="connectExistingInstance">🔌</button>
                 </div>
                 <hr />
-                <h3>Advanced settings</h3>
-                <details id="advancedSettings">
-                    <summary>⚡⚙️</summary>
-                    <div class="d-flex justify-content-between">
-                        <label for="saveToken">
-                            Save the token 
-                        </label> 
-                        <input name="saveToken" id="saveToken" type="checkbox" />
-                    </div>
-                    <div class="note">⚠️ can be read by anyone with access to local storage</div>
-
-                    <div class="d-flex justify-content-between">
-                        <label for="saveInstanceHistory">
-                            Save instances history
-                        </label> 
-                        <input name="saveInstanceHistory" id="saveInstanceHistory" type="checkbox" />
-                    </div>
-                    <div class="d-flex justify-content-between  align-items-baseline">
-                        <input name="apiBaseUrl" id="apiBaseUrl" type="text" placeholder="API base url (empty to fallback default)" />
-                        <div class="actions ml-1 ">
-                            <button id="saveAPIBaseUrl">💾</button>
-                        </div>
-                    </div>
-                </details>
-                <hr />
                 <h3>More about geny's products and integration</h3>
                 <a href="https://www.genymotion.com" target="_blank" class="mb-1"> 👉 Our products </a>
                 <a href="https://docs.genymotion.com/gmsaas/" target="_blank" class="mb-1"> 👉 Our CLI, gmsaas </a>
                 <a href="https://github.com/Genymobile/genymotion-device-web-player" target="_blank" class="mb-1">
                     👉 Player documentation
                 </a>
+                <hr />
+                <h3>Advanced settings</h3>
+                <details id="advancedSettings">
+                    <summary>⚡⚙️</summary>
+                    <div class="d-flex justify-content-between">
+                        <label for="saveToken"> Save the token </label>
+                        <input name="saveToken" id="saveToken" type="checkbox" />
+                    </div>
+                    <div class="note">⚠️ can be read by anyone with access to local storage</div>
+
+                    <div class="d-flex justify-content-between">
+                        <label for="saveInstanceHistory"> Save instances history </label>
+                        <input name="saveInstanceHistory" id="saveInstanceHistory" type="checkbox" />
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <input
+                            name="apiBaseUrl"
+                            id="apiBaseUrl"
+                            type="text"
+                            placeholder="API base url (empty to fallback default)"
+                        />
+                        <div class="actions ml-1">
+                            <button id="saveAPIBaseUrl">💾</button>
+                        </div>
+                    </div>
+                </details>
             </div>
             <div id="player">
                 <div id="fe-player"></div>

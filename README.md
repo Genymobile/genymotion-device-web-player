@@ -566,7 +566,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
--   **Compatibility:** `PaaS`
+-   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enable or disable baseband (MMC/MNC) widget.
 

@@ -2,12 +2,10 @@
  * Turn server plugin styles
  */
 
-.device-renderer-instance .gm-default-turn-button {
-    text-decoration: none;
-
+.device-renderer-instance { 
     .gm-default-turn-used {
-        position: relative;
-        top: -48px;
+        
+        position: absolute;
         left: -305px;
         color: $white;
         font-size: 1em;
@@ -19,12 +17,17 @@
         background-color: $modal-background-color;
         vertical-align: middle;
         padding: 11px 8px 20px;
+        margin-top: -83px;
+
+        &.gm-hidden {
+            display: none;
+        }
 
         &::after {
             content: ' ';
             position: absolute;
-            top: 50%;
-            left: 100%; /* To the right of the tooltip */
+            bottom: 0;
+            right: -17px; 
             margin-top: -10px;
             border-width: 10px;
             border-style: solid;
@@ -41,9 +44,5 @@
                 font-size: 1.2em;
             }
         }
-    }
-
-    .gm-hidden {
-        display: none;
     }
 }

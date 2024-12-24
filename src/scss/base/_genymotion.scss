@@ -156,19 +156,21 @@
             }
         }
         .gm-toolbar-wrapper {
-            background-color: #292929;
+            background-color: var(--gm-toolbar-bg-color);
             min-width: 50px;
-            overflow: scroll;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            max-height: 100%;
+            position: relative;
         }
         .gm-toolbar-wrapper::-webkit-scrollbar {
             display: none;
         }
 
         .gm-toolbar {
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
             display: flex;
-            min-height: 100%;
+            max-height: 100%;
             flex-direction: column;
             align-items: center;
 

@@ -41,8 +41,8 @@
     .gm {
         &-icon-button {
             display: block;
-            width: 32px;
-            height: 26px;
+            width: 30px;
+            height: 30px;
         }
 
         &-video-overlay {
@@ -164,7 +164,7 @@
         .gm-toolbar-wrapper::-webkit-scrollbar {
             display: none;
         }
-
+        
         .gm-toolbar {
             overflow: scroll;
             -ms-overflow-style: none;

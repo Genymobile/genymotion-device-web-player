@@ -333,7 +333,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `streamResolution`
 
-<img align="right" src="./doc/assets/ic-resolution_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -393,7 +393,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `rotation`
 
-<img align="right" src="./doc/assets/ic_rotation_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_rotation.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -403,9 +403,9 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `navbar`
 
-<img align="right" src="./doc/assets/ic-nav_android_back_active_black.svg" alt="..."></img>
-<img align="right" src="./doc/assets/ic-nav_android_home_active_black.svg" alt="..."></img>
-<img align="right" src="./doc/assets/ic-nav_android_multiapp_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_nav_android_back.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_nav_android_home.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_nav_android_multiapp.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -415,7 +415,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `power`
 
-<img align="right" src="./doc/assets/ic_icon_power_inactive_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_power.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -436,7 +436,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `camera`
 
-<img align="right" src="./doc/assets/ic_camera_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_camera.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -475,7 +475,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `clipboard`
 
-<img align="right" src="./doc/assets/ic_clipboard_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_clipboard.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -485,7 +485,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `battery`
 
-<img align="right" src="./doc/assets/ic-battery_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_battery.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -495,7 +495,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `gps`
 
-<img align="right" src="./doc/assets/ic_location_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_location.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -530,7 +530,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 ### `identifiers`
 
-<img align="right" src="./doc/assets/ic_id_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_id.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -541,7 +541,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 ### `network`
 
-<img align="right" src="./doc/assets/ic_network_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_network.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -551,7 +551,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 ### `phone`
 
-<img align="right" src="./doc/assets/ic_textandcall_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_text_and_call.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -562,7 +562,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 ### `baseband`
 
-<img align="right" src="./doc/assets/ic_baseband_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_baseband.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
@@ -572,7 +572,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 ### `diskIO`
 
-<img align="right" src="./doc/assets/ic_diskIO_active_black.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_disk_IO.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`

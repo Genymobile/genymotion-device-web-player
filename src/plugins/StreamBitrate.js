@@ -40,7 +40,7 @@ module.exports = class StreamBitrate {
         const toolbar = toolbars.children[0];
         const button = document.createElement('li');
         this.chooser = document.createElement('div');
-        this.chooser.className = '.gm-streamrate-chooser gm-icon-button gm-streamrate-button';
+        this.chooser.className = 'gm-streamrate-chooser gm-icon-button gm-streamrate-button';
         this.chooser.title = this.i18n.STREAMRATE_TITLE || 'High quality';
         button.appendChild(this.chooser);
         toolbar.appendChild(button);

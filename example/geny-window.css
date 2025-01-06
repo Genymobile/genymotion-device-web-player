@@ -202,7 +202,6 @@ header {
     --gm-btn-bg-color-disabled-hover: #ced4da;
     --gm-btn-color-disabled: #6c757d;
 
-    --gm-input-bg-color: #ffffff;
     --gm-input-text-color: #495057;
 
     --gm-underline-color: var(--gm-primary-color);
@@ -231,8 +230,7 @@ header {
     --gm-btn-bg-color-disabled-hover: #828282;
     --gm-btn-color-disabled: #c4c4c4;
 
-    --gm-input-bg-color: #fff;
-    --gm-input-text-color: #000;
+    --gm-input-text-color: #fff;
 
     --gm-underline-color: var(--gm-text-color);
 

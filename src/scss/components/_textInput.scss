@@ -1,0 +1,18 @@
+.text-input-container {
+    border-bottom: 2px solid var(--gm-input-text-color);
+    color: var(--gm-input-text-color);
+    display: flex;
+    align-items: center;
+
+    .text-input{
+        text-align: right;
+        padding-left: 0;
+        padding-right: 0;
+        &:focus {
+            outline: none; 
+        }
+        border: none;
+        background-color: transparent;
+        color: var(--gm-input-text-color);
+    }
+}

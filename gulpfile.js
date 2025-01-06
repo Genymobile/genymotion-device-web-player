@@ -89,7 +89,7 @@ gulp.task('fontToBase64', () => {
         .src('src/assets/fonts/**/*.ttf')
         .pipe(
             inlineFonts({
-                name: 'roboto',
+                name: 'lato-regular',
                 formats: ['ttf'],
             }),
         )

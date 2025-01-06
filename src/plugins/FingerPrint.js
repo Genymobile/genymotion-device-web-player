@@ -112,9 +112,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                             }
 
                             // update switch
-                            document
-                                .querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status')
-                                .setState(value);
+                            this.recognizedFPByDefaultStatus.setState(value);
                             break;
                         default:
                             break;
@@ -202,16 +200,16 @@ module.exports = class FingerPrint extends OverlayPlugin {
         recognizedFPByDefaultLabel.innerHTML =
             this.i18n.FINGERPRINT_RECOGNIZED_FP_BY_DEFAULT_LABEL || 'Recognized by default';
 
-        const recognizedFPByDefaultStatus = switchButton.createSwitch({
+        this.recognizedFPByDefaultStatus = switchButton.createSwitch({
             onChange: (value) => {
                 this.state.isRecognizedFPByDefault = value;
             },
         });
 
-        recognizedFPByDefaultStatus.classList.add('gm-fingerprint-dialog-recognized-fp-by-default-status');
+        this.recognizedFPByDefaultStatus.element.classList.add('gm-fingerprint-dialog-recognized-fp-by-default-status');
 
         recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultLabel);
-        recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultStatus);
+        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus.element);
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);

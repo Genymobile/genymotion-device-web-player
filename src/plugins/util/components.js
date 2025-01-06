@@ -18,7 +18,7 @@
  */
 
 const switchButton = (() => {
-    const createSwitch = ({onChange}) => {
+    const createSwitch = ({onChange = null}) => {
         const switchDiv = document.createElement('div');
         switchDiv.className = 'switch';
 
@@ -31,30 +31,32 @@ const switchButton = (() => {
         switchDiv.appendChild(input);
         switchDiv.appendChild(slider);
 
-        const changeStateRenderer = () => {
-            if (onChange && typeof onChange === 'function') {
-                onChange(input.checked);
-            }
-        };
-
-        // Expose a function to change the state of the switch button
-        const setState = (value) => {
-            // avoid infinite loop
+        const setState = (value, triggerOnChange = false) => {
             if (input.checked === value) {
                 return;
             }
             input.checked = value;
-            changeStateRenderer();
+
+            // Trigger onChange only if triggerOnChange is true
+            if (triggerOnChange && onChange && typeof onChange === 'function') {
+                onChange(input.checked);
+            }
         };
 
-        // Bind event listeners to the switch button click event
-        slider.addEventListener('click', () => {
+        const getState = () => input.checked;
+
+        switchDiv.addEventListener('click', () => {
             setState(!input.checked);
+            if (onChange && typeof onChange === 'function') {
+                onChange(input.checked);
+            }
         });
 
-        switchDiv.setState = setState;
-
-        return switchDiv;
+        return {
+            element: switchDiv,
+            getState,
+            setState,
+        };
     };
 
     return {createSwitch};
@@ -65,39 +67,36 @@ const switchButton = (() => {
  * @function
  * @param {Object} options - Options for configuring the slider.
  * @param {Function} [options.onChange] - Optional callback function to be executed when the slider value changes.
+ * @param {boolean} [options.triggerOnChange] - Whether or not to trigger onChange when setting the value programmatically.
  * @returns {HTMLElement} - The slider component as an HTML element. setValue function is exposed to change the value of the slider.
  */
 
 const slider = (() => {
     const createSlider = ({onChange = null, onCursorMove = null, min = 0, max = 100, value = 50}) => {
-        // Validate parameters
         if (min >= max) {
             throw new Error('`min` must be less than `max`.');
         }
-        if (value < min || value > max) {
-            throw new Error('`value` must be within the range defined by `min` and `max`.');
-        }
 
-        // Container for the slider
+        // Create slider container
         const sliderDiv = document.createElement('div');
         sliderDiv.classList.add('slider');
 
-        // Progress bar first part
+        // Create progress bar (filled portion)
         const progressBar = document.createElement('div');
         progressBar.classList.add('slider-progress-bar');
         sliderDiv.appendChild(progressBar);
 
-        // Progress bar second part
+        // Create progress bar (remaining portion)
         const progressBarRemaining = document.createElement('div');
         progressBarRemaining.classList.add('slider-progress-bar-remaining');
         sliderDiv.appendChild(progressBarRemaining);
 
-        // Custom cursor element
+        // Create the slider cursor
         const sliderCursor = document.createElement('span');
         sliderCursor.classList.add('slider-cursor');
         sliderDiv.appendChild(sliderCursor);
 
-        // Hidden input range element
+        // Create hidden range input
         const input = document.createElement('input');
         input.type = 'range';
         input.min = min;
@@ -106,70 +105,143 @@ const slider = (() => {
         input.classList.add('slider-input');
         sliderDiv.appendChild(input);
 
-        // Update slider UI
-        const updateSlider = () => {
-            // requestAnimationFrame assures that div element have css properties applied before running the code
+        // Update UI based on the current slider value
+        const updateUI = () => {
             requestAnimationFrame(() => {
-                sliderDiv.value = input.value;
                 const val = parseFloat(input.value);
                 const percentage = ((val - min) / (max - min)) * 100;
-
-                // Actual cursor width in pixels
                 const cursorWidth = sliderCursor.offsetWidth;
                 const sliderWidth = sliderDiv.offsetWidth;
 
-                // Dynamic adjustment to avoid overflow
-                const offset = (cursorWidth / 2 / sliderWidth) * 100; // Offset in percentage
-                let adjustedPercentage = percentage;
-
-                adjustedPercentage = `${percentage - offset}%`;
+                const offset = (cursorWidth / 2 / sliderWidth) * 100;
+                const adjustedPercentage = `${percentage - offset}%`;
 
                 progressBar.style.width = `${percentage}%`;
-                sliderCursor.style.left = `${adjustedPercentage}`;
+                sliderCursor.style.left = adjustedPercentage;
 
-                // Slider thumb position adjustment
                 const calc = ((percentage / 100) * 16 - 8) * -1;
                 sliderCursor.style.transform = `translate(${calc}px, -50%)`;
             });
         };
 
-        // Programmatically set the value of the slider
-        const setValue = (newValue) => {
-            // avoid infinite loop
-            if (input.value === newValue) {
+        const getValue = () => parseFloat(input.value);
+
+        const setValue = (newValue, triggerOnChange = false) => {
+            if (isNaN(newValue) || newValue < min || newValue > max) {
+                console.warn('`value` must be within the range defined by `min` and `max`.');
                 return;
             }
-            if (newValue < min || newValue > max) {
-                throw new Error('`value` must be within the range defined by `min` and `max`.');
+
+            if (input.value === String(newValue)) {
+                return;
             }
+
             input.value = newValue;
-            updateSlider();
-        };
+            updateUI();
 
-        input.onchange = (event) => {
-            if (onChange) {
-                onChange(event);
+            if (triggerOnChange && onChange && typeof onChange === 'function') {
+                onChange(newValue);
             }
-            updateSlider();
         };
 
-        input.oninput = (event) => {
+        input.addEventListener('input', (event) => {
+            updateUI();
             if (onCursorMove) {
-                onCursorMove(event);
+                onCursorMove(event.target.value);
             } else if (onChange) {
-                onChange(event);
+                onChange(event.target.value);
             }
-            updateSlider();
+        });
+
+        input.addEventListener('change', () => {
+            updateUI();
+            if (onChange) {
+                onChange(getValue());
+            }
+        });
+
+        updateUI();
+
+        return {
+            element: sliderDiv,
+            getValue,
+            setValue,
         };
-
-        updateSlider();
-
-        sliderDiv.setValue = setValue;
-        sliderDiv.value = input.value;
-        return sliderDiv;
     };
 
     return {createSlider};
 })();
 
-module.exports = {switchButton, slider};
+/**
+ * Creates a custom text input component.
+ * @function
+ * @param {Object} options - Options for configuring the text input.
+ * @param {Function} [options.onChange] - Optional callback function to be executed when the text input value changes.
+ * @param {string} [options.value] - Optional initial value for the text input.
+ * @param {RegExp} [options.regexFilter] - Optional regular expression to filter the input value.
+ * @param {string} [options.appendText] - Optional text to append to the input field.
+ * @returns {HTMLElement} - The text input component as an HTML element. setValue function is exposed to change the value of the text input.
+ */
+
+const textInput = (() => {
+    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = ''}) => {
+        const inputDiv = document.createElement('div');
+        const inputDivContainer = document.createElement('div');
+        inputDivContainer.classList.add('text-input-container');
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value;
+        input.classList.add('text-input');
+
+        if (appendText) {
+            const appendSpan = document.createElement('span');
+            appendSpan.textContent = appendText;
+            appendSpan.classList.add('append-text');
+            inputDivContainer.appendChild(appendSpan);
+        }
+
+        inputDivContainer.insertBefore(input, inputDivContainer.firstChild);
+        inputDiv.appendChild(inputDivContainer);
+
+        const setValue = (newValue, triggerOnChange = false) => {
+            if (regexFilter && !regexFilter.test(newValue)) {
+                console.warn('Invalid value:', newValue);
+                return;
+            }
+
+            input.value = newValue;
+
+            if (triggerOnChange && onChange) {
+                onChange(newValue);
+            }
+        };
+
+        const getValue = () => input.value;
+
+        input.addEventListener('input', (event) => {
+            const {value: v} = event.target;
+            if (regexFilter && !regexFilter.test(v)) {
+                return;
+            }
+
+            setValue(v);
+            if (onChange) {
+                onChange(v);
+            }
+        });
+
+        inputDiv.setValue = setValue;
+        inputDiv.getValue = getValue;
+
+        return {
+            element: inputDiv,
+            setValue,
+            getValue,
+        };
+    };
+
+    return {createTextInput};
+})();
+
+module.exports = {switchButton, slider, textInput};

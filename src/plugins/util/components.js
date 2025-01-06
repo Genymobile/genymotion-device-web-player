@@ -19,57 +19,19 @@
 
 const switchButton = (() => {
     const createSwitch = ({onChange}) => {
-        // Todo reprendre ce code pour passer par une classe
         const switchDiv = document.createElement('div');
-        switchDiv.style.position = 'relative';
-        switchDiv.style.display = 'inline-block';
-        switchDiv.style.width = '50px';
-        switchDiv.style.height = '20px';
+        switchDiv.className = 'switch';
 
         const input = document.createElement('input');
         input.type = 'checkbox';
-        input.style.opacity = '0';
-        input.style.width = '0';
-        input.style.height = '0';
 
         const slider = document.createElement('span');
-        slider.style.position = 'absolute';
-        slider.style.cursor = 'pointer';
-        slider.style.top = '0';
-        slider.style.left = '0';
-        slider.style.right = '0';
-        slider.style.bottom = '0';
-        slider.style.backgroundColor = '#ccc';
-        slider.style.transition = '.4s';
-        slider.style.borderRadius = '15px';
-
-        const sliderBefore = document.createElement('span');
-
-        sliderBefore.style.position = 'absolute';
-        sliderBefore.style.content = '';
-        sliderBefore.style.height = '30px';
-        sliderBefore.style.width = '30px';
-        sliderBefore.style.left = '-3px';
-        sliderBefore.style.bottom = '-5px';
-        sliderBefore.style.backgroundColor = 'white';
-        sliderBefore.style.transition = '.4s';
-        sliderBefore.style.borderRadius = '50%';
-
-        slider.appendChild(sliderBefore);
+        slider.className = 'switch-slider';
 
         switchDiv.appendChild(input);
         switchDiv.appendChild(slider);
 
         const changeStateRenderer = () => {
-            if (input.checked) {
-                slider.style.backgroundColor = 'color-mix(in srgb, var(--gm-primary-color), black 45%)';
-                sliderBefore.style.backgroundColor = 'var(--gm-primary-color)';
-                sliderBefore.style.transform = 'translateX(26px)';
-            } else {
-                slider.style.backgroundColor = 'color-mix(in srgb, var(--gm-text-color), black 45%)';
-                sliderBefore.style.backgroundColor = 'var(--gm-text-color)';
-                sliderBefore.style.transform = 'translateX(0)';
-            }
             if (onChange && typeof onChange === 'function') {
                 onChange(input.checked);
             }
@@ -87,7 +49,6 @@ const switchButton = (() => {
 
         // Bind event listeners to the switch button click event
         slider.addEventListener('click', () => {
-            // Toggle button status on/off
             setState(!input.checked);
         });
 
@@ -95,6 +56,7 @@ const switchButton = (() => {
 
         return switchDiv;
     };
+
     return {createSwitch};
 })();
 

@@ -5,6 +5,10 @@
     text-align: center;
     height: 100%;
 
+    * {
+        font-family: roboto, sans-serif;
+        font-size: 14px;
+    }
     *,
     *::after,
     *::before {
@@ -76,7 +80,6 @@
             border-radius: 8px;
             font-size: 15px;
             text-align: left;
-            font-family: Roboto, sans-serif;
             padding: 16px 20px 17px 60px;
             position: absolute;
             z-index: 1;
@@ -93,7 +96,6 @@
             background: black url('../assets/images/ic_error_default.svg') no-repeat center 40%;
             background-size: 200px;
             font-size: 28px;
-            font-family: Roboto, sans-serif;
             font-weight: 300;
             padding-top: 10%;
 

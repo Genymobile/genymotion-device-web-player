@@ -47,21 +47,6 @@
         margin-bottom: 30px;
     }
 
-    // TODO delete when screencast will be reworked
-    .gm-horizontal {
-        margin: 15px 0;
-
-        label,
-        input,
-        button {
-            display: inline-block;
-        }
-
-        label {
-            width: 50%;
-        }
-    }
-
     button {
         color: var(--gm-btn-text-color);
         background-color: var(--gm-btn-bg-color);

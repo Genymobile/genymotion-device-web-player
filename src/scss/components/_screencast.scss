@@ -24,33 +24,43 @@
             pointer-events: none;
         }
 
+        .gm-inputs {
+            display: flex;
+        }
+
         .gm-screenshot,
         .gm-screencast {
             display: inline-block;
             width: auto;
             margin-right: 50px;
+            display: flex;
+            flex-direction: row-reverse;
 
             .gm-action {
                 width: 32px;
                 min-height: 32px;
                 cursor: pointer;
                 display: block;
-                float: left;
-                background-size: 26px;
-                background-repeat: no-repeat;
-                background-position: center;
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                background-color: var(--gm-toolbar-icon-color);
             }
         }
 
         .gm-screenshot .gm-action {
-            background-image: url('../assets/images/ic-screenshot_default.svg');
+            mask-image: url('../assets/images/ic_screenshot.svg');
+            --webkit-mask-image: url('../assets/images/ic_screenshot.svg');
         }
 
         .gm-screencast .gm-action {
-            background-image: url('../assets/images/ic-screencast_default.svg');
+            mask-image: url('../assets/images/ic_screencast.svg');
+            --webkit-mask-image: url('../assets/images/ic_screencast.svg');
 
             .disabled {
-                background-image: url('../assets/images/ic-screencast_disabled.svg');
                 color: var(--gm-btn-bg-color-disabled);
             }
         }

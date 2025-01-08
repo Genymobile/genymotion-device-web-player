@@ -19,6 +19,9 @@ const requestInit = {
     },
 };
 
+//Theme
+let themeSelected = localStorage.getItem('themeSelected') ?? 'dark';
+
 // get apiToken from HTML input and fetch recipes
 const getApiToken = async () => {
     apiToken = document.querySelector('#apiToken').value;
@@ -222,6 +225,26 @@ const generateInstanceHistoryList = () => {
 document.addEventListener(
     'DOMContentLoaded',
     () => {
+        // Theme
+        document.querySelector('#themeCtrl').textContent = themeSelected === 'light' ? '🌑' : '🌞';
+        if (themeSelected === 'light') {
+            document.body.classList.add('light');
+        }
+
+        document.querySelector('#themeCtrl').addEventListener('click', () => {
+            if (themeSelected === 'light') {
+                themeSelected = 'dark';
+                document.body.classList.remove('light');
+                document.querySelector('#themeCtrl').textContent = '🌞';
+                localStorage.setItem('themeSelected', 'dark');
+            } else {
+                themeSelected = 'light';
+                document.body.classList.add('light');
+                document.querySelector('#themeCtrl').textContent = '🌑';
+                localStorage.setItem('themeSelected', 'light');
+            }
+        });
+
         // get apiToken and JWT token + fetch the recipes list on load if input is filled
         if (localStorage.getItem('hasSaveToken') === 'true') {
             document.querySelector('#apiToken').value = localStorage.getItem('apiToken');

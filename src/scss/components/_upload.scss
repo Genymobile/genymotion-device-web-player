@@ -42,14 +42,14 @@
 
             &-txt::-webkit-scrollbar-track {
                 background: #45474d;
-                border-left: 9px solid $modal-background-color;
-                border-right: 9px solid $modal-background-color;
+                border-left: 9px solid var(--gm-modal-bg-color);
+                border-right: 9px solid var(--gm-modal-bg-color);
             }
 
             &-txt::-webkit-scrollbar-thumb {
                 background: white;
-                border-left: 8px solid $modal-background-color;
-                border-right: 8px solid $modal-background-color;
+                border-left: 8px solid var(--gm-modal-bg-color);
+                border-right: 8px solid var(--gm-modal-bg-color);
                 border-radius: 9px;
             }
         }
@@ -76,7 +76,7 @@
 
             &-percent {
                 height: 3px;
-                background-color: $btn-background-color;
+                background-color: var(--gm-btn-bg-color);
             }
         }
 
@@ -102,14 +102,14 @@
                 font-weight: bold;
                 font-size: 14px;
                 cursor: pointer;
-                color: $white;
-                background-color: $btn-background-color;
+                color: var(--gm-text-color);
+                background-color: var(--gm-btn-bg-color);
                 border-radius: 2px;
                 margin-bottom: 10px;
 
                 &:hover {
-                    background-color: $btn-background-color-hover;
-                    color: $white;
+                    background-color: var(--gm-btn-bg-color-hover);
+                    color: var(--gm-text-color);
                 }
             }
         }
@@ -140,14 +140,14 @@
                 font-weight: bold;
                 font-size: 14px;
                 cursor: pointer;
-                color: $white;
-                background-color: $btn-background-color;
+                color: var(--gm-text-color);
+                background-color: var(--gm-btn-bg-color);
                 border-radius: 2px;
                 margin-bottom: 10px;
 
                 &:hover {
-                    background-color: $btn-background-color-hover;
-                    color: $white;
+                    background-color: var(--gm-btn-bg-color-hover);
+                    color: var(--gm-text-color);
                 }
             }
         }
@@ -164,12 +164,12 @@
                 font-weight: bold;
                 font-size: 14px;
                 cursor: pointer;
-                color: $white;
-                background-color: $btn-background-color;
+                color: var(--gm-text-color);
+                background-color: var(--gm-btn-bg-color);
                 border-radius: 2px;
                 &:hover {
-                    background-color: $btn-background-color-hover;
-                    color: $white;
+                    background-color: var(--gm-btn-bg-color-hover);
+                    color: var(--gm-text-color);
                 }
             }
 
@@ -181,8 +181,8 @@
         &-upload-main-bottom-buttons-disabled,
         &-upload-main-bottom-buttons-disabled:hover {
             cursor: default;
-            color: $btn-disabled-color;
-            background-color: $btn-disabled-background;
+            color: var(--gm-btn-bg-color-disabled);
+            background-color: var(--gm-btn-bg-color-disabled);
         }
 
         &-upload-title {

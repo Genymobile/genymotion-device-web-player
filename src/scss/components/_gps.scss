@@ -9,7 +9,7 @@
 
         input {
             &.gm-error {
-                border-bottom: 1px solid $btn-background-color;
+                border-bottom: 1px solid var(--gm-btn-bg-color);
             }
         }
     }
@@ -31,7 +31,7 @@
             left: 26px;
             right: 26px;
             top: 26px;
-            background-color: $white;
+            background-color: #fff;
         }
 
         .gm-gps-mapview-capture {

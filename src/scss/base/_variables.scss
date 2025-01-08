@@ -1,32 +1,47 @@
+/**
+* CSS variables
+*/
 :root {
+    /** Colors **/
     --gm-text-color: #ffffff;
     --gm-primary-color: #e6195e;
+    --gm-secondary-color: #292929;
+    --gm-success-color: #11b920;
+
+    /** Player **/
+    --gm-player-bg-color: var(--gm-secondary-color);
+    --gm-loader-color: var(--gm-text-color);
+
     /** Toolbar **/
     --gm-toolbar-bg-color: var(--gm-secondary-color);
     --gm-toolbar-icon-color: #e8eaed;
     --gm-toolbar-icon-color-hover: var(--gm-primary-color);
+
+    /** Button **/
+    --gm-btn-text-color: var(--gm-text-color);
+    --gm-btn-bg-color: var(--gm-primary-color);
+    --gm-btn-bg-color-hover: var(--gm-primary-color);
+    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
+    --gm-btn-bg-color-disabled-hover: #828282;
+    --gm-btn-color-disabled: #c4c4c4;
+
+    /** Input **/
+    --gm-input-bg-color: #fff;
+    --gm-input-text-color: #000;
+
+    /** Design **/
+    --gm-underline-color: var(--gm-text-color);
+
+    /** Modal **/
+    --gm-modal-bg-color: var(--gm-secondary-color);
 }
+
 /**
  * SASS variables
  */
 
-// General use
-$white: #ffffff;
-$black: #000000;
-$accent-color-light: #e6195e;
-
 // Responsive breakpoint
 $breakpoint-mobile: 650px;
-
-// Elements
-$btn-background-color: #e6195e;
-$btn-background-color-hover: #c62c53;
-$btn-disabled-background: rgba(179, 179, 179, 0.24);
-$btn-disabled-color: #c4c4c4;
-$btn-disabled-background-hover: #828282;
-$modal-background-color: #303339;
-$succes-color: #11b920;
-$btn-hover-background-color: #2c2c2c;
 
 //Spacing
 $spacing-xxs: 2px;

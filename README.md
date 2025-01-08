@@ -118,6 +118,51 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 </script>
 ```
 
+## Style and CSS
+
+The player uses css variables to style some parts of the app, but the player is still totally customisable through overloading the css classes.
+
+#### CSS variables available with their default presets:
+
+    Colors
+
+    --gm-text-color: #ffffff;
+    --gm-primary-color: #e6195e;
+    --gm-secondary-color: #292929;
+    --gm-success-color: #11b920;
+
+    Player
+
+    --gm-player-bg-color: var(--gm-secondary-color);
+    --gm-loader-color: var(--gm-text-color);
+
+    Toolbar
+
+    --gm-toolbar-bg-color: var(--gm-secondary-color);
+    --gm-toolbar-icon-color: #e8eaed;
+    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
+
+    Button
+
+    --gm-btn-text-color: var(--gm-text-color);
+    --gm-btn-bg-color: var(--gm-primary-color);
+    --gm-btn-bg-color-hover: var(--gm-primary-color);
+    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
+    --gm-btn-bg-color-disabled-hover: #828282;
+    --gm-btn-color-disabled: #c4c4c4;
+
+    Input
+
+    --gm-input-bg-color: #fff;
+    --gm-input-text-color: #000;
+
+    Design
+
+    --gm-underline-color: var(--gm-text-color);
+
+    Modal
+    --gm-modal-bg-color: var(--gm-secondary-color);
+
 ## Player API
 
 The Player API provides functionality for managing plugin options and websocket communication. These operations are handled through the API (categorized) object returned by the `setupRenderer` function.
@@ -551,7 +596,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 ### `phone`
 
-<img align="right" src="./doc/assets/ic_text_and_call.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_textandcall_active_black.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -572,7 +617,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 ### `diskIO`
 
-<img align="right" src="./doc/assets/ic_disk_IO.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_diskIO_active_black.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`

@@ -5,6 +5,10 @@
     text-align: center;
     height: 100%;
 
+    * {
+        font-family: roboto, sans-serif;
+        font-size: 14px;
+    }
     *,
     *::after,
     *::before {
@@ -49,8 +53,8 @@
             position: absolute;
             z-index: 1;
             cursor: pointer;
-            background-color: $black;
-            color: $white;
+            background-color: #000;
+            color: var(--gm-text-color);
             text-align: center;
             display: block;
             width: calc(100% - 55px);
@@ -76,11 +80,10 @@
             border-radius: 8px;
             font-size: 15px;
             text-align: left;
-            font-family: Roboto, sans-serif;
             padding: 16px 20px 17px 60px;
             position: absolute;
             z-index: 1;
-            color: $white;
+            color: var(--gm-text-color);
             display: block;
             width: 80%;
             max-width: 380px;
@@ -93,7 +96,6 @@
             background: black url('../assets/images/ic_error_default.svg') no-repeat center 40%;
             background-size: 200px;
             font-size: 28px;
-            font-family: Roboto, sans-serif;
             font-weight: 300;
             padding-top: 10%;
 
@@ -110,13 +112,13 @@
             }
 
             a {
-                color: $btn-background-color;
+                color: var(--gm-btn-bg-color);
             }
         }
     }
 
     .gm-wrapper {
-        background-color: #1a1a1a;
+        background-color: var(--gm-player-bg-color);
         height: 100%;
         display: grid;
         grid-template-columns: auto min-content;
@@ -127,8 +129,16 @@
             transition: opacity 0.5s;
         }
         &.waitingForStream {
-            background: transparent url('../assets/images/loader.svg') center no-repeat;
+            mask-image: url('../assets/images/loader.svg');
+            -webkit-mask-image: url('../assets/images/loader.svg');
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
             background-size: 40%;
+            background-color: var(--gm-loader-color);
             > * {
                 opacity: 0;
             }

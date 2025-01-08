@@ -19,7 +19,7 @@
                 border-radius: 15px;
                 padding: 0 8px;
                 background-color: #2a151c;
-                color: $accent-color-light;
+                color: var(--gm-primary-color);
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
@@ -33,7 +33,7 @@
                 &.active {
                     pointer-events: all;
                     background-color: #152616;
-                    color: $succes-color;
+                    color: var(--success-color);
                     &::before {
                         content: attr(data-text);
                     }
@@ -71,10 +71,19 @@
                     padding: 15px 0;
                     width: 80%;
                     cursor: pointer;
-                    &:hover {
-                        background: $btn-hover-background-color;
+                    position: relative;
+                    z-index: 0;
+                    &:hover::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: var(--gm-modal-bg-color);
+                        filter: brightness(85%);
                         border-radius: 15px;
-                        margin: 0 auto;
+                        z-index: -1;
                     }
                     &.disabled {
                         opacity: 0.5;
@@ -137,7 +146,7 @@
                     }
                     &:hover {
                         cursor: pointer;
-                        color: $accent-color-light;
+                        color: var(--gm-primary-color);
                         &::before {
                             background-image: url('../assets/images/ic_feedback_hover.svg');
                         }

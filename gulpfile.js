@@ -27,6 +27,7 @@ const using = require('gulp-using');
 const util = require('gulp-util');
 const replace = require('gulp-replace');
 const header = require('gulp-header');
+const inlineFonts = require('gulp-inline-fonts');
 
 const PATHS = {
     SRC: {
@@ -83,10 +84,22 @@ gulp.task('app-geny-window', function () {
 });
 
 // SASS styles
+gulp.task('fontToBase64', () => {
+    return gulp
+        .src('src/assets/fonts/**/*.ttf')
+        .pipe(
+            inlineFonts({
+                name: 'roboto',
+                formats: ['ttf'],
+            }),
+        )
+        .pipe(gulp.dest('src/assets/fonts/'));
+});
+
 gulp.task('app-styles', function () {
     const version = `/*! Version: ${getVersion()} */\n`;
     return gulp
-        .src(PATHS.SRC.ASSETS.STYLES + '/**/*.scss')
+        .src([PATHS.SRC.ASSETS.STYLES + '/**/*.scss', 'src/assets/fonts/**/*.css'])
         .pipe(gulpif(util.env.debug, using()))
         .pipe(sass().on('error', sass.logError))
         .pipe(autoprefixer())
@@ -173,16 +186,21 @@ gulp.task('connect', function () {
 // Build project
 gulp.task(
     'build',
-    gulp.series('clean', gulp.parallel('app-styles', 'app-js', 'app-dts', 'app-geny-window'), 'inject', function (cb) {
-        cb();
-    }),
+    gulp.series(
+        'clean',
+        gulp.parallel(gulp.series('fontToBase64', 'app-styles'), 'app-js', 'app-dts', 'app-geny-window'),
+        'inject',
+        function (cb) {
+            cb();
+        },
+    ),
 );
 
 // Watch project update
 gulp.task(
     'watch',
     gulp.series('build', function (cb) {
-        gulp.watch([PATHS.SRC.ASSETS.STYLES + '/**/*.scss'], gulp.series('app-styles'));
+        gulp.watch([PATHS.SRC.ASSETS.STYLES + '/**/*.scss'], gulp.series('fontToBase64', 'app-styles'));
 
         gulp.watch(
             [

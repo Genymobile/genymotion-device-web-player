@@ -7,6 +7,8 @@
     --gm-primary-color: #e6195e;
     --gm-secondary-color: #292929;
     --gm-success-color: #11b920;
+    --gm-warning-color: #ffcc00;
+    --gm-error-color: #ff0000;
 
     /** Player **/
     --gm-player-bg-color: var(--gm-secondary-color);
@@ -26,8 +28,7 @@
     --gm-btn-color-disabled: #c4c4c4;
 
     /** Input **/
-    --gm-input-bg-color: #fff;
-    --gm-input-text-color: #000;
+    --gm-input-text-color: var(--gm-text-color);
 
     /** Design **/
     --gm-underline-color: var(--gm-text-color);

@@ -19,7 +19,7 @@
                 margin-left: 20px;
 
                 &.charging {
-                    color: $accent-color-light;
+                    color: var(--gm-primary-color);
                 }
             }
         }
@@ -39,6 +39,7 @@
                 position: relative;
                 width: 35px;
                 height: 60px;
+                /* TODO */
                 background: url('../assets/images/ic-battery_empty.svg') no-repeat center;
                 background-size: 32px;
                 margin: 0 auto;
@@ -49,7 +50,7 @@
                     bottom: 3px;
                     width: 80%;
                     height: 0;
-                    background-color: $white;
+                    background-color: #fff;
                 }
 
                 .gm-full-charge-image-overlay {
@@ -58,7 +59,7 @@
                     bottom: 10px;
                     width: 27%;
                     height: 0;
-                    background-color: $white;
+                    background-color: #fff;
                 }
             }
 
@@ -73,6 +74,7 @@
                 height: 31px;
                 transform: rotate(270deg);
                 padding: 0 3px;
+                accent-color: var(--gm-primary-color);
             }
         }
     }

@@ -43,12 +43,12 @@
 
         &:read-only {
             border-bottom: 1px solid transparent;
-            background: $btn-disabled-background;
+            background: var(--gm-btn-bg-color-disabled);
         }
 
         &:required:invalid,
         &:focus:invalid {
-            border-bottom: 1px solid $btn-background-color;
+            border-bottom: 1px solid var(--gm-btn-bg-color);
         }
     }
 

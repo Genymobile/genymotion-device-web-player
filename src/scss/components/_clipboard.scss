@@ -6,8 +6,9 @@
         &-clipboard-input {
             min-height: 300px;
             resize: none;
-            color: $black !important;
-            background-color: $white !important;
+
+            color: var(--gm-input-text-color);
+            background-color: var(---gm-input-bg-color);
         }
 
         &-text-copied {

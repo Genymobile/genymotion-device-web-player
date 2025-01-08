@@ -25,7 +25,7 @@
         flex: 1;
 
         &.gm-error {
-            border-bottom: 1px solid $btn-background-color;
+            border-bottom: 1px solid var(--gm-btn-bg-color);
         }
     }
 }

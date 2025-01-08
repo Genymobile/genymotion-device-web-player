@@ -185,7 +185,7 @@
                     -webkit-mask-image: url('../assets/images/ic_keymapping.svg');
                 }
                 &.keymapping-paused {
-                    background-color: $btn-disabled-color;
+                    background-color: var(--gm-btn-color-disabled);
                 }
             }
 

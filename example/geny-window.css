@@ -18,6 +18,10 @@
     margin-left: 5px;
 }
 
+.mr-1 {
+    margin-right: 5px;
+}
+
 .d-flex {
     display: flex;
 }
@@ -28,6 +32,7 @@
 .align-items-baseline {
     align-items: baseline;
 }
+
 /* global */
 * {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -98,6 +103,13 @@ input[type='checkbox'] {
 #snackbar.show {
     visibility: visible;
 }
+
+#themeCtrl {
+    align-self: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+
 /* Page */
 body {
     margin: 0;
@@ -164,7 +176,67 @@ header {
     margin-bottom: 10px;
 }
 
+/** Player */
+.light header,
+.light #sidebar {
+    background-color: #f8f9fa;
+    color: #000;
+}
+.light #player {
+    --gm-text-color: #2b2b2b;
+    --gm-primary-color: #007bff;
+    --gm-secondary-color: #f8f9fa;
+    --gm-success-color: #28a745;
+
+    --gm-player-bg-color: #ffffff;
+    --gm-loader-color: #2b2b2b;
+
+    --gm-toolbar-bg-color: #ffffff;
+    --gm-toolbar-icon-color: #6c757d;
+    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
+
+    --gm-btn-text-color: #ffffff;
+    --gm-btn-bg-color: var(--gm-primary-color);
+    --gm-btn-bg-color-hover: #0056b3;
+    --gm-btn-bg-color-disabled: #e9ecef;
+    --gm-btn-bg-color-disabled-hover: #ced4da;
+    --gm-btn-color-disabled: #6c757d;
+
+    --gm-input-bg-color: #ffffff;
+    --gm-input-text-color: #495057;
+
+    --gm-underline-color: var(--gm-primary-color);
+
+    --gm-modal-bg-color: #ffffff;
+    background-color: #ffffff;
+}
 #player {
+    /** override css variables **/
+    --gm-text-color: #ffffff;
+    --gm-primary-color: #e6195e;
+    --gm-secondary-color: #292929;
+    --gm-success-color: #11b920;
+
+    --gm-player-bg-color: var(--gm-secondary-color);
+    --gm-loader-color: var(--gm-text-color);
+
+    --gm-toolbar-bg-color: #1e1e1e;
+    --gm-toolbar-icon-color: #e8eaed;
+    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
+
+    --gm-btn-text-color: var(--gm-text-color);
+    --gm-btn-bg-color: var(--gm-primary-color);
+    --gm-btn-bg-color-hover: var(--gm-primary-color);
+    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
+    --gm-btn-bg-color-disabled-hover: #828282;
+    --gm-btn-color-disabled: #c4c4c4;
+
+    --gm-input-bg-color: #fff;
+    --gm-input-text-color: #000;
+
+    --gm-underline-color: var(--gm-text-color);
+
+    --gm-modal-bg-color: var(--gm-secondary-color);
     background-color: #1a1a1a;
     color: #fff;
     box-sizing: border-box;
@@ -173,9 +245,6 @@ header {
     max-height: calc(100vh - 84px);
 }
 
-#fe-player .gm-toolbar {
-    background-color: #1e1e1e;
-}
 #fe-player .gm-video-wrapper {
     padding: 10px 0 10px 10px;
 }

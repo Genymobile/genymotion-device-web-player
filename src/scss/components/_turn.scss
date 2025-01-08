@@ -7,14 +7,14 @@
         
         position: absolute;
         left: -305px;
-        color: $white;
+        color: var(--gm-text-color);
         font-size: 1em;
         font-family: Helvetica, sans-serif;
         pointer-events: none;
         z-index: 5;
         border-radius: 6px;
         width: 290px;
-        background-color: $modal-background-color;
+        background-color: var(--gm-modal-bg-color);
         vertical-align: middle;
         padding: 11px 8px 20px;
         margin-top: -83px;
@@ -31,12 +31,12 @@
             margin-top: -10px;
             border-width: 10px;
             border-style: solid;
-            border-color: transparent transparent transparent $modal-background-color;
+            border-color: transparent transparent transparent var(--gm-modal-bg-color);
         }
 
         h1 {
             font-size: 1.1em;
-            color: $accent-color-light;
+            color: var(--gm-primary-color);
             padding-bottom: 5px;
 
             span {

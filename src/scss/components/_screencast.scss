@@ -51,7 +51,7 @@
 
             .disabled {
                 background-image: url('../assets/images/ic-screencast_disabled.svg');
-                color: $btn-disabled-background;
+                color: var(--gm-btn-bg-color-disabled);
             }
         }
     }
@@ -68,7 +68,7 @@
         padding: 11px 8px 8px 8px;
         border-radius: 6px;
         width: 80px;
-        background-color: $modal-background-color;
+        background-color: var(--gm-modal-bg-color);
         vertical-align: middle;
 
         &::after {
@@ -79,7 +79,7 @@
             margin-top: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: transparent transparent transparent $modal-background-color;
+            border-color: transparent transparent transparent var(--gm-modal-bg-color);
         }
     }
 

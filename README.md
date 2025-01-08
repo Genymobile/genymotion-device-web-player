@@ -551,7 +551,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 ### `phone`
 
-<img align="right" src="./doc/assets/ic_text_and_call.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_textandcall_active_black.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
@@ -572,7 +572,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 ### `diskIO`
 
-<img align="right" src="./doc/assets/ic_disk_IO.svg" alt="..."></img>
+<img align="right" src="./doc/assets/ic_diskIO_active_black.svg" alt="..."></img>
 
 -   **Type:** `Boolean`
 -   **Default:** `true`

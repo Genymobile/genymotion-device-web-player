@@ -114,7 +114,6 @@
             &-screencast-button {
                 mask-image: url('../assets/images/ic_screencast.svg');
                 -webkit-mask-image: url('../assets/images/ic_screencast.svg');
-
                 &.gm-screencast-button-recording {
                     background-color: var(--gm-toolbar-icon-color-hover);
                 }

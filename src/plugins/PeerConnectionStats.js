@@ -76,7 +76,8 @@ module.exports = class PeerConnectionStats {
      */
     displayDefaultTurnWarning() {
         let message = '<h1><span>&#9888;</span> Using a default TURN</h1>Performance is not optimal.';
-        const warning = document.createElement('a');
+        const li = document.createElement('li');
+        const warning = document.createElement('div');
         warning.classList.add('gm-default-turn-button');
         warning.classList.add('gm-icon-button');
         const hover = document.createElement('div');
@@ -87,16 +88,20 @@ module.exports = class PeerConnectionStats {
             warning.target = '_blank';
         }
         hover.innerHTML = message;
-        warning.appendChild(hover);
+        li.appendChild(hover);
+        li.appendChild(warning);
 
         warning.onmouseenter = () => {
             hover.classList.remove('gm-hidden');
+            const {top} = warning.getBoundingClientRect();
+            hover.style.top = `${top - hover.offsetHeight + hover.parentElement.offsetHeight /2	+ 10}px`;
         };
         warning.onmouseleave = () => {
             hover.classList.add('gm-hidden');
         };
-        const toolbar = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        toolbar.appendChild(warning);
+
+        const toolbar = this.instance.root.querySelector('.gm-toolbar ul');
+        toolbar.appendChild(li);
     }
 
     /**

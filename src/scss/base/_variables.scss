@@ -1,3 +1,11 @@
+:root {
+    --gm-text-color: #ffffff;
+    --gm-primary-color: #e6195e;
+    /** Toolbar **/
+    --gm-toolbar-bg-color: var(--gm-secondary-color);
+    --gm-toolbar-icon-color: #e8eaed;
+    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
+}
 /**
  * SASS variables
  */

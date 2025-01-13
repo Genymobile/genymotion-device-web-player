@@ -11,22 +11,26 @@
  */
 module.exports = [
     {
+        name: 'None',
+        label: '(No disk performance alteration)',
+        readByteRate: 0,
+    },
+    {
         name: 'High-end device',
-        label: 'High-end device',
+        label: '(200 MiB per second)',
         readByteRate: 200,
     },
     {
         name: 'Mid-range device',
-        label: 'Mid-range device',
+        label: '(100 MiB per second)',
         readByteRate: 100,
     },
     {
         name: 'Low-end device',
-        label: 'Low-end device',
+        label: '(50 MiB per second)',
         readByteRate: 50,
     },
     {
         name: 'Custom',
-        label: 'Custom device',
     },
 ];

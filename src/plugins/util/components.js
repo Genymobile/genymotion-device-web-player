@@ -256,14 +256,14 @@ const dropdownSelect = (() => {
      * @returns {Object} - Dropdown component with methods to interact with it.
      */
     const createDropdown = ({items = [], onChange = null, value = ''}) => {
-        let selectedValue = value || 'Select...';
+        let selectedValue = value ?? 'Select...';
         const dropdownDiv = document.createElement('div');
         dropdownDiv.className = 'dropdown';
 
         // Create the div displaying the selected value
         const selectedValueDiv = document.createElement('div');
         selectedValueDiv.className = 'dropdown-selected';
-        selectedValueDiv.textContent = value || 'Select...';
+        selectedValueDiv.textContent = value ?? 'Select...';
         dropdownDiv.appendChild(selectedValueDiv);
 
         // Create the menu div where options will be appended

@@ -9,3 +9,27 @@
         opacity: 1;
     }
 }
+
+@keyframes blink-alert {
+    0% {
+        opacity: 1;
+    }
+    10% {
+        opacity: 0.3;
+    }
+    20% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 0.3;
+    }
+    40% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
+}

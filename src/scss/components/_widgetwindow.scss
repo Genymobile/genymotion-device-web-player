@@ -217,4 +217,9 @@
         display: flex;
         flex-direction: column;
     }
+
+    .gm-separator {
+        width: calc(100% + $modal-x-padding + $modal-x-padding);
+        margin-left: -$modal-x-padding;
+    }
 }

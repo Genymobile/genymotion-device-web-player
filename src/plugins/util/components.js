@@ -46,10 +46,7 @@ const switchButton = (() => {
         const getState = () => input.checked;
 
         switchDiv.addEventListener('click', () => {
-            setState(!input.checked);
-            if (onChange && typeof onChange === 'function') {
-                onChange(input.checked);
-            }
+            setState(!input.checked, true);
         });
 
         return {
@@ -219,16 +216,20 @@ const textInput = (() => {
 
         const getValue = () => input.value;
 
+        const setReadOnly = (readOnly) => {
+            input.readOnly = readOnly;
+        };
+
         input.addEventListener('input', (event) => {
-            const {value: v} = event.target;
+            const {value: v, selectionStart} = event.target;
             if (regexFilter && !regexFilter.test(v)) {
+                // delete the last character if it doesn't match the regex
+                const correctedValue = v.slice(0, selectionStart - 1) + v.slice(selectionStart);
+                event.target.value = correctedValue;
+                event.target.setSelectionRange(selectionStart - 1, selectionStart - 1);
                 return;
             }
-
-            setValue(v);
-            if (onChange) {
-                onChange(v);
-            }
+            setValue(v, true);
         });
 
         inputDiv.setValue = setValue;
@@ -238,6 +239,7 @@ const textInput = (() => {
             element: inputDiv,
             setValue,
             getValue,
+            setReadOnly,
         };
     };
 

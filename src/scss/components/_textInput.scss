@@ -4,15 +4,26 @@
     display: flex;
     align-items: center;
 
+    &:has(.text-input:read-only) {
+        border-bottom: 2px solid transparent;
+    }
+
     .text-input{
         text-align: right;
         padding-left: 0;
         padding-right: 0;
-        &:focus {
-            outline: none; 
-        }
         border: none;
         background-color: transparent;
         color: var(--gm-input-text-color);
+
+        &:focus {
+            outline: none; 
+        }
+
+        &:read-only {
+            background:  color-mix(in srgb, var(--gm-btn-bg-color-disabled), transparent 80%); //TODO
+            border: none;
+            color: var(--gm-btn-bg-color-disabled) //TODO
+        }
     }
 }

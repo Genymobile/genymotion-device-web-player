@@ -3,6 +3,7 @@
     color: var(--gm-input-text-color);
     display: flex;
     align-items: center;
+    height: 34px;
 
     &:has(.text-input:read-only) {
         border-bottom: 2px solid transparent;
@@ -21,9 +22,9 @@
         }
 
         &:read-only {
-            background:  color-mix(in srgb, var(--gm-btn-bg-color-disabled), transparent 80%); //TODO
+            background:  color-mix(in srgb, var(--gm-fourth-color), transparent 90%);
             border: none;
-            color: var(--gm-btn-bg-color-disabled) //TODO
+            color: var(--gm-fourth-color)
         }
     }
 }

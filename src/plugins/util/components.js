@@ -181,8 +181,9 @@ const slider = (() => {
  */
 
 const textInput = (() => {
-    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = ''}) => {
+    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = '', classes=''}) => {
         const inputDiv = document.createElement('div');
+        inputDiv.className = classes;
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
 

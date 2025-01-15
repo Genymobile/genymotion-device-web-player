@@ -74,7 +74,6 @@ module.exports = class Battery extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-
         const {modal, container} = this.createTemplateModal({
             title: this.i18n.BATTERY_TITLE || 'Battery',
             classes: 'gm-battery-plugin',
@@ -184,7 +183,6 @@ module.exports = class Battery extends OverlayPlugin {
         this.chargeGroup.appendChild(sliderGroup);
 
         // Charge level input
-        const inputGroup = document.createElement('div');
         this.chargeInput = textInput.createTextInput({
             appendText: '%',
             value: '50',
@@ -198,8 +196,7 @@ module.exports = class Battery extends OverlayPlugin {
 
         this.chargeInput.element.className = 'gm-charge-input';
 
-        inputGroup.appendChild(this.chargeInput.element);
-        this.chargeGroup.appendChild(inputGroup);
+        this.chargeGroup.appendChild(this.chargeInput.element);
 
         return this.chargeGroup;
     }

@@ -4,7 +4,6 @@
  .device-renderer-instance .gm-battery-plugin {
     .gm {
         &-charging-group {
-            margin-top: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -46,7 +45,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: $modal-section-mb;
 
             > div:nth-child(2) {
                 flex-grow: 1;
@@ -119,7 +118,7 @@
 
             .gm-charge-input {
                 width: 39px;
-                margin-bottom: 37px;
+                margin-top: -30px;
             }
 
             .gm-charge-slider {

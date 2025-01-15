@@ -59,7 +59,7 @@ describe('IOThrottling Plugin', () => {
         test('diskio', () => {
             ['jean-michel', 'readbyterate -123', '', 'readbyterate invalid'].forEach((invalidValue) => {
                 instance.emit('diskio', invalidValue);
-                expect(diskio.dropdownProfile.getValue()).toBe('None');
+                expect(diskio.dropdownProfile.getValue()).toBe(0);
             });
 
             [69, 420].forEach((customValue) => {

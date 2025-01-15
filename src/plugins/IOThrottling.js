@@ -110,7 +110,8 @@ module.exports = class IOThrottling extends OverlayPlugin {
 
         this.dropdownProfile = dropdownSelect.createDropdown({
             items: this.profilesForDropdown,
-            value: this.profilesForDropdown.find((profile) => profile.value===0).valueToDisplay,
+            value: 0,
+            hasCheckmark: true,
             onChange: (newValue) => {
                 this.updateDiskIOValues(newValue);
             },

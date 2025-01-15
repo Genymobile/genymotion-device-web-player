@@ -256,7 +256,7 @@ const dropdownSelect = (() => {
      * @param {string} [options.value] - Initial selected value.
      * @returns {Object} - Dropdown component with methods to interact with it.
      */
-    const createDropdown = ({items = [], onChange = null, value = ''}) => {
+    const createDropdown = ({items = [], onChange = null, value = '', hasCheckmark = false}) => {
         let selectedValue = value ?? 'Select...';
         const dropdownDiv = document.createElement('div');
         dropdownDiv.className = 'dropdown';
@@ -281,6 +281,26 @@ const dropdownSelect = (() => {
         };
 
         /**
+         * Adds a checkmark to the selected item in the dropdown.
+         * @param {Array} itemsArr - The list of items to display in the dropdown menu.
+         */
+        const addCheckmark = (itemsArr) => {
+            itemsArr.forEach((item) => {
+                // remove all checkmark
+                const checkmarkDiv = item.element.querySelector('.dropdown-checkmark');
+                if (checkmarkDiv) {
+                    item.element.removeChild(checkmarkDiv);
+                }
+
+                if (item.value === selectedValue || item === selectedValue) {
+                    const checkmark = document.createElement('div');
+                    checkmark.className = 'dropdown-checkmark';
+                    item.element.appendChild(checkmark);
+                }
+            });
+        };
+
+        /**
          * Gets the current selected value from the dropdown.
          * @returns {string} - The current selected value.
          */
@@ -296,24 +316,24 @@ const dropdownSelect = (() => {
             if (typeof item === 'string') {
                 itemValue = item;
                 valueToDisplay = item;
-            } else if (typeof item === 'object' && 'value' in item) {
+            } else if (typeof item === 'object' && 'value' in item && 'element' in item) {
                 itemValue = item.value;
-                if (item.valueToDisplay) {
-                    valueToDisplay = item.valueToDisplay;
-                } else {
-                    valueToDisplay = item.value;
-                }
-            } else if (typeof item === 'object') {
-                itemValue = item.element.textContent;
-                valueToDisplay = item.element.textContent;
+                valueToDisplay = item.valueToDisplay ?? item.element.innerHTML ?? item.value;
             }
 
             // Only update if the new value is different from the current one
             if (selectedValueDiv.innerHTML === itemValue || selectedValueDiv.innerHTML === valueToDisplay) {
                 return;
             }
+
             selectedValueDiv.innerHTML = valueToDisplay || itemValue;
             selectedValue = itemValue;
+
+            // update options checkmark if the value is selected
+            if (hasCheckmark) {
+                addCheckmark(items);
+            }
+
             // Trigger onChange callback if provided
             if (triggerOnChange && onChange) {
                 onChange(selectedValue);
@@ -337,10 +357,12 @@ const dropdownSelect = (() => {
                 // Check if the item is a string, object with label, or a custom element
                 if (typeof item === 'string') {
                     optionDiv.innerHTML = item;
-                } else if (typeof item === 'object' && item.label) {
-                    optionDiv.innerHTML = item.label;
-                } else if (typeof item === 'object' && item.element && item.element instanceof HTMLElement) {
+                } else if (typeof item === 'object'
+                    && typeof item.value !== 'undefined' && item.element && item.element instanceof HTMLElement) {
                     optionDiv.appendChild(item.element);
+                } else {
+                    console.warn('Invalid item. Need at least props element and value. Item', item);
+                    return;
                 }
 
                 // Add event listener for option click
@@ -355,6 +377,10 @@ const dropdownSelect = (() => {
 
         // Initialize dropdown with provided items
         updateOptions(items);
+        // update options checkmark if the value is selected
+        if (hasCheckmark) {
+            addCheckmark(items);
+        }
 
         // Toggle dropdown visibility when the selected value div is clicked
         selectedValueDiv.addEventListener('click', () => {

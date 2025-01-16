@@ -236,8 +236,12 @@
     border-radius: 4px;
     
     &:hover{
-        background: var(--gm-primary-color);
         background: color-mix(in srgb, var(--gm-primary-color), transparent 85%);
         color: var(--gm-primary-color)
+    }
+    &:disabled{
+        color: color-mix(in srgb, var(--gm-text-color), transparent 70%);
+        background: none;
+        cursor: default;
     }
 }

@@ -2,30 +2,50 @@
  * Identifiers (IMEI) plugin styles
  */
 .device-renderer-instance .gm-identifiers-plugin {
-    .gm-identifier-device,
-    .gm-identifier-android {
-        .gm-description {
-            font-size: 90%;
-            padding-left: 10px;
-        }
+    .gm-modal-body {
+        display: flex;
+        flex-direction: column;
+    }
 
-        margin-bottom: 16px;
-
-        .gm-input-group {
-            display: flex;
-
-            button {
-                margin-top: -5px;
+    .gm-identifiers-saved {
+        .gm-actions{
+            .gm-tag-success {
+                visibility: visible;
             }
         }
     }
 
-    input {
-        margin-right: 6px;
+    .gm-inputs{
         flex: 1;
-
-        &.gm-error {
-            border-bottom: 1px solid var(--gm-btn-bg-color);
+        .gm-identifier-android{
+            margin-bottom: $modal-section-mb;
+        }
+        .gm-identifier-android,
+        .gm-identifier-device{
+            display: flex;
+            justify-content: space-between;
+            gap: calc($modal-x-padding / 2);
+            align-items: center;
+            .gm-identifiers-device-input,
+            .gm-identifiers-android-input {
+                flex: 1;
+            }
+            .gm-identifiers-android-generate,
+            .gm-identifiers-device-generate {
+                mask-image: url('../assets/images/ic_generate.svg');
+                -webkit-mask-image: url('../assets/images/ic_generate.svg');
+                background-color: var(--gm-text-color);
+                cursor: pointer;
+            }
+        }
+    }
+    .gm-actions{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 60px;
+        .gm-tag-success {
+            visibility: hidden;
         }
     }
 }

@@ -181,7 +181,8 @@ const slider = (() => {
  */
 
 const textInput = (() => {
-    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = '', classes=''}) => {
+    const createTextInput = ({
+        onChange = null, value = '', regexFilter, regexValidField, appendText = '', classes=''}) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
         const inputDivContainer = document.createElement('div');
@@ -221,8 +222,16 @@ const textInput = (() => {
             input.readOnly = readOnly;
         };
 
+        const checkValidity = () => {
+            if (regexValidField && regexValidField.test(input.value)) {
+                return true;
+            }
+            return false;
+        };
+
         input.addEventListener('input', (event) => {
             const {value: v, selectionStart} = event.target;
+
             if (regexFilter && !regexFilter.test(v)) {
                 // delete the last character if it doesn't match the regex
                 const correctedValue = v.slice(0, selectionStart - 1) + v.slice(selectionStart);
@@ -240,6 +249,7 @@ const textInput = (() => {
             element: inputDiv,
             setValue,
             getValue,
+            checkValidity,
             setReadOnly,
         };
     };

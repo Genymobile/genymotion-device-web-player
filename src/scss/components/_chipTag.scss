@@ -2,7 +2,7 @@
  .gm-tag{
     &-success{
         .gm-tag-container{
-            display: flex;
+            display: inline-flex;
             align-items: center;
             border-radius: 8px;
             padding: 2px 6px;

@@ -222,7 +222,7 @@
     }
 
     .gm-separator {
-        width: calc(100% + $modal-x-padding + $modal-x-padding);
+        width: calc(100% + $modal-x-padding * 2);
         margin-left: -$modal-x-padding;
         margin-bottom: $spacing-m;
     }

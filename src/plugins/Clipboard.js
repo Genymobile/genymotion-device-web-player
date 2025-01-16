@@ -1,6 +1,7 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
+const {chipTag} = require('./util/components');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -45,6 +46,13 @@ module.exports = class Clipboard extends OverlayPlugin {
 
             try {
                 this.clipboard = decodeURIComponent(escape(window.atob(values[2])));
+                if (this.clipboard !== this.clipboardInput.value) {
+                    this.container.classList.remove('gm-clipboard-saved');
+                }
+                if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
+                    // if the widget is not opened, we update the clipboard input
+                    this.clipboardInput.value = this.clipboard;
+                }
             } catch (error) {
                 log.warn('Malformed clipboard content');
             }
@@ -75,34 +83,52 @@ module.exports = class Clipboard extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.container = document.createElement('div');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.CLIPBOARD_TITLE || 'Device Clipboard',
+            classes: 'gm-clipboard-plugin',
+            width: 378,
+            height: 484,
+        });
+        this.container = container;
+        this.widget = modal;
 
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.CLIPBOARD_TITLE || 'Device Clipboard';
-        this.container.appendChild(title);
+        const text = document.createElement('div');
+        text.innerHTML = this.i18n.CLIPBOARD_TEXT ||
+            'The content you type below will be copied directly to your virtual device\'s clipboard.';
 
         this.clipboardInput = document.createElement('textarea');
         this.clipboardInput.className = 'gm-clipboard-input';
+        this.clipboardInput.placeholder = this.i18n.CLIPBOARD_PLACEHOLDER || 'Write your content here';
+        this.clipboardInput.oninput = (event) => {
+            this.container.classList.remove('gm-clipboard-saved');
+            if (event.target.value.length > 0) {
+                this.submitBtn.disabled = false;
+            } else {
+                this.submitBtn.disabled = true;
+            }
+        };
 
-        // Setup
-        this.container.appendChild(this.clipboardInput);
-        this.widget.className = 'gm-overlay gm-clipboard-plugin gm-hidden';
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'gm-actions';
+        const appliedTag = chipTag.createChip({
+            text: this.i18n.CLIPBOARD_COPIED || 'Copied',
+        });
 
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.container);
-
-        this.widget.onclose = () => {
-            this.clipboard = this.clipboardInput.value;
+        this.submitBtn = document.createElement('button');
+        this.submitBtn.innerHTML = this.i18n.CLIPBOARD_COPY || 'Copy to device';
+        this.submitBtn.className = 'gm-btn gm-clipboard-apply';
+        this.submitBtn.onclick = () => {
+            this.container.classList.add('gm-clipboard-saved');
             this.sendDataToInstance();
         };
+
+        actionsDiv.appendChild(appliedTag.element);
+        actionsDiv.appendChild(this.submitBtn);
+
+        // Setup
+        this.container.appendChild(text);
+        this.container.appendChild(this.clipboardInput);
+        this.container.appendChild(actionsDiv);
 
         // Render into document
         this.instance.root.appendChild(this.widget);
@@ -121,38 +147,12 @@ module.exports = class Clipboard extends OverlayPlugin {
     }
 
     /**
-     * Copy the instance clipboard (reflected to the text input field) into the client clipboard.
-     *
-     * @param {HTMLElement} clipboardInput         Clipboard value (text input).
-     * @param {HTMLElement} clipboardCopyIndicator Clipboard copy indicator.
-     */
-    copyInstanceClipboardToClient(clipboardInput, clipboardCopyIndicator) {
-        try {
-            navigator.clipboard.writeText(this.clipboardInput.value);
-        } catch (error) {
-            // Old, deprecated fallback
-            clipboardInput.focus();
-            clipboardInput.select();
-            document.execCommand('copy');
-        }
-
-        clipboardCopyIndicator.classList.remove('gm-invisible');
-        clipboardCopyIndicator.classList.remove('gm-hidden');
-        setTimeout(() => {
-            clipboardCopyIndicator.classList.add('gm-invisible');
-            setTimeout(() => {
-                clipboardCopyIndicator.classList.add('gm-hidden');
-            }, 500);
-        }, 2000);
-    }
-
-    /**
      * Send information to instance.
      */
     sendDataToInstance() {
         const json = {
             channel: 'framework',
-            messages: ['set_device_clipboard ' + window.btoa(unescape(encodeURIComponent(this.clipboard)))],
+            messages: ['set_device_clipboard ' + window.btoa(unescape(encodeURIComponent(this.clipboardInput.value)))],
         };
         this.instance.sendEvent(json);
     }

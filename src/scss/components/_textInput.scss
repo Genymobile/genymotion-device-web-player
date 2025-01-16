@@ -1,16 +1,16 @@
 .text-input-container {
-    border-bottom: 2px solid var(--gm-input-text-color);
+    border-bottom: 1px solid var(--gm-input-text-color);
     color: var(--gm-input-text-color);
     display: flex;
     align-items: center;
     height: 34px;
 
     &:has(.text-input:read-only) {
-        border-bottom: 2px solid transparent;
+        border-bottom: 1px solid transparent;
     }
 
     .text-input{
-        text-align: right;
+        text-align: left;
         padding-left: 0;
         padding-right: 0;
         border: none;

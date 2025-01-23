@@ -194,6 +194,17 @@ module.exports = class Battery extends OverlayPlugin {
             },
         });
 
+        // bind arrow keys to input, to increase/decrease value with arrow up/down
+        this.instance.addListener(this.chargeInput.element, 'keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.chargeInput.setValue(Math.min(100, Number(this.chargeInput.getValue()) + 1), true);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.chargeInput.setValue(Math.max(0, Number(this.chargeInput.getValue()) - 1), true);
+            }
+        });
+
         this.chargeInput.element.className = 'gm-charge-input';
 
         this.chargeGroup.appendChild(this.chargeInput.element);

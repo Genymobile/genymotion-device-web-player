@@ -1,6 +1,24 @@
 'use strict';
 
 const Original = require('../../src/DeviceRenderer');
+const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
+
+class ToolBarManager extends OriginalToolbarManager {
+    constructor() {
+        super();
+    }
+    registerButton(args) {
+        const button = super.registerButton(args);
+        /**
+         * Tricks, render button after register
+         * cause it's the deviceRenderFactory script which launch the renderButton
+         * and this script is not available in test
+         */
+        this.renderButton(args.id);
+
+        return button;
+    }
+}
 module.exports = class DeviceRenderer extends Original {
     constructor(options) {
         document.body.innerHTML = `
@@ -19,12 +37,6 @@ module.exports = class DeviceRenderer extends Original {
         </div>
     </div>
 </div>`;
-
-        window.adapter = {
-            browserDetails: {
-                browser: 'test',
-            },
-        };
 
         navigator.mediaDevices = {
             getUserMedia: jest.fn().mockReturnValue(Promise.resolve(null)),
@@ -45,6 +57,7 @@ module.exports = class DeviceRenderer extends Original {
         this.apiManager = {
             registerFunction: jest.fn(),
         };
+        this.toolbarManager = new ToolBarManager();
     }
 
     /**

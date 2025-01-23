@@ -95,9 +95,7 @@ class OverlayPlugin {
                 this.widget.onclose();
             }
         }
-        if (this.toolbarBtnImage) {
-            this.toolbarBtnImage.classList.remove('gm-active');
-        }
+        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
     }
 
     openOverlay() {
@@ -105,9 +103,7 @@ class OverlayPlugin {
             this.widget.classList.remove('gm-hidden');
         }
 
-        if (this.toolbarBtnImage) {
-            this.toolbarBtnImage.classList.add('gm-active');
-        }
+        this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
         this.instance.store.dispatch({
             type: 'ADD_TRACKED_EVENT',
             payload: {
@@ -119,45 +115,11 @@ class OverlayPlugin {
     }
 
     /**
-     * Save current button state (icon & click action)
-     */
-    saveState() {
-        if (!this.savedState) {
-            this.savedState = {
-                toolbarBtn: {
-                    className: this.toolbarBtn.className,
-                    onclick: this.toolbarBtn.onclick,
-                },
-                toolbarBtnImage: {
-                    className: this.toolbarBtnImage.className,
-                },
-            };
-        }
-    }
-
-    /**
-     * Re-apply the saved toolbar button state.
-     */
-    restoreState() {
-        if (this.savedState) {
-            this.toolbarBtn.className = this.savedState.toolbarBtn.className;
-            this.toolbarBtnImage.className = this.savedState.toolbarBtnImage.className;
-            this.toolbarBtn.onclick = this.savedState.toolbarBtn.onclick;
-
-            this.savedState = null;
-        }
-    }
-
-    /**
      * Disable associated toolbar icon.
      */
     disable() {
-        if (this.toolbarBtn && this.toolbarBtnImage) {
-            this.saveState();
-
-            this.toolbarBtn.className += ' gm-disabled-widget-pop-up';
-            this.toolbarBtnImage.className += ' gm-disabled-widget-icon';
-            this.toolbarBtn.onclick = null;
+        if (this.instance.toolbarManager) {
+            this.instance.toolbarManager.disableButton(this.constructor.name);
         }
     }
 
@@ -165,9 +127,7 @@ class OverlayPlugin {
      * Enable associated toolbar icon.
      */
     enable() {
-        if (this.toolbarBtn && this.toolbarBtnImage) {
-            this.restoreState();
-        }
+        this.instance.toolbarManager.enableButton(this.constructor.name);
     }
 
     /**

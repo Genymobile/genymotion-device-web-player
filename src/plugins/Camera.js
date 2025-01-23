@@ -31,38 +31,29 @@ module.exports = class Camera extends OverlayPlugin {
         this.instance.camera = this;
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
     }
 
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: this.instance.options.microphone ? 'gm-camera-mic-button' : 'gm-camera-button',
+            title: this.instance.options.microphone
+                ? this.i18n.CAMERA_MIC_TITLE || 'Camera and microphone injection'
+                : this.i18n.CAMERA_TITLE || 'Camera injection',
+            onClick: () => this.instance.mediaManager.toggleVideoStreaming(),
+        });
+    }
 
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        if (this.instance.options.microphone) {
-            this.toolbarBtnImage.className = 'gm-icon-button gm-camera-mic-button';
-            this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera and microphone injection';
+    enable() {
+        const videoCapabilities = RTCRtpSender.getCapabilities('video');
+        if (videoCapabilities.codecs.some((codec) => codec.mimeType === 'video/H264')) {
+            super.enable();
         } else {
-            this.toolbarBtnImage.className = 'gm-icon-button gm-camera-button';
-            this.toolbarBtnImage.title = this.i18n.CAMERA_TITLE || 'Camera injection';
-        }
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        toolbar.appendChild(this.toolbarBtn);
-
-        // if we are using safari, we disable camera since it sends its stream on h264 which is not currently supported
-        if (adapterjs.default.browserDetails.browser === 'safari') {
-            this.toolbarBtn.className += ' gm-disabled-widget-pop-up';
-            this.toolbarBtnImage.className += ' gm-disabled-widget-icon';
-        } else {
-            const toggleVideoStreaming = () => this.instance.mediaManager.toggleVideoStreaming();
-            this.instance.addListener(this.toolbarBtn, 'click', toggleVideoStreaming);
+            this.instance.toolbarManager.disableButton(this.constructor.name);
         }
     }
 };

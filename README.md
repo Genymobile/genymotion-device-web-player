@@ -375,12 +375,48 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
 
-### `streamResolution`
+### `connectionFailedURL`
 
-<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Type:** `String`
+-   **Default:** `undefined`
+-   **Compatibility:** `SaaS`, `PaaS`
+-   **Details:**
+    Redirection page in case of connection error.
+
+### `giveFeedbackLink`
+
+-   **Type:** `String`
+-   **Default:** `giveFeedbackLink`
+-   **Compatibility:** `SaaS`, `PaaS`
+-   **Details:**
+    Set url for feedback page.
+
+### `toolbarOrder`
+
+-   **Type:** `Array<string>`
+-   **Default:** `[]`
+-   **Special options**
+    -   `separator`: to display a separator between icons
+    -   `unordered`: to display all plugins activate but not specified un toolbarOrder
+-   **Example**`[
+'ButtonsEvents_ROTATE',
+'separator',
+'Battery',
+'FingerPrint',
+'separator',
+'unordered',
+'separator',
+'ButtonsEvents_POWER']`
+-   **Details:**
+    The toolbarOrder option allows you to define the order in which plugin icons appear in the toolbar. Each string in the array corresponds to the unique identifier (id) of a button registered in the toolbar manager. The IDs of the plugins are provided below in the plugin option details.
+
+### **Plugins options**
+
+### `streamResolution`
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `StreamResolution`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `SaaS`
 -   **Details:**
     Enables or disables the video stream quality widget.
@@ -389,6 +425,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
+-   **Toolbar name:** `StreamBitrate`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `SaaS`
 -   **Details:**
     Enables or disables the stream bitrate widget.
@@ -421,6 +458,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `KeyboardMapping`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the keyboardMapping. This widget can be used to map key with command (i.e. tap, swipe-left, tilt, ...).
@@ -431,6 +469,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_VOLUME_UP` `ButtonsEvents_VOLUME_DOWN`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the volume widget. This widget can be used to increase or decrease the volume of the Android virtual device.
@@ -441,6 +480,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_ROTATE`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the rotation widget. This widget can be used to rotate the Android virtual device.
@@ -453,6 +493,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_BACK` `ButtonsEvents_HOME` `ButtonsEvents_RECENT_APP`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the navbar widgets. This widget can be used to navigate in the Android virtual device like when using hardware buttons.
@@ -463,6 +504,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_POWER`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the power widget. This widget can be used to poweroff or reboot the Android virtual device.
@@ -474,6 +516,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Fullscreen`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the fullscreen widget. This widget can be used to make the renderer go fullscreen.
@@ -484,6 +527,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Camera`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the camera widget. This widget can be used to forward local webcam video to the Android virtual device.
@@ -505,6 +549,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `FileUpload`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the fileUpload widget and drag & drop. This widget can be used to forward local file to the Android virtual device. When drag & dropping APK or ZIP files, it will install them.
@@ -523,6 +568,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Clipboard`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the clipboard widget. This widget can be used to forward local clipboard to the Android virtual device.
@@ -533,6 +579,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Battery`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the battery widget. This widget can be used to set the battery level and state of the Android virtual device.
@@ -543,6 +590,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `GPS`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device.
@@ -568,6 +616,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Screencast`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the capture widget. This widget can be used to capture the screen of the Android virtual device (screenshot or screencast).
@@ -578,6 +627,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Identifiers`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
 
@@ -589,6 +639,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Network`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the network widget. This widget can be used to enable or disable the wifi or mobile network, and to set the network throttling (mobile network type and signal strength) of the Android virtual device.
@@ -599,6 +650,7 @@ Enables or disables the identifiers widget. This widget can be used to set the i
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Phone`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
 
@@ -610,6 +662,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
+-   **Toolbar name:** `Baseband`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enable or disable baseband (MMC/MNC) widget.
@@ -620,6 +673,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `IOThrottling`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enables or disables the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
@@ -628,6 +682,7 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Gamepad`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `SaaS`, `PaaS`
 -   **Details:**
     Enable or disable gamepad support & widget
@@ -636,25 +691,10 @@ Enables or disables the phone widget. This widget can be used to send SMS or pho
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `FingerPrint`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `SaaS`, `PaaS`
 -   **Details:**
     Enable or disable fingerprints widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above
-
-### `connectionFailedURL`
-
--   **Type:** `String`
--   **Default:** `undefined`
--   **Compatibility:** `SaaS`, `PaaS`
--   **Details:**
-    Redirection page in case of connection error.
-
-### `giveFeedbackLink`
-
--   **Type:** `String`
--   **Default:** `giveFeedbackLink`
--   **Compatibility:** `SaaS`, `PaaS`
--   **Details:**
-    Set url for feedback page.
 
 ## Contributing
 

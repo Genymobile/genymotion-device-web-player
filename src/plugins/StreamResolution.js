@@ -32,35 +32,38 @@ module.exports = class StreamResolution {
         this.i18n = i18n || {};
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
     }
 
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.select = document.createElement('select');
-        this.select.className = 'gm-icon-button gm-streamres-button';
-        this.select.title = this.i18n.STREAMRES_TITLE || 'Quality';
-        RESOLUTIONS.forEach((resolution) => {
-            this.select.add(new Option(resolution.text, resolution.value));
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-streamres-button',
+            title: this.i18n.STREAMRES_TITLE || 'Quality',
+            onClick: (event) => {
+                if (event.target.tagName === 'OPTION') {
+                    return;
+                }
+                let select = event.target.querySelector('select');
+                if (!select) {
+                    // draw the select
+                    select = document.createElement('select');
+                    select.className = 'gm-icon-button gm-streamres-button';
+                    select.title = this.i18n.STREAMRES_TITLE || 'Quality';
+                    RESOLUTIONS.forEach((resolution) => {
+                        select.add(new Option(resolution.text, resolution.value));
+                    });
+                    select.onchange = () => {
+                        const json = {type: 'SIZE', width: Number(select.value)};
+                        this.instance.sendEvent(json);
+                        select.blur();
+                    };
+                    event.target.appendChild(select);
+                }
+            },
         });
-        this.select.onchange = this.onStreamResolutionChange.bind(this);
-        toolbar.appendChild(this.select);
-    }
-
-    /**
-     * Apply the selected stream resolution.
-     */
-    onStreamResolutionChange() {
-        const json = {type: 'SIZE', width: Number(this.select.value)};
-        this.instance.sendEvent(json);
-        this.select.blur();
     }
 };

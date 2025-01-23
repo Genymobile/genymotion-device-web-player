@@ -30,7 +30,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.basebandEnabled = basebandEnabled;
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Listen for baseband messages: "<sim/network> <operator/operator_name/imsi_id/phone_number> <value>"
@@ -73,20 +73,13 @@ module.exports = class BasebandRIL extends OverlayPlugin {
     /**
      * Add the button to the player toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-sim-button';
-        this.toolbarBtnImage.title = this.i18n.BASEBAND_TITLE || 'Baseband';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-sim-button',
+            title: this.i18n.BASEBAND_TITLE || 'Baseband',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**

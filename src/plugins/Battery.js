@@ -28,7 +28,7 @@ module.exports = class Battery extends OverlayPlugin {
         this.instance.battery = this;
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Listen for battery messages: "state mode <discharging/charging/full> <value>"
@@ -53,20 +53,13 @@ module.exports = class Battery extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-battery-button';
-        this.toolbarBtnImage.title = this.i18n.BATTERY_TITLE || 'Battery';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-battery-button',
+            title: this.i18n.BATTERY_TITLE || 'Battery',
+            onClick: () => this.toggleWidget(),
+        });
     }
 
     /**

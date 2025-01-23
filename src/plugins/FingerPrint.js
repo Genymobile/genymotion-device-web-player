@@ -83,11 +83,17 @@ module.exports = class FingerPrint extends OverlayPlugin {
                             if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
                                 authRequiredDiv.classList.add('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
-                                this.toolbarBtnImage.classList.add('fingerprint-require');
+                                this.instance.toolbarManager.addButtonClass(
+                                    this.constructor.name,
+                                    'fingerprint-require',
+                                );
                             } else {
                                 authRequiredDiv.classList.remove('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
-                                this.toolbarBtnImage.classList.remove('fingerprint-require');
+                                this.instance.toolbarManager.removeButtonClass(
+                                    this.constructor.name,
+                                    'fingerprint-require',
+                                );
                             }
                             break;
                         case 'isRecognizedFPByDefault':
@@ -106,9 +112,15 @@ module.exports = class FingerPrint extends OverlayPlugin {
                                 }
                             }
                             if (value) {
-                                this.toolbarBtnImage.classList.add('fingerprint-autoValidation');
+                                this.instance.toolbarManager.addButtonClass(
+                                    this.constructor.name,
+                                    'fingerprint-autoValidation',
+                                );
                             } else {
-                                this.toolbarBtnImage.classList.remove('fingerprint-autoValidation');
+                                this.instance.toolbarManager.removeButtonClass(
+                                    this.constructor.name,
+                                    'fingerprint-autoValidation',
+                                );
                             }
 
                             // update switch
@@ -123,7 +135,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
         );
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // register callback
@@ -143,20 +155,13 @@ module.exports = class FingerPrint extends OverlayPlugin {
     /**
      * Add the button to the player toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-fingerprint-button';
-        this.toolbarBtnImage.title = this.i18n.FINGERPRINT_TITLE || 'Biometrics';
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-fingerprint-button',
+            title: this.i18n.FINGERPRINT_TITLE || 'Biometrics',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**

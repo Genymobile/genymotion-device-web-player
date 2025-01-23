@@ -29,39 +29,40 @@ module.exports = class ButtonsEvents {
         this.instance.buttonsEvents = this;
 
         if (this.instance.options.rotation) {
-            this.renderToolbarButton(ROTATE_KEYCODE, 'gm-rotate', i18n.BUTTONS_ROTATE || 'Rotate', false);
+            this.registerToolbarButton('ROTATE', ROTATE_KEYCODE, 'gm-rotation', i18n.BUTTONS_ROTATE || 'Rotate', false);
         }
 
         if (this.instance.options.volume) {
-            this.renderToolbarButton(
+            this.registerToolbarButton(
+                'VOLUME_DOWN',
                 VOLUME_DOWN_KEYCODE,
                 'gm-sound-down',
                 i18n.BUTTONS_SOUND_DOWN || 'Sound down',
                 false,
             );
-            this.renderToolbarButton(VOLUME_UP_KEYCODE, 'gm-sound-up', i18n.BUTTONS_SOUND_UP || 'Sound up', false);
+            this.registerToolbarButton(
+                'VOLUME_UP',
+                VOLUME_UP_KEYCODE,
+                'gm-sound-up',
+                i18n.BUTTONS_SOUND_UP || 'Sound up',
+                false,
+            );
         }
 
         if (this.instance.options.navbar) {
-            this.renderToolbarButton(
+            this.registerToolbarButton(
+                'RECENT_APP',
                 RECENT_APP_KEYCODE,
                 'gm-recent',
                 i18n.BUTTONS_RECENT_APPS || 'Recent applications',
                 true,
             );
-            this.renderToolbarButton(HOMEPAGE_KEYCODE, 'gm-home', i18n.BUTTONS_HOME || 'Home', true);
-            this.renderToolbarButton(BACK_KEYCODE, 'gm-back', i18n.BUTTONS_BACK || 'Back', true);
+            this.registerToolbarButton('HOMEPAGE', HOMEPAGE_KEYCODE, 'gm-home', i18n.BUTTONS_HOME || 'Home', true);
+            this.registerToolbarButton('BACK', BACK_KEYCODE, 'gm-back', i18n.BUTTONS_BACK || 'Back', true);
         }
 
         if (this.instance.options.power) {
-            this.renderToolbarButton(POWER_KEYCODE, 'gm-power', i18n.BUTTONS_POWER || 'Power', true);
-        }
-
-        const buttons = document.getElementsByClassName('gm-icon-button');
-        for (let i = 0; i < buttons.length; i++) {
-            const button = buttons[i];
-            button.onmousedown = this.mouseButtonPressEvent.bind(this);
-            button.onmouseup = this.mouseButtonReleaseEvent.bind(this);
+            this.registerToolbarButton('POWER', POWER_KEYCODE, 'gm-power', i18n.BUTTONS_POWER || 'Power', true);
         }
     }
 
@@ -96,7 +97,7 @@ module.exports = class ButtonsEvents {
      * @param {Event} event Associated JS event
      */
     mouseButtonPressEvent(event) {
-        const id = event.target.classList[1];
+        const {androidkeycode: id} = event.target.dataset;
         if (!id) {
             return;
         }
@@ -123,7 +124,7 @@ module.exports = class ButtonsEvents {
      * @param {Event} event Associated JS event
      */
     mouseButtonReleaseEvent(event) {
-        const id = event.target.classList[1];
+        const {androidkeycode: id} = event.target.dataset;
         if (!id) {
             return;
         }
@@ -144,100 +145,37 @@ module.exports = class ButtonsEvents {
     }
 
     /**
-     * Retrieve a button from its class name.
-     *
-     * @param  {string} className Button class name.
-     * @return {Object}           Button state.
-     */
-    getButtonState(className) {
-        const image = this.instance.getChildByClass(this.instance.root, className);
-        const button = image.parentNode;
-
-        return {
-            image: {
-                className: image.className,
-            },
-            button: {
-                className: button.className,
-                onclick: button.onclick,
-            },
-        };
-    }
-
-    /**
-     * Retrieve a button state identified by its class name.
-     *
-     * @param {string} className Button class name.
-     * @param {Object} state     Button state
-     */
-    setButtonState(className, state) {
-        const image = this.instance.getChildByClass(this.instance.root, className);
-        const button = image.parentNode;
-
-        image.className = state.image.className;
-        button.className = state.button.className;
-        button.onclick = state.button.onclick;
-    }
-
-    /**
      * Disable instance rotation.
      */
     disableRotation() {
-        if (!this.instance.getChildByClass(this.instance.root, 'gm-rotate')) {
-            return; // if we don't have rotation, we can't disable it
-        }
-
-        if (!this.savedRotationState) {
-            this.savedRotationState = this.getButtonState('gm-rotate');
-        }
-
-        const rotationImage = this.instance.getChildByClass(this.instance.root, 'gm-rotate');
-        const rotationButton = rotationImage.parentNode;
-        rotationButton.className += ' gm-disabled-widget-pop-up';
-        rotationImage.className += ' gm-disabled-widget-icon';
-        rotationButton.onclick = null;
+        this.instance.toolbarManager.disableButton(this.constructor.name + '_' + ROTATE_KEYCODE);
     }
 
     /**
      * Enable instance rotation.
      */
     enableRotation() {
-        if (!this.instance.getChildByClass(this.instance.root, 'gm-rotate')) {
-            return; // if we don't have rotation, we can't disable it
-        }
-
-        if (this.savedRotationState) {
-            this.setButtonState('gm-rotate', this.savedRotationState);
-            this.savedRotationState = null;
-        }
+        this.instance.toolbarManager.enableButton(this.constructor.name + '_' + ROTATE_KEYCODE);
     }
 
     /**
      * Add a device button to the renderer toolbar.
      *
+     * @param {string}  ID             Button ID.
      * @param {string}  androidKeycode Button keycode.
      * @param {string}  htmlClass      Button CSS class.
      * @param {string}  htmlTitle      Button title.
-     * @param {boolean} append         Set to true to insert the button at the end.
      */
-    renderToolbarButton(androidKeycode, htmlClass, htmlTitle, append) {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        const button = document.createElement('li');
-        const image = document.createElement('div');
-        image.classList.add('gm-icon-button');
-        image.classList.add(androidKeycode);
-        image.classList.add(htmlClass);
-        image.title = htmlTitle;
-        button.appendChild(image);
-        if (append) {
-            toolbar.appendChild(button);
-        } else {
-            toolbar.insertBefore(button, toolbar.firstChild);
-        }
+    registerToolbarButton(ID, androidKeycode, htmlClass, htmlTitle) {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name + '_' + ID,
+            iconClass: htmlClass,
+            title: htmlTitle,
+            dataAttributes: {
+                androidKeycode,
+            },
+            onMousedown: this.mouseButtonPressEvent.bind(this),
+            onMouseup: this.mouseButtonReleaseEvent.bind(this),
+        });
     }
 };

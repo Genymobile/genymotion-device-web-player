@@ -12,10 +12,12 @@ module.exports = class Fullscreen {
      * Plugin initialization.
      *
      * @param {Object} instance Associated instance.
+     * @param {Object} i18n     Translations keys for the UI.
      */
-    constructor(instance) {
+    constructor(instance, i18n) {
         // Reference instance
         this.instance = instance;
+        this.i18n = i18n || {};
 
         // we register for fullscreen event changes
         this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
@@ -36,39 +38,25 @@ module.exports = class Fullscreen {
                 'Toggle fullscreen mode for the video player. If the player is currently in fullscreen, it will exit fullscreen; otherwise, it will enter fullscreen mode.',
         });
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
     }
 
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-
-        /**
-         * we add a button that will allows the user to set/unset the
-         * fullscreen for the given genycloud instance
-         */
-        this.button = document.createElement('li');
-        this.image = document.createElement('div');
-        this.image.className = 'gm-icon-button gm-fullscreen-button';
-        this.image.title = 'Fullscreen';
-        this.button.appendChild(this.image);
-        toolbar.appendChild(this.button);
-
-        // when clicked on the button, should we enter or exit fullscreen
-        this.button.onclick = () => {
-            if (this.fullscreenEnabled()) {
-                this.exitFullscreen();
-            } else {
-                this.goFullscreen(this.instance.root);
-            }
-        };
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-fullscreen-button',
+            title: this.i18n.FULLSCREEN || 'Fullscreen',
+            onClick: () => {
+                if (this.fullscreenEnabled()) {
+                    this.exitFullscreen();
+                } else {
+                    this.goFullscreen(this.instance.root);
+                }
+            },
+        });
     }
 
     /**
@@ -78,7 +66,7 @@ module.exports = class Fullscreen {
      */
     goFullscreen(element) {
         this.instance.wrapper.classList.add('gm-fullscreen');
-        this.image.classList.add('gm-active');
+        this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
         if (element.requestFullscreen) {
             element.requestFullscreen();
         } else if (element.webkitRequestFullscreen) {
@@ -100,7 +88,7 @@ module.exports = class Fullscreen {
      */
     exitFullscreen() {
         this.instance.wrapper.classList.remove('gm-fullscreen');
-        this.image.classList.remove('gm-active');
+        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
         if (!this.fullscreenEnabled()) {
             return; // do not try to remove fulllscreen if it is not active
         }

@@ -56,7 +56,7 @@ module.exports = class GPS extends OverlayPlugin {
         this.minimumZoomLevel = 8;
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderGPSForm();
         this.renderMapView();
 
@@ -72,20 +72,13 @@ module.exports = class GPS extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-gps-button';
-        this.toolbarBtnImage.title = this.i18n.GPS_TITLE || 'GPS';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleForm.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-gps-button',
+            title: this.i18n.GPS_TITLE || 'GPS',
+            onClick: this.toggleForm.bind(this),
+        });
     }
 
     /**

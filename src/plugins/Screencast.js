@@ -33,7 +33,7 @@ module.exports = class Screencast extends OverlayPlugin {
         this.instance.screencast = this;
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Screencast webrtc stuff
@@ -115,11 +115,6 @@ module.exports = class Screencast extends OverlayPlugin {
      * Display screencast timer indicator.
      */
     displayTimer() {
-        if (this.timer.classList.contains('gm-timer-hidden')) {
-            this.timer.classList.remove('gm-timer-hidden');
-            this.displayInterval = setInterval(this.displayTimer.bind(this), 1000);
-        }
-
         const endTime = new Date();
 
         // compute seconds
@@ -144,8 +139,7 @@ module.exports = class Screencast extends OverlayPlugin {
      */
     hideTimer() {
         clearInterval(this.displayInterval);
-        this.timer.classList.add('gm-timer-hidden');
-        this.timer.innerHTML = '';
+        this.timer.remove();
     }
 
     findBestMimeType() {
@@ -179,14 +173,17 @@ module.exports = class Screencast extends OverlayPlugin {
         } catch (error) {
             log.error('Error while creating MediaRecorder: ' + error);
             this.hideTimer();
-            this.toolbarBtnImage.classList.remove('gm-screencast-button-recording');
+            this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-screencast-button-recording');
             return;
         }
 
         this.recordedBlobs = [];
         this.isRecording = true;
         this.startTime = new Date();
-        this.displayTimer();
+
+        this.timer.style.display = '';
+        this.displayInterval = setInterval(this.displayTimer.bind(this), 1000);
+
         this.mediaRecorder.ondataavailable = this.handleDataAvailable.bind(this);
         this.mediaRecorder.start(CAPTURE_INTERVAL_MS);
         log.debug('MediaRecorder started', this.mediaRecorder);
@@ -196,9 +193,10 @@ module.exports = class Screencast extends OverlayPlugin {
      * Stop screencast recording.
      */
     stopRecording() {
+        this.timer.style.display = 'none';
         this.mediaRecorder.stop();
         this.hideTimer();
-        this.toolbarBtnImage.classList.remove('gm-screencast-button-recording');
+        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-screencast-button-recording');
         this.downloadScreencast();
         log.debug('MediaRecorder stopped', this.mediaRecorder);
     }
@@ -206,23 +204,21 @@ module.exports = class Screencast extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-screencast-button';
-        this.toolbarBtnImage.title = this.i18n.SCREENCAST_TITLE || 'Screencast';
-        this.timer = document.createElement('div');
-        this.timer.className = 'gm-screencast-timer gm-timer-hidden';
-        this.toolbarBtnImage.appendChild(this.timer);
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-screencast-button',
+            title: this.i18n.SCREENCAST_TITLE || 'Screencast',
+            onClick: (event) => {
+                if (event.target.parentElement.querySelector('.gm-screencast-timer') === null) {
+                    this.timer = document.createElement('div');
+                    this.timer.className = 'gm-screencast-timer';
+                    this.timer.style.display = 'none';
+                    event.target.parentElement.appendChild(this.timer);
+                }
+                this.toggleWidget();
+            },
+        });
     }
 
     /**
@@ -302,7 +298,7 @@ module.exports = class Screencast extends OverlayPlugin {
         super.toggleWidget();
 
         if (keepIconActive === true) {
-            this.toolbarBtnImage.classList.add('gm-screencast-button-recording');
+            this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-screencast-button-recording');
         }
     }
 

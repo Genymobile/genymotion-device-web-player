@@ -18,10 +18,8 @@ module.exports = class Fullscreen {
         this.instance = instance;
 
         // we register for fullscreen event changes
-        if (document.addEventListener) {
-            this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
-            this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
-        }
+        this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
+        this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
 
         this.instance.apiManager.registerFunction({
             name: 'fullscreen',
@@ -52,38 +50,25 @@ module.exports = class Fullscreen {
 
         const toolbar = toolbars.children[0];
 
-        if (this.isTemplateFullscreen()) {
-            /**
-             * If the template is fullscreen, there is a splash screen that ask the user
-             * to allow the fullscreen. It is needed due to HTML5 requirements.
-             */
-            const fullscreenMessage = this.instance.getChildByClass(this.instance.root, 'gm-fullscreen-message');
-            fullscreenMessage.onclick = () => {
-                fullscreenMessage.classList.add('hide');
-                this.instance.wrapper.classList.remove('hide');
-                this.goFullscreen(this.instance.root);
-            };
-        } else {
-            /**
-             * Else we add a button that will allows the user to set/unset the
-             * fullscreen for the given genycloud instance
-             */
-            this.button = document.createElement('li');
-            this.image = document.createElement('div');
-            this.image.className = 'gm-icon-button gm-fullscreen-button';
-            this.image.title = 'Fullscreen';
-            this.button.appendChild(this.image);
-            toolbar.appendChild(this.button);
+        /**
+         * we add a button that will allows the user to set/unset the
+         * fullscreen for the given genycloud instance
+         */
+        this.button = document.createElement('li');
+        this.image = document.createElement('div');
+        this.image.className = 'gm-icon-button gm-fullscreen-button';
+        this.image.title = 'Fullscreen';
+        this.button.appendChild(this.image);
+        toolbar.appendChild(this.button);
 
-            // when clicked on the button, should we enter or exit fullscreen
-            this.button.onclick = () => {
-                if (this.fullscreenEnabled()) {
-                    this.exitFullscreen();
-                } else {
-                    this.goFullscreen(this.instance.root);
-                }
-            };
-        }
+        // when clicked on the button, should we enter or exit fullscreen
+        this.button.onclick = () => {
+            if (this.fullscreenEnabled()) {
+                this.exitFullscreen();
+            } else {
+                this.goFullscreen(this.instance.root);
+            }
+        };
     }
 
     /**
@@ -124,15 +109,6 @@ module.exports = class Fullscreen {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-    }
-
-    /**
-     * Determine whether the template is configured to be displayed in fullscreen or not.
-     *
-     * @return {boolean} Whether the template is configured to be displayed in fullscreen or not.
-     */
-    isTemplateFullscreen() {
-        return Boolean(this.instance.getChildByClass(this.instance.root, 'gm-fullscreen-message'));
     }
 
     /**

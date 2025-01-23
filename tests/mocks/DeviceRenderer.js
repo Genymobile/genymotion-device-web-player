@@ -2,6 +2,7 @@
 
 const Original = require('../../src/DeviceRenderer');
 const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
+const store = require('../../src/store/index');
 
 class ToolBarManager extends OriginalToolbarManager {
     constructor() {
@@ -44,20 +45,12 @@ module.exports = class DeviceRenderer extends Original {
 
         super(document.body, options || {});
         this.outgoingMessages = [];
-        this.store = {
-            getState: () => {
-                return {};
-            },
-            subscribe: jest.fn(),
-            dispatch: jest.fn(),
-            getters: {
-                isWidgetOpened: () => false,
-            },
-        };
         this.apiManager = {
             registerFunction: jest.fn(),
         };
         this.toolbarManager = new ToolBarManager();
+        // Load store since it's deviceRendererFactory which load it
+        store(this);
     }
 
     /**

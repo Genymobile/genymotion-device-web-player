@@ -4,7 +4,6 @@ jest.mock('loglevel');
 
 const FingerPrint = require('../../src/plugins/FingerPrint');
 const Instance = require('../mocks/DeviceRenderer');
-const store = require('../../src/store/index');
 
 let instance;
 
@@ -13,7 +12,6 @@ describe('FingerPrint Plugin', () => {
         instance = new Instance({
             giveFeedbackLink: 'https://github.com/orgs/Genymobile/discussions',
         });
-        store(instance);
         new FingerPrint(instance, {}, true);
     });
 

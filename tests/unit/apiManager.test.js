@@ -3,7 +3,6 @@
 const ApiManager = require('../../src/APIManager');
 const Instance = require('../mocks/DeviceRenderer');
 const Clipboard = require('../../src/plugins/Clipboard');
-const store = require('../../src/store/index');
 
 let apiManager;
 let instance;
@@ -14,7 +13,6 @@ describe('APIManager', () => {
         instance = new Instance({});
         apiManager = new ApiManager(instance);
         exposedApiFunctions = apiManager.getExposedApiFunctions();
-        store(instance);
 
         new Clipboard(instance, {
             CLIPBOARD_TITLE: 'TEST CLIPBOARD PLUGIN TITLE',

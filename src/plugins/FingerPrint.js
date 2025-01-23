@@ -83,17 +83,11 @@ module.exports = class FingerPrint extends OverlayPlugin {
                             if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
                                 authRequiredDiv.classList.add('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
-                                this.instance.toolbarManager.addButtonClass(
-                                    this.constructor.name,
-                                    'fingerprint-require',
-                                );
+                                this.toolbarBtn.addClass('fingerprint-require');
                             } else {
                                 authRequiredDiv.classList.remove('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
-                                this.instance.toolbarManager.removeButtonClass(
-                                    this.constructor.name,
-                                    'fingerprint-require',
-                                );
+                                this.toolbarBtn.removeClass('fingerprint-require');
                             }
                             break;
                         case 'isRecognizedFPByDefault':
@@ -112,15 +106,9 @@ module.exports = class FingerPrint extends OverlayPlugin {
                                 }
                             }
                             if (value) {
-                                this.instance.toolbarManager.addButtonClass(
-                                    this.constructor.name,
-                                    'fingerprint-autoValidation',
-                                );
+                                this.toolbarBtn.addClass('fingerprint-autoValidation');
                             } else {
-                                this.instance.toolbarManager.removeButtonClass(
-                                    this.constructor.name,
-                                    'fingerprint-autoValidation',
-                                );
+                                this.toolbarBtn.removeClass('fingerprint-autoValidation');
                             }
 
                             // update switch
@@ -156,7 +144,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
      * Add the button to the player toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-fingerprint-button',
             title: this.i18n.FINGERPRINT_TITLE || 'Biometrics',

@@ -45,7 +45,7 @@ module.exports = class Fullscreen {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-fullscreen-button',
             title: this.i18n.FULLSCREEN || 'Fullscreen',
@@ -66,7 +66,7 @@ module.exports = class Fullscreen {
      */
     goFullscreen(element) {
         this.instance.wrapper.classList.add('gm-fullscreen');
-        this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
+        this.toolbarBtn.setActive();
         if (element.requestFullscreen) {
             element.requestFullscreen();
         } else if (element.webkitRequestFullscreen) {
@@ -88,7 +88,7 @@ module.exports = class Fullscreen {
      */
     exitFullscreen() {
         this.instance.wrapper.classList.remove('gm-fullscreen');
-        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
+        this.toolbarBtn.setActive(false);
         if (!this.fullscreenEnabled()) {
             return; // do not try to remove fulllscreen if it is not active
         }

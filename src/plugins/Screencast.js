@@ -173,7 +173,7 @@ module.exports = class Screencast extends OverlayPlugin {
         } catch (error) {
             log.error('Error while creating MediaRecorder: ' + error);
             this.hideTimer();
-            this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-screencast-button-recording');
+            this.toolbarBtn.removeClass('gm-screencast-button-recording');
             return;
         }
 
@@ -196,7 +196,7 @@ module.exports = class Screencast extends OverlayPlugin {
         this.timer.style.display = 'none';
         this.mediaRecorder.stop();
         this.hideTimer();
-        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-screencast-button-recording');
+        this.toolbarBtn.removeClass('gm-screencast-button-recording');
         this.downloadScreencast();
         log.debug('MediaRecorder stopped', this.mediaRecorder);
     }
@@ -205,7 +205,7 @@ module.exports = class Screencast extends OverlayPlugin {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-screencast-button',
             title: this.i18n.SCREENCAST_TITLE || 'Screencast',
@@ -298,7 +298,7 @@ module.exports = class Screencast extends OverlayPlugin {
         super.toggleWidget();
 
         if (keepIconActive === true) {
-            this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-screencast-button-recording');
+            this.toolbarBtn.addClass('gm-screencast-button-recording');
         }
     }
 

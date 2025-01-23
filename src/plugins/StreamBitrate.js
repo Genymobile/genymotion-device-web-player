@@ -32,20 +32,20 @@ module.exports = class StreamBitrate {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-streamrate-chooser',
             title: this.i18n.STREAMRATE_TITLE || 'High quality',
             onClick: () => {
                 this.highQuality = !this.highQuality;
                 if (this.highQuality) {
-                    this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
+                    this.toolbarBtn.setActive();
 
                     const json = {type: 'BITRATE', videoBitrate: 5000, audioBitrate: 192000};
                     this.instance.sendEvent(json);
                     this.instance.renegotiateWebRTCConnection();
                 } else {
-                    this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
+                    this.toolbarBtn.setActive(false);
 
                     // if we pass 0 here, we just use WebRTC default value
                     const json = {type: 'BITRATE', videoBitrate: 0, audioBitrate: 0};

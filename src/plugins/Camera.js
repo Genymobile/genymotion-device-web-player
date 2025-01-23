@@ -1,6 +1,5 @@
 'use strict';
 
-const adapterjs = require('webrtc-adapter');
 const OverlayPlugin = require('./util/OverlayPlugin');
 
 const log = require('loglevel');
@@ -38,7 +37,7 @@ module.exports = class Camera extends OverlayPlugin {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: this.instance.options.microphone ? 'gm-camera-mic-button' : 'gm-camera-button',
             title: this.instance.options.microphone
@@ -53,7 +52,7 @@ module.exports = class Camera extends OverlayPlugin {
         if (videoCapabilities.codecs.some((codec) => codec.mimeType === 'video/H264')) {
             super.enable();
         } else {
-            this.instance.toolbarManager.disableButton(this.constructor.name);
+            this.toolbarBtn.disable();
         }
     }
 };

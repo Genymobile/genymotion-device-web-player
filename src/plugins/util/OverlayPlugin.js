@@ -95,7 +95,7 @@ class OverlayPlugin {
                 this.widget.onclose();
             }
         }
-        this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
+        this.instance.toolbarManager.setActiveButton(this.constructor.name, false);
     }
 
     openOverlay() {
@@ -103,7 +103,7 @@ class OverlayPlugin {
             this.widget.classList.remove('gm-hidden');
         }
 
-        this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
+        this.instance.toolbarManager.setActiveButton(this.constructor.name, true);
         this.instance.store.dispatch({
             type: 'ADD_TRACKED_EVENT',
             payload: {
@@ -118,9 +118,7 @@ class OverlayPlugin {
      * Disable associated toolbar icon.
      */
     disable() {
-        if (this.instance.toolbarManager) {
-            this.instance.toolbarManager.disableButton(this.constructor.name);
-        }
+        this.instance.toolbarManager.disableButton(this.constructor.name);
     }
 
     /**

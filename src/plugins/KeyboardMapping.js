@@ -141,13 +141,10 @@ module.exports = class KeyboardMapping {
                             break;
                         case 'isPaused':
                             if (value) {
-                                this.instance.toolbarManager.addButtonClass(this.constructor.name, 'keymapping-paused');
+                                this.toolbarBtn.addClass('keymapping-paused');
                                 this.state.isActive = false;
                             } else {
-                                this.instance.toolbarManager.removeButtonClass(
-                                    this.constructor.name,
-                                    'keymapping-paused',
-                                );
+                                this.toolbarBtn.removeClass('keymapping-paused');
                                 this.state.isActive = true;
                             }
                             break;
@@ -182,7 +179,7 @@ module.exports = class KeyboardMapping {
     }
 
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-keymapping-button',
             title: this.i18n.KEYMAPPING_TITLE || 'Key Mapping',
@@ -192,12 +189,12 @@ module.exports = class KeyboardMapping {
 
     activatePlugin() {
         if (this.state.isActive) {
-            this.instance.toolbarManager.addButtonClass(this.constructor.name, 'gm-active');
+            this.toolbarBtn.setActive();
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
         } else {
-            this.instance.toolbarManager.removeButtonClass(this.constructor.name, 'gm-active');
+            this.toolbarBtn.setActive(false);
             this.removeKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: !this.state.isPaused});

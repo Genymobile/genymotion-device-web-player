@@ -12,6 +12,18 @@ log.setDefaultLevel('debug');
 
 // Default options
 const defaultOptions = {
+    toolbarOrder: [
+        'ButtonsEvents_VOLUME_UP',
+        'ButtonsEvents_VOLUME_DOWN',
+        'ButtonsEvents_ROTATE',
+        'separator',
+        'unordered',
+        'separator',
+        'ButtonsEvents_RECENT_APP',
+        'ButtonsEvents_HOMEPAGE',
+        'ButtonsEvents_BACK',
+        'ButtonsEvents_POWER',
+    ],
     touch: true,
     mouse: true,
     volume: true,
@@ -74,6 +86,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             webRTCUrl                      WebRTC URL of the instance.
      * @param  {Object}             options                        Various configuration options.
      * @param  {boolean}            options.showPhoneBorder        Show phone border. Default: false.
+     * @param  {boolean}            options.toolbarOrder           Toolbar buttons order. Default: see defaultOptions.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
      * @param  {boolean}            options.volume                 Audio volume control support activated. Default: true.
@@ -145,7 +158,7 @@ module.exports = class DeviceRendererFactory {
         });
 
         instance.apiManager = new APIManager(instance);
-        instance.toolbarManager = new ToolbarManager(instance);
+        instance.toolbarManager = new ToolbarManager();
 
         this.instances.push(instance);
 
@@ -238,7 +251,7 @@ module.exports = class DeviceRendererFactory {
 
         instance.toolbarManager.buttonRegistry.forEach((value, key) => {
             const order = orderMap.get(key);
-            if (order !== undefined) {
+            if (typeof order !== 'undefined') {
                 orderedButtons.push({key, value, order});
             } else {
                 unorderedButtons.push({key, value});

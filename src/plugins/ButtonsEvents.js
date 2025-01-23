@@ -15,6 +15,9 @@ const ROTATE_KEYCODE = 'gm-rotation';
  * Provides physical buttons (power, volume, ...) control.
  */
 module.exports = class ButtonsEvents {
+    static get name() {
+        return 'ButtonsEvents';
+    }
     /**
      * Plugin initialization.
      *
@@ -24,6 +27,7 @@ module.exports = class ButtonsEvents {
     constructor(instance, i18n) {
         // Reference instance
         this.instance = instance;
+        this.i18n = i18n || {};
 
         // Register plugin
         this.instance.buttonsEvents = this;

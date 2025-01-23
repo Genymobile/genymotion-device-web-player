@@ -61,6 +61,7 @@ module.exports = class StreamResolution {
                         this.instance.sendEvent(json);
                         select.blur();
                     };
+
                     event.target.appendChild(select);
                 }
             },

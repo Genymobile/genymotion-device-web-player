@@ -2,12 +2,6 @@
  * Widget window styles
  */
 .gm-overlay {
-    /**
-    * working var, changed by js
-    */
-    --gm-working-disabled-widget-pop-up-x: 200px;
-
-
     text-align: left;
     position: absolute;
     padding: 25px;
@@ -138,6 +132,10 @@
 .gm-disabled-widget-pop-up {
     &::before {
         position: fixed;
+        /**
+        * working var, changed by js
+        * TODO: evolve to a better solution in the story for tooltip
+        */
         right: var(--gm-working-disabled-widget-pop-up-x);
         font-size: 15px;
         z-index: 20;

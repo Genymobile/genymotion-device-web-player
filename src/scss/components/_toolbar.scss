@@ -2,7 +2,32 @@
  * renderer toolbar styles
  */
 .device-renderer-instance {
-    .gm-toolbar {
+    .gm-toolbar-wrapper {
+        background-color: var(--gm-toolbar-bg-color);
+        min-width: 50px;
+        max-height: 100%;
+        position: relative;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gm-toolbar {
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            display: flex;
+            max-height: 100%;
+            flex-direction: column;
+            align-items: center;
+    
+            ul {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
         .gm {
             &-icon-button {
                 background-color: var(--gm-toolbar-icon-color);

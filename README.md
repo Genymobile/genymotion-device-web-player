@@ -3,33 +3,43 @@
 ![npm](https://img.shields.io/npm/v/@genymotion/device-web-player)
 ![GitHub](https://img.shields.io/github/license/Genymobile/genymotion-device-web-player)
 
-<img align="right" src="./doc/assets/screenshot.png" height="500"></img>
+<a href="./doc/assets/screenshot.png" target="_blank">
+  <img align="right" src="./doc/assets/screenshot.png" height="280">
+</a>
 
 This repository contains the Genymotion device web renderer JavaScript SDK.
 It provides an easy way to integrate **Genymotion devices** running in the cloud into any web application. You will be able to display an emulator screen and interact with the device.
 
-It focuses on:
+### 🚀 Engineered for Power
 
 -   **compatibility** (vanilla JavaScript, no external framework used)
 -   **performance** (30fps or more)
 -   **quality** (Up to 1920×1080)
 -   **low latency**
 
-For more information about Genymotion devices, please visit [genymotion website](https://www.genymotion.com).
+For more information about Genymotion devices, please visit the [Genymotion website](https://www.genymotion.com).
 
-## Table of contents
+## 📜 Table of contents
 
-1. [Requirements](#Requirements)
-2. [Getting started](#getting-started)
-    1. [With NPM/Yarn](#with-npmyarn)
-    2. [With CDN](#with-cdn)
-3. [Usage](#usage)
-4. [Player API](#player-api)
-5. [Features & options](#features--options)
-6. [Features notes](#features-notes)
-    1. [Key mapping](#keymapping-notes)
+1. 📋 [Requirements](#📋-requirements)
+2. 📦 [Installation](#📦-installation)
+    1. 📥 [Install via NPM / Yarn](#📥-install-via-npm--yarn)
+    2. 🌐 [Install via a CDN](#🌐-install-via-a-cdn)
+3. ⚡ [Quick Start Guide](#⚡-quick-start-guide)
+4. 🎨 [Style and CSS](#🎨-style-and-css)
+5. 📘 [API Documentation](#📘-api-documentation)
+    1. 📡 [VM Communication](#📡-vm_communication)
+    2. 🛠️ [utils](#🛠️-utils)
+    3. 🎮 [keyMapping](#🎮-keyMapping)
+    4. 🔊 [media](#🔊-media)
+    5. 🎥 [video](#🎥-video)
+6. ⚙️ [Features & Instance Options](#⚙️-features--instance-options)
+    1. 🖥️ [Instance Options](#🖥️-instance-options)
+    2. 🔌 [Plugin Options](#🔌-plugin-options)
+7. ❓ [FAQ](#❓-faq)
+8. 🤝 [Contributing](#🤝-contributing)
 
-## Requirements
+## 📋 Requirements
 
 A Modern, WebRTC compatible, Web browser:
 
@@ -39,9 +49,9 @@ A Modern, WebRTC compatible, Web browser:
 -   Microsoft Edge 20.10240+
 -   Safari 11+
 
-## Getting started
+## 📦 Installation
 
-### With NPM/Yarn
+### 📥 Install via NPM / Yarn
 
 Using yarn:
 
@@ -67,7 +77,7 @@ const {DeviceRendererFactory} = require('genymotion/device-web-player');
 </style>
 ```
 
-### With CDN
+### 🌐 Install via a CDN
 
 ```html
 <link
@@ -77,9 +87,9 @@ const {DeviceRendererFactory} = require('genymotion/device-web-player');
 <script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.1.5/dist/js/device-renderer.min.js"></script>
 ```
 
-## Usage
+## ⚡ Quick Start Guide
 
-Use `DeviceRendererFactory` to instanciate one or more device renderer.
+Use `DeviceRendererFactory` to instantiate one or more device renderers.
 All you need is an HTML element to use as a container. See example below.
 To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
 or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requirements/), based on your device provider.
@@ -118,7 +128,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 </script>
 ```
 
-## Style and CSS
+## 🎨 Style and CSS
 
 The player uses css variables to style some parts of the app, but the player is still totally customisable through overloading the css classes.
 
@@ -162,162 +172,136 @@ The player uses css variables to style some parts of the app, but the player is 
     Modal
     --gm-modal-bg-color: var(--gm-secondary-color);
 
-## Player API
+## 📘 API Documentation
 
 The Player API provides functionality for managing plugin options and websocket communication. These operations are handled through the API (categorized) object returned by the `setupRenderer` function.
 
-### `VM_communication`
+### 📡 `VM_communication`
 
--   #### `disconnect`
+#### `disconnect`
 
-    Disconnects the player from the virtual machine (VM) and cleans up the memory listener.
+**Description**: Disconnects the player from the virtual machine (VM) and cleans up the memory listeners.
 
--   #### `addEventListener`
+#### `addEventListener`
 
-    Registers a listener for messages emitted from the VM.
+**Description**: Registers a listener for messages emitted from the VM.
 
-    -   Parameters:
+-   **Parameters**:
 
-        -   event (string): The name of the event to listen for. Example events include 'fingerprint', 'gps'...
-        -   callback (function): The function to call when the event is emitted. The message from the VM will be passed as an argument to the callback function.
+    -   `event` (string): The name of the event to listen for (e.g., 'fingerprint', 'gps').
+    -   `callback` (function): The function to call when the event is emitted. The VM's message will be passed to the callback.
 
-    -   Example Usage
-
+-   **Example usage**:
     ```js
     addEventListener('fingerprint', (msg) => {
         console.log(msg);
     });
     ```
 
--   #### `sendData`
-    Sends messages to the VM.
-    -   Parameters:
-        -   `data` (object): An object containing the channel and the messages to be sent.
-            -   `channel` (string): The channel to send the messages to.
-            -   `messages` (array): An array of messages to be sent.
-    -   Example Usage
+#### `sendData`
 
-```js
-sendData({
-    channel: 'battery',
-    messages: ['set state level 10', 'set state status true'],
-});
-```
+**Description**: Sends messages to the VM.
 
-### `utils`
+-   **Parameters**:
 
--   #### `getRegisteredFunctions`
-    Returns a list of available functions with optional descriptions.
+    -   `data` (object): An object containing the channel and messages to be sent.
+        -   `channel` (string): The channel to send the messages to.
+        -   `messages` (array\<string\>): An array of messages to send.
 
-### `keymapping`
+-   **Example usage**:
+    ```js
+    sendData({
+        channel: 'battery',
+        messages: ['set state level 10', 'set state status true'],
+    });
+    ```
 
--   #### `setConfig`
+### 🛠️ `utils`
 
-    supply a config for keymapping
+#### `getRegisteredFunctions`
 
+**Description**: Returns a list of available functions with optional descriptions.
+
+### 🎮 `keyMapping`
+
+#### `setConfig`
+
+**Description**: Provides configuration for keymapping. The configuration is passed as an object containing key-value pairs
+
+-   **Example configuration**:
     ```js
     {
-        dPad:[{
-            keys:[
+        dPad: [{
+            keys: [
                 {
                     key: 'w',
-                    effect: {
-                        initialX: 20,
-                        initialY: 80,
-                        distanceX: 0,
-                        distanceY: -10,
-                    },
+                    effect: { initialX: 20, initialY: 80, distanceX: 0, distanceY: -10 },
                     name: 'up',
                     description: 'move up',
                 },
                 {
                     key: 's',
-                    effect: {
-                        initialX: 20,
-                        initialY: 80,
-                        distanceX: 0,
-                        distanceY: 10,
-                    },
+                    effect: { initialX: 20, initialY: 80, distanceX: 0, distanceY: 10 },
                     name: 'down',
                     description: 'move down',
                 },
-                {
-                    key: 'a',
-                    effect: {
-                        initialX: 20,
-                        initialY: 80,
-                        distanceX: -10,
-                        distanceY: 0,
-                    },
-                    name: 'left',
-                    description: 'move left',
-                },
-                {
-                    key: 'd',
-                    effect: {
-                        initialX: 20,
-                        initialY: 80,
-                        distanceX: 10,
-                        distanceY: 0,
-                    },
-                    name: 'up',
-                    description: 'move right',
-                },
-
+                // ... other keys
             ],
             name: 'character movement',
-            description: 'left joystick used to move the character',
+            description: 'Left joystick used to move the character',
         }],
-        tap:[{
+        tap: [{
             key: 'p',
-            effect: {
-                initialX: 50,
-                initialY: 50,
-            },
-            name:'Fire'
+            effect: { initialX: 50, initialY: 50 },
+            name: 'Fire',
         }],
         swipe: [{
             key: 'u',
-            effect: {
-                initialX: 50,
-                initialY: 50,
-                distanceX: -10,
-                distanceY: 0,
-                description: 'swipe left',
-            },
-            name:'Left dodge',
-            description: 'Dodge on the left'
+            effect: { initialX: 50, initialY: 50, distanceX: -10, distanceY: 0, description: 'swipe left' },
+            name: 'Left dodge',
+            description: 'Dodge on the left',
         }]
     }
     ```
 
--   #### `activeKeyMappingDebug`
+#### `activeKeyMappingDebug`
 
-    helper to create the config mapping
+**Description**: Helper to create the config mapping.
 
-    -   Parameters:
-        -   `isTraceActivate` (boolean) : when true all click on video stream will print x and y coord over the video
-        -   `isGridActivate` (boolean): when true display a grid over the video stream. Row and column have both a size of 10%.
+-   **Parameters**:
+    -   `isTraceActivate` (boolean): If true, it prints the x and y coordinates over the video stream for all clicks.
+    -   `isGridActivate` (boolean): If true, displays a grid over the video stream. Both rows and columns have a size of 10%.
 
--   #### `enable`
-    -   Parameters:
-        -   `isActive` (boolean) : **Optionnal** parameter to activate or desactivate keymapping, **default false**
+#### `enable`
 
-### `media`
+**Description**: Enable or disable keymapping.
 
--   #### `mute`
--   #### `unmute`
+-   **Parameters**:
+    -   `isActive` (boolean, optional): Enable or disable keymapping. Default is false.
 
-### `video`
+### 🔊 `media`
 
--   #### `fullscreen`
-    Need to be call from an user action, in accordance with browser security rules
+#### `mute`
 
-## Features & options
+**Description**: Mutes the player’s audio.
+
+#### `unmute`
+
+**Description**: Unmutes the player’s audio.
+
+### 🎥 `video`
+
+#### `fullscreen`
+
+**Description**: Enables fullscreen mode, but must be called from a user action in compliance with browser security rules.
+
+## ⚙️ Features & Instance options
 
 A device renderer instance can be configured using the `options` argument (object). Possible configuration key / value are described below.
 
-### `token`
+### 🖥️ Instance options
+
+#### `token`
 
 -   **Type:** `String`
 -   **Default:** `undefined`
@@ -325,7 +309,51 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [login api](https://developer.genymotion.com/saas/#operation/login).
 
-### `i18n`
+#### `toolbarOrder`
+
+-   **Type:** `Array<string>`
+-   **Default:** `[]`
+-   **Special options**
+    -   `separator`: to display a separator between icons
+    -   `unordered`: displays all other plugin icons that are active but not explicitly specified in the `toolbarOrder`
+-   **Example**:`[
+'ButtonsEvents_ROTATE',
+'separator',
+'Battery',
+'FingerPrint',
+'separator',
+'unordered',
+'separator',
+'ButtonsEvents_POWER']`
+-   **Details:**
+    The `toolbarOrder` option allows you to define the order in which plugin icons appear in the toolbar. Each string in the array corresponds to the unique identifier (id) of a button registered in the toolbar manager. The IDs of the plugins are provided below in the plugin option details.
+
+#### `showPhoneBorder`
+
+-   **Type:** `Boolean`
+-   **Default:** `false`
+-   **Details:**
+    Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
+
+#### `connectionFailedURL`
+
+-   **Type:** `String`
+-   **Default:** `undefined`
+-   **Compatibility:** `SaaS`, `PaaS`
+-   **Details:**
+    Redirection page in case of a connection error.
+
+#### `giveFeedbackLink`
+
+-   **Type:** `String`
+-   **Default:** `giveFeedbackLink`
+-   **Compatibility:** `SaaS`, `PaaS`
+-   **Details:**
+    Set the url for the feedback page.
+
+#### 🔧 Advanced Options
+
+#### `i18n`
 
 -   **Type:** `Object`
 -   **Default:** `{}`
@@ -333,7 +361,7 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Alternative translation for the renderer UI.
 
-### `stun`
+#### `stun`
 
 -   **Type:** `Object`
 -   **Default:** `{}`
@@ -351,7 +379,7 @@ A device renderer instance can be configured using the `options` argument (objec
 }
 ```
 
-### `turn`
+#### `turn`
 
 -   **Type:** `Object`
 -   **Default:** `{}`
@@ -368,334 +396,260 @@ A device renderer instance can be configured using the `options` argument (objec
 }
 ```
 
-### `showPhoneBorder`
+### 🔌 Plugin Options
+
+#### battery <img align="right" src="./doc/assets/ic_battery.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `Battery`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the battery widget. This widget can be used to set the battery level and state of the Android virtual device.
+
+#### baseband <img align="right" src="./doc/assets/ic_baseband.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
+-   **Toolbar name:** `Baseband`
+-   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
+    Enable or disable the baseband (MMC/MNC) widget.
 
-### `connectionFailedURL`
+#### biometrics <img align="right" src="./doc/assets/ic_biometrics.svg">
 
--   **Type:** `String`
--   **Default:** `undefined`
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `FingerPrint`
 -   **Compatibility:** `SaaS`, `PaaS`
 -   **Details:**
-    Redirection page in case of connection error.
+    Enable or disable the fingerprint widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above.
 
-### `giveFeedbackLink`
-
--   **Type:** `String`
--   **Default:** `giveFeedbackLink`
--   **Compatibility:** `SaaS`, `PaaS`
--   **Details:**
-    Set url for feedback page.
-
-### `toolbarOrder`
-
--   **Type:** `Array<string>`
--   **Default:** `[]`
--   **Special options**
-    -   `separator`: to display a separator between icons
-    -   `unordered`: to display all plugins activate but not specified un toolbarOrder
--   **Example**`[
-'ButtonsEvents_ROTATE',
-'separator',
-'Battery',
-'FingerPrint',
-'separator',
-'unordered',
-'separator',
-'ButtonsEvents_POWER']`
--   **Details:**
-    The toolbarOrder option allows you to define the order in which plugin icons appear in the toolbar. Each string in the array corresponds to the unique identifier (id) of a button registered in the toolbar manager. The IDs of the plugins are provided below in the plugin option details.
-
-### **Plugins options**
-
-### `streamResolution`
+#### camera <img align="right" src="./doc/assets/ic_camera.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `StreamResolution`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `SaaS`
--   **Details:**
-    Enables or disables the video stream quality widget.
-
-### `streamBitrate`
-
--   **Type:** `Boolean`
--   **Default:** `false`
--   **Toolbar name:** `StreamBitrate`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `SaaS`
--   **Details:**
-    Enables or disables the stream bitrate widget.
-
-### `touch`
-
--   **Type:** `Boolean`
--   **Default:** `true`
+-   **Toolbar name:** `Camera`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the touch events (fingers on screen). If you want to disable all VM interaction, please also disable `mouse` and `keyboard`.
+    Enable or disable the camera widget. This widget can be used to forward local webcam video to the Android virtual device. By default, if the `microphone` property is also true, then the default audio input will be used as well.
 
-### `mouse`
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the mouse events. If you want to disable all VM interaction, please also disable `touch` and `keyboard`.
-
-### `keyboard`
+#### clipboard <img align="right" src="./doc/assets/ic_clipboard.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
+-   **Toolbar name:** `Clipboard`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the keyboard widget. This widget can be used to transmit keyboard key strokes to the Android virtual device.
+    Enable or disable the clipboard widget. This widget allows you to share clipboard content between the local machine and the Android virtual device, enabling seamless copy-paste functionality in both directions.
 
-### `keyboardMapping`
+#### capture <img align="right" src="./doc/assets/ic_screencast.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `KeyboardMapping`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `Screencast`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the keyboardMapping. This widget can be used to map key with command (i.e. tap, swipe-left, tilt, ...).
+    Enable or disable the capture widget. This widget can be used to capture the screen of the Android virtual device (screenshot or screencast).
 
-### `volume`
-
-<img align="right" src="./doc/assets/ic_sound_active_black.svg" alt="..."></img>
+#### diskIO <img align="right" src="./doc/assets/ic_diskIO.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `ButtonsEvents_VOLUME_UP` `ButtonsEvents_VOLUME_DOWN`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `IOThrottling`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the volume widget. This widget can be used to increase or decrease the volume of the Android virtual device.
+    Enable or disable the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
 
-### `rotation`
-
-<img align="right" src="./doc/assets/ic_rotation.svg" alt="..."></img>
+#### fileUpload <img align="right" src="./doc/assets/ic_installation.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `ButtonsEvents_ROTATE`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `FileUpload`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the rotation widget. This widget can be used to rotate the Android virtual device.
+    Enable or disable the fileUpload widget and drag & drop. This widget can be used to forward local file to the Android virtual device. When dragging & dropping APK or ZIP files, it will install them.
 
-### `navbar`
-
-<img align="right" src="./doc/assets/ic_nav_android_back.svg" alt="..."></img>
-<img align="right" src="./doc/assets/ic_nav_android_home.svg" alt="..."></img>
-<img align="right" src="./doc/assets/ic_nav_android_multiapp.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `ButtonsEvents_BACK` `ButtonsEvents_HOME` `ButtonsEvents_RECENT_APP`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the navbar widgets. This widget can be used to navigate in the Android virtual device like when using hardware buttons.
-
-### `power`
-
-<img align="right" src="./doc/assets/ic_power.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `ButtonsEvents_POWER`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the power widget. This widget can be used to poweroff or reboot the Android virtual device.
-
-### `fullscreen`
-
-<img align="right" src="./doc/assets/ic_fullscreen_active_black.svg" alt="..."></img>
-<img align="right" src="./doc/assets/ic_fullscreen_exit_active_black.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `Fullscreen`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the fullscreen widget. This widget can be used to make the renderer go fullscreen.
-
-### `camera`
-
-<img align="right" src="./doc/assets/ic_camera.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `Camera`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the camera widget. This widget can be used to forward local webcam video to the Android virtual device.
-    By default, if the `microphone` property is also true, then the default audio input will be used as well.
-
-### `microphone`
-
-<img align="right" src="./doc/assets/ic_camera_mic_active_black.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `false`
--   **Compatibility:** `PaaS`
--   **Details:**
-    Enables or disables microphone injection. This can be used to forward local microphone (or webcam audio) to the Android virtual device.
-
-### `fileUpload`
-
-<img align="right" src="./doc/assets/ic_cloud_upload_active_black.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `FileUpload`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enables or disables the fileUpload widget and drag & drop. This widget can be used to forward local file to the Android virtual device. When drag & dropping APK or ZIP files, it will install them.
-
-### `fileUploadUrl`
+#### `fileUploadUrl`
 
 -   **Type:** `String`
 -   **Default:** `undefined`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Set the file upload url, required if `fileUpload` is set to `true`.
+    Set the file upload URL, required if `fileUpload` is set to `true`.
 
-### `clipboard`
-
-<img align="right" src="./doc/assets/ic_clipboard.svg" alt="..."></img>
+#### fullscreen <img align="right" src="./doc/assets/ic_fullscreen.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `Clipboard`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `Fullscreen`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the clipboard widget. This widget can be used to forward local clipboard to the Android virtual device.
+    Enable or disable the fullscreen widget. This widget can be used to make the renderer go fullscreen.
 
-### `battery`
-
-<img align="right" src="./doc/assets/ic_battery.svg" alt="..."></img>
+#### gamepad <img align="right" src="./doc/assets/ic_gamepad.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `Battery`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
+-   **Toolbar name:** `Gamepad`
+-   **Compatibility:** `SaaS`, `PaaS`
 -   **Details:**
-    Enables or disables the battery widget. This widget can be used to set the battery level and state of the Android virtual device.
+    Enable or disable gamepad support & widget.
 
-### `gps`
-
-<img align="right" src="./doc/assets/ic_location.svg" alt="..."></img>
+#### gps <img align="right" src="./doc/assets/ic_location.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `GPS`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `GPS`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the gps widget. This widget can be used to set the gps location of the Android virtual device.
-    If you want to use a visual map instead of GPS coordinates number to set the location, you must import google maps
-    library with your API key.
+    Enable or disable the GPS widget. This widget can be used to set the GPS location of the Android virtual device. If you want to use a visual map instead of GPS coordinates to set the location, you must import the Google Maps library with your API key.
 
 ```html
 <!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature -->
 <script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
 ```
 
-### `gpsSpeedSupport`
+#### `gpsSpeedSupport`
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables gps speed support.
+    Enable or disable GPS speed support.
 
-### `capture`
-
-<img align="right" src="./doc/assets/ic-screenshot_active_black.svg" alt="..."></img>
+#### identifiers <img align="right" src="./doc/assets/ic_id.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `Screencast`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `Identifiers`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the capture widget. This widget can be used to capture the screen of the Android virtual device (screenshot or screencast).
+    Enable or disable the identifiers widget. This widget can be used to set the identifiers (Android ID / IMEI) of the Android virtual device.
 
-### `identifiers`
-
-<img align="right" src="./doc/assets/ic_id.svg" alt="..."></img>
+#### `keyboard`
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `Identifiers`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
+    Enable or disable the keyboard widget. This widget can be used to transmit keyboard keystrokes to the Android virtual device.
 
-Enables or disables the identifiers widget. This widget can be used to set the identifiers (Android ID / IMEI) of the Android virtual device.
-
-### `network`
-
-<img align="right" src="./doc/assets/ic_network.svg" alt="..."></img>
+#### keyboardMapping <img align="right" src="./doc/assets/ic_keymapping.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `Network`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `KeyboardMapping`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the network widget. This widget can be used to enable or disable the wifi or mobile network, and to set the network throttling (mobile network type and signal strength) of the Android virtual device.
+    Enable or disable the keyboard mapping. This widget can be used to map keys with commands (e.g., tap, swipe-left, tilt, etc.).
 
-### `phone`
-
-<img align="right" src="./doc/assets/ic_textandcall_active_black.svg" alt="..."></img>
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `Phone`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-
-Enables or disables the phone widget. This widget can be used to send SMS or phone call the Android virtual device.
-
-### `baseband`
-
-<img align="right" src="./doc/assets/ic_baseband.svg" alt="..."></img>
+#### `microphone`
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
--   **Toolbar name:** `Baseband`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Compatibility:** `PaaS`
+-   **Details:**
+    Enable or disable microphone injection. This can be used to forward the local microphone (or webcam audio) to the Android virtual device.
+
+#### `mouse`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enable or disable baseband (MMC/MNC) widget.
+    Enable or disable the mouse events. If you want to disable all VM interactions, also disable `touch` and `keyboard`.
 
-### `diskIO`
-
-<img align="right" src="./doc/assets/ic_diskIO_active_black.svg" alt="..."></img>
+#### navbar <img align="right" src="./doc/assets/ic_nav_android_multiapp.svg"><img align="right" src="./doc/assets/ic_nav_android_home.svg"><img align="right" src="./doc/assets/ic_nav_android_back.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `IOThrottling`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
+-   **Toolbar name:** `ButtonsEvents_RECENT_APP`, `ButtonsEvents_HOME`, `ButtonsEvents_BACK`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enables or disables the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
+    Enable or disable the navbar widgets. This widget can be used to navigate in the Android virtual device like when using hardware buttons.
 
-### `gamepad`
-
--   **Type:** `Boolean`
--   **Default:** `true`
--   **Toolbar name:** `Gamepad`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `SaaS`, `PaaS`
--   **Details:**
-    Enable or disable gamepad support & widget
-
-### `biometrics`
+#### network <img align="right" src="./doc/assets/ic_network.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
--   **Toolbar name:** `FingerPrint`<img align="right" src="./doc/assets/ic_resolution.svg" alt="..."></img>
--   **Compatibility:** `SaaS`, `PaaS`
+-   **Toolbar name:** `Network`
+-   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enable or disable fingerprints widget. This widget can be used to manage fingerprint reading requests. Available for Android 9 and above
+    Enable or disable the network widget. This widget can be used to enable or disable the Wi-Fi or mobile network, and to set network throttling (mobile network type and signal strength) of the Android virtual device.
 
-## Contributing
+#### phone <img align="right" src="./doc/assets/ic_text_and_call.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `Phone`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the phone widget. This widget can be used to send SMS's or make phone calls to the Android virtual device.
+
+#### power <img align="right" src="./doc/assets/ic_power.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_POWER`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the power widget. This widget can be used to power off or reboot the Android virtual device.
+
+#### rotation <img align="right" src="./doc/assets/ic_rotation.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_ROTATE`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the rotation widget. This widget can be used to rotate the Android virtual device.
+
+#### streamResolution <img align="right" src="./doc/assets/ic_resolution.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `StreamResolution`
+-   **Compatibility:** `SaaS`
+-   **Details:**
+    Enable or disable the video stream quality widget.
+
+#### streamBitrate <img align="right" src="./doc/assets/ic_hq.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `false`
+-   **Toolbar name:** `StreamBitrate`
+-   **Compatibility:** `SaaS`
+-   **Details:**
+    Enable or disable the stream bitrate widget.
+
+#### volume <img align="right" src="./doc/assets/ic_sound_up.svg"> <img align="right" src="./doc/assets/ic_sound_down.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `ButtonsEvents_VOLUME_UP`, `ButtonsEvents_VOLUME_DOWN`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the volume widget. This widget can be used to increase or decrease the volume of the Android virtual device.
+
+#### `wifi`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+    Enable or disable the Wi-Fi widget. This widget can be used to enable or disable the Wi-Fi network on the Android virtual device.
+
+## ❓ FAQ
+
+### How do I get an API key?
+
+Sign up on [Genymotion SaaS](https://cloud.geny.io/signin) and generate an API key from the dashboard.
+
+### Can I use this SDK with on-premise deployments?
+
+No, this SDK is designed for Genymotion's SaaS platform only.
+
+## 🤝 Contributing
 
 Read through our [contributing guidelines](https://github.com/Genymobile/genymotion-device-web-player/blob/main/CONTRIBUTING.md) to learn about our submission process, coding rules and more.

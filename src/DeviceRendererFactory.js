@@ -181,6 +181,7 @@ module.exports = class DeviceRendererFactory {
             <div class="gm-video-wrapper">
                 <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag
                 </video>
+                ${options.showPhoneBorder ? '<div class="gm-phone-button"></div>' : ''}
             </div>
             <div class="gm-toolbar-wrapper">
                 <div class="gm-toolbar">

@@ -456,6 +456,14 @@ module.exports = class DeviceRenderer {
 
             log.debug('Added remote video track using ontrack');
             this.video.srcObject = event.streams[0];
+            // Set aspect ratio of the video element to match the video stream
+            this.video.addEventListener(
+                'loadedmetadata',
+                () => {
+                    this.videoWrapper.style.aspectRatio = this.video.videoWidth + '/' + this.video.videoHeight;
+                },
+                {once: true},
+            );
             this.video.setAttribute('playsinline', true); // needed on iOs
 
             // Get the PeerConnection Statistics after 3 seconds

@@ -91,7 +91,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
             height: 422,
         });
 
-        this.widget = modal;
         this.container = container;
 
         // Generate input rows
@@ -191,7 +190,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
         this.container.appendChild(clearCacheDiv);
 
         // Render into document
-        this.instance.root.appendChild(this.widget);
+        this.instance.root.appendChild(modal);
     }
 
     /**

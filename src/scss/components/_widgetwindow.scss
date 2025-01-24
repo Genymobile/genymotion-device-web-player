@@ -113,6 +113,10 @@
         padding: 8px;
     }
 
+    // TODO delete this after rework all modal
+    &.gm-modal{
+        padding: 0
+    }
     // TODO delete this after rework all modal cause it's replaced by the new style .gm-modal-close-btn
     .gm-close-btn {
         position: absolute;

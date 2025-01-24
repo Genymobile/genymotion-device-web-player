@@ -80,6 +80,12 @@ class OverlayPlugin {
 
         divModal.appendChild(divBody);
 
+        // Keep a reference to the widget to be able to close it by changing the class
+        this.widget = divModal;
+
+        // Append the modal to the root element
+        this.instance.root.appendChild(this.widget);
+
         return {
             modal: divModal,
             container: divBody,
@@ -152,6 +158,10 @@ class OverlayPlugin {
         ) {
             this.instance.store.dispatch({type: 'OVERLAY_OPEN', payload: {toOpen: false}});
         }
+    }
+
+    setTitle(title) {
+        this.widget.querySelector('.gm-modal-title').innerHTML = title;
     }
 }
 

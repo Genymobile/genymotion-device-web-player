@@ -67,14 +67,13 @@ module.exports = class Battery extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {modal, container} = this.createTemplateModal({
+        const {container} = this.createTemplateModal({
             title: this.i18n.BATTERY_TITLE || 'Battery',
             classes: 'gm-battery-plugin',
             width: 378,
             height: 331,
         });
-        this.widget = modal;
-        this.container = container;
+
         // Generate input rows
         const inputs = document.createElement('div');
         inputs.className = 'gm-inputs';
@@ -92,10 +91,8 @@ module.exports = class Battery extends OverlayPlugin {
         // Add charging section
         inputs.appendChild(this.createChargingSection());
 
-        // Setup
-        this.container.appendChild(inputs);
-
-        this.instance.root.appendChild(this.widget);
+        // Append inputs to the modal container
+        container.appendChild(inputs);
     }
 
     /**

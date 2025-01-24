@@ -63,7 +63,6 @@ module.exports = class DeviceRenderer {
         this.video = this.getChildByClass(this.root, 'gm-video');
         this.wrapper = this.getChildByClass(this.root, 'gm-wrapper');
         this.videoWrapper = this.getChildByClass(this.root, 'gm-video-wrapper');
-        this.stream = null;
 
         // Event callbacks
         this.callbacks = {};
@@ -458,7 +457,6 @@ module.exports = class DeviceRenderer {
             log.debug('Added remote video track using ontrack');
             this.video.srcObject = event.streams[0];
             this.video.setAttribute('playsinline', true); // needed on iOs
-            this.stream = event.streams[0];
 
             // Get the PeerConnection Statistics after 3 seconds
             new PeerConnectionStats(this, this.peerConnection, 3000);
@@ -937,6 +935,5 @@ module.exports = class DeviceRenderer {
         delete this.wrapper;
         delete this.videoWrapper;
         delete this.root;
-        delete this.stream;
     }
 };

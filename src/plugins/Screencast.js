@@ -167,7 +167,7 @@ module.exports = class Screencast extends OverlayPlugin {
      */
     startRecording() {
         try {
-            this.mediaRecorder = new MediaRecorder(this.instance.stream, {
+            this.mediaRecorder = new MediaRecorder(this.instance.video.srcObject, {
                 mimeType: this.findBestMimeType(),
             });
         } catch (error) {

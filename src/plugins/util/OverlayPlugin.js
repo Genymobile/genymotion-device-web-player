@@ -21,13 +21,13 @@ class OverlayPlugin {
         // Listen for close trigger
         this.instance.store.subscribe(
             ({overlay}) => {
-                if (overlay.widgetOpened.includes(this.overlayID)) {
+                if (overlay.widgetsOpened.includes(this.overlayID)) {
                     this.openOverlay();
                 } else {
                     this.closeOverlay();
                 }
             },
-            ['overlay.widgetOpened'],
+            ['overlay.widgetsOpened'],
         );
 
         // Attach listener for first object created only
@@ -142,7 +142,6 @@ class OverlayPlugin {
             type: 'OVERLAY_OPEN',
             payload: {
                 overlayID: this.overlayID,
-                toOpen: this.widget.classList.contains('gm-hidden'),
             },
         });
     }

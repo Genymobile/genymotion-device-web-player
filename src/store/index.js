@@ -7,7 +7,7 @@ const initialState = {
     isWebRTCConnectionReady: false,
     overlay: {
         isOpen: false,
-        widgetOpened: [],
+        widgetsOpened: [],
     },
     isKeyboardEventsEnabled: false,
     isMouseEventsEnabled: false,
@@ -22,7 +22,7 @@ const createStore = (instance, reducer) => {
 
     const getters = {
         isWidgetOpened: (overlayID) =>
-            instance.store.state.overlay.isOpen && instance.store.state.overlay.widgetOpened.includes(overlayID),
+            instance.store.state.overlay.isOpen && instance.store.state.overlay.widgetsOpened.includes(overlayID),
     };
 
     const hasChanged = (changedKeys, keyPath) => {
@@ -119,19 +119,24 @@ const reducer = (state, action) => {
             break;
         case 'OVERLAY_OPEN':
             // eslint-disable-next-line no-case-declarations
-            const {overlayID, toOpen} = action.payload;
-            if (toOpen) {
+            const {overlayID, toOpen = null} = action.payload;
+            // eslint-disable-next-line no-case-declarations
+            const shouldOpenOverlay = toOpen === null ? !state.overlay.widgetsOpened.includes(overlayID) : toOpen;
+
+            if (shouldOpenOverlay) {
+                // Open
                 state.overlay.isOpen = true;
                 /*
                  * to open several widgets at the same time
-                 * widgetOpened: [...state.overlay.widgetOpened, overlayID],
+                 * widgetsOpened: [...state.overlay.widgetsOpened, overlayID],
                  */
-                state.overlay.widgetOpened = [overlayID];
+                state.overlay.widgetsOpened = [overlayID];
                 state.isKeyboardEventsEnabled = false;
                 state.isMouseEventsEnabled = false;
             } else {
+                // Close
                 state.overlay.isOpen = false;
-                state.overlay.widgetOpened = [];
+                state.overlay.widgetsOpened = [];
                 state.isKeyboardEventsEnabled = true;
                 state.isMouseEventsEnabled = true;
             }

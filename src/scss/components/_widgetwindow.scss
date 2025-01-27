@@ -9,8 +9,8 @@
     left: calc(50% - 250px);
     min-height: 400px;
     top: 50px;
-    background-color: var(--gm-modal-bg-color);
-    color: var(--gm-text-color);
+    background-color: var(--gm-secondary-color);
+    color: var(--gm-on-secondary-color);
     border: none;
     border-radius: 2px;
 
@@ -48,8 +48,8 @@
     }
 
     button {
-        color: var(--gm-btn-text-color);
-        background-color: var(--gm-btn-bg-color);
+        color: var(--gm-on-secondary-color);
+        background-color: var(--gm-primary-color);
         padding: 11px 25px;
 
         border-radius: 2px;
@@ -62,17 +62,17 @@
         &:hover,
         &:focus {
             cursor: pointer;
-            background-color: var(--gm-btn-bg-color-hover);
+            background-color: var(--gm-primary-color);
         }
 
         &:disabled {
             pointer-events: none;
             transition: all 0.3s ease;
-            background: var(--gm-btn-bg-color-disabled);
-            color: var(--gm-btn-color-disabled);
+            background: var(--gm-tertiary-color);
+            color: var(--gm-on-tertiary-color);
 
             &:hover {
-                color: var(--gm-btn-bg-color-disabled-hover);
+                color: var(--gm-tertiary-color);
             }
         }
     }
@@ -90,7 +90,7 @@
 
         // border: 1px solid black;
         border: none;
-        border-bottom: 1px solid var(--gm-underline-color);
+        border-bottom: 1px solid var(--gm-tertiary-color);
 
         padding: 0 8px;
         width: 100%;
@@ -133,45 +133,14 @@
     }
 }
 
-.gm-disabled-widget-pop-up {
-    &::before {
-        position: fixed;
-        /**
-        * working var, changed by js
-        * TODO: evolve to a better solution in the story for tooltip
-        */
-        right: var(--gm-working-disabled-widget-pop-up-x);
-        font-size: 15px;
-        z-index: 20;
-        padding: 12px 20px;
-        margin-right: 10px;
-        background-color: #303339;
-        vertical-align: middle;
-        content: 'Not\00a0 currently\00a0 supported';
-        display: none;
-        width: 200px;
-    }
-
-    
-
-    &:hover::before {
-        display: block;
-    }
-}
-
-.gm-disabled-widget-icon {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
 .gm-modal {
     text-align: left;
     position: absolute;
     width: 500px;
     left: calc(50% - 250px);
     top: 50px;
-    background-color: var(--gm-modal-bg-color);
-    color: var(--gm-text-color);
+    background-color: var(--gm-secondary-color);
+    color: var(--gm-on-secondary-color);
     border: none;
     border-radius: 2px;
     transition: top 0.4s;
@@ -199,7 +168,7 @@
         font-size: 16px;
         font-weight: bold;
         letter-spacing: 0.1em;
-        border-bottom: 1px solid color-mix(in srgb, var(--gm-fourth-color), transparent 70%);
+        border-bottom: 1px solid var(--gm-tertiary-color);
     }
 
     .gm-modal-title {
@@ -217,7 +186,7 @@
         -webkit-mask-repeat: no-repeat;
         -webkit-mask-position: top center;
         -webkit-mask-size: contain;
-        background-color: var(--gm-text-color);
+        background-color: var(--gm-on-secondary-color);
         cursor: pointer;
         width: 24px;
         height: 24px;

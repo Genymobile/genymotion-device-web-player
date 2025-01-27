@@ -183,7 +183,13 @@ const slider = (() => {
 
 const textInput = (() => {
     const createTextInput = ({
-        onChange = null, value = '', regexFilter, regexValidField, appendText = '', classes=''}) => {
+        onChange = null,
+        value = '',
+        regexFilter,
+        regexValidField,
+        appendText = '',
+        classes = '',
+    }) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
         const inputDivContainer = document.createElement('div');
@@ -368,8 +374,12 @@ const dropdownSelect = (() => {
                 // Check if the item is a string, object with label, or a custom element
                 if (typeof item === 'string') {
                     optionDiv.innerHTML = item;
-                } else if (typeof item === 'object'
-                    && typeof item.value !== 'undefined' && item.element && item.element instanceof HTMLElement) {
+                } else if (
+                    typeof item === 'object' &&
+                    typeof item.value !== 'undefined' &&
+                    item.element &&
+                    item.element instanceof HTMLElement
+                ) {
                     optionDiv.appendChild(item.element);
                 } else {
                     log.warn('Invalid item. Need at least props element and value. Item', item);
@@ -421,9 +431,9 @@ const dropdownSelect = (() => {
 
 const chipTag = (() => {
     let tagDiv = null;
-    const createChip = ({type= 'success', text = 'Applied'} = {}) => {
+    const createChip = ({type = 'success', text = 'Applied'} = {}) => {
         tagDiv = document.createElement('div');
-        tagDiv.className = 'gm-tag-'+type;
+        tagDiv.className = 'gm-tag-' + type;
 
         const container = document.createElement('div');
         container.className = 'gm-tag-container';
@@ -431,7 +441,7 @@ const chipTag = (() => {
         tagDiv.appendChild(container);
 
         const setType = (newType) => {
-            tagDiv.className = 'gm-tag-'+newType;
+            tagDiv.className = 'gm-tag-' + newType;
         };
 
         const setValue = (newText) => {

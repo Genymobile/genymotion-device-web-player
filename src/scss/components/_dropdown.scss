@@ -24,14 +24,14 @@
         
         transition: transform 0.2s ease;
         transition: border-color 0.2s ease;
-        border-bottom: 1px solid var(--gm-fourth-color); 
+        border-bottom: 1px solid var(--gm-tertiary-variant-color); 
 
         &::after {
             content: '';
             width: 8px;
             height: 8px;
             margin-right: 8px;
-            border: solid var(--gm-text-color);
+            border: solid var(--gm-on-secondary-color);
             border-width: 2px 2px 0 0;
             transform: rotate(135deg);
             transform-origin: center;
@@ -50,14 +50,13 @@
         padding: 10px 0;
         gap: 6px;
         border-radius: 4px;
-        background-color: var(--gm-third-color);
-        box-shadow: 0px 1px 4px 0px var(--gm-secondary-color);
+        background-color: var(--gm-secondary-variant-color);
 
         .dropdown-item {
             padding: 16px 20px;
             cursor: pointer;
             .dropdown-checkmark{
-                background-color: var(--gm-text-color);
+                background-color: var(--gm-on-secondary-color);
                 mask-image: url('../assets/images/ic_check.svg');
                 -webkit-mask-image: url('../assets/images/ic_check.svg');
                 -webkit-mask-size: contain;
@@ -72,7 +71,7 @@
         }
         
         .dropdown-item:hover {
-            background: var(--gm-primary-color);
+            background: var(--gm-background-color);
         }
 
     }

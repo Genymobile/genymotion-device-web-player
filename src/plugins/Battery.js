@@ -233,7 +233,7 @@ module.exports = class Battery extends OverlayPlugin {
         }
 
         value = Math.min(Math.max(0, value), 100);
-        this.chargeImageOverlay.style.cssText = 'height: ' + value + '%';
+        this.chargeImageOverlay.style.cssText = 'height: calc( ' + value + '% + 1px);';
         this.chargeGroup.classList.remove('low', 'medium');
         if (value <= 10) {
             this.chargeGroup.classList.add('low');

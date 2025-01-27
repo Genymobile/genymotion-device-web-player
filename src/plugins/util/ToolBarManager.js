@@ -93,7 +93,7 @@ class ToolbarManager {
             }
         } else {
             button.classList.add('gm-disabled-widget-pop-up');
-            buttonIcon.classList.add('gm-disabled-widget-icon');
+            buttonIcon.classList.add('gm-disabled-icon-button');
         }
 
         // Update registry with the DOM elements
@@ -117,7 +117,7 @@ class ToolbarManager {
 
         const {button, buttonIcon} = buttonData;
         button.classList.add('gm-disabled-widget-pop-up');
-        buttonIcon.classList.add('gm-disabled-widget-icon');
+        buttonIcon.classList.add('gm-disabled-icon-button');
         /*
          * Calculate location of the button to display the pop-up next
          * and update the CSS variable.
@@ -147,7 +147,7 @@ class ToolbarManager {
 
         const {button, buttonIcon, onClick, onMousedown, onMouseup} = buttonData;
         button.classList.remove('gm-disabled-widget-pop-up');
-        buttonIcon.classList.remove('gm-disabled-widget-icon');
+        buttonIcon.classList.remove('gm-disabled-icon-button');
 
         if (onClick) {
             buttonIcon.onclick = onClick;

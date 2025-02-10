@@ -2,6 +2,8 @@
 
 const Original = require('../../src/DeviceRenderer');
 const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
+const OriginalApiManager = require('../../src/APIManager');
+
 const store = require('../../src/store/index');
 
 class ToolBarManager extends OriginalToolbarManager {
@@ -45,9 +47,7 @@ module.exports = class DeviceRenderer extends Original {
 
         super(document.body, options || {});
         this.outgoingMessages = [];
-        this.apiManager = {
-            registerFunction: jest.fn(),
-        };
+        this.apiManager = new OriginalApiManager(this);
         this.toolbarManager = new ToolBarManager();
         // Load store since it's deviceRendererFactory which load it
         store(this);

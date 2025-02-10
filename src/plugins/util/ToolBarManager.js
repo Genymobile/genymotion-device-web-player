@@ -212,6 +212,16 @@ class ToolbarManager {
     }
 
     /**
+     * Retrieves a button from the registry by its ID.
+     *
+     * @param {string} id - The unique identifier of the button.
+     * @returns {Object|undefined} The button object if found, otherwise undefined.
+     */
+    getButtonById(id) {
+        return this.buttonRegistry.get(id);
+    }
+
+    /**
      * Render a separator in the toolbar.
      */
     renderSeparator() {

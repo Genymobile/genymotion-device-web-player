@@ -84,7 +84,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
     renderWidget() {
         // Create elements
 
-        const {modal, container} = this.createTemplateModal({
+        const {container} = this.createTemplateModal({
             title: this.i18n.IOTHROTTLING_TITLE || 'Disk I/O',
             classes: 'gm-iothrottling-plugin',
             width: 378,
@@ -184,9 +184,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
         this.container.appendChild(applyBtnDiv);
         this.container.appendChild(separator);
         this.container.appendChild(clearCacheDiv);
-
-        // Render into document
-        this.instance.root.appendChild(modal);
     }
 
     /**

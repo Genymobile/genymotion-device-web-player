@@ -214,8 +214,6 @@ module.exports = class KeyboardEvents {
      * Bind all event listener callback.
      */
     addKeyboardCallbacks() {
-        this.instance.root.tabIndex = 0;
-
         if (!this.isListenerAdded) {
             // This avoid having continuously pressed keys because of alt+tab or any other command that blur from tab
             this.removeBlurListener = this.instance.addListener(window, 'blur', this.cancelAllPressedKeys.bind(this));
@@ -225,11 +223,20 @@ module.exports = class KeyboardEvents {
                     {event: 'keypress', handler: this.onKeyPress.bind(this), removeListener: null},
                     {event: 'keydown', handler: this.onKeyDown.bind(this), removeListener: null},
                     {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null},
+                    {
+                        event: 'click',
+                        handler: () => {
+                            // need to be able to capture key events on the video element when it is clicked
+                            this.instance.video.tabIndex = 0;
+                            this.instance.video.focus();
+                        },
+                        removeListener: null,
+                    },
                 ];
             }
             this.instance.root.focus();
             this.keyboardCallbacks.forEach((item, index, array) => {
-                array[index].removeListener = this.instance.addListener(this.instance.root, item.event, item.handler);
+                array[index].removeListener = this.instance.addListener(this.instance.video, item.event, item.handler);
             });
             this.isListenerAdded = true;
         }

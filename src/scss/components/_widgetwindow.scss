@@ -148,8 +148,16 @@
     display: flex;
     flex-direction: column;
 
+    &.gm-visible {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out, visibility 0s 0s;
+    }
+    
     &.gm-hidden {
-        top: -1000px;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
     }
 
     label {
@@ -169,6 +177,8 @@
         font-weight: bold;
         letter-spacing: 0.1em;
         border-bottom: 1px solid var(--gm-tertiary-color);
+        // Disable text selection, in order to avoid to select the text when dragging the modal
+        user-select: none;
     }
 
     .gm-modal-title {

@@ -47,7 +47,7 @@
             display: block;
             width: 30px;
             height: 30px;
-            
+
             -webkit-mask-size: contain;
             mask-size: contain;
             -webkit-mask-repeat: no-repeat;
@@ -128,7 +128,6 @@
         background-color: var(--gm-background-color);
         height: 100%;
         display: flex;
-        
 
         > * {
             transition: opacity 0.5s;
@@ -159,13 +158,13 @@
         }
 
         .gm-video-wrapper {
-            flex:1;
+            flex: 1;
             display: flex;
             justify-content: center;
             max-height: 100%;
 
             margin: auto;
-            // Todo calc via JS
+            // calc through JS
             aspect-ratio: 0;
             .gm-video {
                 max-width: 100%;
@@ -179,21 +178,21 @@
                 margin-left: -3px;
                 margin-top: clamp(50px, 15%, 85px);
                 margin-right: 10px;
-                &:before{
-                    content: " ";
+                &:before {
+                    content: ' ';
                     display: block;
                     width: 8px;
-                    height:  clamp(50px, 70px, 5%);
-                    background: #A8B0AD;
+                    height: clamp(50px, 70px, 5%);
+                    background: #a8b0ad;
                     border-radius: 6px;
                 }
-                &:after{
-                    content: " ";
+                &:after {
+                    content: ' ';
                     display: block;
                     margin-top: 20px;
                     width: 8px;
-                    height:  clamp(80px, 120px, 10%);
-                    background: #A8B0AD;
+                    height: clamp(80px, 120px, 10%);
+                    background: #a8b0ad;
                     border-radius: 3px;
                     max-height: 31%;
                 }
@@ -221,11 +220,11 @@
 .gm-separator {
     width: 100%;
     height: 1px;
-    background-color: var(--gm-tertiary-color);
+    border: 1px solid var(--gm-tertiary-color);
     margin: 10px 0;
 }
 
-.gm-btn{
+.gm-btn {
     max-height: 40px;
     height: 40px;
     border: none;
@@ -237,12 +236,12 @@
     border: none;
     padding: 10px 15px;
     border-radius: 4px;
-    
-    &:hover{
-        background: var(--gm-primary-variant-color);    
-        color: var(--gm-primary-color)
+
+    &:hover {
+        background: var(--gm-primary-variant-color);
+        color: var(--gm-primary-color);
     }
-    &:disabled{
+    &:disabled {
         color: var(--gm-tertiary-color);
         background: none;
         cursor: default;

@@ -326,6 +326,16 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
 
+### `toolbarPosition`
+
+-   **Type:** `String`
+-   **Default:** `right`
+-   **Details:**
+    Position of the toolbar
+-   **Available options:**
+-   `"left"` → Toolbar appears on the left side.
+-   `"right"` → Toolbar appears on the right side.
+
 #### `connectionFailedURL`
 
 -   **Type:** `String`

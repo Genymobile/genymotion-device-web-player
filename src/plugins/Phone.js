@@ -50,7 +50,7 @@ module.exports = class Phone extends OverlayPlugin {
         // Create elements
         const {modal, container} = this.createTemplateModal({
             title: this.i18n.PHONE_TITLE || 'Phone',
-            classes: 'gm-phone',
+            classes: 'gm-phone-plugin',
         });
 
         // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility

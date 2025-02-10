@@ -69,20 +69,20 @@ const createStore = (instance, reducer) => {
         return changedKeys;
     };
 
-    const notifyListeners = (changedKeys) => {
+    const notifyListeners = (changedKeys, copyOfPreviousState) => {
         listeners.forEach(({keys, cb}) => {
             if (keys.length === 0 || keys.some((key) => hasChanged(changedKeys, key))) {
                 // send a copy of the store's state, in order to avoid mutation of the store
-                cb({...instance.store.state});
+                cb({...instance.store.state}, copyOfPreviousState);
             }
         });
     };
 
     const dispatch = (action) => {
-        const previousState = JSON.parse(JSON.stringify(instance.store.state));
+        const copyOfPreviousState = JSON.parse(JSON.stringify(instance.store.state));
         instance.store.state = reducer({...instance.store.state}, action);
-        const changedKeys = findChangedKeys(instance.store.state, previousState);
-        notifyListeners(changedKeys);
+        const changedKeys = findChangedKeys(instance.store.state, copyOfPreviousState);
+        notifyListeners(changedKeys, copyOfPreviousState);
     };
 
     const subscribe = (listener, keys = []) => {
@@ -130,15 +130,17 @@ const reducer = (state, action) => {
                  * to open several widgets at the same time
                  * widgetsOpened: [...state.overlay.widgetsOpened, overlayID],
                  */
-                state.overlay.widgetsOpened = [overlayID];
-                state.isKeyboardEventsEnabled = false;
-                state.isMouseEventsEnabled = false;
+                state.overlay.widgetsOpened = [...state.overlay.widgetsOpened, overlayID];
             } else {
+                if (overlayID) {
+                    state.overlay.widgetsOpened = state.overlay.widgetsOpened.filter((id) => id !== overlayID);
+                } else {
+                    state.overlay.widgetsOpened = [];
+                }
                 // Close
-                state.overlay.isOpen = false;
-                state.overlay.widgetsOpened = [];
-                state.isKeyboardEventsEnabled = true;
-                state.isMouseEventsEnabled = true;
+                if (state.overlay.widgetsOpened.length === 0) {
+                    state.overlay.isOpen = false;
+                }
             }
             break;
         case 'ENABLE_TRACKED_EVENTS':

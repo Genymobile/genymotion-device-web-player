@@ -128,10 +128,13 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const {modal, container} = this.createTemplateModal({
             title: this.i18n.UPLOADER_TITLE || 'File upload',
             classes: 'gm-uploader-plugin',
         });
+
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
 
         // Generate input rows
         this.inputs = document.createElement('div');

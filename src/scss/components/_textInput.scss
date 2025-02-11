@@ -16,6 +16,8 @@
         border: none;
         background-color: transparent;
         color: var(--gm-input-text-color);
+        /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
+        font-size: inherit;
 
         &:focus {
             outline: none; 

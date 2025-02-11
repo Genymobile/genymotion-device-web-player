@@ -141,10 +141,10 @@ module.exports = class KeyboardMapping {
                             break;
                         case 'isPaused':
                             if (value) {
-                                this.toolbarBtnImage.classList.add('keymapping-paused');
+                                this.toolbarBtn.addClass('keymapping-paused');
                                 this.state.isActive = false;
                             } else {
-                                this.toolbarBtnImage.classList.remove('keymapping-paused');
+                                this.toolbarBtn.removeClass('keymapping-paused');
                                 this.state.isActive = true;
                             }
                             break;
@@ -172,40 +172,29 @@ module.exports = class KeyboardMapping {
         );
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
 
         // register api function
         this.exposedAPI();
     }
 
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-keymapping-button';
-        this.toolbarBtnImage.title = this.i18n.KEYMAPPING_TITLE || 'Key Mapping';
-        this.toolbarBtn.onclick = () => (this.state.isActive = !this.state.isActive);
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-keymapping-button',
+            title: this.i18n.KEYMAPPING_TITLE || 'Key Mapping',
+            onClick: () => (this.state.isActive = !this.state.isActive),
+        });
     }
 
     activatePlugin() {
         if (this.state.isActive) {
-            if (this.toolbarBtnImage) {
-                this.toolbarBtnImage.classList.add('gm-active');
-            }
+            this.toolbarBtn.setActive();
             this.addKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: false});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: false});
         } else {
-            if (this.toolbarBtnImage) {
-                this.toolbarBtnImage.classList.remove('gm-active');
-            }
+            this.toolbarBtn.setActive(false);
             this.removeKeyboardCallbacks();
             this.instance.store.dispatch({type: 'KEYBOARD_EVENTS_ENABLED', payload: !this.state.isPaused});
             this.instance.store.dispatch({type: 'MOUSE_EVENTS_ENABLED', payload: !this.state.isPaused});

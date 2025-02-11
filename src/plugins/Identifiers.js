@@ -31,7 +31,7 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.instance.identifiers = this;
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Listen for settings messages: "parameter <device_id/android_id>:<id>"
@@ -56,20 +56,13 @@ module.exports = class Identifiers extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-identifiers-button';
-        this.toolbarBtnImage.title = this.i18n.IDENTIFIERS_TITLE || 'Identifiers';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-identifiers-button',
+            title: this.i18n.IDENTIFIERS_TITLE || 'Identifiers',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**

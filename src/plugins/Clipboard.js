@@ -34,7 +34,7 @@ module.exports = class Clipboard extends OverlayPlugin {
         this.clipboard = '';
 
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Listen for framework messages: "clipboard <from_android|from_renderer> <base64>"
@@ -62,20 +62,13 @@ module.exports = class Clipboard extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-clipboard-button';
-        this.toolbarBtnImage.title = this.i18n.CLIPBOARD_TITLE || 'Clipboard';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-clipboard-button',
+            title: this.i18n.CLIPBOARD_TITLE || 'Clipboard',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**
@@ -93,8 +86,9 @@ module.exports = class Clipboard extends OverlayPlugin {
         this.widget = modal;
 
         const text = document.createElement('div');
-        text.innerHTML = this.i18n.CLIPBOARD_TEXT ||
-            'The content you type below will be copied directly to your virtual device\'s clipboard.';
+        text.innerHTML =
+            this.i18n.CLIPBOARD_TEXT ||
+            "The content you type below will be copied directly to your virtual device's clipboard.";
 
         this.clipboardInput = document.createElement('textarea');
         this.clipboardInput.className = 'gm-clipboard-input';

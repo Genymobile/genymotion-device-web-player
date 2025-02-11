@@ -94,7 +94,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.createStepper();
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         /*
@@ -114,20 +114,13 @@ module.exports = class FileUpload extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        const button = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-uploader-button';
-        this.toolbarBtnImage.title = this.i18n.UPLOADER_TITLE || 'File upload';
-        button.appendChild(this.toolbarBtnImage);
-        button.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(button);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-uploader-button',
+            title: this.i18n.UPLOADER_TITLE || 'File upload',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**

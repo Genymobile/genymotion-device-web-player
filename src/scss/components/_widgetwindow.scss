@@ -130,11 +130,13 @@
 }
 
 .gm-disabled-widget-pop-up {
-    position: relative;
     &::before {
-        position: absolute;
-        right: 100%;
-        top: -7px;
+        position: fixed;
+        /**
+        * working var, changed by js
+        * TODO: evolve to a better solution in the story for tooltip
+        */
+        right: var(--gm-working-disabled-widget-pop-up-x);
         font-size: 15px;
         z-index: 20;
         padding: 12px 20px;
@@ -143,7 +145,10 @@
         vertical-align: middle;
         content: 'Not\00a0 currently\00a0 supported';
         display: none;
+        width: 200px;
     }
+
+    
 
     &:hover::before {
         display: block;

@@ -33,8 +33,8 @@ yarn build:dev
 And import your local file directly
 
 ```html
-<link rel="stylesheet" href="file:///[...]/genymotion-device-web-player/dist/css/gm-player.min.css" />
-<script src="file:///[...]/genymotion-device-web-player/dist/js/gm-player.min.js"></script>
+<link rel="stylesheet" href="file:///[...]/genymotion-device-web-player/dist/css/device-renderer.min.js" />
+<script src="file:///[...]/genymotion-device-web-player/dist/js/device-renderer.min.js"></script>
 ```
 
 Don't forget to re-run the build command each time you make a modification to the code.

@@ -33,7 +33,7 @@ describe('ButtonsEvents Plugin', () => {
             new ButtonsEvents(instance, {}, false);
 
             // Toolbar buttons
-            expect(document.getElementsByClassName('gm-rotate')).toHaveLength(1);
+            expect(document.getElementsByClassName('gm-rotation')).toHaveLength(1);
             expect(document.getElementsByClassName('gm-sound-down')).toHaveLength(1);
             expect(document.getElementsByClassName('gm-sound-up')).toHaveLength(1);
             expect(document.getElementsByClassName('gm-recent')).toHaveLength(1);
@@ -50,7 +50,7 @@ describe('ButtonsEvents Plugin', () => {
             new ButtonsEvents(instance, {}, false);
 
             // Toolbar buttons
-            expect(document.getElementsByClassName('gm-rotate')).toHaveLength(0);
+            expect(document.getElementsByClassName('gm-rotation')).toHaveLength(0);
             expect(document.getElementsByClassName('gm-sound-down')).toHaveLength(0);
             expect(document.getElementsByClassName('gm-sound-up')).toHaveLength(0);
             expect(document.getElementsByClassName('gm-recent')).toHaveLength(0);
@@ -104,7 +104,7 @@ describe('ButtonsEvents Plugin', () => {
         });
 
         test('rotation', () => {
-            const button = document.getElementsByClassName('gm-rotate')[0];
+            const button = document.getElementsByClassName('gm-rotation')[0];
 
             button.dispatchEvent(new Event('mousedown'));
             button.dispatchEvent(new Event('mouseup'));

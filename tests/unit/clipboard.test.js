@@ -4,7 +4,6 @@ jest.mock('loglevel');
 
 const Clipboard = require('../../src/plugins/Clipboard');
 const Instance = require('../mocks/DeviceRenderer');
-const store = require('../../src/store/index');
 
 let clipboard;
 let instance;
@@ -13,7 +12,6 @@ let plugin;
 describe('Clipboard Plugin', () => {
     beforeEach(() => {
         instance = new Instance();
-        store(instance);
         clipboard = new Clipboard(instance, {});
         plugin = document.getElementsByClassName('gm-clipboard-plugin')[0];
     });
@@ -27,7 +25,6 @@ describe('Clipboard Plugin', () => {
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
-            store(instance);
             clipboard = new Clipboard(instance, {
                 CLIPBOARD_TITLE: 'TEST CLIPBOARD PLUGIN TITLE',
             });

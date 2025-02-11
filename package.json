@@ -33,8 +33,7 @@
         "gulp-header": "^2.0.9",
         "gulp-replace": "^1.1.4",
         "lodash": "^4.17.21",
-        "loglevel": "^1.8.0",
-        "webrtc-adapter": "^7.7.1"
+        "loglevel": "^1.8.0"
     },
     "devDependencies": {
         "@babel/core": "^7.18.6",

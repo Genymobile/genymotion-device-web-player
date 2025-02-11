@@ -53,7 +53,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
         });
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
 
         // Listen for diskio messages: "readbyterate <value>" (or "cachecleared")
@@ -69,20 +69,13 @@ module.exports = class IOThrottling extends OverlayPlugin {
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-iothrottling-button';
-        this.toolbarBtnImage.title = this.i18n.IOTHROTTLING_TITLE || 'Disk I/O';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-iothrottling-button',
+            title: this.i18n.IOTHROTTLING_TITLE || 'Disk I/O',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**
@@ -259,7 +252,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
         // if readspeed is not a number or is less than 0 then set select "none" profile
         if (!readSpeedIsCustom && (Number.isNaN(readSpeed) || readSpeed <= 0)) {
             this.readByteRate.setValue(0);
-            this.dropdownProfile.setValue(this.profilesForDropdown.find((profile) => profile.value===0));
+            this.dropdownProfile.setValue(this.profilesForDropdown.find((profile) => profile.value === 0));
             // Display Read speed limit: No disk performance alteration
             this.container.classList.add('gm-iothrottling-none');
             return;

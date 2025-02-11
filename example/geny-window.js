@@ -117,6 +117,29 @@ const initPlayer = (webrtcAddress) => {
     const options = {
         token: jwtToken || apiToken,
         showPhoneBorder: true,
+        streamBitrate: true,
+        keyboardMapping: false,
+        toolbarOrder: [
+            'ButtonsEvents_VOLUME_UP',
+            'ButtonsEvents_VOLUME_DOWN',
+            'ButtonsEvents_ROTATE',
+            'separator',
+            'StreamResolution',
+            'Battery',
+            'FingerPrint',
+            'GPS',
+            'Camera',
+            'Phone',
+            'Network',
+            'IOThrottling',
+            'separator',
+            'ButtonsEvents_RECENT_APP',
+            'ButtonsEvents_HOMEPAGE',
+            'ButtonsEvents_BACK',
+            'ButtonsEvents_POWER',
+            'separator',
+            'unordered',
+        ],
     };
 
     const {DeviceRendererFactory} = window.genyDeviceWebPlayer;

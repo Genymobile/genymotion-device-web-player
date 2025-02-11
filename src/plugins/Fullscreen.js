@@ -12,16 +12,16 @@ module.exports = class Fullscreen {
      * Plugin initialization.
      *
      * @param {Object} instance Associated instance.
+     * @param {Object} i18n     Translations keys for the UI.
      */
-    constructor(instance) {
+    constructor(instance, i18n) {
         // Reference instance
         this.instance = instance;
+        this.i18n = i18n || {};
 
         // we register for fullscreen event changes
-        if (document.addEventListener) {
-            this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
-            this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
-        }
+        this.instance.addListener(document, 'webkitfullscreenchange', this.onFullscreenEvent.bind(this), false);
+        this.instance.addListener(document, 'fullscreenchange', this.onFullscreenEvent.bind(this), false);
 
         this.instance.apiManager.registerFunction({
             name: 'fullscreen',
@@ -38,52 +38,25 @@ module.exports = class Fullscreen {
                 'Toggle fullscreen mode for the video player. If the player is currently in fullscreen, it will exit fullscreen; otherwise, it will enter fullscreen mode.',
         });
         // Display widget
-        this.renderToolbarButton();
+        this.registerToolbarButton();
     }
 
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-
-        if (this.isTemplateFullscreen()) {
-            /**
-             * If the template is fullscreen, there is a splash screen that ask the user
-             * to allow the fullscreen. It is needed due to HTML5 requirements.
-             */
-            const fullscreenMessage = this.instance.getChildByClass(this.instance.root, 'gm-fullscreen-message');
-            fullscreenMessage.onclick = () => {
-                fullscreenMessage.classList.add('hide');
-                this.instance.wrapper.classList.remove('hide');
-                this.goFullscreen(this.instance.root);
-            };
-        } else {
-            /**
-             * Else we add a button that will allows the user to set/unset the
-             * fullscreen for the given genycloud instance
-             */
-            this.button = document.createElement('li');
-            this.image = document.createElement('div');
-            this.image.className = 'gm-icon-button gm-fullscreen-button';
-            this.image.title = 'Fullscreen';
-            this.button.appendChild(this.image);
-            toolbar.appendChild(this.button);
-
-            // when clicked on the button, should we enter or exit fullscreen
-            this.button.onclick = () => {
+    registerToolbarButton() {
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-fullscreen-button',
+            title: this.i18n.FULLSCREEN || 'Fullscreen',
+            onClick: () => {
                 if (this.fullscreenEnabled()) {
                     this.exitFullscreen();
                 } else {
                     this.goFullscreen(this.instance.root);
                 }
-            };
-        }
+            },
+        });
     }
 
     /**
@@ -93,7 +66,7 @@ module.exports = class Fullscreen {
      */
     goFullscreen(element) {
         this.instance.wrapper.classList.add('gm-fullscreen');
-        this.image.classList.add('gm-active');
+        this.toolbarBtn.setActive();
         if (element.requestFullscreen) {
             element.requestFullscreen();
         } else if (element.webkitRequestFullscreen) {
@@ -115,7 +88,7 @@ module.exports = class Fullscreen {
      */
     exitFullscreen() {
         this.instance.wrapper.classList.remove('gm-fullscreen');
-        this.image.classList.remove('gm-active');
+        this.toolbarBtn.setActive(false);
         if (!this.fullscreenEnabled()) {
             return; // do not try to remove fulllscreen if it is not active
         }
@@ -124,15 +97,6 @@ module.exports = class Fullscreen {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-    }
-
-    /**
-     * Determine whether the template is configured to be displayed in fullscreen or not.
-     *
-     * @return {boolean} Whether the template is configured to be displayed in fullscreen or not.
-     */
-    isTemplateFullscreen() {
-        return Boolean(this.instance.getChildByClass(this.instance.root, 'gm-fullscreen-message'));
     }
 
     /**

@@ -27,27 +27,20 @@ module.exports = class Phone extends OverlayPlugin {
         this.instance.phone = this;
 
         // Render components
-        this.renderToolbarButton();
+        this.registerToolbarButton();
         this.renderWidget();
     }
 
     /**
      * Add the button to the renderer toolbar.
      */
-    renderToolbarButton() {
-        const toolbars = this.instance.getChildByClass(this.instance.root, 'gm-toolbar');
-        if (!toolbars) {
-            return; // if we don't have toolbar, we can't spawn the widget
-        }
-
-        const toolbar = toolbars.children[0];
-        this.toolbarBtn = document.createElement('li');
-        this.toolbarBtnImage = document.createElement('div');
-        this.toolbarBtnImage.className = 'gm-icon-button gm-phone-button';
-        this.toolbarBtnImage.title = this.i18n.PHONE_TITLE || 'Phone';
-        this.toolbarBtn.appendChild(this.toolbarBtnImage);
-        this.toolbarBtn.onclick = this.toggleWidget.bind(this);
-        toolbar.appendChild(this.toolbarBtn);
+    registerToolbarButton() {
+        this.instance.toolbarManager.registerButton({
+            id: this.constructor.name,
+            iconClass: 'gm-phone-button',
+            title: this.i18n.PHONE_TITLE || 'Phone',
+            onClick: this.toggleWidget.bind(this),
+        });
     }
 
     /**

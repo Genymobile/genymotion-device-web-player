@@ -28,7 +28,8 @@ describe.only('StreamBitrate Plugin', () => {
 
         test('is initialized properly at construct', () => {
             // Toolbar button
-            expect(document.getElementsByClassName('gm-streamrate-button')).toHaveLength(1);
+            document.querySelector('.gm-streamrate-button');
+            expect(document.getElementsByClassName('gm-streamrate-chooser')).toHaveLength(1);
         });
     });
 
@@ -37,11 +38,11 @@ describe.only('StreamBitrate Plugin', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
             chooser.highQuality = false;
-            chooser.chooser.click();
+            document.querySelector('.gm-streamrate-chooser').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({type: 'BITRATE', videoBitrate: 5000, audioBitrate: 192000});
 
-            chooser.chooser.click();
+            document.querySelector('.gm-streamrate-chooser').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({type: 'BITRATE', videoBitrate: 0, audioBitrate: 0});
         });
@@ -50,11 +51,11 @@ describe.only('StreamBitrate Plugin', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
             chooser.highQuality = true;
-            chooser.chooser.click();
+            document.querySelector('.gm-streamrate-chooser').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({type: 'BITRATE', videoBitrate: 0, audioBitrate: 0});
 
-            chooser.chooser.click();
+            document.querySelector('.gm-streamrate-chooser').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({type: 'BITRATE', videoBitrate: 5000, audioBitrate: 192000});
         });

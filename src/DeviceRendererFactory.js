@@ -5,12 +5,25 @@ const defaultsDeep = require('lodash/defaultsDeep');
 
 const store = require('./store');
 const APIManager = require('./APIManager');
+const ToolbarManager = require('./plugins/util/ToolBarManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 // Default options
 const defaultOptions = {
+    toolbarOrder: [
+        'ButtonsEvents_VOLUME_UP',
+        'ButtonsEvents_VOLUME_DOWN',
+        'ButtonsEvents_ROTATE',
+        'separator',
+        'unordered',
+        'separator',
+        'ButtonsEvents_RECENT_APP',
+        'ButtonsEvents_HOMEPAGE',
+        'ButtonsEvents_BACK',
+        'ButtonsEvents_POWER',
+    ],
     touch: true,
     mouse: true,
     volume: true,
@@ -73,6 +86,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             webRTCUrl                      WebRTC URL of the instance.
      * @param  {Object}             options                        Various configuration options.
      * @param  {boolean}            options.showPhoneBorder        Show phone border. Default: false.
+     * @param  {boolean}            options.toolbarOrder           Toolbar buttons order. Default: see defaultOptions.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
      * @param  {boolean}            options.volume                 Audio volume control support activated. Default: true.
@@ -144,10 +158,12 @@ module.exports = class DeviceRendererFactory {
         });
 
         instance.apiManager = new APIManager(instance);
+        instance.toolbarManager = new ToolbarManager();
 
         this.instances.push(instance);
 
         this.loadPlugins(instance);
+        this.loadToolbar(instance);
         instance.onWebRTCReady();
 
         return instance.apiManager.getExposedApiFunctions();
@@ -169,7 +185,7 @@ module.exports = class DeviceRendererFactory {
             <div class="gm-toolbar-wrapper">
                 <div class="gm-toolbar">
                     <ul></ul>
-                    </div>
+                </div>
             </div>
         </div>
         `;
@@ -212,7 +228,65 @@ module.exports = class DeviceRendererFactory {
                     });
                 }
                 // eslint-disable-next-line no-unused-expressions
-                plugin.class && new plugin.class(instance, ...args);
+                if (plugin.class) {
+                    new plugin.class(instance, ...args);
+                }
+            }
+        });
+    }
+
+    /**
+     * Load toolbar buttons in the specified order:
+     * Buttons listed in options.toolbarOrder will be rendered in the specified sequence.
+     * Buttons not included in options.toolbarOrder will be added at the end of the toolbar.
+     * If the keyword 'unordered' is specified in options.toolbarOrder, unlisted buttons will be inserted at the position of 'unordered'.
+     * @param {DeviceRenderer} instance The DeviceRenderer instance.
+     */
+    loadToolbar(instance) {
+        const {toolbarOrder} = instance.options;
+        const orderMap = new Map(toolbarOrder.map((name, index) => [name, index]));
+
+        const orderedButtons = [];
+        const unorderedButtons = [];
+
+        instance.toolbarManager.buttonRegistry.forEach((value, key) => {
+            const order = orderMap.get(key);
+            if (typeof order !== 'undefined') {
+                orderedButtons.push({key, value, order});
+            } else {
+                unorderedButtons.push({key, value});
+            }
+        });
+
+        toolbarOrder.forEach((name, index) => {
+            if (name === 'separator') {
+                orderedButtons.push({
+                    key: `separator-${index}`,
+                    value: 'separator',
+                    order: index,
+                });
+            }
+        });
+
+        orderedButtons.sort((a, b) => a.order - b.order);
+
+        const sortedToolbarItems = [];
+        if (toolbarOrder.includes('unordered')) {
+            const unOrderedIndex = toolbarOrder.findIndex((name) => name === 'unordered');
+            sortedToolbarItems.push(
+                ...orderedButtons.slice(0, unOrderedIndex),
+                ...unorderedButtons,
+                ...orderedButtons.slice(unOrderedIndex),
+            );
+        } else {
+            sortedToolbarItems.push(...orderedButtons, ...unorderedButtons);
+        }
+
+        sortedToolbarItems.forEach(({key, value}) => {
+            if (value === 'separator') {
+                instance.toolbarManager.renderSeparator(key);
+            } else {
+                instance.toolbarManager.renderButton(key);
             }
         });
     }

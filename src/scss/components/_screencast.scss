@@ -66,34 +66,33 @@
         }
     }
 
+    .gm-screencast-button:hover {
+        + .gm-screencast-timer {
+            display: block;
+        }
+    }
     .gm-screencast-timer {
-        position: relative;
-        top: -10px;
-        left: -90px;
+        position: fixed;
+        right: 57px;
         color: #c6225a;
         font-size: 20px;
         font-family: Helvetica, sans-serif;
         pointer-events: none;
-        z-index: 5;
         padding: 11px 8px 8px 8px;
         border-radius: 6px;
         width: 80px;
-        background-color: var(--gm-modal-bg-color);
-        vertical-align: middle;
+        background-color: #303339;
+        margin-top: -37px;
+        display: none;
 
         &::after {
             content: ' ';
             position: absolute;
-            top: 50%;
-            left: 100%; /* To the right of the tooltip */
-            margin-top: -5px;
+            right: -10px;
+            top: 16px;
             border-width: 5px;
             border-style: solid;
-            border-color: transparent transparent transparent var(--gm-modal-bg-color);
+            border-color: transparent transparent transparent #303339;
         }
-    }
-
-    .gm-timer-hidden {
-        display: none;
     }
 }

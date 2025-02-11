@@ -6,6 +6,8 @@
     --gm-text-color: #ffffff;
     --gm-primary-color: #e6195e;
     --gm-secondary-color: #292929;
+    --gm-third-color: #1a1a1a;
+    --gm-fourth-color: #C4C4C4;
     --gm-success-color: #11b920;
     --gm-warning-color: #ffcc00;
     --gm-error-color: #ff0000;
@@ -23,9 +25,9 @@
     --gm-btn-text-color: var(--gm-text-color);
     --gm-btn-bg-color: var(--gm-primary-color);
     --gm-btn-bg-color-hover: var(--gm-primary-color);
-    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
+    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24); // TODO
     --gm-btn-bg-color-disabled-hover: #828282;
-    --gm-btn-color-disabled: #c4c4c4;
+    --gm-btn-color-disabled: var(--gm-fourth-color);
 
     /** Input **/
     --gm-input-text-color: var(--gm-text-color);
@@ -44,10 +46,15 @@
 // Responsive breakpoint
 $breakpoint-mobile: 650px;
 
-//Spacing
+// Spacing
 $spacing-xxs: 2px;
 $spacing-xs: 5px;
 $spacing-s: 10px;
 $spacing-m: 15px;
 $spacing-l: 20px;
 $spacing-xl: 30px;
+
+// Modal
+$modal-x-padding: 30px;
+$modal-section-mb: $spacing-xl;
+$modal-label-mb: $spacing-m;

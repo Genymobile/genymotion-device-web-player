@@ -47,6 +47,13 @@
             display: block;
             width: 30px;
             height: 30px;
+            
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
         }
 
         &-video-overlay {
@@ -210,16 +217,10 @@
     }
 }
 
-.gm-modal {
-    .gm-separator {
-        
-    }
-}
-
 .gm-separator {
     width: 100%;
     height: 1px;
-    background-color: color-mix(in srgb, var(--gm-modal-bg-color), grey 10%);
+    background-color: color-mix(in srgb, var(--gm-fourth-color), transparent 70%);
     margin: 10px 0;
 }
 

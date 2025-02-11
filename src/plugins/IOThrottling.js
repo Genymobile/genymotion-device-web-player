@@ -1,8 +1,10 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
+const {dropdownSelect, textInput, chipTag} = require('./util/components');
 
 const PROFILES = require('./util/iothrottling-profiles');
+const PROFILE_CUSTOM_NAME = 'Custom';
 const BYTES_PER_KILOBYTE = 1024;
 const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE << 10;
 
@@ -30,7 +32,25 @@ module.exports = class IOThrottling extends OverlayPlugin {
         // Register plugin
         this.instance.diskIO = this;
 
-        this.fields = {};
+        this.lastReadByteRateReceived = 0;
+
+        // Array of profiles for dropdown
+        this.profilesForDropdown = PROFILES.map((profile) => {
+            const divContainer = document.createElement('div');
+            const label = document.createElement('div');
+            const name = document.createElement('div');
+            divContainer.appendChild(name);
+            divContainer.appendChild(label);
+            divContainer.style.display = 'flex';
+            divContainer.style.justifyContent = 'space-between';
+            name.innerHTML = profile.name;
+            label.innerHTML = profile.label || '';
+            return {
+                element: divContainer,
+                value: profile.readByteRate ?? profile.name,
+                valueToDisplay: profile.name || '',
+            };
+        });
 
         // Render components
         this.renderToolbarButton();
@@ -40,7 +60,8 @@ module.exports = class IOThrottling extends OverlayPlugin {
         this.instance.registerEventCallback('diskio', (message) => {
             const values = message.split(' ');
             if (values[0] === 'readbyterate' && values.length === 2) {
-                this.updateDiskIOValues(values[1] / BYTES_PER_MEGABYTE);
+                this.lastReadByteRateReceived = values[1] / BYTES_PER_MEGABYTE;
+                this.updateDiskIOValues(this.lastReadByteRateReceived);
             }
         });
     }
@@ -69,14 +90,16 @@ module.exports = class IOThrottling extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.form = document.createElement('form');
 
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.IOTHROTTLING_TITLE || 'Disk I/O';
-        this.form.appendChild(title);
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.IOTHROTTLING_TITLE || 'Disk I/O',
+            classes: 'gm-iothrottling-plugin',
+            width: 378,
+            height: 422,
+        });
+
+        this.widget = modal;
+        this.container = container;
 
         // Generate input rows
         const inputs = document.createElement('div');
@@ -85,105 +108,97 @@ module.exports = class IOThrottling extends OverlayPlugin {
         const IOThrottlingLabel = this.i18n.IOTHROTTLING_PROFILE || 'Profile';
         inputs.innerHTML = '<label>' + IOThrottlingLabel + '</label>';
 
-        // Create select
-        this.select = document.createElement('select');
-        this.select.className = 'gm-iothrottling-select';
-        const defaultOption = new Option(this.i18n.IOTHROTTLING_PROFILE_NONE || 'None');
-        this.select.add(defaultOption);
-        this.select.onchange = this.changeProfile.bind(this);
-        inputs.appendChild(this.select);
+        this.dropdownProfile = dropdownSelect.createDropdown({
+            items: this.profilesForDropdown,
+            value: 0,
+            hasCheckmark: true,
+            onChange: (newValue) => {
+                this.updateDiskIOValues(newValue);
+            },
+        });
+        inputs.appendChild(this.dropdownProfile.element);
 
-        // Add option for each child
-        PROFILES.forEach((profile) => {
-            const option = new Option(profile.label, profile.name);
-            this.select.add(option);
+        const readByteRateDiv = document.createElement('div');
+        readByteRateDiv.classList.add('gm-fields');
+        const readByteRateContainer = document.createElement('div');
+        readByteRateContainer.classList.add('gm-fields-container');
+        readByteRateDiv.appendChild(readByteRateContainer);
+
+        const readByteRateText = document.createElement('div');
+        readByteRateText.innerHTML = this.i18n.IOTHROTTLING_READ_BYTERATE || 'Read speed limit:';
+
+        this.readByteRate = textInput.createTextInput({
+            value: '50',
+            classes: 'gm-iothrottling-readbyterate',
+            regexFilter: /^[0-9]*$/,
         });
 
-        this.readByteRateDiv = document.createElement('div');
-        this.readByteRateDiv.classList.add('gm-fields');
-        const readByteRateLabel = document.createElement('label');
-        readByteRateLabel.innerHTML = this.i18n.IOTHROTTLING_READ_BYTERATE || 'Read speed limit:';
-        this.readByteRate = document.createElement('input');
-        this.readByteRate.className = 'gm-iothrottling-readbyterate';
-        this.readByteRate.placeholder = this.i18n.IOTHROTTLING_READ_BYTERATE_EXAMPLE || 'eg: 100';
-        this.readByteRate.title = this.i18n.READ_BYTE_RATE || 'Read speed limit';
-        this.readByteRate.required = true;
-        this.readByteRate.pattern = '[0-9]*';
-        this.readByteRateDiv.appendChild(readByteRateLabel);
-        const readByteRateSpeed = document.createElement('label');
-        readByteRateSpeed.innerHTML = this.i18n.IOTHROTTLING_BYTERATE_UNIT || 'MiB per sec';
-        readByteRateSpeed.classList.add('gm-units');
-        this.readByteRateDiv.appendChild(readByteRateSpeed);
-        this.readByteRateDiv.appendChild(this.readByteRate);
+        const readByteRateSpeedText = document.createElement('div');
+        readByteRateSpeedText.innerHTML = this.i18n.IOTHROTTLING_BYTERATE_UNIT || 'MiB per sec';
+        readByteRateSpeedText.classList.add('gm-units');
+        const readByteRateSpeedNoneText = document.createElement('div');
+        readByteRateSpeedNoneText.innerHTML = this.i18n.IOTHROTTLING_BYTERATE_NONE || 'No disk performance alteration';
+        readByteRateSpeedNoneText.classList.add('gm-noThrottling');
+        const readByteRateSpeedCustomText = document.createElement('div');
+        readByteRateSpeedCustomText.innerHTML =
+            this.i18n.IOTHROTTLING_BYTERATE_CUSTOM || 'Enter the read speed limit you wish to emulate.';
+        readByteRateSpeedCustomText.classList.add('gm-customThrottling');
 
-        // Add submit button
-        this.submitBtn = document.createElement('button');
-        this.submitBtn.className = 'gm-iothrottling-update';
-        this.submitBtn.innerHTML = this.i18n.IOTHROTTLING_UPDATE || 'Update';
-        this.submitBtn.onclick = this.sendDataToInstance.bind(this);
+        readByteRateContainer.appendChild(readByteRateText);
+        readByteRateContainer.appendChild(this.readByteRate.element);
+        readByteRateContainer.appendChild(readByteRateSpeedText);
+        readByteRateContainer.appendChild(readByteRateSpeedNoneText);
+        readByteRateDiv.appendChild(readByteRateSpeedCustomText);
+
+        // Separator
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+        // Add apply button
+        const applyBtnDiv = document.createElement('div');
+        applyBtnDiv.className = 'gm-iothrottling-apply';
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'gm-iothrottling-status';
+        const statusText = document.createElement('div');
+        statusText.innerHTML = 'Status:';
+        statusText.className = 'gm-iothrottling-status-text';
+        const appliedTag = chipTag.createChip();
+        const statusNotApplied = document.createElement('div');
+        statusNotApplied.innerHTML = 'Not applied';
+        statusNotApplied.className = 'gm-iothrottling-notapplied-text';
+
+        statusDiv.appendChild(statusText);
+        statusDiv.appendChild(statusNotApplied);
+        statusDiv.appendChild(appliedTag.element);
+
+        const applyBtn = document.createElement('button');
+        applyBtn.className = 'gm-btn';
+        applyBtn.innerHTML = this.i18n.IOTHROTTLING_UPDATE || 'Apply';
+        applyBtn.onclick = this.sendDataToInstance.bind(this);
+
+        applyBtnDiv.appendChild(statusDiv);
+        applyBtnDiv.appendChild(applyBtn);
 
         // Add clear cache button
-        this.clearCacheBtn = document.createElement('button');
-        this.clearCacheBtn.className = 'gm-iothrottling-clearcache';
-        this.clearCacheBtn.innerHTML = this.i18n.IOTHROTTLING_CLEAR_CACHE || 'Clear cache';
-        this.clearCacheBtn.onclick = this.clearCache.bind(this);
         const clearCacheDiv = document.createElement('div');
+        clearCacheDiv.className = 'gm-iothrottling-clearcache';
+        const clearCacheLabel = this.i18n.CLEAR_CACHE_PROFILE || 'Disk cache';
+        clearCacheDiv.innerHTML = '<label>' + clearCacheLabel + '</label>';
+
+        this.clearCacheBtn = document.createElement('button');
+        this.clearCacheBtn.className = 'gm-btn';
+        this.clearCacheBtn.innerHTML = this.i18n.IOTHROTTLING_CLEAR_CACHE || 'Clear';
+        this.clearCacheBtn.onclick = this.clearCache.bind(this);
         clearCacheDiv.appendChild(this.clearCacheBtn);
 
         // Setup
-        this.form.appendChild(inputs);
-        this.form.appendChild(this.readByteRateDiv);
-        this.form.appendChild(clearCacheDiv);
-        this.form.appendChild(this.submitBtn);
-
-        this.setFieldsReadOnly(true);
-        this.resetFields('0');
-        this.displayFields(false);
-
-        this.widget.className = 'gm-overlay gm-iothrottling-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.form);
+        this.container.appendChild(inputs);
+        this.container.appendChild(readByteRateDiv);
+        this.container.appendChild(applyBtnDiv);
+        this.container.appendChild(separator);
+        this.container.appendChild(clearCacheDiv);
 
         // Render into document
         this.instance.root.appendChild(this.widget);
-    }
-
-    /**
-     * Set custom fields read-only or not.
-     *
-     * @param {boolean} readOnly Desired read-only status.
-     */
-    setFieldsReadOnly(readOnly) {
-        this.readByteRate.readOnly = readOnly;
-    }
-
-    /**
-     * Reset custom fields value.
-     *
-     * @param {number} value Desired value.
-     */
-    resetFields(value) {
-        value = typeof value !== 'undefined' ? value : '';
-        this.readByteRate.value = value;
-    }
-
-    /**
-     * Toggle custom fields input visibility.
-     *
-     * @param {boolean} display Whether or not inputs should be visible.
-     */
-    displayFields(display) {
-        if (display) {
-            this.readByteRateDiv.classList.remove('gm-hidden');
-        } else {
-            this.readByteRateDiv.classList.add('gm-hidden');
-        }
     }
 
     /**
@@ -194,14 +209,11 @@ module.exports = class IOThrottling extends OverlayPlugin {
     sendDataToInstance(event) {
         event.preventDefault();
 
-        if (this.form.checkValidity()) {
-            const json = {
-                channel: 'diskio',
-                messages: ['set readbyterate ' + this.readByteRate.value * BYTES_PER_MEGABYTE, 'clearcache'],
-            };
-            this.instance.sendEvent(json);
-            this.toggleWidget();
-        }
+        const json = {
+            channel: 'diskio',
+            messages: ['set readbyterate ' + this.readByteRate.getValue() * BYTES_PER_MEGABYTE, 'clearcache'],
+        };
+        this.instance.sendEvent(json);
     }
 
     /**
@@ -210,27 +222,14 @@ module.exports = class IOThrottling extends OverlayPlugin {
      * @param {Event} event Event.
      */
     clearCache(event) {
+        this.container.classList.remove('gm-iothrottling-cache-cleared');
+        // Force a reflow to restart the animation
+        void this.container.offsetWidth;
+        this.container.classList.add('gm-iothrottling-cache-cleared');
         event.preventDefault();
 
         const json = {channel: 'diskio', messages: ['clearcache']};
         this.instance.sendEvent(json);
-    }
-
-    /**
-     * Handles profile change.
-     */
-    changeProfile() {
-        const profile = PROFILES.find((elem) => elem.name === this.select.value);
-        if (profile && profile.name !== 'Custom') {
-            this.loadDetails(profile);
-            this.displayFields(true);
-        } else if (profile && profile.name === 'Custom') {
-            this.setFieldsReadOnly(false);
-            this.displayFields(true);
-        } else {
-            this.resetFields('0');
-            this.displayFields(false);
-        }
     }
 
     /**
@@ -239,46 +238,46 @@ module.exports = class IOThrottling extends OverlayPlugin {
      * @param {number} readSpeed Read byte rate.
      */
     updateDiskIOValues(readSpeed) {
-        readSpeed = Number(readSpeed);
+        this.container.classList.remove('gm-iothrottling-saved');
+        this.container.classList.remove('gm-iothrottling-none');
+        this.container.classList.remove('gm-iothrottling-custom');
 
-        if (Number.isNaN(readSpeed) || readSpeed <= 0) {
-            this.select.value = this.i18n.IOTHROTTLING_PROFILE_NONE || 'None';
-            this.resetFields('0');
-            this.displayFields(false);
+        // Handle the chipTag display. If readSpeed is custom (trigger from dropdown)
+        const readSpeedIsCustom = readSpeed === PROFILE_CUSTOM_NAME;
+        if (readSpeedIsCustom) {
+            // if the lastReadByteRateReceived exists in the profiles the active profil isn't a custom one
+            const profile = this.profilesForDropdown.find((p) => p.value === this.lastReadByteRateReceived);
+
+            if (!profile) {
+                this.container.classList.add('gm-iothrottling-saved');
+            }
+        } else if (readSpeed === this.lastReadByteRateReceived) {
+            // if readSpeed isn't custom and is equal to the lastReadByteRateReceived then the active profil is dropdown profil
+            this.container.classList.add('gm-iothrottling-saved');
+        }
+
+        // if readspeed is not a number or is less than 0 then set select "none" profile
+        if (!readSpeedIsCustom && (Number.isNaN(readSpeed) || readSpeed <= 0)) {
+            this.readByteRate.setValue(0);
+            this.dropdownProfile.setValue(this.profilesForDropdown.find((profile) => profile.value===0));
+            // Display Read speed limit: No disk performance alteration
+            this.container.classList.add('gm-iothrottling-none');
             return;
         }
 
-        this.readByteRate.value = readSpeed;
-        const profile = PROFILES.find((elem) => elem.readByteRate === readSpeed);
-        if (profile && profile.name !== 'Custom') {
-            this.select.value = profile.name;
-            this.loadDetails(profile);
-            this.displayFields(true);
+        const profile = this.profilesForDropdown.find((prof) => prof.value === readSpeed);
+
+        if (!readSpeedIsCustom && profile) {
+            this.readByteRate.setReadOnly(true);
+            this.dropdownProfile.setValue(profile);
+            this.readByteRate.setValue(readSpeed);
         } else {
-            this.select.value = 'Custom';
-            this.setFieldsReadOnly(false);
-            this.displayFields(true);
+            // custom
+            this.container.classList.add('gm-iothrottling-custom');
+            this.readByteRate.setReadOnly(false);
+            const custom = this.profilesForDropdown.find((prof) => prof.value === PROFILE_CUSTOM_NAME);
+            this.dropdownProfile.setValue(custom);
+            this.readByteRate.setValue(this.lastReadByteRateReceived);
         }
-    }
-
-    /**
-     * Load fields with the given profile info.
-     *
-     * @param {Object} profile Selected profile.
-     */
-    loadDetails(profile) {
-        if (profile.name !== 'Custom') {
-            this.setFieldsReadOnly(true);
-            this.readByteRate.value = profile.readByteRate;
-        }
-    }
-
-    /**
-     * Activate disk I/O throttling. Keeps UI in sync with the instance state.
-     *
-     * @param {number} readSpeed Read byte rate.
-     */
-    setActive(readSpeed) {
-        this.updateDiskIOValues(Number(readSpeed) / BYTES_PER_KILOBYTE);
     }
 };

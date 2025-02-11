@@ -26,10 +26,11 @@ describe('IOThrottling Plugin', () => {
             instance = new Instance();
             new IOThrottling(instance, {
                 IOTHROTTLING_TITLE: 'TEST IOTHROTTLING PLUGIN TITLE',
-                IOTHROTTLING_PROFILE: 'TEST IOTHROTTLING PLUGIN PROFILE',
                 IOTHROTTLING_PROFILE_NONE: 'TEST IOTHROTTLING PLUGIN PROFILE NONE',
+                IOTHROTTLING_PROFILE: 'TEST PROFILE',
                 IOTHROTTLING_READ_BYTERATE: 'TEST IOTHROTTLING PLUGIN READ BYTERATE',
-                IOTHROTTLING_READ_BYTERATE_EXAMPLE: 'TEST IOTHROTTLING PLUGIN READ BYTERATE EXAMPLE',
+                IOTHROTTLING_READ_BYTERATE_CUSTOM: 'TEST IOTHROTTLING PLUGIN READ BYTERATE CUSTOM',
+                IOTHROTTLING_READ_BYTERATE_NONE: 'TEST IOTHROTTLING PLUGIN READ BYTERATE NONE',
                 IOTHROTTLING_BYTERATE_UNIT: 'TEST IOTHROTTLING PLUGIN BYTERATE UNIT',
                 IOTHROTTLING_UPDATE: 'TEST IOTHROTTLING PLUGIN UPDATE BUTTON',
                 IOTHROTTLING_CLEAR_CACHE: 'TEST IOTHROTTLING PLUGIN CLEAR CACHE BUTTON',
@@ -46,10 +47,8 @@ describe('IOThrottling Plugin', () => {
 
         test('has translations', () => {
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN TITLE'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN PROFILE'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN PROFILE NONE'));
+            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST PROFILE'));
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN READ BYTERATE'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN READ BYTERATE EXAMPLE'));
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN BYTERATE UNIT'));
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN UPDATE BUTTON'));
             expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST IOTHROTTLING PLUGIN CLEAR CACHE BUTTON'));
@@ -60,13 +59,13 @@ describe('IOThrottling Plugin', () => {
         test('diskio', () => {
             ['jean-michel', 'readbyterate -123', '', 'readbyterate invalid'].forEach((invalidValue) => {
                 instance.emit('diskio', invalidValue);
-                expect(diskio.select.value).toBe('None');
+                expect(diskio.dropdownProfile.getValue()).toBe(0);
             });
 
             [69, 420].forEach((customValue) => {
                 instance.emit('diskio', `readbyterate ${customValue * 1024 * 1024}`);
-                expect(diskio.select.value).toBe('Custom');
-                expect(Number(diskio.readByteRate.value)).toBe(customValue);
+                expect(diskio.dropdownProfile.getValue()).toBe('Custom');
+                expect(Number(diskio.readByteRate.getValue())).toBe(customValue);
             });
 
             IOThrottlingProfiles.forEach((profile) => {
@@ -75,8 +74,8 @@ describe('IOThrottling Plugin', () => {
                 }
 
                 instance.emit('diskio', `readbyterate ${profile.readByteRate * 1024 * 1024}`);
-                expect(diskio.select.value).toBe(profile.name);
-                expect(Number(diskio.readByteRate.value)).toBe(profile.readByteRate);
+                expect(diskio.dropdownProfile.getValue()).toBe(profile.readByteRate);
+                expect(Number(diskio.readByteRate.getValue())).toBe(profile.readByteRate);
             });
         });
     });
@@ -92,9 +91,9 @@ describe('IOThrottling Plugin', () => {
 
                 sendEventSpy.mockClear();
                 instance.outgoingMessages = [];
-                diskio.select.value = profile.name;
-                diskio.select.dispatchEvent(new Event('change'));
-                diskio.submitBtn.click();
+                const dropDownProfile = diskio.profilesForDropdown.find((p) => p.value === profile.readByteRate);
+                diskio.dropdownProfile.setValue(dropDownProfile, true);
+                diskio.widget.querySelector('.gm-btn').click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(1);
                 expect(instance.outgoingMessages[0]).toEqual({
                     channel: 'diskio',
@@ -104,10 +103,10 @@ describe('IOThrottling Plugin', () => {
 
             sendEventSpy.mockClear();
             instance.outgoingMessages = [];
-            diskio.select.value = 'Custom';
-            diskio.select.dispatchEvent(new Event('change'));
-            diskio.readByteRate.value = 69; // Nice
-            diskio.submitBtn.click();
+            const dropDownProfile = diskio.profilesForDropdown.find((p) => p.name === 'Custom');
+            diskio.dropdownProfile.setValue(dropDownProfile, true);
+            diskio.readByteRate.setValue(69);
+            diskio.widget.querySelector('.gm-btn').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 channel: 'diskio',

@@ -3,16 +3,28 @@
     color: var(--gm-input-text-color);
     display: flex;
     align-items: center;
+    height: 34px;
+
+    &:has(.text-input:read-only) {
+        border-bottom: 2px solid transparent;
+    }
 
     .text-input{
         text-align: right;
         padding-left: 0;
         padding-right: 0;
-        &:focus {
-            outline: none; 
-        }
         border: none;
         background-color: transparent;
         color: var(--gm-input-text-color);
+
+        &:focus {
+            outline: none; 
+        }
+
+        &:read-only {
+            background:  color-mix(in srgb, var(--gm-fourth-color), transparent 90%);
+            border: none;
+            color: var(--gm-fourth-color)
+        }
     }
 }

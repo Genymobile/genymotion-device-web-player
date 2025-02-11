@@ -1,0 +1,29 @@
+
+ .gm-tag{
+    &-success{
+        .gm-tag-container{
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            padding: 2px 6px;
+            color: var(--gm-success-color);
+            background-color:  color-mix(in srgb, var(--gm-success-color), transparent 80%);
+
+            &::after{
+                content: ' ';
+                background-color: var(--gm-success-color);
+                mask-image: url('../assets/images/ic_check.svg');
+                -webkit-mask-image: url('../assets/images/ic_check.svg');
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                width: 22px;
+                height: 22px;
+                display: block;
+            }
+        }
+    }
+ }   

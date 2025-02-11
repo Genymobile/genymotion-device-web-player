@@ -46,10 +46,7 @@ const switchButton = (() => {
         const getState = () => input.checked;
 
         switchDiv.addEventListener('click', () => {
-            setState(!input.checked);
-            if (onChange && typeof onChange === 'function') {
-                onChange(input.checked);
-            }
+            setState(!input.checked, true);
         });
 
         return {
@@ -184,8 +181,9 @@ const slider = (() => {
  */
 
 const textInput = (() => {
-    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = ''}) => {
+    const createTextInput = ({onChange = null, value = '', regexFilter, appendText = '', classes=''}) => {
         const inputDiv = document.createElement('div');
+        inputDiv.className = classes;
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
 
@@ -219,16 +217,20 @@ const textInput = (() => {
 
         const getValue = () => input.value;
 
+        const setReadOnly = (readOnly) => {
+            input.readOnly = readOnly;
+        };
+
         input.addEventListener('input', (event) => {
-            const {value: v} = event.target;
+            const {value: v, selectionStart} = event.target;
             if (regexFilter && !regexFilter.test(v)) {
+                // delete the last character if it doesn't match the regex
+                const correctedValue = v.slice(0, selectionStart - 1) + v.slice(selectionStart);
+                event.target.value = correctedValue;
+                event.target.setSelectionRange(selectionStart - 1, selectionStart - 1);
                 return;
             }
-
-            setValue(v);
-            if (onChange) {
-                onChange(v);
-            }
+            setValue(v, true);
         });
 
         inputDiv.setValue = setValue;
@@ -238,10 +240,201 @@ const textInput = (() => {
             element: inputDiv,
             setValue,
             getValue,
+            setReadOnly,
         };
     };
 
     return {createTextInput};
 })();
 
-module.exports = {switchButton, slider, textInput};
+const dropdownSelect = (() => {
+    /**
+     * Creates a custom dropdown component.
+     * @param {Object} options - Configuration options for the dropdown.
+     * @param {Array} [options.items] - The initial list of items to display in the dropdown menu.
+     * @param {Function} [options.onChange] - Optional callback triggered when the selected value changes.
+     * @param {string} [options.value] - Initial selected value.
+     * @returns {Object} - Dropdown component with methods to interact with it.
+     */
+    const createDropdown = ({items = [], onChange = null, value = '', hasCheckmark = false}) => {
+        let selectedValue = value ?? 'Select...';
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.className = 'dropdown';
+
+        // Create the div displaying the selected value
+        const selectedValueDiv = document.createElement('div');
+        selectedValueDiv.className = 'dropdown-selected';
+        selectedValueDiv.textContent = value ?? 'Select...';
+        dropdownDiv.appendChild(selectedValueDiv);
+
+        // Create the menu div where options will be appended
+        const dropdownMenuDiv = document.createElement('div');
+        dropdownMenuDiv.className = 'dropdown-menu';
+        dropdownDiv.appendChild(dropdownMenuDiv);
+
+        /**
+         * Synchronizes the width of the dropdown menu to match the selected value display.
+         */
+        const synchronizeMenuWidth = () => {
+            const width = selectedValueDiv.offsetWidth;
+            dropdownMenuDiv.style.width = `${width}px`;
+        };
+
+        /**
+         * Adds a checkmark to the selected item in the dropdown.
+         * @param {Array} itemsArr - The list of items to display in the dropdown menu.
+         */
+        const addCheckmark = (itemsArr) => {
+            itemsArr.forEach((item) => {
+                // remove all checkmark
+                const checkmarkDiv = item.element.querySelector('.dropdown-checkmark');
+                if (checkmarkDiv) {
+                    item.element.removeChild(checkmarkDiv);
+                }
+
+                if (item.value === selectedValue || item === selectedValue) {
+                    const checkmark = document.createElement('div');
+                    checkmark.className = 'dropdown-checkmark';
+                    item.element.appendChild(checkmark);
+                }
+            });
+        };
+
+        /**
+         * Gets the current selected value from the dropdown.
+         * @returns {string} - The current selected value.
+         */
+        const getValue = () => selectedValue;
+
+        /**
+         * Sets the selected value in the dropdown and triggers onChange if necessary.
+         * @param {object} item - The new selected item.
+         * @param {boolean} [triggerOnChange=false] - Whether to trigger the onChange callback.
+         */
+        const setValue = (item, triggerOnChange = false) => {
+            let itemValue, valueToDisplay;
+            if (typeof item === 'string') {
+                itemValue = item;
+                valueToDisplay = item;
+            } else if (typeof item === 'object' && 'value' in item && 'element' in item) {
+                itemValue = item.value;
+                valueToDisplay = item.valueToDisplay ?? item.element.innerHTML ?? item.value;
+            }
+
+            // Only update if the new value is different from the current one
+            if (selectedValueDiv.innerHTML === itemValue || selectedValueDiv.innerHTML === valueToDisplay) {
+                return;
+            }
+
+            selectedValueDiv.innerHTML = valueToDisplay || itemValue;
+            selectedValue = itemValue;
+
+            // update options checkmark if the value is selected
+            if (hasCheckmark) {
+                addCheckmark(items);
+            }
+
+            // Trigger onChange callback if provided
+            if (triggerOnChange && onChange) {
+                onChange(selectedValue);
+            }
+        };
+
+        /**
+         * Updates the options displayed in the dropdown menu.
+         * Clears current options and appends the new ones.
+         * @param {Array} newItems - The new list of items to display in the dropdown.
+         */
+        const updateOptions = (newItems) => {
+            // Clear current options before appending new ones
+            dropdownMenuDiv.innerHTML = '';
+
+            // Iterate through newItems to create and append dropdown options
+            newItems.forEach((item) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'dropdown-item';
+
+                // Check if the item is a string, object with label, or a custom element
+                if (typeof item === 'string') {
+                    optionDiv.innerHTML = item;
+                } else if (typeof item === 'object'
+                    && typeof item.value !== 'undefined' && item.element && item.element instanceof HTMLElement) {
+                    optionDiv.appendChild(item.element);
+                } else {
+                    console.warn('Invalid item. Need at least props element and value. Item', item);
+                    return;
+                }
+
+                // Add event listener for option click
+                optionDiv.addEventListener('click', () => {
+                    setValue(item, true);
+                    dropdownDiv.classList.remove('open');
+                });
+
+                dropdownMenuDiv.appendChild(optionDiv);
+            });
+        };
+
+        // Initialize dropdown with provided items
+        updateOptions(items);
+        // update options checkmark if the value is selected
+        if (hasCheckmark) {
+            addCheckmark(items);
+        }
+
+        // Toggle dropdown visibility when the selected value div is clicked
+        selectedValueDiv.addEventListener('click', () => {
+            synchronizeMenuWidth();
+            dropdownDiv.classList.toggle('open');
+        });
+
+        // Close the dropdown if the user clicks outside of it
+        document.addEventListener('click', (event) => {
+            if (!dropdownDiv.contains(event.target)) {
+                dropdownDiv.classList.remove('open');
+            }
+        });
+
+        // Return the dropdown element and helper methods for interaction
+        return {
+            element: dropdownDiv,
+            getValue,
+            setValue,
+            updateOptions, // Expose method to dynamically update options
+        };
+    };
+
+    // Expose createDropdown method for external usage
+    return {createDropdown};
+})();
+
+const chipTag = (() => {
+    let tagDiv = null;
+    const createChip = ({type= 'success', text = 'Applied'} = {}) => {
+        tagDiv = document.createElement('div');
+        tagDiv.className = 'gm-tag-'+type;
+
+        const container = document.createElement('div');
+        container.className = 'gm-tag-container';
+        container.textContent = text;
+        tagDiv.appendChild(container);
+
+        const setType = (newType) => {
+            tagDiv.className = 'gm-tag-'+newType;
+        };
+
+        const setValue = (newText) => {
+            container.textContent = newText;
+        };
+
+        return {
+            element: tagDiv,
+            setType,
+            setValue,
+        };
+    };
+
+    return {createChip};
+})();
+
+module.exports = {switchButton, slider, textInput, dropdownSelect, chipTag};

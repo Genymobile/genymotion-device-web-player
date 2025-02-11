@@ -88,18 +88,24 @@ describe('Clipboard Plugin', () => {
             sendEventSpy.mockRestore();
         });
 
-        test('clipboard value', () => {
-            const button = document.getElementsByClassName('gm-clipboard-button')[0];
+        test('clipboard send value', () => {
+            expect(clipboard.clipboard).toBe('');
 
-            clipboard.clipboard = 'test value';
-            button.click(); // Open
-            button.click(); // Close
+            clipboard.clipboardInput.value = 'test value';
+            const event = new Event('input', {bubbles: true});
+            clipboard.clipboardInput.dispatchEvent(event);
+
+            expect(clipboard.clipboard).toBe('');
+
+            clipboard.submitBtn.click();
+            instance.emit('framework', 'clipboard from_android dGVzdCB2YWx1ZQ==');
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 channel: 'framework',
                 messages: ['set_device_clipboard dGVzdCB2YWx1ZQ=='],
             });
+            expect(clipboard.clipboard).toBe('test value');
         });
     });
 });

@@ -3,18 +3,58 @@
  */
 .device-renderer-instance .gm-clipboard-plugin {
     .gm {
-        &-clipboard-input {
-            min-height: 300px;
-            resize: none;
-
-            color: var(--gm-input-text-color);
-            background-color: #fff;
+        &-modal-body {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        &-clipboard-saved {
+            .gm-actions{
+                .gm-tag-success {
+                    visibility: visible;
+                }
+            }
         }
 
-        &-text-copied {
-            padding: 15px 0 0 30px;
-            transition: opacity 0.5s ease-in-out;
-            background: url('../assets/images/ic_clipboard_inactive.svg') no-repeat left 10px !important;
+        &-clipboard-input {
+            height: 249px;
+            resize: none;
+            border: none;
+            margin: $spacing-m 0;
+            padding: $spacing-m 0 0 $spacing-m;
+
+            color: var(--gm-input-text-color);
+            background-color: var(--gm-third-color);
+
+            &:focus {
+                outline: none; 
+            }
+        }
+        &-actions{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .gm-clipboard-apply {
+                display: flex;
+                align-items: center;
+            }
+            .gm-clipboard-apply::before {
+                content: "";
+                mask-image: url('../assets/images/ic_copy.svg');
+                -webkit-mask-image: url('../assets/images/ic_copy.svg');
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                background: currentColor;
+                width: 32px;
+                height: 32px;
+            }
+            .gm-tag-success {
+                visibility: hidden;
+            }
         }
     }
 }

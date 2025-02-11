@@ -1,4 +1,5 @@
 'use strict';
+const log = require('loglevel');
 
 /**
  * Factory function to create a custom switch button.
@@ -125,7 +126,7 @@ const slider = (() => {
 
         const setValue = (newValue, triggerOnChange = false) => {
             if (isNaN(newValue) || newValue < min || newValue > max) {
-                console.warn('`value` must be within the range defined by `min` and `max`.');
+                log.warn('`value` must be within the range defined by `min` and `max`.');
                 return;
             }
 
@@ -205,7 +206,7 @@ const textInput = (() => {
 
         const setValue = (newValue, triggerOnChange = false) => {
             if (regexFilter && !regexFilter.test(newValue)) {
-                console.warn('Invalid value:', newValue);
+                log.warn('Invalid value:', newValue);
                 return;
             }
 
@@ -371,7 +372,7 @@ const dropdownSelect = (() => {
                     && typeof item.value !== 'undefined' && item.element && item.element instanceof HTMLElement) {
                     optionDiv.appendChild(item.element);
                 } else {
-                    console.warn('Invalid item. Need at least props element and value. Item', item);
+                    log.warn('Invalid item. Need at least props element and value. Item', item);
                     return;
                 }
 

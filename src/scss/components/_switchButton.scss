@@ -18,7 +18,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: color-mix(in srgb, var(--gm-btn-color-disabled), transparent 41.25%);
+    background-color:  var(--gm-tertiary-color);
     border-radius: 15px;
     transition: background-color 0.4s;
 }
@@ -29,22 +29,20 @@
     height:20px;
     width: 20px;
     bottom: -3px;
-    left: -6px;
-    background-color: var(--gm-btn-color-disabled);
+    background-color: var(--gm-tertiary-variant-color);
     border-radius: 50%;
     transition:
         transform 0.4s,
         background-color 0.4s;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 /* Active state */
 .switch input:checked + .switch-slider {
-    background-color: color-mix(in srgb, var(--gm-primary-color), transparent 41.25%);
-
+    background-color: var(--gm-primary-variant-color);
+    
 }
 
 .switch input:checked + .switch-slider::before {
     background-color: var(--gm-primary-color);
-    transform: translateX(26px);
+    transform: translateX(17px);
 }

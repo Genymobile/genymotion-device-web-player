@@ -48,14 +48,13 @@ module.exports = class Phone extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.container = document.createElement('div');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.PHONE_TITLE || 'Phone',
+            classes: 'gm-phone-plugin',
+        });
 
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.PHONE_TITLE || 'Phone';
-        this.container.appendChild(title);
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
 
         // Generate input rows
         const inputs = document.createElement('div');
@@ -102,21 +101,7 @@ module.exports = class Phone extends OverlayPlugin {
         textGroup.appendChild(this.textBtn);
         inputs.appendChild(textGroup);
 
-        this.container.appendChild(inputs);
-
-        // Setup
-        this.widget.className = 'gm-overlay gm-phone-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.container);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(inputs);
     }
 
     /**

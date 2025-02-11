@@ -199,7 +199,7 @@ module.exports = class MouseEvents {
 
             this.mouseCallbacks.forEach((item, index, array) => {
                 array[index].removeListener = this.instance.addListener(
-                    this.instance.videoWrapper,
+                    this.instance.video,
                     item.event,
                     item.handler,
                     item.options,

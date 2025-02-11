@@ -91,7 +91,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
             height: 422,
         });
 
-        this.widget = modal;
         this.container = container;
 
         // Generate input rows
@@ -151,15 +150,11 @@ module.exports = class IOThrottling extends OverlayPlugin {
         applyBtnDiv.className = 'gm-iothrottling-apply';
         const statusDiv = document.createElement('div');
         statusDiv.className = 'gm-iothrottling-status';
-        const statusText = document.createElement('div');
-        statusText.innerHTML = 'Status:';
-        statusText.className = 'gm-iothrottling-status-text';
         const appliedTag = chipTag.createChip();
         const statusNotApplied = document.createElement('div');
         statusNotApplied.innerHTML = 'Not applied';
         statusNotApplied.className = 'gm-iothrottling-notapplied-text';
 
-        statusDiv.appendChild(statusText);
         statusDiv.appendChild(statusNotApplied);
         statusDiv.appendChild(appliedTag.element);
 
@@ -191,7 +186,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
         this.container.appendChild(clearCacheDiv);
 
         // Render into document
-        this.instance.root.appendChild(this.widget);
+        this.instance.root.appendChild(modal);
     }
 
     /**

@@ -76,14 +76,13 @@ module.exports = class Clipboard extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {modal, container} = this.createTemplateModal({
+        const {container} = this.createTemplateModal({
             title: this.i18n.CLIPBOARD_TITLE || 'Device Clipboard',
             classes: 'gm-clipboard-plugin',
             width: 378,
             height: 484,
         });
         this.container = container;
-        this.widget = modal;
 
         const text = document.createElement('div');
         text.innerHTML =
@@ -123,9 +122,6 @@ module.exports = class Clipboard extends OverlayPlugin {
         this.container.appendChild(text);
         this.container.appendChild(this.clipboardInput);
         this.container.appendChild(actionsDiv);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
     }
 
     /**

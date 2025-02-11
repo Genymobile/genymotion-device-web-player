@@ -23,8 +23,8 @@
             margin: $spacing-m 0;
             padding: $spacing-m 0 0 $spacing-m;
 
-            color: var(--gm-input-text-color);
-            background-color: var(--gm-third-color);
+            color: var(--gm-on-tertiary-color);
+            background-color: var(--gm-tertiary-color);
 
             &:focus {
                 outline: none; 

@@ -56,35 +56,19 @@ module.exports = class Gamepad extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.container = document.createElement('div');
-
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.GAMEPAD_TITLE || 'Gamepad';
-        this.container.appendChild(title);
+        const {container} = this.createTemplateModal({
+            title: this.i18n.GAMEPAD_TITLE || 'Gamepad',
+            classes: 'gm-gamepad-plugin',
+        });
 
         // Generate content wrapper
         this.content = document.createElement('div');
-        this.container.appendChild(this.content);
+        // Setup
+        container.appendChild(this.content);
+
         this.generateContent();
         this.instance.addListener(window, 'gm-gamepadConnected', this.handleGamepadPlugged.bind(this));
         this.instance.addListener(window, 'gm-gamepadDisconnected', this.handleGamepadUnplugged.bind(this));
-
-        // Setup
-        this.widget.className = 'gm-overlay gm-gamepad-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.onclick = this.toggleWidget.bind(this);
-        close.className = 'gm-close-btn';
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.container);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
     }
 
     /**

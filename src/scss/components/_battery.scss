@@ -24,12 +24,12 @@
                 mask-repeat: no-repeat;
                 -webkit-mask-position: center;
                 mask-position: center;
-                background-color: var(--gm-btn-bg-color-disabled);
+                background-color: var(--gm-tertiary-variant-color);
                 
                 &.charging {
                     mask-image: url('../assets/images/ic_battery_charging.svg');
                     -webkit-mask-image: url('../assets/images/ic_battery_charging.svg');
-                    background-color: var(--gm-text-color);
+                    background-color: var(--gm-on-secondary-color);
                 }
             }
 
@@ -94,7 +94,7 @@
                         height: 0;
                         width: 100%;
                         align-self: flex-end;
-                        background-color: var(--gm-text-color);
+                        background-color: var(--gm-on-secondary-color);
                     }
                 }
     
@@ -112,7 +112,7 @@
                     mask-repeat: no-repeat;
                     -webkit-mask-position: center;
                     mask-position: center;
-                    background-color: var(--gm-text-color);
+                    background-color: var(--gm-on-secondary-color);
                 }
             }
 
@@ -122,15 +122,6 @@
                 input {
                    text-align: right;
                 }
-            }
-
-            .gm-charge-slider {
-                margin: 0;
-                width: 65px;
-                height: 31px;
-                transform: rotate(270deg);
-                padding: 0 3px;
-                accent-color: var(--gm-primary-color);
             }
         }
     }

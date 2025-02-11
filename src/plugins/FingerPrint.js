@@ -157,15 +157,11 @@ module.exports = class FingerPrint extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.container = document.createElement('div');
-        this.container.className = 'gm-fingerprint-container';
-
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.FINGERPRINT_TITLE || 'Biometrics';
-        this.container.appendChild(title);
+        const {container} = this.createTemplateModal({
+            title: this.i18n.FINGERPRINT_TITLE || 'Biometrics',
+            classes: 'gm-fingerprint-plugin',
+        });
+        container.classList.add('gm-fingerprint-container');
 
         // header
         const headerDiv = document.createElement('div');
@@ -206,8 +202,8 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);
-        this.container.appendChild(headerDiv);
-        this.container.appendChild(document.createElement('hr'));
+        container.appendChild(headerDiv);
+        container.appendChild(document.createElement('hr'));
 
         // body
         const bodyDiv = document.createElement('div');
@@ -252,10 +248,10 @@ module.exports = class FingerPrint extends OverlayPlugin {
         });
 
         bodyDiv.appendChild(buttonsDiv);
-        this.container.appendChild(bodyDiv);
+        container.appendChild(bodyDiv);
 
         // Footer
-        this.container.appendChild(document.createElement('hr'));
+        container.appendChild(document.createElement('hr'));
         const footerDiv = document.createElement('div');
         footerDiv.classList.add('gm-fingerprint-dialog-footer');
 
@@ -270,21 +266,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
         giveFeedbackDiv.appendChild(giveFeedbackLink);
 
         footerDiv.appendChild(giveFeedbackDiv);
-        this.container.appendChild(footerDiv);
-
-        // Setup
-        this.widget.className = 'gm-overlay gm-fingerprint-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.container);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(footerDiv);
 
         // post setup
         this.disableBody();

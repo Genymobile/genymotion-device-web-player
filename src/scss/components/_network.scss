@@ -41,12 +41,12 @@
 
         &-section {
             display: block;
-            margin: 20px 0 10px 0;
+            margin: 0px 0 10px 0;
             padding: 0;
             width: 100%;
             height: 50px;
             font-weight: bold;
-            border-bottom: 1px solid var(--gm-underline-color);
+            border-bottom: 1px solid var(--gm-tertiary-color);
         }
 
         &-fields {
@@ -73,6 +73,7 @@
 
         &:invalid,
         &:focus:invalid {
+            // TODO quand reprend ce plugin
             border-bottom: 1px solid var(--gm-btn-bg-color);
         }
     }

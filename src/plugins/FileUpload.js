@@ -128,31 +128,20 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.container = document.createElement('div');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.UPLOADER_TITLE || 'File upload',
+            classes: 'gm-uploader-plugin',
+        });
 
-        // Generate title
-        this.title = document.createElement('div');
-        this.title.className = 'gm-title';
-        this.container.appendChild(this.title);
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
 
         // Generate input rows
         this.inputs = document.createElement('div');
         this.inputs.className = 'gm-uploader-content';
 
         // Setup
-        this.container.appendChild(this.inputs);
-        this.widget.className = 'gm-overlay gm-uploader-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.container);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(this.inputs);
     }
 
     /**
@@ -389,7 +378,7 @@ module.exports = class FileUpload extends OverlayPlugin {
 
         // Set current step
         const template = this.stepper[step]();
-        this.title.innerHTML = template.title;
+        this.setTitle(template.title);
         this.inputs.appendChild(template.body);
     }
 

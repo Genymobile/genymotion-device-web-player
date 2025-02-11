@@ -326,14 +326,15 @@ module.exports = class Network extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.form = document.createElement('form');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.NETWORK_TITLE || 'Network',
+            classes: 'gm-network-plugin',
+        });
 
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.NETWORK_TITLE || 'Network';
-        this.form.appendChild(title);
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
+
+        this.form = document.createElement('form');
 
         // generate wifi checkbox
         this.wifiGroupSection = document.createElement('div');
@@ -368,18 +369,7 @@ module.exports = class Network extends OverlayPlugin {
 
         this.form.appendChild(this.profileDetails);
 
-        this.widget.className = 'gm-overlay gm-network-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.form);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(this.form);
     }
 
     /**

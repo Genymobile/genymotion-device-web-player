@@ -7,7 +7,7 @@
             border-radius: 8px;
             padding: 2px 6px;
             color: var(--gm-success-color);
-            background-color:  color-mix(in srgb, var(--gm-success-color), transparent 80%);
+            background-color: var(--gm-background-success-color);
 
             &::after{
                 content: ' ';

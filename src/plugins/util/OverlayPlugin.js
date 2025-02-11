@@ -39,6 +39,53 @@ class OverlayPlugin {
     }
 
     /**
+     * Creates a template modal with a title and additional classes.
+     *
+     * @param {Object} [options={}] - Options for the modal.
+     * @param {string|null} [options.title=null] - The title of the modal. If null, no title will be set.
+     * @param {string} [options.classes=''] - Additional classes to add to the modal container.
+     * @returns {Object} An object containing the modal and container elements.
+     * @returns {HTMLElement} return.modal - The modal element.
+     * @returns {HTMLElement} return.container - The container element inside the modal.
+     */
+    createTemplateModal(options = {}) {
+        const {title = null, classes = '', width = null, height = null} = options;
+        const divModal = document.createElement('div');
+        divModal.className = `gm-modal gm-hidden ${classes}`;
+        const divBody = document.createElement('div');
+        divBody.className = 'gm-modal-body';
+
+        if (width) {
+            divModal.style.width = `${width}px`;
+        }
+        if (height) {
+            divModal.style.height = `${height}px`;
+        }
+
+        // Generate title
+        const divHeader = document.createElement('div');
+        divHeader.className = 'gm-modal-header';
+        const divTitle = document.createElement('div');
+        divTitle.className = 'gm-modal-title';
+        divTitle.innerHTML = title;
+        divHeader.appendChild(divTitle);
+
+        // Add close button
+        const close = document.createElement('div');
+        close.onclick = this.toggleWidget.bind(this);
+        close.className = 'gm-modal-close-btn';
+        divHeader.appendChild(close);
+
+        divModal.appendChild(divHeader);
+
+        divModal.appendChild(divBody);
+
+        return {
+            modal: divModal,
+            container: divBody,
+        };
+    }
+    /**
      * Closes overlay and updates toolbar button state
      */
     closeOverlay() {
@@ -138,6 +185,8 @@ class OverlayPlugin {
 
     clickHandlerCloseOverlay(event) {
         if (
+            // TODO change delete gm-overlay when all widget are migrated
+            event.target.closest('.gm-modal') === null &&
             event.target.closest('.gm-overlay') === null &&
             !event.target.classList.contains('gm-icon-button') &&
             !event.target.classList.contains('gm-dont-close') &&

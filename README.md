@@ -153,7 +153,6 @@ The player uses css variables to style some parts of the app, but the player is 
 
     Input
 
-    --gm-input-bg-color: #fff;
     --gm-input-text-color: #000;
 
     Design

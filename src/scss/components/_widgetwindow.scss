@@ -27,6 +27,7 @@
         top: -1000px;
     }
 
+    // TODO delete when screencast and GPS will be reworked
     .gm-wrap:after,
     .gm-horizontal:after {
         display: table;
@@ -34,6 +35,7 @@
         clear: both;
     }
 
+    //TODO used only in GPS,  delete when GPS will be reworked
     .gm-col {
         width: 50%;
         float: left;
@@ -43,20 +45,6 @@
     .gm-title {
         text-align: center;
         margin-bottom: 30px;
-    }
-
-    .gm-horizontal {
-        margin: 15px 0;
-
-        label,
-        input,
-        button {
-            display: inline-block;
-        }
-
-        label {
-            width: 50%;
-        }
     }
 
     button {
@@ -125,6 +113,7 @@
         padding: 8px;
     }
 
+    // TODO delete this after rework all modal cause it's replaced by the new style .gm-modal-close-btn
     .gm-close-btn {
         position: absolute;
         top: 10px;
@@ -164,4 +153,68 @@
 .gm-disabled-widget-icon {
     opacity: 0.3;
     pointer-events: none;
+}
+
+.gm-modal {
+    text-align: left;
+    position: absolute;
+    width: 500px;
+    left: calc(50% - 250px);
+    top: 50px;
+    background-color: var(--gm-modal-bg-color);
+    color: var(--gm-text-color);
+    border: none;
+    border-radius: 2px;
+    transition: top 0.4s;
+    -webkit-transition: top 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+
+    &.gm-hidden {
+        top: -1000px;
+    }
+
+    label {
+        color: var(--gm-primary-color);
+        font-weight: bold;
+    }
+    .gm-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 40px;
+        margin-bottom: 28px;
+        font-size: 16px;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        border-bottom: 2px solid color-mix(in srgb, var(--gm-modal-bg-color), grey 10%);
+    }
+
+    .gm-modal-title {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .gm-modal-close-btn {
+        mask-image: url('../assets/images/ic_close-modal.svg');
+        mask-repeat: no-repeat;
+        mask-position: top center;
+        mask-size: contain;
+        -webkit-mask-image: url('../assets/images/ic_close-modal.svg');
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: top center;
+        -webkit-mask-size: contain;
+        background-color: var(--gm-text-color);
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+    }
+
+    .gm-modal-body {
+        padding: 0 40px 19px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 }

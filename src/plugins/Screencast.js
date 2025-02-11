@@ -247,7 +247,7 @@ module.exports = class Screencast extends OverlayPlugin {
         this.screenshotBtn = document.createElement('div');
         this.screenshotBtn.className = 'gm-action gm-screencast-screenshot';
         screenshot.onclick = this.onScreenshotClick.bind(this);
-        screenshot.className = 'gm-horizontal gm-screenshot';
+        screenshot.className = 'gm-screenshot';
 
         const screenshotLabel = this.i18n.SCREENCAST_SCREENSHOT || 'Screenshot';
         screenshot.innerHTML = '<label>' + screenshotLabel + '</label>';
@@ -260,7 +260,7 @@ module.exports = class Screencast extends OverlayPlugin {
         this.screencastBtn.className = 'gm-action gm-screencast-screencast';
 
         this.screencast.onclick = this.onScreencastClick.bind(this);
-        this.screencast.className = 'gm-horizontal gm-screencast';
+        this.screencast.className = 'gm-screencast';
 
         const screencastLabel = this.i18n.SCREENCAST_SCREENCAST || 'Screencast';
         this.screencast.innerHTML = '<label>' + screencastLabel + '</label>';

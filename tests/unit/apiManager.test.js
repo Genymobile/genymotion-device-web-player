@@ -1,18 +1,15 @@
 'use strict';
 
-const ApiManager = require('../../src/APIManager');
 const Instance = require('../mocks/DeviceRenderer');
 const Clipboard = require('../../src/plugins/Clipboard');
 
-let apiManager;
 let instance;
 let exposedApiFunctions;
 
 describe('APIManager', () => {
     beforeEach(() => {
         instance = new Instance({});
-        apiManager = new ApiManager(instance);
-        exposedApiFunctions = apiManager.getExposedApiFunctions();
+        exposedApiFunctions = instance.apiManager.getExposedApiFunctions();
 
         new Clipboard(instance, {
             CLIPBOARD_TITLE: 'TEST CLIPBOARD PLUGIN TITLE',

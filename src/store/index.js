@@ -7,7 +7,7 @@ const initialState = {
     isWebRTCConnectionReady: false,
     overlay: {
         isOpen: false,
-        widgetOpened: [],
+        widgetsOpened: [],
     },
     isKeyboardEventsEnabled: false,
     isMouseEventsEnabled: false,
@@ -22,7 +22,7 @@ const createStore = (instance, reducer) => {
 
     const getters = {
         isWidgetOpened: (overlayID) =>
-            instance.store.state.overlay.isOpen && instance.store.state.overlay.widgetOpened.includes(overlayID),
+            instance.store.state.overlay.isOpen && instance.store.state.overlay.widgetsOpened.includes(overlayID),
     };
 
     const hasChanged = (changedKeys, keyPath) => {
@@ -69,20 +69,20 @@ const createStore = (instance, reducer) => {
         return changedKeys;
     };
 
-    const notifyListeners = (changedKeys) => {
+    const notifyListeners = (changedKeys, copyOfPreviousState) => {
         listeners.forEach(({keys, cb}) => {
             if (keys.length === 0 || keys.some((key) => hasChanged(changedKeys, key))) {
                 // send a copy of the store's state, in order to avoid mutation of the store
-                cb({...instance.store.state});
+                cb({...instance.store.state}, copyOfPreviousState);
             }
         });
     };
 
     const dispatch = (action) => {
-        const previousState = JSON.parse(JSON.stringify(instance.store.state));
+        const copyOfPreviousState = JSON.parse(JSON.stringify(instance.store.state));
         instance.store.state = reducer({...instance.store.state}, action);
-        const changedKeys = findChangedKeys(instance.store.state, previousState);
-        notifyListeners(changedKeys);
+        const changedKeys = findChangedKeys(instance.store.state, copyOfPreviousState);
+        notifyListeners(changedKeys, copyOfPreviousState);
     };
 
     const subscribe = (listener, keys = []) => {
@@ -119,21 +119,28 @@ const reducer = (state, action) => {
             break;
         case 'OVERLAY_OPEN':
             // eslint-disable-next-line no-case-declarations
-            const {overlayID, toOpen} = action.payload;
-            if (toOpen) {
+            const {overlayID, toOpen = null} = action.payload;
+            // eslint-disable-next-line no-case-declarations
+            const shouldOpenOverlay = toOpen === null ? !state.overlay.widgetsOpened.includes(overlayID) : toOpen;
+
+            if (shouldOpenOverlay) {
+                // Open
                 state.overlay.isOpen = true;
                 /*
                  * to open several widgets at the same time
-                 * widgetOpened: [...state.overlay.widgetOpened, overlayID],
+                 * widgetsOpened: [...state.overlay.widgetsOpened, overlayID],
                  */
-                state.overlay.widgetOpened = [overlayID];
-                state.isKeyboardEventsEnabled = false;
-                state.isMouseEventsEnabled = false;
+                state.overlay.widgetsOpened = [...state.overlay.widgetsOpened, overlayID];
             } else {
-                state.overlay.isOpen = false;
-                state.overlay.widgetOpened = [];
-                state.isKeyboardEventsEnabled = true;
-                state.isMouseEventsEnabled = true;
+                if (overlayID) {
+                    state.overlay.widgetsOpened = state.overlay.widgetsOpened.filter((id) => id !== overlayID);
+                } else {
+                    state.overlay.widgetsOpened = [];
+                }
+                // Close
+                if (state.overlay.widgetsOpened.length === 0) {
+                    state.overlay.isOpen = false;
+                }
             }
             break;
         case 'ENABLE_TRACKED_EVENTS':

@@ -70,13 +70,12 @@ module.exports = class Identifiers extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {modal, container} = this.createTemplateModal({
+        const {container} = this.createTemplateModal({
             title: this.i18n.IDENTIFIERS_TITLE || 'Identifiers',
             classes: 'gm-identifiers-plugin',
             width: 378,
             height: 422,
         });
-        this.widget = modal;
         this.container = container;
 
         // Generate input rows
@@ -152,9 +151,6 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.container.appendChild(inputs);
         this.container.appendChild(separator);
         this.container.appendChild(actionsDiv);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
     }
 
     /**

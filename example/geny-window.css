@@ -113,7 +113,6 @@ input[type='checkbox'] {
 /* Page */
 body {
     margin: 0;
-    background: #000;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -121,7 +120,7 @@ body {
 
 header {
     padding: 10px 0;
-    background-color: #1e1e1e;
+    background-color: #292929;
     display: flex;
     justify-content: flex-start;
 }
@@ -147,7 +146,7 @@ header {
     flex-direction: column;
     min-width: 300px;
     max-width: 300px;
-    background-color: #1e1e1e;
+    background-color: #292929;
     color: #fff;
     padding: 10px;
     box-sizing: border-box;
@@ -182,65 +181,42 @@ header {
     background-color: #f8f9fa;
     color: #000;
 }
+
 .light #player {
-    --gm-text-color: #2b2b2b;
-    --gm-primary-color: #007bff;
-    --gm-secondary-color: #f8f9fa;
-    --gm-success-color: #28a745;
-
-    --gm-player-bg-color: #ffffff;
-    --gm-loader-color: #2b2b2b;
-
-    --gm-toolbar-bg-color: #ffffff;
-    --gm-toolbar-icon-color: #6c757d;
-    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
-
-    --gm-btn-text-color: #ffffff;
-    --gm-btn-bg-color: var(--gm-primary-color);
-    --gm-btn-bg-color-hover: #0056b3;
-    --gm-btn-bg-color-disabled: #e9ecef;
-    --gm-btn-bg-color-disabled-hover: #ced4da;
-    --gm-btn-color-disabled: #6c757d;
-
-    --gm-input-text-color: #495057;
-
-    --gm-underline-color: var(--gm-primary-color);
-
-    --gm-modal-bg-color: #ffffff;
-    background-color: #ffffff;
+      /* Light Theme Variables */
+    --gm-primary-color: rgba(230, 25, 94, 1);
+    --gm-on-primary-color: rgba(255, 255, 255, 1);
+    --gm-primary-variant-color: rgba(230, 25, 94, 0.2);
+    --gm-on-primary-variant-color: rgba(230, 25, 94, 1);
+    --gm-secondary-color: #ffffff;
+    --gm-on-secondary-color: #292929;
+    --gm-secondary-variant-color: #F7F7F7;
+    --gm-on-secondary-variant-color: #1A1A1A;
+    --gm-tertiary-color: #C4C4C44D;
+    --gm-on-tertiary-color: #1A1A1A;
+    --gm-tertiary-variant-color: #C4C4C4;
+    --gm-on-tertiary-variant-color: #1A1A1A;
+    --gm-background-color: #E7E7F3;
+    --gm-on-background-color: #1A1A1A;
+    --gm-surface-color: #F7F7F7;
+    --gm-on-surface-color: #1A1A1A;
+    --gm-error-color: rgba(255, 17, 17, 1);
+    --gm-background-error-color: rgba(255, 17, 17, 0.1);
+    --gm-success-color: rgba(17, 185, 32, 1);
+    --gm-background-success-color: rgba(17, 185, 32, 0.1);
+    --gm-warning-color: rgba(255, 204, 0, 1);
+    --gm-background-warning-color: rgba(255, 204, 0, 0.1);
+    --gm-gradient-1: linear-gradient(142.33deg, #E6195E 4.58%, #2B41EA 122.31%);
+    --gm-on-gradient-1: rgba(255, 255, 255, 1);
+    --gm-gradient-2: linear-gradient(275.69deg, #E6195E 10.31%, #2B41EA 136.09%);
+    --gm-on-gradient-2: rgba(255, 255, 255, 1);
 }
 #player {
-    /** override css variables **/
-    --gm-text-color: #ffffff;
-    --gm-primary-color: #e6195e;
-    --gm-secondary-color: #292929;
-    --gm-success-color: #11b920;
-
-    --gm-player-bg-color: var(--gm-secondary-color);
-    --gm-loader-color: var(--gm-text-color);
-
-    --gm-toolbar-bg-color: #1e1e1e;
-    --gm-toolbar-icon-color: #e8eaed;
-    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
-
-    --gm-btn-text-color: var(--gm-text-color);
-    --gm-btn-bg-color: var(--gm-primary-color);
-    --gm-btn-bg-color-hover: var(--gm-primary-color);
-    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
-    --gm-btn-bg-color-disabled-hover: #828282;
-    --gm-btn-color-disabled: #c4c4c4;
-
-    --gm-input-text-color: #fff;
-
-    --gm-underline-color: var(--gm-text-color);
-
-    --gm-modal-bg-color: var(--gm-secondary-color);
-    background-color: #1a1a1a;
-    color: #fff;
     box-sizing: border-box;
     margin: 0 auto;
     flex-grow: 1;
     max-height: calc(100vh - 84px);
+    background: var(--gm-background-color);
 }
 
 #fe-player .gm-video-wrapper {

@@ -201,15 +201,16 @@ module.exports = class GPS extends OverlayPlugin {
      */
     renderGPSForm() {
         // Create elements
-        this.widget = document.createElement('div');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.GPS_TITLE || 'GPS',
+            classes: 'gm-gps-controls',
+        });
+
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
+
         this.form = document.createElement('form');
         const formWrap = document.createElement('div');
-
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.GPS_TITLE || 'GPS';
-        this.form.appendChild(title);
 
         // Generate form inputs
         const inputs = document.createElement('div');
@@ -276,19 +277,7 @@ module.exports = class GPS extends OverlayPlugin {
         button.onclick = this.sendDataToInstance.bind(this);
         this.form.appendChild(button);
 
-        // Setup
-        this.widget.className = 'gm-overlay gm-gps-controls gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleForm.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.form);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(this.form);
     }
 
     /**

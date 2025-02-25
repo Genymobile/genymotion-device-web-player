@@ -36,7 +36,9 @@ module.exports = class APIManager {
             fn: () => {
                 this.instance.destroy();
             },
-            description: 'Disconnect from the current instance, ending the WebSocket communication.',
+            description:
+                // eslint-disable-next-line max-len
+                'Disconnect from the current instance, clearing all registered listeners and ending the WebSocket communication.',
         });
 
         // Register a function to get all registered functions

@@ -24,6 +24,7 @@ const defaultOptions = {
         'ButtonsEvents_BACK',
         'ButtonsEvents_POWER',
     ],
+    toolbarPosition: 'right',
     touch: true,
     mouse: true,
     volume: true,
@@ -86,6 +87,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {string}             webRTCUrl                      WebRTC URL of the instance.
      * @param  {Object}             options                        Various configuration options.
      * @param  {boolean}            options.showPhoneBorder        Show phone border. Default: false.
+     * @param  {string}             options.toolbarPosition        Toolbar position. Default: 'right'. Available values: 'left', 'right'.
      * @param  {boolean}            options.toolbarOrder           Toolbar buttons order. Default: see defaultOptions.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
@@ -177,10 +179,11 @@ module.exports = class DeviceRendererFactory {
      */
     loadTemplate(dom, options) {
         dom.innerHTML = `
-        <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''}">
+        <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''} 
+        toolbarPosition-${options.toolbarPosition}">
             <div class="gm-video-wrapper">
-                <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag
-                </video>
+                <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
+                ${options.showPhoneBorder ? '<div class="gm-phone-button"></div>' : ''}
             </div>
             <div class="gm-toolbar-wrapper">
                 <div class="gm-toolbar">

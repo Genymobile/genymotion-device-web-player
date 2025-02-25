@@ -87,14 +87,15 @@ module.exports = class BasebandRIL extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        this.widget = document.createElement('div');
-        this.form = document.createElement('form');
+        const {modal, container} = this.createTemplateModal({
+            title: this.i18n.BASEBAND_TITLE || 'Baseband',
+            classes: 'gm-baseband-plugin',
+        });
 
-        // Generate title
-        const title = document.createElement('div');
-        title.className = 'gm-title';
-        title.innerHTML = this.i18n.BASEBAND_TITLE || 'Baseband';
-        this.form.appendChild(title);
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        modal.classList.add('gm-overlay');
+
+        this.form = document.createElement('form');
 
         if (this.basebandEnabled) {
             this.networkOperator = document.createElement('div');
@@ -209,18 +210,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         }
         this.form.appendChild(this.submitBtn);
 
-        this.widget.className = 'gm-overlay gm-baseband-plugin gm-hidden';
-
-        // Add close button
-        const close = document.createElement('div');
-        close.className = 'gm-close-btn';
-        close.onclick = this.toggleWidget.bind(this);
-
-        this.widget.appendChild(close);
-        this.widget.appendChild(this.form);
-
-        // Render into document
-        this.instance.root.appendChild(this.widget);
+        container.appendChild(this.form);
     }
 
     /**

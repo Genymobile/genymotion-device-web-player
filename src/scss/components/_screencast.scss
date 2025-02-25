@@ -3,6 +3,11 @@
  */
 .device-renderer-instance {
     .gm-screencast-plugin {
+        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+        label{
+            color: var(--gm-text-color);
+            font-weight: normal;
+        }
         width: 400px;
         left: calc(50% - 200px);
 
@@ -47,7 +52,7 @@
                 mask-repeat: no-repeat;
                 -webkit-mask-position: center;
                 mask-position: center;
-                background-color: var(--gm-toolbar-icon-color);
+                background-color: var(--gm-on-secondary-color);
             }
         }
 

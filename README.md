@@ -130,47 +130,38 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
 ## 🎨 Style and CSS
 
-The player uses css variables to style some parts of the app, but the player is still totally customisable through overloading the css classes.
+The player leverages CSS variables in Material Design mode to style the app, while remaining fully customizable by overriding the CSS classes.
 
 #### CSS variables available with their default presets:
 
-    Colors
+Colors
 
-    --gm-text-color: #ffffff;
-    --gm-primary-color: #e6195e;
+    --gm-primary-color: rgba(230, 25, 94, 1);
+    --gm-on-primary-color: rgba(255, 255, 255, 1);
+    --gm-primary-variant-color: rgba(230, 25, 94, 0.2);
+    --gm-on-primary-variant-color: rgba(230, 25, 94, 1);
     --gm-secondary-color: #292929;
-    --gm-success-color: #11b920;
-
-    Player
-
-    --gm-player-bg-color: var(--gm-secondary-color);
-    --gm-loader-color: var(--gm-text-color);
-
-    Toolbar
-
-    --gm-toolbar-bg-color: var(--gm-secondary-color);
-    --gm-toolbar-icon-color: #e8eaed;
-    --gm-toolbar-icon-color-hover: var(--gm-primary-color);
-
-    Button
-
-    --gm-btn-text-color: var(--gm-text-color);
-    --gm-btn-bg-color: var(--gm-primary-color);
-    --gm-btn-bg-color-hover: var(--gm-primary-color);
-    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24);
-    --gm-btn-bg-color-disabled-hover: #828282;
-    --gm-btn-color-disabled: #c4c4c4;
-
-    Input
-
-    --gm-input-text-color: #000;
-
-    Design
-
-    --gm-underline-color: var(--gm-text-color);
-
-    Modal
-    --gm-modal-bg-color: var(--gm-secondary-color);
+    --gm-on-secondary-color: #ffffff;
+    --gm-secondary-variant-color: #212121;
+    --gm-on-secondary-variant-color: #ffffff;
+    --gm-tertiary-color: #c4c4c44d;
+    --gm-on-tertiary-color: #ffffff;
+    --gm-tertiary-variant-color: #c4c4c4;
+    --gm-on-tertiary-variant-color: #1A1A1A;
+    --gm-background-color: #1A1A1A;
+    --gm-on-background-color: #ffffff;
+    --gm-surface-color: #292929;
+    --gm-on-surface-color: #ffffff;
+    --gm-error-color: rgba(255, 17, 17, 1);
+    --gm-background-error-color: rgba(255, 17, 17, 0.1);
+    --gm-success-color: rgba(17, 185, 32, 1);
+    --gm-background-success-color: rgba(17, 185, 32, 0.1);
+    --gm-warning-color: rgba(255, 204, 0, 1);
+    --gm-background-warning-color:  rgba(255, 204, 0, 0.1);
+    --gm-gradiant-1: linear-gradient(142.33deg, #E6195E 4.58%, #2B41EA 122.31%);
+    --gm-on-gradiant-1: rgba(255, 255, 255, 1);
+    --gm-gradiant-2: linear-gradient(275.69deg, #E6195E 10.31%, #2B41EA 136.09%);
+    --gm-on-gradiant-2: rgba(255, 255, 255, 1);
 
 ## 📘 API Documentation
 
@@ -334,6 +325,16 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Default:** `false`
 -   **Details:**
     Adds a mobile-style frame around the video to mimic the appearance of a smartphone screen.
+
+### `toolbarPosition`
+
+-   **Type:** `String`
+-   **Default:** `right`
+-   **Details:**
+    Position of the toolbar
+-   **Available options:**
+-   `"left"` → Toolbar appears on the left side.
+-   `"right"` → Toolbar appears on the right side.
 
 #### `connectionFailedURL`
 

@@ -2,6 +2,11 @@
  * Fullscreen plugin styles
  */
 .device-renderer-instance .gm-fingerprint-plugin {
+    // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
+    label{
+        color: var(--gm-text-color);
+        font-weight: normal;
+    }
     .gm-fingerprint-container {
         display: flex;
         flex-direction: column;

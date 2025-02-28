@@ -54,17 +54,17 @@ describe('Phone Plugin', () => {
     });
 
     describe('outgoing events', () => {
-        test('gsm call', () => {
+        test.only('gsm call', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
             ['jean-michel', '-666', ''].forEach((invalidValue) => {
-                phone.phoneInput.value = invalidValue;
-                phone.sendPhoneCallToInstance();
+                phone.phoneInput.setValue(invalidValue, true);
+                phone.phoneBtn.click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(0);
             });
 
-            phone.phoneInput.value = '0123456789';
-            phone.sendPhoneCallToInstance();
+            phone.phoneInput.setValue('0123456789', true);
+            phone.phoneBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
             expect(instance.outgoingMessages[0]).toEqual({channel: 'baseband', messages: ['gsm call 0123456789']});
@@ -72,14 +72,19 @@ describe('Phone Plugin', () => {
 
         test('sms send', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
-            phone.phoneInput.value = '0123456789';
+            phone.phoneInput.setValue('0123456789', true);
 
-            phone.textInput.value = '';
-            phone.sendSMSToInstance();
+            const event = new KeyboardEvent('keyup', {key: ''});
+            phone.textInput.dispatchEvent(event);
+
+            phone.textBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
 
             phone.textInput.value = 'Hello world';
-            phone.sendSMSToInstance();
+            const eventt = new KeyboardEvent('keyup', {key: 'Hello world'});
+            phone.textInput.dispatchEvent(eventt);
+
+            phone.textBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
             expect(instance.outgoingMessages[0]).toEqual({

@@ -114,8 +114,8 @@
     }
 
     // TODO delete this after rework all modal
-    &.gm-modal{
-        padding: 0
+    &.gm-modal {
+        padding: 0;
     }
     // TODO delete this after rework all modal cause it's replaced by the new style .gm-modal-close-btn
     .gm-close-btn {
@@ -151,13 +151,17 @@
     &.gm-visible {
         visibility: visible;
         opacity: 1;
-        transition: opacity 0.5s ease-in-out, visibility 0s 0s;
+        transition:
+            opacity 0.5s ease-in-out,
+            visibility 0s 0s;
     }
-    
+
     &.gm-hidden {
         visibility: hidden;
         opacity: 0;
-        transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
+        transition:
+            opacity 0.5s ease-in-out,
+            visibility 0s 0.5s;
     }
 
     label {
@@ -165,7 +169,6 @@
         font-weight: bold;
         margin-bottom: $modal-label-mb;
         display: block;
-
     }
     .gm-modal-header {
         display: flex;
@@ -198,8 +201,8 @@
         -webkit-mask-size: contain;
         background-color: var(--gm-on-secondary-color);
         cursor: pointer;
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
     }
 
     .gm-modal-body {

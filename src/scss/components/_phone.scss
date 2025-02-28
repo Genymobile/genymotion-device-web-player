@@ -3,18 +3,13 @@
  */
 .device-renderer-instance .gm-phone-plugin {
     .gm-phone-group {
-        &:first-child {
-            margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: $modal-section-mb;
+        .gm-phone-call,
+        .gm-phone-send {
+            margin-top: $spacing-m;
+            align-self: flex-end;
         }
-    }
-
-    input,
-    textarea {
-        margin-bottom: 4px;
-    }
-
-    textarea {
-        resize: none;
-        width: 100%;
     }
 }

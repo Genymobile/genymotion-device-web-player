@@ -7,9 +7,9 @@
             display: flex;
             flex-direction: column;
         }
-    
+
         &-clipboard-saved {
-            .gm-actions{
+            .gm-actions {
                 .gm-tag-success {
                     visibility: visible;
                 }
@@ -17,20 +17,9 @@
         }
 
         &-clipboard-input {
-            height: 249px;
-            resize: none;
-            border: none;
             margin: $spacing-m 0;
-            padding: $spacing-m 0 0 $spacing-m;
-
-            color: var(--gm-on-tertiary-color);
-            background-color: var(--gm-tertiary-color);
-
-            &:focus {
-                outline: none; 
-            }
         }
-        &-actions{
+        &-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -39,7 +28,7 @@
                 align-items: center;
             }
             .gm-clipboard-apply::before {
-                content: "";
+                content: '';
                 mask-image: url('../assets/images/ic_copy.svg');
                 -webkit-mask-image: url('../assets/images/ic_copy.svg');
                 -webkit-mask-size: contain;

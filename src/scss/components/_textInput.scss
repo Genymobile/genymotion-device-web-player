@@ -1,5 +1,5 @@
 .text-input-container {
-    border-bottom: 1px solid var(--gm-on-secondary-color);
+    border-bottom: 1px solid var(--gm-tertiary-variant-color);
     color: var(--gm-on-secondary-color);
     display: flex;
     align-items: center;
@@ -9,7 +9,7 @@
         border-bottom: 1px solid transparent;
     }
 
-    .text-input{
+    .text-input {
         text-align: left;
         padding-left: 0;
         padding-right: 0;
@@ -19,14 +19,17 @@
         /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
         font-size: inherit;
 
+        &::placeholder {
+            color: var(--gm-tertiary-color);
+        }
         &:focus {
-            outline: none; 
+            outline: none;
         }
 
         &:read-only {
-            background:  var(--gm-tertiary-color);
+            background: var(--gm-tertiary-color);
             border: none;
-            color: var(--gm-tertiary-variant-color)
+            color: var(--gm-tertiary-variant-color);
         }
     }
 }

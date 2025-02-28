@@ -189,6 +189,7 @@ const textInput = (() => {
         regexValidField,
         appendText = '',
         classes = '',
+        placeholder = '',
     }) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
@@ -199,6 +200,7 @@ const textInput = (() => {
         input.type = 'text';
         input.value = value;
         input.classList.add('text-input');
+        input.placeholder = placeholder;
 
         if (appendText) {
             const appendSpan = document.createElement('span');

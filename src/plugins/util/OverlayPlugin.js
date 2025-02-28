@@ -302,7 +302,7 @@ class OverlayPlugin {
                             wrapperRect.bottom -
                                 modalHeight -
                                 wrapperRect.top +
-                                marginTopAndBottom * 2 -
+                                marginTopAndBottom -
                                 OVERLAY_BORDER_MARGIN,
                             y,
                         ),
@@ -322,7 +322,7 @@ class OverlayPlugin {
                             wrapperRect.bottom -
                                 modalHeight -
                                 wrapperRect.top +
-                                marginTopAndBottom * 2 -
+                                marginTopAndBottom -
                                 OVERLAY_BORDER_MARGIN,
                             y,
                         ),

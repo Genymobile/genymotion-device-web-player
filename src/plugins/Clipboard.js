@@ -87,7 +87,8 @@ module.exports = class Clipboard extends OverlayPlugin {
         const text = document.createElement('div');
         text.innerHTML =
             this.i18n.CLIPBOARD_TEXT ||
-            "The content you type below will be copied directly to your virtual device's clipboard.";
+            // eslint-disable-next-line max-len
+            'The content you type here will be copied to your virtual phone. The content you copy from your virtual phone will be added here as well.';
 
         this.clipboardInput = document.createElement('textarea');
         this.clipboardInput.className = 'gm-clipboard-input';

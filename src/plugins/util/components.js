@@ -193,8 +193,13 @@ const textInput = (() => {
     }) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
+        inputDiv.classList.add('text-input');
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
+        const inputMessage = document.createElement('div');
+        inputMessage.classList.add('text-input-message');
+        inputDiv.appendChild(inputDivContainer);
+        inputDiv.appendChild(inputMessage);
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -210,7 +215,6 @@ const textInput = (() => {
         }
 
         inputDivContainer.insertBefore(input, inputDivContainer.firstChild);
-        inputDiv.appendChild(inputDivContainer);
 
         const setValue = (newValue, triggerOnChange = false) => {
             if (regexFilter && !regexFilter.test(newValue)) {
@@ -229,6 +233,16 @@ const textInput = (() => {
 
         const setReadOnly = (readOnly) => {
             input.readOnly = readOnly;
+        };
+
+        const setErrorMessage = (message) => {
+            if (!message) {
+                inputMessage.classList.remove('error');
+                inputMessage.removeAttribute('data-error');
+                return;
+            }
+            inputMessage.classList.add('error');
+            inputMessage.setAttribute('data-error', message);
         };
 
         const checkValidity = () => {
@@ -260,6 +274,7 @@ const textInput = (() => {
             getValue,
             checkValidity,
             setReadOnly,
+            setErrorMessage,
         };
     };
 

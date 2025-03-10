@@ -114,7 +114,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n]},
             {enabled: this.options.network, class: Network, params: [this.options.i18n]},
             {enabled: this.options.phone, class: Phone, params: [this.options.i18n]},
-            {enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n, this.options.baseband]},
+            {enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n]},
             {enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n]},
             {enabled: this.options.biometrics, class: FingerPrint},
             {enabled: this.options.microphone, dependencies: [MediaManager]},

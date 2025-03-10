@@ -1,6 +1,7 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
+const {textInput, chipTag} = require('./util/components');
 
 /**
  * Instance Baseband/RIL plugin.
@@ -15,9 +16,8 @@ module.exports = class BasebandRIL extends OverlayPlugin {
      *
      * @param {Object}  instance        Associated instance.
      * @param {Object}  i18n            Translations keys for the UI.
-     * @param {boolean} basebandEnabled Whether or not baseband control is enabled.
      */
-    constructor(instance, i18n, basebandEnabled) {
+    constructor(instance, i18n) {
         super(instance);
 
         // Reference instance
@@ -27,8 +27,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.instance.baseband = this;
         this.i18n = i18n || {};
 
-        this.basebandEnabled = basebandEnabled;
-
+        this.formValid = false;
         // Render components
         this.registerToolbarButton();
         this.renderWidget();
@@ -51,23 +50,25 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         }
 
         if (values[0] === 'network' && values[1] === 'operator') {
-            this.networkOperatorMMC.value = values[2];
+            this.networkOperatorMMC.setValue(values[2]);
         }
         if (values[0] === 'network' && values[1] === 'operator_name') {
-            this.networkOperatorName.value = values.slice(2).join(' ');
+            this.networkOperatorName.setValue(values.slice(2).join(' '));
         }
         if (values[0] === 'sim' && values[1] === 'operator') {
-            this.simOperatorMMC.value = values[2];
+            this.simOperatorMMC.setValue(values[2]);
         }
         if (values[0] === 'sim' && values[1] === 'operator_name') {
-            this.simOperatorName.value = values.slice(2).join(' ');
+            this.simOperatorName.setValue(values.slice(2).join(' '));
         }
         if (values[0] === 'sim' && values[1] === 'imsi_id') {
-            this.simMSIN.value = values[2];
+            this.simMSIN.setValue(values[2]);
         }
         if (values[0] === 'sim' && values[1] === 'phone_number') {
-            this.simOperatorPhoneNumber.value = values[2];
+            this.simOperatorPhoneNumber.setValue(values[2]);
         }
+        this.checkIfFormIsValid();
+        this.container.classList.add('gm-baseband-saved');
     }
 
     /**
@@ -87,130 +88,173 @@ module.exports = class BasebandRIL extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {modal, container} = this.createTemplateModal({
+        const {container} = this.createTemplateModal({
             title: this.i18n.BASEBAND_TITLE || 'Baseband',
             classes: 'gm-baseband-plugin',
+            width: 378,
+            height: 551,
         });
 
-        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
-        modal.classList.add('gm-overlay');
+        this.container = container;
 
-        this.form = document.createElement('form');
+        // nextworkOperatorSectionDiv
+        const nextworkOperatorSectionDiv = document.createElement('div');
+        nextworkOperatorSectionDiv.className = 'gm-section';
+        const networkOperatorTitleDiv = document.createElement('div');
+        networkOperatorTitleDiv.innerHTML = this.i18n.NETWORK_OPERATOR || 'Network Operator';
+        networkOperatorTitleDiv.className = 'gm-network-operator-section-title';
+        nextworkOperatorSectionDiv.appendChild(networkOperatorTitleDiv);
 
-        if (this.basebandEnabled) {
-            this.networkOperator = document.createElement('div');
+        const networkOperatorFirstLineDiv = document.createElement('div');
+        networkOperatorFirstLineDiv.className = 'gm-network-operator-section-line';
 
-            const networkOperatorLabelDiv = document.createElement('div');
-            networkOperatorLabelDiv.className = 'gm-section';
-            const networkOperatorLabel = document.createElement('label');
-            networkOperatorLabel.innerHTML = this.i18n.NETWORK_OPERATOR || 'Network Operator';
-            networkOperatorLabelDiv.appendChild(networkOperatorLabel);
+        const networkOperatorMMCDiv = document.createElement('div');
+        const networkOperatorMMCLabel = document.createElement('label');
+        networkOperatorMMCLabel.innerHTML = 'MCC/MNC';
+        this.networkOperatorMMC = textInput.createTextInput({
+            classes: 'gm-network-mmc',
+            regexFilter: /^[0-9]{0,6}$/,
+            regexValidField: /^[0-9]{5,6}$/,
+            placeholder: 'eg: 20814',
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
+        });
+        networkOperatorMMCDiv.appendChild(networkOperatorMMCLabel);
+        networkOperatorMMCDiv.appendChild(this.networkOperatorMMC.element);
 
-            const networkOperatorMMCDiv = document.createElement('div');
-            networkOperatorMMCDiv.className = 'gm-fields';
-            const networkOperatorMMCLabel = document.createElement('label');
-            networkOperatorMMCLabel.innerHTML = 'MCC/MNC';
-            this.networkOperatorMMC = document.createElement('input');
-            this.networkOperatorMMC.className = 'gm-network-network-mmc';
-            this.networkOperatorMMC.placeholder = 'eg: 20814';
-            this.networkOperatorMMC.pattern = '[0-9]{5,6}';
-            this.networkOperatorMMC.title = 'Operator MCC/MNC';
-            networkOperatorMMCDiv.appendChild(networkOperatorMMCLabel);
-            networkOperatorMMCDiv.appendChild(this.networkOperatorMMC);
+        const networkOperatorNameDiv = document.createElement('div');
+        const networkOperatorNameLabel = document.createElement('label');
+        networkOperatorNameLabel.innerHTML = 'Name';
+        this.networkOperatorName = textInput.createTextInput({
+            classes: 'gm-network-name',
+            placeholder: 'eg: Verizon',
+            onChange: () => {
+                this.container.classList.remove('gm-baseband-saved');
+            },
+        });
+        networkOperatorNameDiv.appendChild(networkOperatorNameLabel);
+        networkOperatorNameDiv.appendChild(this.networkOperatorName.element);
 
-            const networkOperatorNameDiv = document.createElement('div');
-            networkOperatorNameDiv.className = 'gm-fields';
-            const networkOperatorNameLabel = document.createElement('label');
-            networkOperatorNameLabel.innerHTML = 'Name';
-            this.networkOperatorName = document.createElement('input');
-            this.networkOperatorName.className = 'gm-network-network-name';
-            this.networkOperatorName.placeholder = 'eg: Verizon';
-            this.networkOperatorName.title = 'Operator Name';
-            networkOperatorNameDiv.appendChild(networkOperatorNameLabel);
-            networkOperatorNameDiv.appendChild(this.networkOperatorName);
+        networkOperatorFirstLineDiv.appendChild(networkOperatorMMCDiv);
+        networkOperatorFirstLineDiv.appendChild(networkOperatorNameDiv);
+        nextworkOperatorSectionDiv.appendChild(networkOperatorFirstLineDiv);
 
-            this.networkOperator.appendChild(networkOperatorLabelDiv);
-            this.networkOperator.appendChild(networkOperatorMMCDiv);
-            this.networkOperator.appendChild(networkOperatorNameDiv);
+        // simOperatorSectionDiv
+        const simOperatorSectionDiv = document.createElement('div');
+        simOperatorSectionDiv.className = 'gm-section';
+        const simOperatorTitleDiv = document.createElement('div');
+        simOperatorTitleDiv.innerHTML = this.i18n.NETWORK_SIM_OPERATOR || 'SIM Operator';
+        simOperatorTitleDiv.className = 'gm-sim-operator-section-title';
+        simOperatorSectionDiv.appendChild(simOperatorTitleDiv);
 
-            this.simOperator = document.createElement('div');
+        const simOperatorFirstLineDiv = document.createElement('div');
+        simOperatorFirstLineDiv.className = 'gm-sim-operator-section-line';
+        const simOperatorSecondLineDiv = document.createElement('div');
+        simOperatorSecondLineDiv.className = 'gm-sim-operator-section-line';
 
-            const simperatorLabelDiv = document.createElement('div');
-            simperatorLabelDiv.className = 'gm-section';
-            const simperatorLabel = document.createElement('label');
-            simperatorLabel.innerHTML = this.i18n.NETWORK_SIM_OPERATOR || 'SIM Operator';
-            simperatorLabelDiv.appendChild(simperatorLabel);
+        const simOperatorMMCDiv = document.createElement('div');
+        const simOperatorMMCLabel = document.createElement('label');
+        simOperatorMMCLabel.innerHTML = 'MCC/MNC';
+        this.simOperatorMMC = textInput.createTextInput({
+            classes: 'gm-sim-name',
+            placeholder: 'eg: 20814',
+            regexFilter: /^[0-9]{0,6}$/,
+            regexValidField: /^[0-9]{5,6}$/,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
+        });
+        simOperatorMMCDiv.appendChild(simOperatorMMCLabel);
+        simOperatorMMCDiv.appendChild(this.simOperatorMMC.element);
 
-            const simOperatorMMCDiv = document.createElement('div');
-            simOperatorMMCDiv.className = 'gm-fields';
-            const simOperatorMMCLabel = document.createElement('label');
-            simOperatorMMCLabel.innerHTML = 'MCC/MNC';
-            this.simOperatorMMC = document.createElement('input');
-            this.simOperatorMMC.className = 'gm-network-sim-mmc';
-            this.simOperatorMMC.placeholder = 'eg: 20814';
-            this.simOperatorMMC.pattern = '[0-9]{5,6}';
-            this.simOperatorMMC.title = 'SIM Operator MCC/MNC';
-            this.instance.addListener(this.simOperatorMMC, 'keyup', this.checkSimImsiErrors.bind(this));
-            simOperatorMMCDiv.appendChild(simOperatorMMCLabel);
-            simOperatorMMCDiv.appendChild(this.simOperatorMMC);
+        const simOperatorNameDiv = document.createElement('div');
+        const simOperatorNameLabel = document.createElement('label');
+        simOperatorNameLabel.innerHTML = 'Name';
+        this.simOperatorName = textInput.createTextInput({
+            classes: 'gm-sim-name',
+            placeholder: 'eg: AT&T',
+            onChange: () => {
+                this.container.classList.remove('gm-baseband-saved');
+            },
+        });
+        simOperatorNameDiv.appendChild(simOperatorNameLabel);
+        simOperatorNameDiv.appendChild(this.simOperatorName.element);
 
-            const simOperatorNameDiv = document.createElement('div');
-            simOperatorNameDiv.className = 'gm-fields';
-            const simOperatorNameLabel = document.createElement('label');
-            simOperatorNameLabel.innerHTML = 'Name';
-            this.simOperatorName = document.createElement('input');
-            this.simOperatorName.className = 'gm-network-sim-name';
-            this.simOperatorName.placeholder = 'eg: AT&T';
-            this.simOperatorName.title = 'SIM Operator Name';
-            simOperatorNameDiv.appendChild(simOperatorNameLabel);
-            simOperatorNameDiv.appendChild(this.simOperatorName);
+        simOperatorFirstLineDiv.appendChild(simOperatorMMCDiv);
+        simOperatorFirstLineDiv.appendChild(simOperatorNameDiv);
+        simOperatorSectionDiv.appendChild(simOperatorFirstLineDiv);
 
-            const simMSINDiv = document.createElement('div');
-            simMSINDiv.className = 'gm-fields';
-            const simMSINLabel = document.createElement('label');
-            simMSINLabel.innerHTML = 'MSIN';
-            this.simMSIN = document.createElement('input');
-            this.simMSIN.className = 'gm-network-sim-msin';
-            this.simMSIN.placeholder = 'eg: 2176510739';
-            this.simMSIN.pattern = '[0-9]{9,10}';
-            this.simMSIN.title = 'SIM MSIN';
-            this.instance.addListener(this.simMSIN, 'keyup', this.checkSimImsiErrors.bind(this));
-            simMSINDiv.appendChild(simMSINLabel);
-            simMSINDiv.appendChild(this.simMSIN);
+        const simMSINDiv = document.createElement('div');
+        const simMSINLabel = document.createElement('label');
+        simMSINLabel.innerHTML = 'MSIN';
+        this.simMSIN = textInput.createTextInput({
+            classes: 'gm-sim-msin',
+            placeholder: 'eg: 2176510739',
+            regexFilter: /^[0-9]{0,10}$/,
+            regexValidField: /^[0-9]{9,10}$/,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('f');
+            },
+        });
+        simMSINDiv.appendChild(simMSINLabel);
+        simMSINDiv.appendChild(this.simMSIN.element);
 
-            const simOperatorPhoneDiv = document.createElement('div');
-            simOperatorPhoneDiv.className = 'gm-fields';
-            const simOperatorPhoneLabel = document.createElement('label');
-            simOperatorPhoneLabel.innerHTML = 'Phone Number';
-            this.simOperatorPhoneNumber = document.createElement('input');
-            this.simOperatorPhoneNumber.className = 'gm-network-sim-phone';
-            this.simOperatorPhoneNumber.placeholder = 'eg: 8004337300';
-            this.simOperatorPhoneNumber.pattern = '[0-9]*';
-            this.simOperatorPhoneNumber.title = 'Phone Number';
-            simOperatorPhoneDiv.appendChild(simOperatorPhoneLabel);
-            simOperatorPhoneDiv.appendChild(this.simOperatorPhoneNumber);
+        const simOperatorPhoneDiv = document.createElement('div');
+        const simOperatorPhoneLabel = document.createElement('label');
+        simOperatorPhoneLabel.innerHTML = 'Phone Number';
+        this.simOperatorPhoneNumber = textInput.createTextInput({
+            classes: 'gm-sim-phone',
+            placeholder: 'eg: 8004337300',
+            regexFilter: /^[0-9+\-().\s]{0,25}$/,
+            regexValidField:
+                // eslint-disable-next-line max-len
+                /^\+?[0-9]\d{0,2}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}$/,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
+        });
+        simOperatorPhoneDiv.appendChild(simOperatorPhoneLabel);
+        simOperatorPhoneDiv.appendChild(this.simOperatorPhoneNumber.element);
 
-            this.simOperator.appendChild(simperatorLabelDiv);
-            this.simOperator.appendChild(simOperatorMMCDiv);
-            this.simOperator.appendChild(simMSINDiv);
-            this.simOperator.appendChild(simOperatorNameDiv);
-            this.simOperator.appendChild(simOperatorPhoneDiv);
-        }
+        simOperatorSecondLineDiv.appendChild(simMSINDiv);
+        simOperatorSecondLineDiv.appendChild(simOperatorPhoneDiv);
+        simOperatorSectionDiv.appendChild(simOperatorSecondLineDiv);
 
-        // Add submit button
+        // Actions
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'gm-actions';
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+
+        const appliedTag = chipTag.createChip();
+        actionsDiv.appendChild(appliedTag.element);
+
         this.submitBtn = document.createElement('button');
-        this.submitBtn.className = 'gm-network-update';
-        this.submitBtn.innerHTML = this.i18n.NETWORK_UPDATE || 'Update';
+        this.submitBtn.innerHTML = this.i18n.BASEBAND_APPLY || 'Apply';
+        this.submitBtn.className = 'gm-btn gm-baseband-update';
+        actionsDiv.appendChild(this.submitBtn);
+        this.submitBtn.disabled = true;
         this.submitBtn.onclick = this.sendDataToInstance.bind(this);
 
-        // Setup
-        if (this.basebandEnabled) {
-            this.form.appendChild(this.networkOperator);
-            this.form.appendChild(this.simOperator);
-        }
-        this.form.appendChild(this.submitBtn);
+        // Container
+        container.appendChild(nextworkOperatorSectionDiv);
+        // Separator
+        const sep1 = document.createElement('div');
+        sep1.className = 'gm-separator';
+        container.appendChild(sep1);
+        container.appendChild(simOperatorSectionDiv);
+        // Separator
+        const sep2 = document.createElement('div');
+        sep2.className = 'gm-separator';
+        container.appendChild(sep2);
+        container.appendChild(actionsDiv);
 
-        container.appendChild(this.form);
+        return;
     }
 
     /**
@@ -220,16 +264,71 @@ module.exports = class BasebandRIL extends OverlayPlugin {
      * Only do the check if both are not empty: we might set one and not the other
      * (We can't handle the case where one was set previously and the other is now
      * beeing configured.)
+     *
+     * @returns {boolean} True if there is an error, false otherwise.
      */
     checkSimImsiErrors() {
-        this.simMSIN.setCustomValidity('');
-        if (this.simOperatorMMC.value.length > 0 && this.simMSIN.value.length > 0) {
-            if (this.simOperatorMMC.value.length === 6 && this.simMSIN.value.length !== 9) {
-                this.simMSIN.setCustomValidity('Should be 9');
-            } else if (this.simOperatorMMC.value.length === 5 && this.simMSIN.value.length !== 10) {
-                this.simMSIN.setCustomValidity('Should be 10');
-            }
+        let isError = false;
+        if (!this.simOperatorMMC.getValue().length) {
+            this.simMSIN.setErrorMessage('');
+            return isError;
         }
+        if (!this.simMSIN.getValue().length) {
+            this.simOperatorMMC.setErrorMessage('');
+            return isError;
+        }
+        if (this.simOperatorMMC.getValue().length === 6 && this.simMSIN.getValue().length !== 9) {
+            this.simMSIN.setErrorMessage('9 digits required');
+            isError = true;
+        } else if (this.simOperatorMMC.getValue().length === 5 && this.simMSIN.getValue().length !== 10) {
+            this.simMSIN.setErrorMessage('10 digits required');
+            isError = true;
+        }
+        return isError;
+    }
+
+    /**
+     * Validates the form fields related to network and SIM operator information.
+     *
+     * This method checks the validity of the following fields:
+     * - networkOperatorMMC
+     * - simOperatorMMC
+     * - simMSIN
+     * - simOperatorPhoneNumber
+     *
+     * It sets error messages for invalid fields and disables the submit button if any field is invalid.
+     *
+     * @returns {void}
+     */
+    checkIfFormIsValid() {
+        let isValid = true;
+
+        this.networkOperatorMMC.setErrorMessage('');
+        this.simOperatorMMC.setErrorMessage('');
+        this.simMSIN.setErrorMessage('');
+        this.simOperatorPhoneNumber.setErrorMessage('');
+
+        isValid = !this.checkSimImsiErrors();
+
+        if (this.networkOperatorMMC.getValue().length && !this.networkOperatorMMC.checkValidity()) {
+            this.networkOperatorMMC.setErrorMessage('Invalid value');
+            isValid = false;
+        }
+        if (this.simOperatorMMC.getValue().length && !this.simOperatorMMC.checkValidity()) {
+            this.simOperatorMMC.setErrorMessage('Invalid value');
+            isValid = false;
+        }
+        if (this.simMSIN.getValue().length && !this.simMSIN.checkValidity()) {
+            this.simMSIN.setErrorMessage('Invalid value');
+            isValid = false;
+        }
+        if (this.simOperatorPhoneNumber.getValue().length && !this.simOperatorPhoneNumber.checkValidity()) {
+            this.simOperatorPhoneNumber.setErrorMessage('Invalid value');
+            isValid = false;
+        }
+
+        this.submitBtn.disabled = !isValid;
+        return isValid;
     }
 
     /**
@@ -240,42 +339,39 @@ module.exports = class BasebandRIL extends OverlayPlugin {
     sendDataToInstance(event) {
         event.preventDefault();
 
-        if (!this.form.checkValidity()) {
+        if (!this.checkIfFormIsValid()) {
             return;
         }
 
         const msgs = [];
-        if (this.basebandEnabled) {
-            if (this.networkOperatorMMC.value) {
-                msgs.push('network operator ' + this.networkOperatorMMC.value);
-            }
-            if (this.networkOperatorName.value) {
-                msgs.push('network operator_name ' + this.networkOperatorName.value);
-            }
-
-            if (this.simOperatorMMC.value) {
-                msgs.push('sim operator ' + this.simOperatorMMC.value);
-            }
-
-            if (this.simOperatorName.value) {
-                msgs.push('sim operator_name ' + this.simOperatorName.value);
-            }
-
-            if (this.simMSIN.value) {
-                msgs.push('sim imsi_id ' + this.simMSIN.value);
-            }
-
-            if (this.simOperatorPhoneNumber.value) {
-                msgs.push('sim phone_number ' + this.simOperatorPhoneNumber.value);
-            }
-
-            if (msgs.length > 0) {
-                const json = {channel: 'baseband', messages: msgs};
-                this.instance.sendEvent(json);
-            }
+        if (this.networkOperatorMMC.getValue().length) {
+            msgs.push('network operator ' + this.networkOperatorMMC.getValue());
+        }
+        if (this.networkOperatorName.getValue().length) {
+            msgs.push('network operator_name ' + this.networkOperatorName.getValue());
         }
 
-        // close the widget
-        this.instance.store.dispatch({type: 'OVERLAY_OPEN', payload: {overlayID: this.overlayID, toOpen: false}});
+        if (this.simOperatorMMC.getValue().length) {
+            msgs.push('sim operator ' + this.simOperatorMMC.getValue());
+        }
+
+        if (this.simOperatorName.getValue().length) {
+            msgs.push('sim operator_name ' + this.simOperatorName.getValue());
+        }
+
+        if (this.simMSIN.getValue().length) {
+            msgs.push('sim imsi_id ' + this.simMSIN.getValue());
+        }
+
+        if (this.simOperatorPhoneNumber.getValue().length) {
+            msgs.push('sim phone_number ' + this.simOperatorPhoneNumber.getValue());
+        }
+
+        if (msgs.length > 0) {
+            const json = {channel: 'baseband', messages: msgs};
+            this.instance.sendEvent(json);
+        }
+
+        this.container.classList.add('gm-baseband-saved');
     }
 };

@@ -175,7 +175,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 25px $modal-x-padding;
-        margin-bottom: 28px;
+        margin-bottom: $spacing-xl;
         font-size: 16px;
         font-weight: bold;
         letter-spacing: 0.1em;
@@ -215,6 +215,5 @@
     .gm-separator {
         width: calc(100% + $modal-x-padding * 2);
         margin-left: -$modal-x-padding;
-        margin-bottom: $spacing-m;
     }
 }

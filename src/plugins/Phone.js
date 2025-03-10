@@ -69,7 +69,7 @@ module.exports = class Phone extends OverlayPlugin {
             regexFilter: /^[0-9+\-().\s]{1,25}$/,
             regexValidField:
                 // eslint-disable-next-line max-len
-                /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/,
+                /^\+?[0-9]\d{0,2}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}$/,
             onChange: () => {
                 if (this.phoneInput.checkValidity()) {
                     this.phoneBtn.disabled = false;

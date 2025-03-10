@@ -18,7 +18,7 @@
             &::-webkit-scrollbar {
                 display: none;
             }
-    
+
             .gm-toolbar {
                 overflow: scroll;
                 -ms-overflow-style: none;
@@ -27,28 +27,28 @@
                 max-height: 100%;
                 flex-direction: column;
                 align-items: center;
-        
+
                 ul {
                     display: flex;
                     flex-direction: column;
                     gap: 10px;
                     width: 100%;
-                    li{
+                    li {
                         width: 100%;
                         transition: background-color 0.3s;
-    
-                        &:not(.gm-separator):hover{
+
+                        &:not(.gm-separator):hover {
                             background-color: var(--gm-secondary-variant-color);
                         }
-                        &:has(.gm-disabled-icon-button):hover{
+                        &:has(.gm-disabled-icon-button):hover {
                             background-color: transparent;
                         }
-    
+
                         .gm {
                             &-icon-button {
                                 background-color: var(--gm-on-secondary-color);
                                 margin: 0 auto;
-                
+
                                 &:hover,
                                 &.gm-active {
                                     cursor: pointer;
@@ -59,62 +59,62 @@
                                 background-color: var(--gm-tertiary-color);
                                 pointer-events: none;
                             }
-                
+
                             &-rotation {
                                 mask-image: url('../assets/images/ic_rotation.svg');
                                 -webkit-mask-image: url('../assets/images/ic_rotation.svg');
                             }
-                
+
                             &-sound-up {
                                 mask-image: url('../assets/images/ic_sound_up.svg');
                                 -webkit-mask-image: url('../assets/images/ic_sound_up.svg');
                             }
-                
+
                             &-sound-down {
                                 mask-image: url('../assets/images/ic_sound_down.svg');
                                 -webkit-mask-image: url('../assets/images/ic_sound_down.svg');
                             }
-                
+
                             &-recent {
                                 mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
                                 -webkit-mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
                             }
-                
+
                             &-home {
                                 mask-image: url('../assets/images/ic_nav_android_home.svg');
                                 -webkit-mask-image: url('../assets/images/ic_nav_android_home.svg');
                             }
-                
+
                             &-back {
                                 mask-image: url('../assets/images/ic_nav_android_back.svg');
                                 -webkit-mask-image: url('../assets/images/ic_nav_android_back.svg');
                             }
-                
+
                             &-battery-button {
                                 mask-image: url('../assets/images/ic_battery.svg');
                                 -webkit-mask-image: url('../assets/images/ic_battery.svg');
                             }
-                
+
                             &-gamepad-button {
                                 mask-image: url('../assets/images/ic_gamepad.svg');
                                 -webkit-mask-image: url('../assets/images/ic_gamepad.svg');
                             }
-                
+
                             &-power {
                                 mask-image: url('../assets/images/ic_power.svg');
                                 -webkit-mask-image: url('../assets/images/ic_power.svg');
                             }
-                
+
                             &-camera-button {
                                 mask-image: url('../assets/images/ic_camera.svg');
                                 -webkit-mask-image: url('../assets/images/ic_camera.svg');
                             }
-                
+
                             &-camera-mic-button {
                                 mask-image: url('../assets/images/ic_camera_mic.svg');
                                 -webkit-mask-image: url('../assets/images/ic_camera_mic.svg');
                             }
-                
+
                             &-streamres-button {
                                 mask-image: url('../assets/images/ic_resolution.svg');
                                 -webkit-mask-image: url('../assets/images/ic_resolution.svg');
@@ -123,7 +123,7 @@
                                 color: transparent;
                                 -webkit-appearance: none;
                                 -moz-appearance: none;
-                
+
                                 &:focus {
                                     outline-style: none;
                                     box-shadow: none;
@@ -133,16 +133,16 @@
                                     opacity: 0;
                                 }
                             }
-                
+
                             &-gps-button {
                                 mask-image: url('../assets/images/ic_location.svg');
                                 -webkit-mask-image: url('../assets/images/ic_location.svg');
                             }
-                
+
                             &-fullscreen-button {
                                 mask-image: url('../assets/images/ic_fullscreen.svg');
                                 -webkit-mask-image: url('../assets/images/ic_fullscreen.svg');
-                
+
                                 &.gm-active,
                                 &.gm-active:hover {
                                     mask-image: url('../assets/images/ic_fullscreen_active.svg');
@@ -150,7 +150,7 @@
                                     background-color: var(--gm-primary-color);
                                 }
                             }
-                
+
                             &-screencast-button {
                                 mask-image: url('../assets/images/ic_screenshot.svg');
                                 -webkit-mask-image: url('../assets/images/ic_screenshot.svg');
@@ -158,68 +158,68 @@
                                     background-color: var(--gm-primary-color);
                                 }
                             }
-                
+
                             &-identifiers-button {
                                 mask-image: url('../assets/images/ic_id.svg');
                                 -webkit-mask-image: url('../assets/images/ic_id.svg');
                             }
-                
+
                             &-network-button {
                                 mask-image: url('../assets/images/ic_network.svg');
                                 -webkit-mask-image: url('../assets/images/ic_network.svg');
                             }
-                
+
                             &-iothrottling-button {
                                 mask-image: url('../assets/images/ic_disk_IO.svg');
                                 -webkit-mask-image: url('../assets/images/ic_disk_IO.svg');
                             }
-                
+
                             &-phone-button {
                                 mask-image: url('../assets/images/ic_text_and_call.svg');
                                 -webkit-mask-image: url('../assets/images/ic_text_and_call.svg');
                             }
-                
+
                             &-sim-button {
                                 mask-image: url('../assets/images/ic_baseband.svg');
                                 -webkit-mask-image: url('../assets/images/ic_baseband.svg');
                             }
-                
+
                             &-uploader-button {
                                 mask-image: url('../assets/images/ic_installation.svg');
                                 -webkit-mask-image: url('../assets/images/ic_installation.svg');
                             }
-                
+
                             &-streamrate-chooser {
                                 mask-image: url('../assets/images/ic_hq.svg');
                                 -webkit-mask-image: url('../assets/images/ic_hq.svg');
                             }
-                
+
                             &-clipboard-button {
                                 mask-image: url('../assets/images/ic_clipboard.svg');
                                 -webkit-mask-image: url('../assets/images/ic_clipboard.svg');
                             }
-                
+
                             &-fingerprint-button {
                                 mask-image: url('../assets/images/ic_biometrics.svg');
                                 -webkit-mask-image: url('../assets/images/ic_biometrics.svg');
-                
+
                                 &.fingerprint-require {
                                     background-color: var(--gm-primary-color);
                                     filter: invert(0) !important;
                                     animation: blink 2s linear infinite;
                                 }
-                
+
                                 &.fingerprint-autoValidation {
                                     mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
                                     -webkit-mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
                                     background-color: var(--gm-primary-color);
                                 }
                             }
-                
+
                             &-keymapping-button {
                                 mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
                                 -webkit-mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
-                
+
                                 &.gm-active {
                                     mask-image: url('../assets/images/ic_keymapping.svg');
                                     -webkit-mask-image: url('../assets/images/ic_keymapping.svg');
@@ -228,17 +228,16 @@
                                     background-color: var(--gm-tertiary-color);
                                 }
                             }
-                
+
                             &-default-turn-button {
                                 mask-image: url('../assets/images/ic_warning.svg');
                                 -webkit-mask-image: url('../assets/images/ic_warning.svg');
                             }
                         }
-    
                     }
                 }
             }
-    
+
             .gm-disabled-widget-pop-up {
                 &::before {
                     position: fixed;
@@ -258,9 +257,7 @@
                     display: none;
                     width: 200px;
                 }
-    
-                
-    
+
                 &:hover::before {
                     display: block;
                 }

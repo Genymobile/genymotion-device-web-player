@@ -1,47 +1,72 @@
 /**
  * Baseband plugin styles
  */
-.gm-player-instance .gm-baseband-plugin {
-    .gm {
-        &-section {
-            display: block;
-            margin: 20px 0 10px 0;
-            padding: 0;
-            width: 100%;
-            height: 50px;
-            font-weight: bold;
-            border-bottom: 1px solid var(--gm-tertiary-color);
-        }
-
-        &-fields {
-            display: block;
-            padding: 0;
-            width: 100%;
-            height: 50px;
+.device-renderer-instance .gm-baseband-plugin {
+    .gm-baseband-saved {
+        .gm-actions {
+            .gm-tag-success {
+                visibility: visible;
+            }
         }
     }
 
-    label {
-        margin-top: 20px;
-        display: block;
-        float: left;
+    .gm-network-operator-section-line,
+    .gm-sim-operator-section-line {
+        display: flex;
+        gap: $spacing-xl;
+        /*margin-bottom: $spacing-m;*/
     }
-
-    input {
-        margin-top: 10px;
-        width: 60%;
-        float: right;
-        text-align: right;
-        font-size: medium;
-        font-family: Helvetica, sans-serif;
-
-        &:invalid,
-        &:focus:invalid {
-            border-bottom: 1px solid var(--gm-btn-bg-color);
+    .gm-network-operator-section-title {
+        color: var(--gm-on-secondary-color);
+        display: flex;
+        align-items: center;
+        font-weight: bolder;
+        margin-bottom: $spacing-m;
+        &::before {
+            content: ' ';
+            width: 30px;
+            height: 30px;
+            background-color: var(--gm-on-secondary-color);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            mask-image: url('../assets/images/ic_world.svg');
+            -webkit-mask-image: url('../assets/images/ic_world.svg');
         }
     }
 
-    button {
-        margin-top: 20px;
+    .gm-sim-operator-section-title {
+        color: var(--gm-on-secondary-color);
+        display: flex;
+        align-items: center;
+        font-weight: bolder;
+        margin-bottom: $spacing-m;
+
+        &::before {
+            content: ' ';
+            width: 30px;
+            height: 30px;
+            background-color: var(--gm-on-secondary-color);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            mask-image: url('../assets/images/ic_baseband.svg');
+            -webkit-mask-image: url('../assets/images/ic_baseband.svg');
+        }
+    }
+    .gm-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 60px;
+        .gm-tag-success {
+            visibility: hidden;
+        }
     }
 }

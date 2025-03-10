@@ -412,7 +412,7 @@ A device renderer instance can be configured using the `options` argument (objec
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
--   **Toolbar name:** `Baseband`
+-   **Toolbar name:** `BasebandRIL`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
     Enable or disable the baseband (MMC/MNC) widget.

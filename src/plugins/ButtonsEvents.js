@@ -91,6 +91,7 @@ module.exports = class ButtonsEvents {
      */
     keyReleaseEvent(key, text) {
         const json = {type: 'KEYBOARD_RELEASE', keychar: text, keycode: key};
+
         this.instance.sendEvent(json);
     }
 
@@ -101,7 +102,9 @@ module.exports = class ButtonsEvents {
      * @param {Event} event Associated JS event
      */
     mouseButtonPressEvent(event) {
-        const {androidkeycode: id} = event.target.dataset;
+        const {androidkeycode: id} = event.target.dataset.androidkeycode
+            ? event.target.dataset
+            : event.target.children[0].dataset;
         if (!id) {
             return;
         }
@@ -128,7 +131,9 @@ module.exports = class ButtonsEvents {
      * @param {Event} event Associated JS event
      */
     mouseButtonReleaseEvent(event) {
-        const {androidkeycode: id} = event.target.dataset;
+        const {androidkeycode: id} = event.target.dataset.androidkeycode
+            ? event.target.dataset
+            : event.target.children[0].dataset;
         if (!id) {
             return;
         }
@@ -152,14 +157,14 @@ module.exports = class ButtonsEvents {
      * Disable instance rotation.
      */
     disableRotation() {
-        this.instance.toolbarManager.disableButton(this.constructor.name + '_' + ROTATE_KEYCODE);
+        this.instance.toolbarManager.disableButton(this.constructor.name + '_ROTATE');
     }
 
     /**
      * Enable instance rotation.
      */
     enableRotation() {
-        this.instance.toolbarManager.enableButton(this.constructor.name + '_' + ROTATE_KEYCODE);
+        this.instance.toolbarManager.enableButton(this.constructor.name + '_ROTATE');
     }
 
     /**

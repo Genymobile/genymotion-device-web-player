@@ -5,6 +5,21 @@
     .gm-wrapper {
         &.toolbarPosition-left {
             flex-direction: row-reverse;
+            .gm-disabled-widget-pop-up {
+                &::before {
+                    /**
+                    * working var, changed by js
+                    * TODO: evolve to a better solution in the story for tooltip
+                    */
+                    left: var(--gm-working-disabled-widget-pop-up-x);
+                    margin-right: 0px;
+                    margin-left: 60px;
+                }
+
+                &:hover::before {
+                    display: block;
+                }
+            }
         }
         /*
         * &.toolbarPosition-right {} is the default, so no need to add it
@@ -12,7 +27,7 @@
 
         .gm-toolbar-wrapper {
             background-color: var(--gm-secondary-color);
-            min-width: 50px;
+            min-width: 86px;
             max-height: 100%;
             position: relative;
             &::-webkit-scrollbar {
@@ -27,6 +42,9 @@
                 max-height: 100%;
                 flex-direction: column;
                 align-items: center;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
 
                 ul {
                     display: flex;
@@ -36,19 +54,72 @@
                     li {
                         width: 100%;
                         transition: background-color 0.3s;
-
+                        position: relative;
+                        height: 48px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        &:hover {
+                            cursor: pointer;
+                            .gm-icon-button {
+                                background-color: var(--gm-primary-color);
+                            }
+                        }
+                        &.gm-separator {
+                            width: 75%;
+                            height: 1px;
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
                         &:not(.gm-separator):hover {
                             background-color: var(--gm-secondary-variant-color);
                         }
                         &:has(.gm-disabled-icon-button):hover {
                             background-color: transparent;
                         }
-
+                        &.gm-toolbar-dot {
+                            &-actif {
+                                &::before {
+                                    content: ' ';
+                                    width: 8px;
+                                    height: 8px;
+                                    border-radius: 10px;
+                                    background-color: var(--gm-success-color);
+                                    position: absolute;
+                                    top: calc(50% - 4px);
+                                    left: 7px;
+                                }
+                            }
+                            &-notification {
+                                &::before {
+                                    content: ' ';
+                                    width: 8px;
+                                    height: 8px;
+                                    border-radius: 10px;
+                                    background-color: var(--gm-primary-color);
+                                    position: absolute;
+                                    top: calc(50% - 4px);
+                                    left: 7px;
+                                    z-index: 2;
+                                }
+                                &::after {
+                                    content: ' ';
+                                    position: absolute;
+                                    width: 18px;
+                                    height: 18px;
+                                    background-color: var(--gm-primary-color);
+                                    border-radius: 50%;
+                                    filter: blur(1px);
+                                    z-index: 1;
+                                    animation: notification-pulse 2s infinite ease-in-out;
+                                    top: calc(50% - 9px);
+                                    left: 2px;
+                                }
+                            }
+                        }
                         .gm {
                             &-icon-button {
                                 background-color: var(--gm-on-secondary-color);
-                                margin: 0 auto;
-
                                 &:hover,
                                 &.gm-active {
                                     cursor: pointer;

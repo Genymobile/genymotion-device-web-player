@@ -3,8 +3,10 @@ const log = require('loglevel');
 class ToolbarManager {
     /**
      * Initialize ToolbarManager
+     * @param {Object} instance - The instance to be managed.
      */
-    constructor() {
+    constructor(instance) {
+        this.instance = instance;
         this.toolbar = document.querySelector('.gm-toolbar ul');
 
         if (!this.toolbar) {
@@ -52,7 +54,8 @@ class ToolbarManager {
             enable: () => this.enableButton(id),
             addClass: (className) => this.addButtonClass(id, className),
             removeClass: (className) => this.removeButtonClass(id, className),
-            setActive: (isActive = true) => this.setActiveButton(id, isActive),
+            setActive: (isActive = true) => this.setButtonActive(id, isActive),
+            setIndicator: (typeOfIndicator) => this.setButtonIndicator(id, typeOfIndicator),
         };
     }
 
@@ -83,13 +86,13 @@ class ToolbarManager {
 
         if (!isDisabled) {
             if (onClick) {
-                buttonIcon.onclick = onClick;
+                button.onclick = onClick;
             }
             if (onMousedown) {
-                buttonIcon.onmousedown = onMousedown;
+                button.onmousedown = onMousedown;
             }
             if (onMouseup) {
-                buttonIcon.onmouseup = onMouseup;
+                button.onmouseup = onMouseup;
             }
         } else {
             button.classList.add('gm-disabled-widget-pop-up');
@@ -124,12 +127,17 @@ class ToolbarManager {
          * This trick is used to position the pop-up next to the button in the toolbar which has an overflow.
          */
         const rect = button.getBoundingClientRect();
-        const x = parseFloat(rect.width) + 20;
+        let x = 0;
+        if (this.instance.options.toolbarPosition === 'right') {
+            x = parseFloat(rect.width) + 20;
+        } else {
+            x = parseFloat(rect.left) + 20;
+        }
         button.style.setProperty('--gm-working-disabled-widget-pop-up-x', x + 'px');
 
-        buttonIcon.onclick = null;
-        buttonIcon.onmousedown = null;
-        buttonIcon.onmouseup = null;
+        button.onclick = null;
+        button.onmousedown = null;
+        button.onmouseup = null;
 
         buttonData.isDisabled = true;
     }
@@ -150,13 +158,13 @@ class ToolbarManager {
         buttonIcon.classList.remove('gm-disabled-icon-button');
 
         if (onClick) {
-            buttonIcon.onclick = onClick;
+            button.onclick = onClick;
         }
         if (onMousedown) {
-            buttonIcon.onmousedown = onMousedown;
+            button.onmousedown = onMousedown;
         }
         if (onMouseup) {
-            buttonIcon.onmouseup = onMouseup;
+            button.onmouseup = onMouseup;
         }
 
         buttonData.isDisabled = false;
@@ -193,11 +201,11 @@ class ToolbarManager {
     }
 
     /**
-     * setActiveButton - Set a button as active.
+     * setButtonActive - Set a button as active.
      * @param {string} id - The ID of the button.
      * @param {boolean} isActive - Whether the button is active.
      */
-    setActiveButton(id, isActive) {
+    setButtonActive(id, isActive) {
         const buttonData = this.buttonRegistry.get(id);
         if (!buttonData || !buttonData.button) {
             log.warn(`No rendered button found with ID "${id}".`);
@@ -208,6 +216,26 @@ class ToolbarManager {
             buttonData.buttonIcon.classList.add('gm-active');
         } else {
             buttonData.buttonIcon.classList.remove('gm-active');
+        }
+    }
+
+    /**
+     * setButtonIndicator - Set an indicator on a button.
+     * @param {string} id - The ID of the button.
+     * @param {string} typeOfIndicator - The type of indicator to set. Values: 'actif', 'notification'. '' to remove the indicator.
+     */
+    setButtonIndicator(id, typeOfIndicator) {
+        const buttonData = this.buttonRegistry.get(id);
+
+        if (!buttonData || !buttonData.button) {
+            log.warn(`No rendered button found with ID "${id}".`);
+            return;
+        }
+        buttonData.button.classList.remove('gm-toolbar-dot-actif');
+        buttonData.button.classList.remove('gm-toolbar-dot-notification');
+
+        if (typeOfIndicator && typeOfIndicator.length) {
+            buttonData.button.classList.add('gm-toolbar-dot-' + typeOfIndicator);
         }
     }
 

@@ -57,7 +57,7 @@ class OverlayPlugin {
                     previousOverlay.widgetsOpened.includes(this.overlayID);
 
                 if (isOpening) {
-                    this.openOverlay(overlay);
+                    this.openOverlay();
                 } else if (isClosing) {
                     if (overlay.widgetsOpened.length === 0) {
                         OverlayPlugin.modalZIndex = 100;
@@ -65,7 +65,7 @@ class OverlayPlugin {
                     if (this.widget) {
                         this.widget.style.zIndex = 'unset';
                     }
-                    this.closeOverlay(overlay);
+                    this.closeOverlay();
                 }
             },
             ['overlay.widgetsOpened'],
@@ -369,6 +369,7 @@ class OverlayPlugin {
 
     /**
      * Handles overlay open state
+     * private method, trigger the store action to open the overlay instead of calling this method directly
      */
     openOverlay() {
         const {button: toolbarButton} = this.instance.toolbarManager.getButtonById(this.constructor.name);
@@ -379,7 +380,7 @@ class OverlayPlugin {
             : this.calculateModalPosition(toolbarButton, this.instance.options.toolbarPosition);
 
         this.applyModalPosition(position);
-        this.instance.toolbarManager.setActiveButton(this.constructor.name, true);
+        this.instance.toolbarManager.setButtonActive(this.constructor.name, true);
         this.widget.style.zIndex = ++OverlayPlugin.modalZIndex;
 
         // Dispatch tracked event
@@ -394,6 +395,7 @@ class OverlayPlugin {
     }
     /**
      * Closes overlay and updates toolbar button state.
+     * private method, trigger the store action to close the overlay instead of calling this method directly
      */
     closeOverlay() {
         if (this.widget && this.widget.classList.contains('gm-visible')) {
@@ -403,7 +405,7 @@ class OverlayPlugin {
                 this.widget.onclose();
             }
         }
-        this.instance.toolbarManager.setActiveButton(this.constructor.name, false);
+        this.instance.toolbarManager.setButtonActive(this.constructor.name, false);
     }
 
     /**
@@ -429,6 +431,33 @@ class OverlayPlugin {
         });
     }
 
+    /**
+     * open the widget
+     * Exposed method, openOverlay is a private method
+     */
+    openWidget() {
+        this.instance.store.dispatch({
+            type: 'OVERLAY_OPEN',
+            payload: {
+                overlayID: this.overlayID,
+                toOpen: true,
+            },
+        });
+    }
+
+    /**
+     * close the widget
+     * Exposed method, closeOverlay is a private method
+     */
+    closeWidget() {
+        this.instance.store.dispatch({
+            type: 'OVERLAY_OPEN',
+            payload: {
+                overlayID: this.overlayID,
+                toOpen: false,
+            },
+        });
+    }
     /**
      * Disable associated toolbar icon.
      */

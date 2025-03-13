@@ -19,9 +19,9 @@ const log = require('loglevel');
  */
 
 const switchButton = (() => {
-    const createSwitch = ({onChange = null}) => {
+    const createSwitch = ({onChange = null, classes = ''}) => {
         const switchDiv = document.createElement('div');
-        switchDiv.className = 'switch';
+        switchDiv.className = classes + ' switch';
 
         const input = document.createElement('input');
         input.type = 'checkbox';

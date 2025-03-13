@@ -2,11 +2,6 @@
  * Fullscreen plugin styles
  */
 .device-renderer-instance .gm-fingerprint-plugin {
-    // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
-    label{
-        color: var(--gm-text-color);
-        font-weight: normal;
-    }
     .gm-fingerprint-container {
         display: flex;
         flex-direction: column;
@@ -22,9 +17,9 @@
                 height: 27px;
                 width: 65px;
                 border-radius: 15px;
-                padding: 0 8px;
-                background-color: #2a151c;
-                color: var(--gm-primary-color);
+                padding: 0 $spacing-s;
+                background-color: var(--gm-background-error-color);
+                color: var(--gm-error-color);
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
@@ -37,8 +32,8 @@
                 pointer-events: none;
                 &.active {
                     pointer-events: all;
-                    background-color: #152616;
-                    color: var(--success-color);
+                    background-color: var(--gm-background-success-color);
+                    color: var(--gm-success-color);
                     &::before {
                         content: attr(data-text);
                     }
@@ -51,6 +46,9 @@
                 display: flex;
                 justify-content: space-between;
                 margin-bottom: $spacing-l;
+                .autoValidationSwitch {
+                    margin-right: 3px;
+                }
             }
         }
 
@@ -63,7 +61,7 @@
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
                 grid-template-rows: auto auto;
-                gap: 10px;
+                gap: $spacing-xl;
                 width: 100%;
 
                 .gm-fingerprint-dialog-button {
@@ -73,22 +71,28 @@
                     align-items: center;
                     text-align: center;
                     margin: 0 auto;
-                    padding: 15px 0;
-                    width: 80%;
+                    width: 100%;
                     cursor: pointer;
                     position: relative;
                     z-index: 0;
-                    &:hover::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: var(--gm-modal-bg-color);
-                        filter: brightness(85%);
-                        border-radius: 15px;
-                        z-index: -1;
+                    &:hover {
+                        &::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: var(--gm-secondary-variant-color);
+                            border-radius: 8px;
+                            z-index: -1;
+                        }
+                        span {
+                            color: var(--gm-primary-color);
+                        }
+                        [class*='gm-'][class*='-fingerprint-image'] {
+                            background-color: var(--gm-primary-color);
+                        }
                     }
                     &.disabled {
                         opacity: 0.5;
@@ -98,66 +102,62 @@
                         width: 20px;
                         height: 20px;
                         position: absolute;
-                        right: 0;
-                        left: auto;
-                        top: 0;
-                        margin: 10px;
+                        right: 5px;
+                        top: 5px;
                     }
 
                     [class*='gm-'][class*='-fingerprint-image'] {
-                        width: 55px;
-                        height: 55px;
-                        background-size: 55px;
+                        width: 48px;
+                        height: 48px;
+                        margin-bottom: $spacing-s;
+
+                        background-color: var(--gm-on-secondary-color);
+                        -webkit-mask-size: contain;
+                        mask-size: contain;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;
+                        -webkit-mask-position: center;
+                        mask-position: center;
                     }
                     .gm-recognized-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_recognized.svg') no-repeat center;
+                        mask-image: url('../assets/images/ic_fingerprint_recognized.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_recognized.svg');
                     }
                     // Unrecognized sensor
                     .gm-unrecognized-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_unrecognized.svg') no-repeat center;
+                        mask-image: url('../assets/images/ic_fingerprint_unrecognized.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_unrecognized.svg');
                     }
                     // Dirty sensor
-                    .gm-dirty-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_dirty.svg') no-repeat center;
+                    .gm-dirty-sensor-fingerprint-image {
+                        mask-image: url('../assets/images/ic_fingerprint_dirty.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_dirty.svg');
                     }
                     // Too fast
                     .gm-too-fast-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_toofast.svg') no-repeat center;
+                        mask-image: url('../assets/images/ic_fingerprint_toofast.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_toofast.svg');
                     }
                     // Partial fingerprint
                     .gm-partial-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_partial.svg') no-repeat center;
+                        mask-image: url('../assets/images/ic_fingerprint_partial.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_partial.svg');
                     }
                     // Insufficient fingerprint
                     .gm-insufficient-fingerprint-image {
-                        background: url('../assets/images/ic_fingerprint_insufficient.svg') no-repeat center;
+                        mask-image: url('../assets/images/ic_fingerprint_insufficient.svg');
+                        -webkit-mask-image: url('../assets/images/ic_fingerprint_insufficient.svg');
+                    }
+                    span {
+                        margin-top: $spacing-s;
+                        font-size: 13px;
+                        color: var(--gm-on-secondary-color);
                     }
                 }
             }
         }
         .gm-fingerprint-dialog-footer {
             margin-top: $spacing-l;
-            .gm-fingerprint-dialog-give-feedback {
-                a {
-                    display: flex;
-                    color: #fff;
-                    &::before {
-                        content: '';
-                        width: 20px;
-                        height: 20px;
-                        margin-right: $spacing-s;
-                        background-image: url('../assets/images/ic_feedback.svg');
-                        display: block;
-                    }
-                    &:hover {
-                        cursor: pointer;
-                        color: var(--gm-primary-color);
-                        &::before {
-                            background-image: url('../assets/images/ic_feedback_hover.svg');
-                        }
-                    }
-                }
-            }
         }
     }
 }

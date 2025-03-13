@@ -25,19 +25,17 @@ describe('FingerPrint Plugin', () => {
         test('has right default value', () => {
             // header
             expect(document.querySelector('.gm-fingerprint-dialog-auth-required').textContent).toContain(
-                'Authentification required',
+                'Biometric authentication required',
             );
             expect(
                 document.querySelector('.gm-fingerprint-dialog-auth-required-status').getAttribute('data-text'),
             ).toBe('No');
             expect(document.querySelector('.gm-fingerprint-dialog-recognized-fp-by-default').textContent).toContain(
-                'Recognized by default',
+                'Automatic biometric authentication',
             );
 
-            const checkbox = document.querySelector(
-                '.gm-fingerprint-dialog-recognized-fp-by-default-status input[type="checkbox"]',
-            );
-            const firstSpan = document.querySelector('.gm-fingerprint-dialog-recognized-fp-by-default-status span');
+            const checkbox = document.querySelector('.autoValidationSwitch input[type="checkbox"]');
+            const firstSpan = document.querySelector('.autoValidationSwitch span');
 
             expect(checkbox).toBeTruthy();
             expect(checkbox.checked).toBe(false);
@@ -51,14 +49,6 @@ describe('FingerPrint Plugin', () => {
             buttons.forEach((button) => {
                 expect(button.classList.contains('disabled')).toBe(true);
             });
-
-            // footer
-            expect(document.querySelector('.gm-fingerprint-dialog-give-feedback > a').textContent).toContain(
-                'Give feedback',
-            );
-            expect(document.querySelector('.gm-fingerprint-dialog-give-feedback > a').getAttribute('href')).toBe(
-                'https://github.com/orgs/Genymobile/discussions',
-            );
         });
 
         test('has buttons enable and working when fingerprint is required', () => {
@@ -90,9 +80,7 @@ describe('FingerPrint Plugin', () => {
         test("Auto validate fingerprint's request when auto validation is enabled", () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
-            const autoValidation = document.querySelector(
-                '.gm-fingerprint-dialog-recognized-fp-by-default-status span',
-            );
+            const autoValidation = document.querySelector('.autoValidationSwitch span');
             autoValidation.click();
 
             instance.emit('fingerprint', 'current_status scanning');
@@ -112,26 +100,32 @@ describe('FingerPrint Plugin', () => {
 
         describe('toolbar icons', () => {
             test('has right icon when auto validation is disabled / enabled', () => {
-                const autoValidation = document.querySelector(
-                    '.gm-fingerprint-dialog-recognized-fp-by-default-status span',
-                );
+                const autoValidation = document.querySelector('.autoValidationSwitch span');
                 expect(
-                    document.querySelector('.gm-fingerprint-button').classList.contains('fingerprint-autoValidation'),
+                    document
+                        .querySelector('.gm-fingerprint-button')
+                        .parentElement.classList.contains('gm-toolbar-dot-actif'),
                 ).toBe(false);
                 autoValidation.click();
                 expect(
-                    document.querySelector('.gm-fingerprint-button').classList.contains('fingerprint-autoValidation'),
+                    document
+                        .querySelector('.gm-fingerprint-button')
+                        .parentElement.classList.contains('gm-toolbar-dot-actif'),
                 ).toBe(true);
             });
             test('has right icon when fingerprint is required and auto validation disabled', () => {
-                expect(document.querySelector('.gm-fingerprint-button').classList.contains('fingerprint-require')).toBe(
-                    false,
-                );
+                expect(
+                    document
+                        .querySelector('.gm-fingerprint-button')
+                        .parentElement.classList.contains('gm-toolbar-dot-notification'),
+                ).toBe(false);
                 instance.emit('fingerprint', 'scan start');
                 instance.emit('fingerprint', 'current_status scanning');
-                expect(document.querySelector('.gm-fingerprint-button').classList.contains('fingerprint-require')).toBe(
-                    true,
-                );
+                expect(
+                    document
+                        .querySelector('.gm-fingerprint-button')
+                        .parentElement.classList.contains('gm-toolbar-dot-notification'),
+                ).toBe(true);
             });
         });
     });

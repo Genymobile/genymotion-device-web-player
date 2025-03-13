@@ -83,11 +83,15 @@ module.exports = class FingerPrint extends OverlayPlugin {
                             if (state.isScanStart && (state.isEnrolling || state.isScanning)) {
                                 authRequiredDiv.classList.add('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.yes || 'Yes');
-                                this.toolbarBtn.addClass('fingerprint-require');
+                                this.toolbarBtn.setIndicator('notification');
                             } else {
                                 authRequiredDiv.classList.remove('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
-                                this.toolbarBtn.removeClass('fingerprint-require');
+                                if (state.isRecognizedFPByDefault) {
+                                    this.toolbarBtn.setIndicator('actif');
+                                } else {
+                                    this.toolbarBtn.setIndicator('');
+                                }
                             }
                             break;
                         case 'isRecognizedFPByDefault':
@@ -106,9 +110,9 @@ module.exports = class FingerPrint extends OverlayPlugin {
                                 }
                             }
                             if (value) {
-                                this.toolbarBtn.addClass('fingerprint-autoValidation');
+                                this.toolbarBtn.setIndicator('actif');
                             } else {
-                                this.toolbarBtn.removeClass('fingerprint-autoValidation');
+                                this.toolbarBtn.setIndicator('');
                             }
 
                             // update switch
@@ -160,6 +164,8 @@ module.exports = class FingerPrint extends OverlayPlugin {
         const {container} = this.createTemplateModal({
             title: this.i18n.FINGERPRINT_TITLE || 'Biometrics',
             classes: 'gm-fingerprint-plugin',
+            width: 378,
+            height: 494,
         });
         container.classList.add('gm-fingerprint-container');
 
@@ -169,8 +175,8 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
         const authRequiredDiv = document.createElement('div');
         authRequiredDiv.classList.add('gm-fingerprint-dialog-auth-required');
-        const authActiveLabel = document.createElement('label');
-        authActiveLabel.innerHTML = this.i18n.FINGERPRINT_AUTH_REQUIRED_LABEL || 'Authentification required';
+        const authActiveText = document.createElement('span');
+        authActiveText.innerHTML = this.i18n.BIOMETRIC_AUTH_REQUIRED || 'Biometric authentication required';
         const autRequiredStatus = document.createElement('div');
         autRequiredStatus.classList.add('gm-fingerprint-dialog-auth-required-status');
         autRequiredStatus.classList.add(this.state.isScanStart ? 'active' : 'inactive');
@@ -180,30 +186,32 @@ module.exports = class FingerPrint extends OverlayPlugin {
             this.state.isScanStart ? this.i18n.yes || 'Yes' : this.i18n.no || 'No',
         );
 
-        authRequiredDiv.appendChild(authActiveLabel);
+        authRequiredDiv.appendChild(authActiveText);
         authRequiredDiv.appendChild(autRequiredStatus);
 
         const recognizedFPByDefaultDiv = document.createElement('div');
         recognizedFPByDefaultDiv.classList.add('gm-fingerprint-dialog-recognized-fp-by-default');
-        const recognizedFPByDefaultLabel = document.createElement('label');
-        recognizedFPByDefaultLabel.innerHTML =
-            this.i18n.FINGERPRINT_RECOGNIZED_FP_BY_DEFAULT_LABEL || 'Recognized by default';
+        const recognizedFPByDefaultText = document.createElement('span');
+        recognizedFPByDefaultText.innerHTML =
+            this.i18n.FINGERPRINT_AUTOMATIC_BIOMETRIC_AUTHENTICATION || 'Automatic biometric authentication';
 
         this.recognizedFPByDefaultStatus = switchButton.createSwitch({
+            classes: 'autoValidationSwitch',
             onChange: (value) => {
                 this.state.isRecognizedFPByDefault = value;
             },
         });
 
-        this.recognizedFPByDefaultStatus.element.classList.add('gm-fingerprint-dialog-recognized-fp-by-default-status');
-
-        recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultLabel);
+        recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultText);
         recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus.element);
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);
         container.appendChild(headerDiv);
-        container.appendChild(document.createElement('hr'));
+
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+        container.appendChild(separator);
 
         // body
         const bodyDiv = document.createElement('div');
@@ -215,30 +223,30 @@ module.exports = class FingerPrint extends OverlayPlugin {
         // buttons fingerprint
         const fingerprintButtons = [
             {
-                cmd: 'recognized',
+                cmd: 'Recognized',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_RECOGNIZED,
                 onclick: (btn) => {
                     btn.classList.add('gm-loader');
                 },
             },
             {
-                cmd: 'unrecognized',
+                cmd: 'Unrecognized',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_UNRECOGNIZED,
             },
             {
-                cmd: 'dirty',
+                cmd: 'Dirty sensor',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_DIRTY,
             },
             {
-                cmd: 'too-fast',
+                cmd: 'Too-fast',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_TOO_FAST,
             },
             {
-                cmd: 'partial',
+                cmd: 'Partial',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_PARTIAL,
             },
             {
-                cmd: 'insufficient',
+                cmd: 'Insufficient',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_INSUFFICIENT,
             },
         ];
@@ -249,24 +257,6 @@ module.exports = class FingerPrint extends OverlayPlugin {
 
         bodyDiv.appendChild(buttonsDiv);
         container.appendChild(bodyDiv);
-
-        // Footer
-        container.appendChild(document.createElement('hr'));
-        const footerDiv = document.createElement('div');
-        footerDiv.classList.add('gm-fingerprint-dialog-footer');
-
-        const giveFeedbackDiv = document.createElement('div');
-        giveFeedbackDiv.classList.add('gm-fingerprint-dialog-give-feedback');
-        const giveFeedbackLink = document.createElement('a');
-        giveFeedbackLink.href = this.instance.options.giveFeedbackLink;
-        giveFeedbackLink.innerHTML = this.i18n.FINGERPRINT_GIVE_FEEDBACK_LABEL || 'Give feedback';
-        giveFeedbackLink.target = '_blank';
-        giveFeedbackLink.rel = 'noopener noreferrer';
-
-        giveFeedbackDiv.appendChild(giveFeedbackLink);
-
-        footerDiv.appendChild(giveFeedbackDiv);
-        container.appendChild(footerDiv);
 
         // post setup
         this.disableBody();
@@ -282,10 +272,10 @@ module.exports = class FingerPrint extends OverlayPlugin {
         buttonDiv.classList.add('gm-fingerprint-dialog-button');
 
         const buttonImage = document.createElement('div');
-        buttonImage.className = `gm-${cmd}-fingerprint-image`;
+        buttonImage.className = `gm-${cmd.toLowerCase().replace(' ', '-')}-fingerprint-image`;
 
-        const buttonLabel = document.createElement('label');
-        buttonLabel.innerHTML = this.i18n[`FINGERPRINT_${cmd.toUpperCase()}_LABEL`] || cmd;
+        const buttonText = document.createElement('span');
+        buttonText.innerHTML = this.i18n[`FINGERPRINT_${cmd.toUpperCase()}`] || cmd;
 
         buttonDiv.onclick = () => {
             this.sendDataToInstance(message);
@@ -295,7 +285,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
         };
 
         buttonDiv.appendChild(buttonImage);
-        buttonDiv.appendChild(buttonLabel);
+        buttonDiv.appendChild(buttonText);
         buttonsDiv.appendChild(buttonDiv);
     }
 
@@ -328,7 +318,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                 Array.from(document.querySelectorAll('.gm-fingerprint-dialog-button')).forEach((btn) => {
                     btn.classList.remove('gm-loader');
                 });
-                this.toggleWidget();
+                this.closeWidget();
                 break;
             case FINGERPRINT_MESSAGES.toReceive.CURRENT_STATUS_SCANNING:
                 this.state.isScanning = true;

@@ -2,7 +2,6 @@
  * IO Throttling plugin styles
  */
 .device-renderer-instance .gm-iothrottling-plugin {
-
     .gm-noThrottling,
     .gm-customThrottling {
         display: none;
@@ -25,10 +24,10 @@
         }
     }
 
-    .gm-iothrottling-cache-cleared{
-        .gm-iothrottling-clearcache{
-            label {        
-                animation: blink-alert 1.5s ease-in-out
+    .gm-iothrottling-cache-cleared {
+        .gm-iothrottling-clearcache {
+            label {
+                animation: blink-alert 1.5s ease-in-out;
             }
         }
     }
@@ -59,41 +58,40 @@
         flex: 1;
         font-size: 13px;
 
-        .gm-fields-container{
+        .gm-fields-container {
             display: flex;
             align-items: center;
             gap: 10px;
-            .gm-iothrottling-readbyterate{
+            .gm-iothrottling-readbyterate {
                 width: 49px;
-                input{
+                input {
                     text-align: center;
                 }
             }
-            .gm-units{
+            .gm-units {
                 margin-left: 20px;
             }
         }
     }
 
-    .gm-iothrottling-clearcache{
-        label{
+    .gm-iothrottling-clearcache {
+        label {
             margin-bottom: 0;
         }
     }
     .gm-iothrottling-clearcache,
-    .gm-iothrottling-apply{
+    .gm-iothrottling-apply {
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 60px;
-        .gm-iothrottling-status{
+        .gm-iothrottling-status {
             display: flex;
             align-items: center;
             gap: 5px;
-            .gm-iothrottling-notapplied-text{
+            .gm-iothrottling-notapplied-text {
                 font-style: italic;
-                color:  #7f7f7f // TODO
-
+                color: var(--gm-tertiary-variant-color);
             }
         }
     }

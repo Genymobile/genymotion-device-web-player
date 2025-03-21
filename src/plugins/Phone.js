@@ -67,9 +67,7 @@ module.exports = class Phone extends OverlayPlugin {
             classes: 'gm-phone-number',
             placeholder: this.i18n.PHONE_CALL_PLACEHOLDER || 'Please enter the phone number',
             regexFilter: /^[0-9+\-().\s]{1,25}$/,
-            regexValidField:
-                // eslint-disable-next-line max-len
-                /^\+?[0-9]\d{0,2}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}$/,
+            regexValidField: /^[0-9+\-().\s]+$/,
             onChange: () => {
                 if (this.phoneInput.checkValidity()) {
                     this.phoneBtn.disabled = false;

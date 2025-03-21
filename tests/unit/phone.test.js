@@ -54,10 +54,10 @@ describe('Phone Plugin', () => {
     });
 
     describe('outgoing events', () => {
-        test.only('gsm call', () => {
+        test('gsm call', () => {
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
-            ['jean-michel', '-666', ''].forEach((invalidValue) => {
+            ['jean-michel', ''].forEach((invalidValue) => {
                 phone.phoneInput.setValue(invalidValue, true);
                 phone.phoneBtn.click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(0);

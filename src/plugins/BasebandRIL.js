@@ -210,9 +210,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             classes: 'gm-sim-phone',
             placeholder: 'eg: 8004337300',
             regexFilter: /^[0-9+\-().\s]{0,25}$/,
-            regexValidField:
-                // eslint-disable-next-line max-len
-                /^\+?[0-9]\d{0,2}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}$/,
+            regexValidField: /^[0-9+\-().\s]+$/,
             onChange: () => {
                 this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');

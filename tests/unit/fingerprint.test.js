@@ -104,13 +104,13 @@ describe('FingerPrint Plugin', () => {
                 expect(
                     document
                         .querySelector('.gm-fingerprint-button')
-                        .parentElement.classList.contains('gm-toolbar-dot-actif'),
+                        .parentElement.classList.contains('gm-toolbar-dot-active'),
                 ).toBe(false);
                 autoValidation.click();
                 expect(
                     document
                         .querySelector('.gm-fingerprint-button')
-                        .parentElement.classList.contains('gm-toolbar-dot-actif'),
+                        .parentElement.classList.contains('gm-toolbar-dot-active'),
                 ).toBe(true);
             });
             test('has right icon when fingerprint is required and auto validation disabled', () => {

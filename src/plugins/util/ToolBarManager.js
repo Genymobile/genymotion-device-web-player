@@ -222,7 +222,7 @@ class ToolbarManager {
     /**
      * setButtonIndicator - Set an indicator on a button.
      * @param {string} id - The ID of the button.
-     * @param {string} typeOfIndicator - The type of indicator to set. Values: 'actif', 'notification'. '' to remove the indicator.
+     * @param {string} typeOfIndicator - The type of indicator to set. Values: 'active', 'notification'. '' to remove the indicator.
      */
     setButtonIndicator(id, typeOfIndicator) {
         const buttonData = this.buttonRegistry.get(id);
@@ -231,7 +231,7 @@ class ToolbarManager {
             log.warn(`No rendered button found with ID "${id}".`);
             return;
         }
-        buttonData.button.classList.remove('gm-toolbar-dot-actif');
+        buttonData.button.classList.remove('gm-toolbar-dot-active');
         buttonData.button.classList.remove('gm-toolbar-dot-notification');
 
         if (typeOfIndicator && typeOfIndicator.length) {

@@ -88,7 +88,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                                 authRequiredDiv.classList.remove('active');
                                 authRequiredDiv.setAttribute('data-text', this.i18n.no || 'No');
                                 if (state.isRecognizedFPByDefault) {
-                                    this.toolbarBtn.setIndicator('actif');
+                                    this.toolbarBtn.setIndicator('active');
                                 } else {
                                     this.toolbarBtn.setIndicator('');
                                 }
@@ -110,7 +110,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                                 }
                             }
                             if (value) {
-                                this.toolbarBtn.setIndicator('actif');
+                                this.toolbarBtn.setIndicator('active');
                             } else {
                                 this.toolbarBtn.setIndicator('');
                             }
@@ -238,7 +238,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_DIRTY,
             },
             {
-                cmd: 'Too-fast',
+                cmd: 'Too fast',
                 message: FINGERPRINT_MESSAGES.toSend.SCAN_TOO_FAST,
             },
             {

@@ -29,7 +29,7 @@ describe('BasebandRIL Plugin', () => {
                     BASEBAND_TITLE: 'TEST BASEBAND PLUGIN TITLE',
                     NETWORK_OPERATOR: 'TEST BASEBAND PLUGIN NETWORK OPERATOR',
                     NETWORK_SIM_OPERATOR: 'TEST BASEBAND PLUGIN SIM OPERATOR',
-                    NETWORK_UPDATE: 'TEST BASEBAND PLUGIN UPDATE',
+                    BASEBAND_APPLY: 'TEST BASEBAND PLUGIN UPDATE',
                 },
                 true,
             );
@@ -56,14 +56,16 @@ describe('BasebandRIL Plugin', () => {
             test('operator', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `network operator ${value}`);
-                    expect(baseband.networkOperatorMMC.value).toBe(value);
+                    expect(baseband.networkOperatorMMC.getValue()).toBe('');
                 });
+                instance.emit('baseband', 'network operator 12345');
+                expect(baseband.networkOperatorMMC.getValue()).toBe('12345');
             });
 
             test('operator_name', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `network operator_name ${value}`);
-                    expect(baseband.networkOperatorName.value).toBe(value);
+                    expect(baseband.networkOperatorName.getValue()).toBe(value);
                 });
             });
         });
@@ -72,29 +74,35 @@ describe('BasebandRIL Plugin', () => {
             test('operator', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim operator ${value}`);
-                    expect(baseband.simOperatorMMC.value).toBe(value);
+                    expect(baseband.simOperatorMMC.getValue()).toBe('');
                 });
+                instance.emit('baseband', 'sim operator 12345');
+                expect(baseband.simOperatorMMC.getValue()).toBe('12345');
             });
 
             test('operator_name', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim operator_name ${value}`);
-                    expect(baseband.simOperatorName.value).toBe(value);
+                    expect(baseband.simOperatorName.getValue()).toBe(value);
                 });
             });
 
             test('imsi_id', () => {
                 ['jean-michel', '-123', ''].forEach((value) => {
                     instance.emit('baseband', `sim imsi_id ${value}`);
-                    expect(baseband.simMSIN.value).toBe(value);
+                    expect(baseband.simMSIN.getValue()).toBe('');
                 });
+                instance.emit('baseband', 'sim imsi_id 012345678');
+                expect(baseband.simMSIN.getValue()).toBe('012345678');
             });
 
             test('phone_number', () => {
-                ['jean-michel', '-123', ''].forEach((value) => {
-                    instance.emit('baseband', `sim phone_number ${value}`);
-                    expect(baseband.simOperatorPhoneNumber.value).toBe(value);
-                });
+                instance.emit('baseband', 'sim phone_number jean-michel');
+                expect(baseband.simOperatorPhoneNumber.getValue()).toBe('');
+                instance.emit('baseband', 'sim phone_number -123');
+                expect(baseband.simOperatorPhoneNumber.getValue()).toBe('-123');
+                instance.emit('baseband', 'sim phone_number ');
+                expect(baseband.simOperatorPhoneNumber.getValue()).toBe('');
             });
         });
     });
@@ -103,11 +111,12 @@ describe('BasebandRIL Plugin', () => {
         test('baseband', () => {
             instance = new Instance();
             baseband = new BasebandRIL(instance, {}, true);
+            instance.emit('baseband', 'network operator 123456');
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
-            baseband.networkOperatorMMC.value = '123456';
-            baseband.networkOperatorName.value = 'value';
-            baseband.simOperatorMMC.value = '123456';
+            baseband.networkOperatorMMC.setValue('123456');
+            baseband.networkOperatorName.setValue('value');
+            baseband.simOperatorMMC.setValue('123456');
             baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
@@ -115,9 +124,9 @@ describe('BasebandRIL Plugin', () => {
                 messages: ['network operator 123456', 'network operator_name value', 'sim operator 123456'],
             });
 
-            baseband.simOperatorName.value = 'value';
-            baseband.simMSIN.value = '0123456789';
-            baseband.simOperatorPhoneNumber.value = '0011223344';
+            baseband.simOperatorName.setValue('value');
+            baseband.simMSIN.setValue('012345678');
+            baseband.simOperatorPhoneNumber.setValue('0011223344');
             baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
@@ -127,7 +136,7 @@ describe('BasebandRIL Plugin', () => {
                     'network operator_name value',
                     'sim operator 123456',
                     'sim operator_name value',
-                    'sim imsi_id 0123456789',
+                    'sim imsi_id 012345678',
                     'sim phone_number 0011223344',
                 ],
             });

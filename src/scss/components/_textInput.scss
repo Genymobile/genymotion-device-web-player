@@ -1,35 +1,68 @@
-.text-input-container {
-    border-bottom: 1px solid var(--gm-tertiary-variant-color);
-    color: var(--gm-on-secondary-color);
-    display: flex;
-    align-items: center;
-    height: 34px;
-
-    &:has(.text-input:read-only) {
-        border-bottom: 1px solid transparent;
-    }
-
-    .text-input {
-        text-align: left;
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
-        background-color: transparent;
+.text-input {
+    .text-input-container {
+        border-bottom: 1px solid var(--gm-tertiary-variant-color);
         color: var(--gm-on-secondary-color);
-        /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
-        font-size: inherit;
+        display: flex;
+        align-items: center;
+        height: 34px;
 
-        &::placeholder {
-            color: var(--gm-tertiary-color);
-        }
-        &:focus {
-            outline: none;
+        &:has(.text-input:read-only) {
+            border-bottom: 1px solid transparent;
         }
 
-        &:read-only {
-            background: var(--gm-tertiary-color);
+        .text-input {
+            text-align: left;
+            padding-left: 0;
+            padding-right: 0;
             border: none;
-            color: var(--gm-tertiary-variant-color);
+            background-color: transparent;
+            color: var(--gm-on-secondary-color);
+            /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
+            font-size: inherit;
+
+            &::placeholder {
+                color: var(--gm-tertiary-color);
+            }
+            &:focus {
+                outline: none;
+            }
+
+            &:read-only {
+                background: var(--gm-tertiary-color);
+                border: none;
+                color: var(--gm-tertiary-variant-color);
+            }
+        }
+    }
+    &:has(.text-input-message.error) .text-input-container {
+        border-bottom: 1px solid var(--gm-error-color);
+    }
+    .text-input-message {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        &::after {
+            content: ' ';
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            width: 20px;
+            height: 20px;
+        }
+        &.error {
+            &::before {
+                content: attr(data-error);
+                color: var(--gm-error-color);
+            }
+            &::after {
+                content: ' ';
+                mask-image: url('../assets/images/ic_alert.svg');
+                -webkit-mask-image: url('../assets/images/ic_alert.svg');
+                background-color: var(--gm-error-color);
+            }
         }
     }
 }

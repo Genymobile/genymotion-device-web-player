@@ -160,7 +160,7 @@ module.exports = class DeviceRendererFactory {
         });
 
         instance.apiManager = new APIManager(instance);
-        instance.toolbarManager = new ToolbarManager();
+        instance.toolbarManager = new ToolbarManager(instance);
 
         this.instances.push(instance);
 

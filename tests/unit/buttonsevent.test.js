@@ -106,8 +106,18 @@ describe('ButtonsEvents Plugin', () => {
         test('rotation', () => {
             const button = document.getElementsByClassName('gm-rotation')[0];
 
-            button.dispatchEvent(new Event('mousedown'));
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'ROTATE',
@@ -117,7 +127,12 @@ describe('ButtonsEvents Plugin', () => {
         test('volume up', () => {
             const button = document.getElementsByClassName('gm-sound-up')[0];
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -125,7 +140,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '0\n',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
                 type: 'KEYBOARD_RELEASE',
@@ -137,7 +157,12 @@ describe('ButtonsEvents Plugin', () => {
         test('volume down', () => {
             const button = document.getElementsByClassName('gm-sound-down')[0];
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -145,7 +170,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '0\n',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
                 type: 'KEYBOARD_RELEASE',
@@ -157,7 +187,12 @@ describe('ButtonsEvents Plugin', () => {
         test('recent apps', () => {
             const button = document.getElementsByClassName('gm-recent')[0];
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -165,7 +200,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '0\n',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
                 type: 'KEYBOARD_RELEASE',
@@ -177,7 +217,12 @@ describe('ButtonsEvents Plugin', () => {
         test('home', () => {
             const button = document.getElementsByClassName('gm-home')[0];
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -190,7 +235,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(4);
             expect(instance.outgoingMessages[2]).toEqual({
                 type: 'KEYBOARD_RELEASE',
@@ -205,9 +255,14 @@ describe('ButtonsEvents Plugin', () => {
         });
 
         test('back', () => {
-            const button = document.getElementsByClassName('gm-back')[0];
+            const button = document.querySelector('.gm-back');
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -215,7 +270,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '0\n',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
                 type: 'KEYBOARD_RELEASE',
@@ -225,9 +285,14 @@ describe('ButtonsEvents Plugin', () => {
         });
 
         test('power', () => {
-            const button = document.getElementsByClassName('gm-power')[0];
+            const button = document.querySelector('.gm-power');
 
-            button.dispatchEvent(new Event('mousedown'));
+            button.dispatchEvent(
+                new MouseEvent('mousedown', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 type: 'KEYBOARD_PRESS',
@@ -235,7 +300,12 @@ describe('ButtonsEvents Plugin', () => {
                 keychar: '0\n',
             });
 
-            button.dispatchEvent(new Event('mouseup'));
+            button.dispatchEvent(
+                new MouseEvent('mouseup', {
+                    bubbles: true,
+                    composed: true, // Ensures the event propagates even if inside a Shadow DOM because the event listener is on the parent (LI)
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({
                 type: 'KEYBOARD_RELEASE',

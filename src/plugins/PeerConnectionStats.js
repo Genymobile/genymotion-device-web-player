@@ -75,6 +75,7 @@ module.exports = class PeerConnectionStats {
      * Creates & display the default turn warning.
      */
     displayDefaultTurnWarning() {
+        // TODO look at this button and see if it can be improved
         let message = '<h1><span>&#9888;</span> Using a default TURN</h1>Performance is not optimal.';
         const li = document.createElement('li');
         const warning = document.createElement('div');
@@ -94,7 +95,7 @@ module.exports = class PeerConnectionStats {
         warning.onmouseenter = () => {
             hover.classList.remove('gm-hidden');
             const {top} = warning.getBoundingClientRect();
-            hover.style.top = `${top - hover.offsetHeight + hover.parentElement.offsetHeight /2	+ 10}px`;
+            hover.style.top = `${top - hover.offsetHeight + hover.parentElement.offsetHeight / 2 + 10}px`;
         };
         warning.onmouseleave = () => {
             hover.classList.add('gm-hidden');

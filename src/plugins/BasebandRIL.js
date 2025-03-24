@@ -116,6 +116,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             regexFilter: /^[0-9]{0,6}$/,
             regexValidField: /^[0-9]{5,6}$/,
             placeholder: 'eg: 20814',
+            messageField: true,
             onChange: () => {
                 this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');
@@ -162,6 +163,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             placeholder: 'eg: 20814',
             regexFilter: /^[0-9]{0,6}$/,
             regexValidField: /^[0-9]{5,6}$/,
+            messageField: true,
             onChange: () => {
                 this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');
@@ -195,6 +197,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             placeholder: 'eg: 2176510739',
             regexFilter: /^[0-9]{0,10}$/,
             regexValidField: /^[0-9]{9,10}$/,
+            messageField: true,
             onChange: () => {
                 this.checkIfFormIsValid();
                 this.container.classList.remove('f');
@@ -211,6 +214,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             placeholder: 'eg: 8004337300',
             regexFilter: /^[0-9+\-().\s]{0,25}$/,
             regexValidField: /^[0-9+\-().\s]+$/,
+            messageField: true,
             onChange: () => {
                 this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');

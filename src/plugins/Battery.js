@@ -177,6 +177,7 @@ module.exports = class Battery extends OverlayPlugin {
             appendText: '%',
             value: '50',
             regexFilter: /^(0?[0-9]{1,2}|100)$/,
+            classes: 'gm-charge-input',
             onChange: (value) => {
                 this.chargeSlider.setValue(value);
                 this.updateUIBatteryChargingPercent(value);
@@ -194,8 +195,6 @@ module.exports = class Battery extends OverlayPlugin {
                 this.chargeInput.setValue(Math.max(0, Number(this.chargeInput.getValue()) - 1), true);
             }
         });
-
-        this.chargeInput.element.className = 'gm-charge-input';
 
         this.chargeGroup.appendChild(this.chargeInput.element);
 

@@ -190,21 +190,26 @@ const textInput = (() => {
         appendText = '',
         classes = '',
         placeholder = '',
+        messageField = false,
     }) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
         inputDiv.classList.add('text-input');
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
+
         const inputMessage = document.createElement('div');
         inputMessage.classList.add('text-input-message');
         inputDiv.appendChild(inputDivContainer);
         inputDiv.appendChild(inputMessage);
+        if (!messageField) {
+            inputMessage.style.display = 'none';
+        }
 
         const input = document.createElement('input');
         input.type = 'text';
         input.value = value;
-        input.classList.add('text-input');
+        input.classList.add('input');
         input.placeholder = placeholder;
 
         if (appendText) {

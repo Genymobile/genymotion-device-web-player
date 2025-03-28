@@ -794,17 +794,13 @@ module.exports = class DeviceRenderer {
                 },
                 {
                     widget: this.network,
-                    capability: data.message.network,
-                },
-                {
-                    widget: this.network,
+                    /*
+                     * On Android 7 and below, network throttling has known issues.
+                     * From version 8 and above, the `mobileThrottling` capability is sent.
+                     * We now use `mobileThrottling` to enable or disable network throttling.
+                     * Previously, this was determined using the `data.message.network` capability.
+                     */
                     capability: data.message.mobileThrottling,
-                    enable: (widget) => {
-                        widget.enableMobileThrottling();
-                    },
-                    disable: (widget) => {
-                        widget.disableMobileThrottling();
-                    },
                 },
                 {
                     widget: this.network,

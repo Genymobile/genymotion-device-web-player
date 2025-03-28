@@ -190,21 +190,26 @@ const textInput = (() => {
         appendText = '',
         classes = '',
         placeholder = '',
+        messageField = false,
     }) => {
         const inputDiv = document.createElement('div');
         inputDiv.className = classes;
         inputDiv.classList.add('text-input');
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
+
         const inputMessage = document.createElement('div');
         inputMessage.classList.add('text-input-message');
         inputDiv.appendChild(inputDivContainer);
         inputDiv.appendChild(inputMessage);
+        if (!messageField) {
+            inputMessage.style.display = 'none';
+        }
 
         const input = document.createElement('input');
         input.type = 'text';
         input.value = value;
-        input.classList.add('text-input');
+        input.classList.add('input');
         input.placeholder = placeholder;
 
         if (appendText) {
@@ -288,12 +293,22 @@ const dropdownSelect = (() => {
      * @param {Array} [options.items] - The initial list of items to display in the dropdown menu.
      * @param {Function} [options.onChange] - Optional callback triggered when the selected value changes.
      * @param {string} [options.value] - Initial selected value.
+     * @param {boolean} [options.hasCheckmark] - Whether to display a checkmark next to the selected item.
+     * @param {string} [options.classes] - Additional classes to apply to the dropdown.
+     * @param {number} [options.dropdownMaxHeight] - Maximum height of the dropdown menu.
      * @returns {Object} - Dropdown component with methods to interact with it.
      */
-    const createDropdown = ({items = [], onChange = null, value = '', hasCheckmark = false}) => {
+    const createDropdown = ({
+        items = [],
+        onChange = null,
+        value = '',
+        hasCheckmark = false,
+        classes = '',
+        dropdownMaxHeight = null,
+    }) => {
         let selectedValue = value ?? 'Select...';
         const dropdownDiv = document.createElement('div');
-        dropdownDiv.className = 'dropdown';
+        dropdownDiv.className = classes + ' dropdown';
 
         // Create the div displaying the selected value
         const selectedValueDiv = document.createElement('div');
@@ -304,6 +319,9 @@ const dropdownSelect = (() => {
         // Create the menu div where options will be appended
         const dropdownMenuDiv = document.createElement('div');
         dropdownMenuDiv.className = 'dropdown-menu';
+        if (dropdownMaxHeight) {
+            dropdownMenuDiv.style.maxHeight = dropdownMaxHeight + 'px';
+        }
         dropdownDiv.appendChild(dropdownMenuDiv);
 
         /**
@@ -321,15 +339,15 @@ const dropdownSelect = (() => {
         const addCheckmark = (itemsArr) => {
             itemsArr.forEach((item) => {
                 // remove all checkmark
-                const checkmarkDiv = item.element.querySelector('.dropdown-checkmark');
+                const checkmarkDiv = item.element.parentElement.querySelector('.dropdown-checkmark');
                 if (checkmarkDiv) {
-                    item.element.removeChild(checkmarkDiv);
+                    item.element.parentElement.removeChild(checkmarkDiv);
                 }
 
                 if (item.value === selectedValue || item === selectedValue) {
                     const checkmark = document.createElement('div');
                     checkmark.className = 'dropdown-checkmark';
-                    item.element.appendChild(checkmark);
+                    item.element.parentElement.appendChild(checkmark);
                 }
             });
         };
@@ -347,10 +365,7 @@ const dropdownSelect = (() => {
          */
         const setValue = (item, triggerOnChange = false) => {
             let itemValue, valueToDisplay;
-            if (typeof item === 'string') {
-                itemValue = item;
-                valueToDisplay = item;
-            } else if (typeof item === 'object' && 'value' in item && 'element' in item) {
+            if (typeof item === 'object' && 'value' in item && 'element' in item) {
                 itemValue = item.value;
                 valueToDisplay = item.valueToDisplay ?? item.element.innerHTML ?? item.value;
             }
@@ -380,8 +395,13 @@ const dropdownSelect = (() => {
          * @param {Array} newItems - The new list of items to display in the dropdown.
          */
         const updateOptions = (newItems) => {
+            items = newItems;
             // Clear current options before appending new ones
             dropdownMenuDiv.innerHTML = '';
+            // if selectedValue is not in the newItems, reset the selectedValue
+            if (!newItems.some((item) => item.value === selectedValue)) {
+                selectedValueDiv.textContent = 'Select...';
+            }
 
             // Iterate through newItems to create and append dropdown options
             newItems.forEach((item) => {
@@ -433,12 +453,21 @@ const dropdownSelect = (() => {
             }
         });
 
+        const setDisabled = (status = false) => {
+            // Set the disabled status of the dropdown
+            if (status) {
+                dropdownDiv.classList.add('disabled');
+            } else {
+                dropdownDiv.classList.remove('disabled');
+            }
+        };
         // Return the dropdown element and helper methods for interaction
         return {
             element: dropdownDiv,
             getValue,
             setValue,
             updateOptions, // Expose method to dynamically update options
+            setDisabled,
         };
     };
 

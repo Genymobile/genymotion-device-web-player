@@ -11,26 +11,37 @@
             &::after {
                 transform: rotate(-45deg);
             }
-    
         }
     }
-    
+
+    &.disabled {
+        .dropdown-selected {
+            pointer-events: none;
+            border-color: var(--gm-tertiary-color);
+            color: var(--gm-tertiary-color);
+            &::after {
+                border-color: var(--gm-tertiary-color);
+            }
+        }
+    }
+
     .dropdown-selected {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 0px 15px 0px;
         cursor: pointer;
-        
+
         transition: transform 0.2s ease;
         transition: border-color 0.2s ease;
-        border-bottom: 1px solid var(--gm-tertiary-variant-color); 
+        border-bottom: 1px solid var(--gm-tertiary-variant-color);
 
         &::after {
             content: '';
             width: 8px;
             height: 8px;
             margin-right: 8px;
+            margin-left: auto;
             border: solid var(--gm-on-secondary-color);
             border-width: 2px 2px 0 0;
             transform: rotate(135deg);
@@ -38,7 +49,7 @@
             transition: transform 0.2s ease;
         }
     }
-        
+
     .dropdown-menu {
         display: none;
         position: absolute;
@@ -46,16 +57,42 @@
         left: 0;
         z-index: 10;
         margin-top: 5px;
-        
+
         padding: 10px 0;
         gap: 6px;
         border-radius: 4px;
         background-color: var(--gm-secondary-variant-color);
+        overflow-y: auto;
+
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
 
         .dropdown-item {
             padding: 16px 20px;
             cursor: pointer;
-            .dropdown-checkmark{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .dropdown-checkmark {
                 background-color: var(--gm-on-secondary-color);
                 mask-image: url('../assets/images/ic_check.svg');
                 -webkit-mask-image: url('../assets/images/ic_check.svg');
@@ -69,12 +106,9 @@
                 height: 22px;
             }
         }
-        
+
         .dropdown-item:hover {
             background: var(--gm-background-color);
         }
-
     }
-    
 }
-

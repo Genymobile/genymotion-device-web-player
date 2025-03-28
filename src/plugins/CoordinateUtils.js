@@ -113,7 +113,16 @@ module.exports = class CoordinateUtils {
     getXCoordinate(event) {
         this.instance.root.focus(); // not on the Y function because we need to focus element only once
         this.setVideoElement();
-        const x = this.getRawXCoordinateFromEvent(event) - this.getLeftBorder();
+        const style = window.getComputedStyle(this.video);
+
+        /*
+         * Retrieve the border size adding in CSS (converted to a number) if it exists
+         * this avoid buf in the calculation of the x coordinate when the video has borders.
+         * introduce with the template over the video.
+         */
+        const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+        const x = this.getRawXCoordinateFromEvent(event) - this.getLeftBorder() + borderLeft;
+
         return Math.round(x * this.getXRatio());
     }
 
@@ -125,7 +134,15 @@ module.exports = class CoordinateUtils {
      */
     getYCoordinate(event) {
         this.setVideoElement();
-        const y = this.getRawYCoordinateFromEvent(event) - this.getTopBorder();
+        const style = window.getComputedStyle(this.video);
+
+        /*
+         * Retrieve the border size adding in CSS (converted to a number) if it exists
+         * this avoid buf in the calculation of the x coordinate when the video has borders.
+         * introduce with the template over the video.
+         */
+        const borderTop = parseFloat(style.borderTopWidth) || 0;
+        const y = this.getRawYCoordinateFromEvent(event) - this.getTopBorder() + borderTop;
         return Math.round(y * this.getYRatio());
     }
 

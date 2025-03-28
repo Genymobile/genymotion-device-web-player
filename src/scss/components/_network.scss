@@ -2,79 +2,77 @@
  * Network plugin styles
  */
 .device-renderer-instance .gm-network-plugin {
-    .gm {
-        &-checkbox-group {
-            margin-bottom: 15px;
+    .gm-network-wifi-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: $spacing-m;
+    }
+    .gm-mobile-data-switch {
+        display: flex;
+        justify-content: space-between;
+        margin-top: $spacing-m;
+        margin-bottom: $spacing-m * 2;
+    }
 
-            .gm-checkbox {
-                width: 15px;
-                float: left;
-                margin: 0;
+    .gm-network-type-dropdown {
+        margin-bottom: $spacing-m * 2;
+        .dropdown-menu {
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                .gm-network-profile-icon {
+                    width: 30px;
+                    height: 30px;
+                    -webkit-mask-size: contain;
+                    mask-size: contain;
+                    -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+                    -webkit-mask-position: center;
+                    mask-position: center;
+                    background-color: var(--gm-on-secondary-color);
+
+                    &.unlimited {
+                        mask-image: url('../assets/images/ic_network-type-unlimited.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-unlimited.svg');
+                    }
+                    &.five-G {
+                        mask-image: url('../assets/images/ic_network-type-5g.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-5G.svg');
+                    }
+                    &.four-G {
+                        mask-image: url('../assets/images/ic_network-type-4g.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-4G.svg');
+                    }
+                    &.three-G {
+                        mask-image: url('../assets/images/ic_network-type-3g.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-3G.svg');
+                    }
+                    &.two-G-edge {
+                        mask-image: url('../assets/images/ic_network-type-edge.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-2G-edge.svg');
+                    }
+                    &.two-G-gprs {
+                        mask-image: url('../assets/images/ic_network-type-gprs.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-2G-gprs.svg');
+                    }
+                    &.two-G-gsm {
+                        mask-image: url('../assets/images/ic_network-type-gprs.svg');
+                        -webkit-mask-image: url('../assets/images/ic_network-type-2G-gsm.svg');
+                    }
+                }
             }
-
-            .gm-checkbox-label {
-                height: 32px;
-                line-height: 32px;
-                margin-left: 30px;
-            }
-        }
-
-        &-inputs {
-            margin-bottom: 15px;
-
-            input-label {
-                height: 32px;
-                line-height: 32px;
-                margin-left: 30px;
-            }
-
-            select {
-                width: 100%;
-                margin-top: 10px;
-                padding: 2px;
-            }
-        }
-
-        &-profile-details {
-            margin: 12px 0;
-        }
-
-        &-section {
-            display: block;
-            margin: 0px 0 10px 0;
-            padding: 0;
-            width: 100%;
-            height: 50px;
-            font-weight: bold;
-            border-bottom: 1px solid var(--gm-tertiary-color);
-        }
-
-        &-fields {
-            display: block;
-            padding: 0;
-            width: 100%;
-            height: 50px;
         }
     }
 
-    label {
-        margin-top: 20px;
-        display: block;
-        float: left;
-    }
-
-    input {
-        margin-top: 10px;
-        width: 60%;
-        float: right;
-        text-align: right;
-        font-size: medium;
-        font-family: Helvetica, sans-serif;
-
-        &:invalid,
-        &:focus:invalid {
-            // TODO quand reprend ce plugin
-            border-bottom: 1px solid var(--gm-btn-bg-color);
+    .gm-network-mobile-section {
+        .gm-signal-strength-dropdown {
+            margin-bottom: $spacing-m * 2;
+        }
+        &.disabled {
+            label,
+            section {
+                color: var(--gm-tertiary-color);
+            }
         }
     }
 }

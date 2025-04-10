@@ -122,13 +122,25 @@ class OverlayPlugin {
         const header = document.createElement('div');
         header.className = 'gm-modal-header';
 
+        // Create container for title and close button
+        const headerContent = document.createElement('div');
+        headerContent.className = 'gm-modal-header-content';
+
         const titleElement = document.createElement('div');
         titleElement.className = 'gm-modal-title';
         titleElement.innerHTML = title || '';
-        header.appendChild(titleElement);
+        headerContent.appendChild(titleElement);
 
         const closeButton = this.createCloseButton();
-        header.appendChild(closeButton);
+        headerContent.appendChild(closeButton);
+
+        // Add header content to header
+        header.appendChild(headerContent);
+
+        // Add separator
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+        header.appendChild(separator);
 
         return header;
     }

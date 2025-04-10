@@ -70,13 +70,14 @@ const switchButton = (() => {
  */
 
 const slider = (() => {
-    const createSlider = ({onChange = null, onCursorMove = null, min = 0, max = 100, value = 50}) => {
+    const createSlider = ({onChange = null, onCursorMove = null, min = 0, max = 100, value = 50, classes = ''}) => {
         if (min >= max) {
             throw new Error('`min` must be less than `max`.');
         }
 
         // Create slider container
         const sliderDiv = document.createElement('div');
+        sliderDiv.className = classes;
         sliderDiv.classList.add('slider');
 
         // Create progress bar (filled portion)
@@ -220,25 +221,29 @@ const textInput = (() => {
         const bottomContainer = document.createElement('div');
         bottomContainer.classList.add('text-input-bottom');
         // Hide bottom container if neither messageField nor unitText is present
-        bottomContainer.style.display = !messageField && !unitText ? 'none' : 'block';
+        if (!messageField && !unitText) {
+            bottomContainer.classList.add('hidden');
+        }
         inputDiv.appendChild(bottomContainer);
 
         // Create error message element
         const inputMessage = document.createElement('div');
         inputMessage.classList.add('text-input-message');
+        if (!messageField) {
+            inputMessage.classList.add('hidden');
+        }
         bottomContainer.appendChild(inputMessage);
 
         // Create unit text element
         const unitTextSpan = document.createElement('div');
         unitTextSpan.textContent = unitText;
         unitTextSpan.classList.add('text-input-unit');
+        if (!unitText) {
+            unitTextSpan.classList.add('hidden');
+        }
         bottomContainer.appendChild(unitTextSpan);
 
         // Initialize visibility based on presence of unit text
-        unitTextSpan.style.display = unitText ? 'block' : 'none';
-        if (!messageField) {
-            inputMessage.style.display = 'none';
-        }
 
         const setValue = (newValue, triggerOnChange = false) => {
             if (regexFilter && !regexFilter.test(newValue)) {
@@ -263,14 +268,18 @@ const textInput = (() => {
             if (!message) {
                 inputMessage.classList.remove('error');
                 inputMessage.removeAttribute('data-error');
-                inputMessage.style.display = 'none';
-                unitTextSpan.style.display = unitText ? 'block' : 'none';
+                inputMessage.classList.add('hidden');
+                if (unitText) {
+                    unitTextSpan.classList.remove('hidden');
+                } else {
+                    unitTextSpan.classList.add('hidden');
+                }
                 return;
             }
             inputMessage.classList.add('error');
             inputMessage.setAttribute('data-error', message);
-            inputMessage.style.display = 'block';
-            unitTextSpan.style.display = 'none';
+            inputMessage.classList.remove('hidden');
+            unitTextSpan.classList.add('hidden');
         };
 
         const checkValidity = () => {

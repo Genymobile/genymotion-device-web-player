@@ -316,30 +316,51 @@ module.exports = class GPS extends OverlayPlugin {
         bearingLabel.innerHTML = this.i18n.GPS_BEARING || 'Bearing';
         bearingDiv.appendChild(bearingLabel);
 
-        const bearingInputWrapper = document.createElement('div');
-        bearingInputWrapper.className = 'gm-gps-bearing-input-wrapper';
-        const bearingIcon = document.createElement('div');
-        bearingIcon.className = 'gm-gps-bearing-icon';
-        bearingInputWrapper.appendChild(bearingIcon);
+        // Create a flex wrapper for bearing input and slider
+        const bearingWrapper = document.createElement('div');
+        bearingWrapper.className = 'gm-gps-bearing-input-wrapper';
+
+        // Create the bearing slider
+        this.bearingSlider = slider.createSlider({
+            min: 0,
+            max: 360,
+            value: 0,
+            classes: 'gm-gps-bearing-slider',
+            onChange: (value) => {
+                this.inputComponents.bearing.setValue(value);
+                this.checkErrors();
+            },
+            onCursorMove: (value) => {
+                // Update UI without sending data to instance
+                this.inputComponents.bearing.setValue(value);
+                this.checkErrors();
+            },
+        });
+
+        // Add the slider to the wrapper
+        bearingWrapper.appendChild(this.bearingSlider.element);
 
         this.inputComponents.bearing = textInput.createTextInput({
             value: '0',
             classes: 'gm-gps-bearing-input',
-            regexFilter: /^-?\d*\.?\d*$/,
-            regexValidField: /^(?:[0-2]?\d{1,2}(?:\.\d*)?|3[0-5]\d(?:\.\d*)?|360(?:\.0*)?)$/,
+            regexFilter: /^$|^(0?[0-9]{1,2}|[1-2][0-9]{2}|3[0-5][0-9]|360)$/,
+            regexValidField: /^(0?[0-9]{1,3}|360)$/,
             messageField: true,
             unitText: 'o',
-            onChange: () => {
-                if (!this.inputComponents.bearing.checkValidity()) {
-                    this.inputComponents.bearing.setErrorMessage('Between 0 and 360');
-                } else {
-                    this.inputComponents.bearing.setErrorMessage('');
-                }
+            onChange: (v) => {
+                // Update slider when input changes
+                const value = parseFloat(v) || 0;
+                this.bearingSlider.setValue(value);
                 this.checkErrors();
             },
         });
-        bearingInputWrapper.appendChild(this.inputComponents.bearing.element);
-        bearingDiv.appendChild(bearingInputWrapper);
+
+        // Add the input to the wrapper
+        bearingWrapper.appendChild(this.inputComponents.bearing.element);
+
+        // Add the wrapper to the bearing div
+        bearingDiv.appendChild(bearingWrapper);
+
         positionThirdLine.appendChild(bearingDiv);
         positionSection.appendChild(positionThirdLine);
 

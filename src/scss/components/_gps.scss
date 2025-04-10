@@ -55,38 +55,19 @@
         .gm-input-wrap {
             flex: 1;
         }
-        .gm-gps-bearing-input-wrapper {
-            display: flex;
-            align-self: center;
-            justify-content: space-between;
-            .gm-gps-bearing-icon {
-                width: 30px;
-                height: 30px;
-                background-color: var(--gm-on-secondary-color);
-                mask-image: url('../assets/images/ic_compass.svg');
-                -webkit-mask-image: url('../assets/images/ic_compass.svg');
-                mask-size: contain;
-                -webkit-mask-size: contain;
-                mask-repeat: no-repeat;
-                -webkit-mask-repeat: no-repeat;
-                mask-position: center;
-                -webkit-mask-position: center;
-            }
-            .gm-gps-bearing-input {
-                width: 47px;
-            }
-        }
-        .gm-gps-accuracy-input-wrapper {
+        [class*='gm-gps-'][class*='-input-wrapper'] {
             display: flex;
             align-items: center;
-            width: 100%;
             justify-content: space-between;
+            .gm-gps-bearing-slider,
             .gm-gps-accuracy-slider {
                 width: 112px;
                 margin-top: 12px;
             }
+            .gm-gps-bearing-input,
             .gm-gps-accuracy-input {
                 width: 47px;
+                min-width: 47px;
             }
         }
     }

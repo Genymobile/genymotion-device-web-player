@@ -2,6 +2,7 @@
 
 const OverlayPlugin = require('./util/OverlayPlugin');
 const {textInput, chipTag} = require('./util/components');
+const {slider} = require('./util/components');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -33,14 +34,19 @@ module.exports = class GPS extends OverlayPlugin {
         // Register plugin
         this.instance.gps = this;
 
-        // Location fields
-        this.fields = ['altitude', 'longitude', 'latitude', 'accuracy', 'bearing'];
-        if (speedSupport) {
-            this.fields.push('speed');
-        }
-
         // Input components
-        this.inputComponents = {};
+        this.inputComponents = {
+            altitude: null,
+            longitude: null,
+            latitude: null,
+            accuracy: null,
+            bearing: null,
+        };
+
+        // Add speed field if supported
+        if (speedSupport) {
+            this.inputComponents.speed = null;
+        }
 
         // Map references
         this.map = null;
@@ -69,7 +75,7 @@ module.exports = class GPS extends OverlayPlugin {
         // Listen for gps events: "<altitude/latitude/longitude/accuracy/bearing/status/speed?> <value>"
         this.instance.registerEventCallback('gps', (message) => {
             const values = message.split(' ');
-            if (this.fields.includes(values[0]) && values.length >= 2) {
+            if (Object.keys(this.inputComponents).includes(values[0]) && values.length >= 2) {
                 this.setFieldValue(values[0], values[1]);
             }
         });
@@ -227,7 +233,32 @@ module.exports = class GPS extends OverlayPlugin {
         accuracyLabel.innerHTML = this.i18n.GPS_ACCURACY || 'Accuracy';
         accuracyDiv.appendChild(accuracyLabel);
 
+        // Create a flex wrapper for accuracy input and slider
+        const accuracyWrapper = document.createElement('div');
+        accuracyWrapper.className = 'gm-gps-accuracy-input-wrapper';
+
+        // Create the accuracy slider
+        this.accuracySlider = slider.createSlider({
+            min: 0,
+            max: 200,
+            value: 0,
+            classes: 'gm-gps-accuracy-slider',
+            onChange: (value) => {
+                this.inputComponents.accuracy.setValue(value);
+                this.checkErrors();
+            },
+            onCursorMove: (value) => {
+                // Update UI without sending data to instance
+                this.inputComponents.accuracy.setValue(value);
+                this.checkErrors();
+            },
+        });
+
+        // Add the slider to the wrapper
+        accuracyWrapper.appendChild(this.accuracySlider.element);
+
         this.inputComponents.accuracy = textInput.createTextInput({
+            classes: 'gm-gps-accuracy-input',
             value: '0',
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^(?:1?\d{1,2}(?:\.\d*)?|200(?:\.0*)?)$/,
@@ -240,10 +271,18 @@ module.exports = class GPS extends OverlayPlugin {
                 } else {
                     this.inputComponents.accuracy.setErrorMessage('');
                 }
+                // Update slider when input changes
+                const value = parseFloat(this.inputComponents.accuracy.getValue()) || 0;
+                this.accuracySlider.setValue(value);
                 this.checkErrors();
             },
         });
-        accuracyDiv.appendChild(this.inputComponents.accuracy.element);
+
+        // Add the input to the wrapper
+        accuracyWrapper.appendChild(this.inputComponents.accuracy.element);
+
+        // Add the wrapper to the accuracy div
+        accuracyDiv.appendChild(accuracyWrapper);
 
         positionSecondLine.appendChild(altitudeDiv);
         positionSecondLine.appendChild(accuracyDiv);
@@ -253,7 +292,7 @@ module.exports = class GPS extends OverlayPlugin {
         positionThirdLine.className = 'gm-gps-section-line';
 
         // Speed input (optional)
-        if (this.fields.includes('speed')) {
+        if (Object.keys(this.inputComponents).includes('speed')) {
             const speedDiv = document.createElement('div');
             speedDiv.className = 'gm-input-wrap';
             const speedLabel = document.createElement('label');
@@ -352,7 +391,7 @@ module.exports = class GPS extends OverlayPlugin {
     checkErrors() {
         let gotAnError = false;
 
-        for (const field of this.fields) {
+        for (const field of Object.keys(this.inputComponents)) {
             const component = this.inputComponents[field];
             if (!component.checkValidity()) {
                 gotAnError = true;
@@ -393,7 +432,7 @@ module.exports = class GPS extends OverlayPlugin {
         const json = {channel: 'gps', messages: []};
         const info = this.getLocationInfo();
 
-        for (const field of this.fields) {
+        for (const field of Object.keys(this.inputComponents)) {
             if (field in info) {
                 json.messages.push('set ' + field + ' ' + info[field]);
             }
@@ -415,7 +454,7 @@ module.exports = class GPS extends OverlayPlugin {
     getLocationInfo() {
         const info = {};
 
-        for (const field of this.fields) {
+        for (const field of Object.keys(this.inputComponents)) {
             const component = this.inputComponents[field];
             if (!component) {
                 continue;
@@ -447,7 +486,7 @@ module.exports = class GPS extends OverlayPlugin {
                 return;
             }
 
-            this.fields.forEach((field) => {
+            Object.keys(this.inputComponents).forEach((field) => {
                 if (position.coords[field]) {
                     this.setFieldValue(field, position.coords[field]);
                 }

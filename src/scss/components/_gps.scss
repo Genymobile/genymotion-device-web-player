@@ -40,6 +40,14 @@
 
     .gm-section {
         margin-bottom: $spacing-m;
+        .gm-gps-section-line {
+            display: flex;
+            gap: $spacing-xl;
+        }
+
+        .gm-input-wrap {
+            flex: 1;
+        }
         .gm-gps-bearing-input-wrapper {
             display: flex;
             align-self: center;
@@ -61,15 +69,19 @@
                 width: 47px;
             }
         }
-    }
-
-    .gm-gps-section-line {
-        display: flex;
-        gap: $spacing-xl;
-    }
-
-    .gm-input-wrap {
-        flex: 1;
+        .gm-gps-accuracy-input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            .gm-gps-accuracy-slider {
+                width: 112px;
+                margin-top: 12px;
+            }
+            .gm-gps-accuracy-input {
+                width: 47px;
+            }
+        }
     }
 
     .gm-actions {
@@ -83,6 +95,7 @@
         }
     }
 
+    // TODO check ca
     &.gm-gps-saved {
         .gm-tag-success {
             visibility: visible;

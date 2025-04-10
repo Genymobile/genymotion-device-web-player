@@ -123,12 +123,19 @@ module.exports = class GPS extends OverlayPlugin {
 
         // Form
         this.form = document.createElement('form');
-        const formWrap = document.createElement('div');
-        formWrap.className = 'gm-wrap';
 
-        // Generate form inputs
-        const inputs = document.createElement('div');
-        inputs.className = 'gm-col';
+        // Position Section
+        const positionSection = document.createElement('div');
+        positionSection.className = 'gm-section';
+
+        const positionTitle = document.createElement('div');
+        positionTitle.className = 'gm-gps-section-title';
+        positionTitle.innerHTML = this.i18n.GPS_POSITION || 'Position';
+        positionSection.appendChild(positionTitle);
+
+        // First line: Latitude & Longitude
+        const positionFirstLine = document.createElement('div');
+        positionFirstLine.className = 'gm-gps-section-line';
 
         // Latitude input
         const latitudeDiv = document.createElement('div');
@@ -153,7 +160,6 @@ module.exports = class GPS extends OverlayPlugin {
             },
         });
         latitudeDiv.appendChild(this.inputComponents.latitude.element);
-        inputs.appendChild(latitudeDiv);
 
         // Longitude input
         const longitudeDiv = document.createElement('div');
@@ -178,7 +184,14 @@ module.exports = class GPS extends OverlayPlugin {
             },
         });
         longitudeDiv.appendChild(this.inputComponents.longitude.element);
-        inputs.appendChild(longitudeDiv);
+
+        positionFirstLine.appendChild(latitudeDiv);
+        positionFirstLine.appendChild(longitudeDiv);
+        positionSection.appendChild(positionFirstLine);
+
+        // Second line: Altitude & Accuracy
+        const positionSecondLine = document.createElement('div');
+        positionSecondLine.className = 'gm-gps-section-line';
 
         // Altitude input
         const altitudeDiv = document.createElement('div');
@@ -203,7 +216,6 @@ module.exports = class GPS extends OverlayPlugin {
             },
         });
         altitudeDiv.appendChild(this.inputComponents.altitude.element);
-        inputs.appendChild(altitudeDiv);
 
         // Accuracy input
         const accuracyDiv = document.createElement('div');
@@ -228,7 +240,23 @@ module.exports = class GPS extends OverlayPlugin {
             },
         });
         accuracyDiv.appendChild(this.inputComponents.accuracy.element);
-        inputs.appendChild(accuracyDiv);
+
+        positionSecondLine.appendChild(altitudeDiv);
+        positionSecondLine.appendChild(accuracyDiv);
+        positionSection.appendChild(positionSecondLine);
+
+        // Movement Section
+        const movementSection = document.createElement('div');
+        movementSection.className = 'gm-section';
+
+        const movementTitle = document.createElement('div');
+        movementTitle.className = 'gm-gps-section-title';
+        movementTitle.innerHTML = this.i18n.GPS_MOVEMENT || 'Movement';
+        movementSection.appendChild(movementTitle);
+
+        // Movement line: Bearing & Speed
+        const movementLine = document.createElement('div');
+        movementLine.className = 'gm-gps-section-line';
 
         // Bearing input
         const bearingDiv = document.createElement('div');
@@ -253,7 +281,7 @@ module.exports = class GPS extends OverlayPlugin {
             },
         });
         bearingDiv.appendChild(this.inputComponents.bearing.element);
-        inputs.appendChild(bearingDiv);
+        movementLine.appendChild(bearingDiv);
 
         // Speed input (optional)
         if (this.fields.includes('speed')) {
@@ -279,8 +307,10 @@ module.exports = class GPS extends OverlayPlugin {
                 },
             });
             speedDiv.appendChild(this.inputComponents.speed.element);
-            inputs.appendChild(speedDiv);
+            movementLine.appendChild(speedDiv);
         }
+
+        movementSection.appendChild(movementLine);
 
         // Generate right side of form
         const right = document.createElement('div');
@@ -297,9 +327,15 @@ module.exports = class GPS extends OverlayPlugin {
         right.appendChild(this.rightGeolocWrap);
 
         // Build form
-        formWrap.appendChild(inputs);
-        formWrap.appendChild(right);
-        this.form.appendChild(formWrap);
+        this.form.appendChild(positionSection);
+        const sep1 = document.createElement('div');
+        sep1.className = 'gm-separator';
+        this.form.appendChild(sep1);
+        this.form.appendChild(movementSection);
+        const sep2 = document.createElement('div');
+        sep2.className = 'gm-separator';
+        this.form.appendChild(sep2);
+        this.form.appendChild(right);
 
         // Actions
         const actionsDiv = document.createElement('div');

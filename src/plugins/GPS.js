@@ -267,6 +267,12 @@ module.exports = class GPS extends OverlayPlugin {
                 this.accuracySlider.setValue(value);
                 this.checkErrors();
             },
+            onBlur: (v) => {
+                if (v === '') {
+                    this.inputComponents.accuracy.setValue('0');
+                    this.accuracySlider.setValue(0);
+                }
+            },
         });
 
         // Add the input to the wrapper
@@ -352,6 +358,12 @@ module.exports = class GPS extends OverlayPlugin {
                 const value = parseFloat(v) || 0;
                 this.bearingSlider.setValue(value);
                 this.checkErrors();
+            },
+            onBlur: (v) => {
+                if (v === '') {
+                    this.inputComponents.bearing.setValue('0');
+                    this.accuracySlider.setValue(0);
+                }
             },
         });
 

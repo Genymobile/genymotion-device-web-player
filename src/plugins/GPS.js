@@ -78,6 +78,7 @@ module.exports = class GPS extends OverlayPlugin {
             if (Object.keys(this.inputComponents).includes(values[0]) && values.length >= 2) {
                 this.setFieldValue(values[0], values[1]);
             }
+            this.container.classList.add('gm-gps-saved');
         });
     }
 
@@ -157,7 +158,6 @@ module.exports = class GPS extends OverlayPlugin {
             messageField: true,
             unitText: 'o',
             onChange: () => {
-                this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.latitude.checkValidity()) {
                     this.inputComponents.latitude.setErrorMessage('Between -90 and 90');
                 } else {
@@ -182,7 +182,6 @@ module.exports = class GPS extends OverlayPlugin {
             messageField: true,
             unitText: 'o',
             onChange: () => {
-                this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.longitude.checkValidity()) {
                     this.inputComponents.longitude.setErrorMessage('Between -180 and 180');
                 } else {
@@ -215,7 +214,6 @@ module.exports = class GPS extends OverlayPlugin {
             messageField: true,
             unitText: 'm',
             onChange: () => {
-                this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.altitude.checkValidity()) {
                     this.inputComponents.altitude.setErrorMessage('Between -10,000 and 10,000');
                 } else {
@@ -299,7 +297,6 @@ module.exports = class GPS extends OverlayPlugin {
                 messageField: true,
                 unitText: 'm/s',
                 onChange: () => {
-                    this.container.classList.remove('gm-gps-saved');
                     if (!this.inputComponents.speed.checkValidity()) {
                         this.inputComponents.speed.setErrorMessage('Between 0 and 399.99');
                     } else {
@@ -403,6 +400,8 @@ module.exports = class GPS extends OverlayPlugin {
      */
     checkErrors() {
         let gotAnError = false;
+
+        this.container.classList.remove('gm-gps-saved');
 
         for (const field of Object.keys(this.inputComponents)) {
             const component = this.inputComponents[field];

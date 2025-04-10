@@ -186,6 +186,7 @@ const slider = (() => {
 const textInput = (() => {
     const createTextInput = ({
         onChange = null,
+        onBlur = null,
         value = '',
         regexFilter,
         regexValidField,
@@ -300,6 +301,12 @@ const textInput = (() => {
                 return;
             }
             setValue(v, true);
+        });
+
+        input.addEventListener('blur', (event) => {
+            if (onBlur) {
+                onBlur(event.target.value);
+            }
         });
 
         inputDiv.setValue = setValue;

@@ -106,6 +106,9 @@ module.exports = class GPS extends OverlayPlugin {
         this.mapview.className = 'gm-mapview';
 
         // set my positon button
+        this.setToMyPositionWrapper = document.createElement('div');
+        this.setToMyPositionWrapper.className = 'gm-gps-setToMyPosition-wrapper';
+
         this.setToMyPositionBtn = document.createElement('button');
         this.setToMyPositionBtn.className = 'gm-btn gm-gps-setToMyPosition';
         this.setToMyPositionBtn.innerHTML = this.i18n.SET_TO_MY_POSITION || 'Set to my position';
@@ -118,8 +121,10 @@ module.exports = class GPS extends OverlayPlugin {
         });
         this.setToMyPositionBtn.onclick = this.getLocation.bind(this);
 
-        this.container.appendChild(this.setToMyPositionBtn);
+        this.setToMyPositionWrapper.appendChild(this.setToMyPositionBtn);
+
         this.container.appendChild(this.mapview);
+        this.container.appendChild(this.setToMyPositionWrapper);
 
         // Form
         this.form = document.createElement('form');
@@ -127,11 +132,6 @@ module.exports = class GPS extends OverlayPlugin {
         // Position Section
         const positionSection = document.createElement('div');
         positionSection.className = 'gm-section';
-
-        const positionTitle = document.createElement('div');
-        positionTitle.className = 'gm-gps-section-title';
-        positionTitle.innerHTML = this.i18n.GPS_POSITION || 'Position';
-        positionSection.appendChild(positionTitle);
 
         // First line: Latitude & Longitude
         const positionFirstLine = document.createElement('div');
@@ -141,7 +141,7 @@ module.exports = class GPS extends OverlayPlugin {
         const latitudeDiv = document.createElement('div');
         latitudeDiv.className = 'gm-input-wrap';
         const latitudeLabel = document.createElement('label');
-        latitudeLabel.innerHTML = this.i18n.GPS_LATITUDE || 'Latitude (°)';
+        latitudeLabel.innerHTML = this.i18n.GPS_LATITUDE || 'Latitude';
         latitudeDiv.appendChild(latitudeLabel);
 
         this.inputComponents.latitude = textInput.createTextInput({
@@ -165,7 +165,7 @@ module.exports = class GPS extends OverlayPlugin {
         const longitudeDiv = document.createElement('div');
         longitudeDiv.className = 'gm-input-wrap';
         const longitudeLabel = document.createElement('label');
-        longitudeLabel.innerHTML = this.i18n.GPS_LONGITUDE || 'Longitude (°)';
+        longitudeLabel.innerHTML = this.i18n.GPS_LONGITUDE || 'Longitude';
         longitudeDiv.appendChild(longitudeLabel);
 
         this.inputComponents.longitude = textInput.createTextInput({
@@ -197,7 +197,7 @@ module.exports = class GPS extends OverlayPlugin {
         const altitudeDiv = document.createElement('div');
         altitudeDiv.className = 'gm-input-wrap';
         const altitudeLabel = document.createElement('label');
-        altitudeLabel.innerHTML = this.i18n.GPS_ALTITUDE || 'Altitude (m)';
+        altitudeLabel.innerHTML = this.i18n.GPS_ALTITUDE || 'Altitude';
         altitudeDiv.appendChild(altitudeLabel);
 
         this.inputComponents.altitude = textInput.createTextInput({
@@ -221,7 +221,7 @@ module.exports = class GPS extends OverlayPlugin {
         const accuracyDiv = document.createElement('div');
         accuracyDiv.className = 'gm-input-wrap';
         const accuracyLabel = document.createElement('label');
-        accuracyLabel.innerHTML = this.i18n.GPS_ACCURACY || 'Accuracy (m)';
+        accuracyLabel.innerHTML = this.i18n.GPS_ACCURACY || 'Accuracy';
         accuracyDiv.appendChild(accuracyLabel);
 
         this.inputComponents.accuracy = textInput.createTextInput({
@@ -245,50 +245,15 @@ module.exports = class GPS extends OverlayPlugin {
         positionSecondLine.appendChild(accuracyDiv);
         positionSection.appendChild(positionSecondLine);
 
-        // Movement Section
-        const movementSection = document.createElement('div');
-        movementSection.className = 'gm-section';
-
-        const movementTitle = document.createElement('div');
-        movementTitle.className = 'gm-gps-section-title';
-        movementTitle.innerHTML = this.i18n.GPS_MOVEMENT || 'Movement';
-        movementSection.appendChild(movementTitle);
-
-        // Movement line: Bearing & Speed
-        const movementLine = document.createElement('div');
-        movementLine.className = 'gm-gps-section-line';
-
-        // Bearing input
-        const bearingDiv = document.createElement('div');
-        bearingDiv.className = 'gm-input-wrap';
-        const bearingLabel = document.createElement('label');
-        bearingLabel.innerHTML = this.i18n.GPS_BEARING || 'Bearing (°)';
-        bearingDiv.appendChild(bearingLabel);
-
-        this.inputComponents.bearing = textInput.createTextInput({
-            value: '0',
-            regexFilter: /^-?\d*\.?\d*$/,
-            regexValidField: /^(?:[0-2]?\d{1,2}(?:\.\d*)?|3[0-5]\d(?:\.\d*)?|360(?:\.0*)?)$/,
-            messageField: true,
-            onChange: () => {
-                this.container.classList.remove('gm-gps-saved');
-                if (!this.inputComponents.bearing.checkValidity()) {
-                    this.inputComponents.bearing.setErrorMessage('Between 0 and 360');
-                } else {
-                    this.inputComponents.bearing.setErrorMessage('');
-                }
-                this.checkErrors();
-            },
-        });
-        bearingDiv.appendChild(this.inputComponents.bearing.element);
-        movementLine.appendChild(bearingDiv);
+        const positionThirdLine = document.createElement('div');
+        positionThirdLine.className = 'gm-gps-section-line';
 
         // Speed input (optional)
         if (this.fields.includes('speed')) {
             const speedDiv = document.createElement('div');
             speedDiv.className = 'gm-input-wrap';
             const speedLabel = document.createElement('label');
-            speedLabel.innerHTML = this.i18n.GPS_SPEED || 'Speed (m/s)';
+            speedLabel.innerHTML = this.i18n.GPS_SPEED || 'Speed';
             speedDiv.appendChild(speedLabel);
 
             this.inputComponents.speed = textInput.createTextInput({
@@ -307,54 +272,71 @@ module.exports = class GPS extends OverlayPlugin {
                 },
             });
             speedDiv.appendChild(this.inputComponents.speed.element);
-            movementLine.appendChild(speedDiv);
+            positionThirdLine.appendChild(speedDiv);
         }
 
-        movementSection.appendChild(movementLine);
+        // Bearing input
+        const bearingDiv = document.createElement('div');
+        bearingDiv.className = 'gm-input-wrap';
+        const bearingLabel = document.createElement('label');
+        bearingLabel.innerHTML = this.i18n.GPS_BEARING || 'Bearing';
+        bearingDiv.appendChild(bearingLabel);
 
-        // Generate right side of form
-        const right = document.createElement('div');
-        this.rightGeolocWrap = document.createElement('div');
-        this.geolocBtn = document.createElement('button');
+        const bearingInputWrapper = document.createElement('div');
+        bearingInputWrapper.className = 'gm-gps-bearing-input-wrapper';
+        const bearingIcon = document.createElement('div');
+        bearingIcon.className = 'gm-gps-bearing-icon';
+        bearingInputWrapper.appendChild(bearingIcon);
 
-        right.className = 'gm-col';
-        this.rightGeolocWrap.className = 'gm-geoloc-wrap';
-        this.geolocBtn.className = 'gm-gps-geoloc';
-        this.geolocBtn.innerHTML = this.i18n.GPS_GEOLOC || 'My position';
-        this.geolocBtn.onclick = this.getLocation.bind(this);
-
-        this.rightGeolocWrap.appendChild(this.geolocBtn);
-        right.appendChild(this.rightGeolocWrap);
+        this.inputComponents.bearing = textInput.createTextInput({
+            value: '0',
+            classes: 'gm-gps-bearing-input',
+            regexFilter: /^-?\d*\.?\d*$/,
+            regexValidField: /^(?:[0-2]?\d{1,2}(?:\.\d*)?|3[0-5]\d(?:\.\d*)?|360(?:\.0*)?)$/,
+            messageField: true,
+            onChange: () => {
+                this.container.classList.remove('gm-gps-saved');
+                if (!this.inputComponents.bearing.checkValidity()) {
+                    this.inputComponents.bearing.setErrorMessage('Between 0 and 360');
+                } else {
+                    this.inputComponents.bearing.setErrorMessage('');
+                }
+                this.checkErrors();
+            },
+        });
+        bearingInputWrapper.appendChild(this.inputComponents.bearing.element);
+        bearingDiv.appendChild(bearingInputWrapper);
+        positionThirdLine.appendChild(bearingDiv);
+        positionSection.appendChild(positionThirdLine);
 
         // Build form
         this.form.appendChild(positionSection);
         const sep1 = document.createElement('div');
         sep1.className = 'gm-separator';
         this.form.appendChild(sep1);
-        this.form.appendChild(movementSection);
-        const sep2 = document.createElement('div');
-        sep2.className = 'gm-separator';
-        this.form.appendChild(sep2);
-        this.form.appendChild(right);
 
         // Actions
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
-        const separator = document.createElement('div');
-        separator.className = 'gm-separator';
 
+        // TODO TEST TAG ON APPLY
         const appliedTag = chipTag.createChip();
         actionsDiv.appendChild(appliedTag.element);
 
         // Submit button
-        const submitBtn = document.createElement('button');
-        submitBtn.innerHTML = this.i18n.GPS_SUBMIT || 'Submit';
-        submitBtn.className = 'gm-gps-submit';
-        submitBtn.onclick = this.sendDataToInstance.bind(this);
-        actionsDiv.appendChild(submitBtn);
+        this.submitBtn = document.createElement('button');
+        this.submitBtn.innerHTML = this.i18n.GPS_APPLY || 'Apply';
+        this.submitBtn.className = 'gm-btn gm-gps-update';
+        this.submitBtn.onclick = this.sendDataToInstance.bind(this);
+        this.submitBtn.disabled = true;
+        actionsDiv.appendChild(this.submitBtn);
 
+        // Build final layout
+        this.form.appendChild(positionSection);
         this.container.appendChild(this.form);
-        this.container.appendChild(separator);
+        const sep4 = document.createElement('div');
+        sep4.className = 'gm-separator';
+        this.container.appendChild(sep4);
         this.container.appendChild(actionsDiv);
     }
 
@@ -372,7 +354,7 @@ module.exports = class GPS extends OverlayPlugin {
             }
         }
 
-        this.instance.getChildByClass(this.instance.root, 'gm-gps-submit').disabled = gotAnError;
+        this.submitBtn.disabled = gotAnError;
     }
 
     /**
@@ -398,18 +380,25 @@ module.exports = class GPS extends OverlayPlugin {
     sendDataToInstance(event) {
         event.preventDefault();
 
+        if (this.submitBtn.disabled) {
+            return;
+        }
+
         const json = {channel: 'gps', messages: []};
         const info = this.getLocationInfo();
-        this.fields.forEach((field) => {
-            json.messages.push('set ' + field + ' ' + info[field]);
-        });
+
+        for (const field of this.fields) {
+            if (field in info) {
+                json.messages.push('set ' + field + ' ' + info[field]);
+            }
+        }
 
         if (json.messages.length) {
             // make sure GPS is started
             json.messages.push('enable');
+            this.instance.sendEvent(json);
+            this.container.classList.add('gm-gps-saved');
         }
-        this.instance.sendEvent(json);
-        this.container.classList.add('gm-gps-saved');
     }
 
     /**

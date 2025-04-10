@@ -159,7 +159,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         const simOperatorMMCLabel = document.createElement('label');
         simOperatorMMCLabel.innerHTML = 'MCC/MNC';
         this.simOperatorMMC = textInput.createTextInput({
-            classes: 'gm-sim-name',
+            classes: 'gm-sim-mmc',
             placeholder: 'eg: 20814',
             regexFilter: /^[0-9]{0,6}$/,
             regexValidField: /^[0-9]{5,6}$/,

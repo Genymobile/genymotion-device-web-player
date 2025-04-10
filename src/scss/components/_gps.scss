@@ -19,7 +19,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        margin-bottom: $spacing-s;
+        margin-top: $spacing-s;
 
         .gm-gps-setToMyPosition {
             display: flex;
@@ -56,7 +56,6 @@
     }
 
     .gm-section {
-        margin-bottom: $spacing-m;
         .gm-gps-section-line {
             display: flex;
             gap: $spacing-xl;

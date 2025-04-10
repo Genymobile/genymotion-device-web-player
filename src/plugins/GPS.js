@@ -260,19 +260,12 @@ module.exports = class GPS extends OverlayPlugin {
         this.inputComponents.accuracy = textInput.createTextInput({
             classes: 'gm-gps-accuracy-input',
             value: '0',
-            regexFilter: /^-?\d*\.?\d*$/,
-            regexValidField: /^(?:1?\d{1,2}(?:\.\d*)?|200(?:\.0*)?)$/,
-            messageField: true,
+            regexFilter: /^$|^(0?[0-9]{1,2}|1[0-9]{2}|200)$/,
+            regexValidField: /^(0?[0-9]{1,3}|200)$/,
             unitText: 'm',
-            onChange: () => {
-                this.container.classList.remove('gm-gps-saved');
-                if (!this.inputComponents.accuracy.checkValidity()) {
-                    this.inputComponents.accuracy.setErrorMessage('Between 0 and 200');
-                } else {
-                    this.inputComponents.accuracy.setErrorMessage('');
-                }
+            onChange: (v) => {
                 // Update slider when input changes
-                const value = parseFloat(this.inputComponents.accuracy.getValue()) || 0;
+                const value = parseFloat(v) || 0;
                 this.accuracySlider.setValue(value);
                 this.checkErrors();
             },

@@ -8,24 +8,23 @@
     }
 
     .gm-identifiers-saved {
-        .gm-actions{
+        .gm-actions {
             .gm-tag-success {
                 visibility: visible;
             }
         }
     }
 
-    .gm-inputs{
+    .gm-inputs {
         flex: 1;
-        .gm-identifier-android{
-            margin-bottom: $modal-section-mb;
-        }
         .gm-identifier-android,
-        .gm-identifier-device{
+        .gm-identifier-device {
             display: flex;
             justify-content: space-between;
-            gap: calc($modal-x-padding / 2);
+            gap: $spacing-gap;
             align-items: center;
+            margin-bottom: $spacing-s;
+            padding-bottom: $spacing-s;
             .gm-identifiers-device-input,
             .gm-identifiers-android-input {
                 flex: 1;
@@ -39,11 +38,7 @@
             }
         }
     }
-    .gm-actions{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 60px;
+    .gm-actions {
         .gm-tag-success {
             visibility: hidden;
         }

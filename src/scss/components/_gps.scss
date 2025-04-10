@@ -1,49 +1,91 @@
 /**
  * GPS plugin styles
  */
-.device-renderer-instance .gm-gps {
-    &-controls {
-        label {
-            margin-top: 10px;
-        }
+.device-renderer-instance .gm-gps-plugin {
+    .gm-mapview {
+        height: 222px;
+        width: 100%;
+        overflow: hidden;
+    }
 
-        input {
-            &.gm-error {
-                border-bottom: 1px solid var(--gm-btn-bg-color);
+    .gm-gps-setToMyPosition-wrapper {
+        display: flex;
+        justify-content: end;
+
+        .gm-gps-setToMyPosition {
+            display: flex;
+            align-items: center;
+
+            &:hover {
+                &:before {
+                    background-color: var(--gm-primary-color);
+                }
+            }
+            &:before {
+                content: '';
+                width: 30px;
+                height: 30px;
+                background-color: var(--gm-on-secondary-color);
+                mask-image: url('../assets/images/ic_target_location.svg');
+                -webkit-mask-image: url('../assets/images/ic_target_location.svg');
+                mask-size: contain;
+                -webkit-mask-size: contain;
+                mask-repeat: no-repeat;
+                -webkit-mask-repeat: no-repeat;
+                mask-position: center;
+                -webkit-mask-position: center;
             }
         }
     }
 
-    &-submit {
-        margin-top: 10px;
+    .gm-section {
+        margin-bottom: $spacing-m;
+        .gm-gps-bearing-input-wrapper {
+            display: flex;
+            align-self: center;
+            justify-content: space-between;
+            .gm-gps-bearing-icon {
+                width: 30px;
+                height: 30px;
+                background-color: var(--gm-on-secondary-color);
+                mask-image: url('../assets/images/ic_compass.svg');
+                -webkit-mask-image: url('../assets/images/ic_compass.svg');
+                mask-size: contain;
+                -webkit-mask-size: contain;
+                mask-repeat: no-repeat;
+                -webkit-mask-repeat: no-repeat;
+                mask-position: center;
+                -webkit-mask-position: center;
+            }
+            .gm-gps-bearing-input {
+                width: 47px;
+            }
+        }
     }
 
-    &-geoloc {
-        margin-top: 10px;
+    .gm-gps-section-line {
+        display: flex;
+        gap: $spacing-xl;
     }
 
-    &-mapview {
-        height: 460px;
+    .gm-input-wrap {
+        flex: 1;
+    }
 
-        .gm-mapview {
-            position: absolute;
-            bottom: 76px;
-            left: 26px;
-            right: 26px;
-            top: 26px;
-            background-color: #fff;
+    .gm-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 60px;
+
+        .gm-tag-success {
+            visibility: hidden;
         }
+    }
 
-        .gm-gps-mapview-capture {
-            position: absolute;
-            bottom: 20px;
-            left: calc(50% + 80px);
-        }
-
-        .gm-gps-mapview-cancel {
-            position: absolute;
-            bottom: 20px;
-            right: calc(50% + 80px);
+    &.gm-gps-saved {
+        .gm-tag-success {
+            visibility: visible;
         }
     }
 }

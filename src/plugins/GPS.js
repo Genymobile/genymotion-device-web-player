@@ -101,7 +101,6 @@ module.exports = class GPS extends OverlayPlugin {
             title: this.i18n.GPS_TITLE || 'GPS',
             classes: 'gm-gps-plugin',
             width: 498,
-            height: 801,
         });
 
         this.container = container;
@@ -124,6 +123,9 @@ module.exports = class GPS extends OverlayPlugin {
 
         this.container.appendChild(this.mapview);
         this.container.appendChild(setToMyPositionWrapper);
+        const sep1 = document.createElement('div');
+        sep1.className = 'gm-separator';
+        this.container.appendChild(sep1);
 
         // Form
         const form = document.createElement('form');
@@ -134,7 +136,7 @@ module.exports = class GPS extends OverlayPlugin {
 
         // First line: Latitude & Longitude
         const positionFirstLine = document.createElement('div');
-        positionFirstLine.className = 'gm-gps-section-line';
+        positionFirstLine.className = 'gm-section-line gm-gps-section-line';
 
         // Latitude input
         const latitudeDiv = document.createElement('div');
@@ -194,7 +196,7 @@ module.exports = class GPS extends OverlayPlugin {
 
         // Second line: Altitude & Accuracy
         const positionSecondLine = document.createElement('div');
-        positionSecondLine.className = 'gm-gps-section-line';
+        positionSecondLine.className = 'gm-section-line gm-gps-section-line';
 
         // Altitude input
         const altitudeDiv = document.createElement('div');
@@ -282,7 +284,7 @@ module.exports = class GPS extends OverlayPlugin {
         positionSection.appendChild(positionSecondLine);
 
         const positionThirdLine = document.createElement('div');
-        positionThirdLine.className = 'gm-gps-section-line';
+        positionThirdLine.className = 'gm-section-line gm-gps-section-line';
 
         // Speed input (optional)
         if (Object.keys(this.inputComponents).includes('speed')) {
@@ -392,9 +394,9 @@ module.exports = class GPS extends OverlayPlugin {
 
         // Build final layout
         this.container.appendChild(form);
-        const sep4 = document.createElement('div');
-        sep4.className = 'gm-separator';
-        this.container.appendChild(sep4);
+        const sep2 = document.createElement('div');
+        sep2.className = 'gm-separator';
+        this.container.appendChild(sep2);
         this.container.appendChild(actionsDiv);
     }
 

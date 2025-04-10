@@ -377,16 +377,12 @@ module.exports = class GPS extends OverlayPlugin {
         positionSection.appendChild(positionThirdLine);
 
         // Build form
-        this.form.appendChild(positionSection);
-        const sep1 = document.createElement('div');
-        sep1.className = 'gm-separator';
-        this.form.appendChild(sep1);
+        form.appendChild(positionSection);
 
         // Actions
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
 
-        // TODO TEST TAG ON APPLY
         const appliedTag = chipTag.createChip();
         actionsDiv.appendChild(appliedTag.element);
 
@@ -528,7 +524,7 @@ module.exports = class GPS extends OverlayPlugin {
                     locations: [location],
                 });
                 if (results.status === 'OK' && results[0]) {
-                    this.setFieldValue('gm-gps-altitude', results[0].elevation);
+                    this.setFieldValue('altitude', results[0].elevation);
                 }
             }
 
@@ -616,8 +612,8 @@ module.exports = class GPS extends OverlayPlugin {
         }
 
         // Update form fields
-        this.setFieldValue('gm-gps-latitude', lat);
-        this.setFieldValue('gm-gps-longitude', lng);
+        this.setFieldValue('latitude', lat);
+        this.setFieldValue('longitude', lng);
 
         if (this.elevationService) {
             const location = new google.maps.LatLng(lat, lng);
@@ -628,7 +624,7 @@ module.exports = class GPS extends OverlayPlugin {
                 (results, status) => {
                     if (status === 'OK' && results[0]) {
                         this.elevation = results[0].elevation;
-                        this.setFieldValue('gm-gps-altitude', this.elevation);
+                        this.setFieldValue('altitude', this.elevation);
                     }
                 },
             );

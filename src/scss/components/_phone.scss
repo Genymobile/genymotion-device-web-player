@@ -5,11 +5,13 @@
     .gm-phone-group {
         display: flex;
         flex-direction: column;
-        margin-bottom: $modal-section-mb;
+        margin-bottom: $spacing-l;
         .gm-phone-call,
         .gm-phone-send {
-            margin-top: $spacing-m;
             align-self: flex-end;
+        }
+        .gm-phone-message {
+            margin-bottom: $spacing-m;
         }
     }
 }

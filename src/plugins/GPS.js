@@ -3,9 +3,7 @@
 const OverlayPlugin = require('./util/OverlayPlugin');
 const {textInput, chipTag} = require('./util/components');
 const {slider} = require('./util/components');
-
 const log = require('loglevel');
-log.setDefaultLevel('debug');
 
 /* global google */
 
@@ -113,28 +111,22 @@ module.exports = class GPS extends OverlayPlugin {
         this.mapview.className = 'gm-mapview';
 
         // set my positon button
-        this.setToMyPositionWrapper = document.createElement('div');
-        this.setToMyPositionWrapper.className = 'gm-gps-setToMyPosition-wrapper';
+        const setToMyPositionWrapper = document.createElement('div');
+        setToMyPositionWrapper.className = 'gm-gps-setToMyPosition-wrapper';
 
         this.setToMyPositionBtn = document.createElement('button');
         this.setToMyPositionBtn.className = 'gm-btn gm-gps-setToMyPosition';
         this.setToMyPositionBtn.innerHTML = this.i18n.SET_TO_MY_POSITION || 'Set to my position';
-        this.isMyLocAvailable().then((isAvailable) => {
-            if (isAvailable) {
-                this.setToMyPositionBtn.disabled = false;
-            } else {
-                this.setToMyPositionBtn.disabled = true;
-            }
-        });
+
         this.setToMyPositionBtn.onclick = this.getLocation.bind(this);
 
-        this.setToMyPositionWrapper.appendChild(this.setToMyPositionBtn);
+        setToMyPositionWrapper.appendChild(this.setToMyPositionBtn);
 
         this.container.appendChild(this.mapview);
-        this.container.appendChild(this.setToMyPositionWrapper);
+        this.container.appendChild(setToMyPositionWrapper);
 
         // Form
-        this.form = document.createElement('form');
+        const form = document.createElement('form');
 
         // Position Section
         const positionSection = document.createElement('div');
@@ -164,6 +156,8 @@ module.exports = class GPS extends OverlayPlugin {
                     this.inputComponents.latitude.setErrorMessage('');
                 }
                 this.checkErrors();
+                this.clearMarkers();
+                this.addMapMarker(this.inputComponents.latitude.getValue(), this.inputComponents.longitude.getValue());
             },
         });
         latitudeDiv.appendChild(this.inputComponents.latitude.element);
@@ -188,6 +182,8 @@ module.exports = class GPS extends OverlayPlugin {
                     this.inputComponents.longitude.setErrorMessage('');
                 }
                 this.checkErrors();
+                this.clearMarkers();
+                this.addMapMarker(this.inputComponents.latitude.getValue(), this.inputComponents.longitude.getValue());
             },
         });
         longitudeDiv.appendChild(this.inputComponents.longitude.element);
@@ -395,8 +391,7 @@ module.exports = class GPS extends OverlayPlugin {
         actionsDiv.appendChild(this.submitBtn);
 
         // Build final layout
-        this.form.appendChild(positionSection);
-        this.container.appendChild(this.form);
+        this.container.appendChild(form);
         const sep4 = document.createElement('div');
         sep4.className = 'gm-separator';
         this.container.appendChild(sep4);
@@ -497,10 +492,31 @@ module.exports = class GPS extends OverlayPlugin {
             return;
         }
 
+        // Ask for geolocation permission
+        if (!this.permissionStatus) {
+            this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
+
+            /*
+             * this is bugged in Firefox, change is never triggered,
+             * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
+             */
+            this.instance.addListener(this.permissionStatus, 'change', () => {
+                if (this.permissionStatus.state === 'granted') {
+                    this.setToMyPositionBtn.disabled = false;
+                } else {
+                    this.setToMyPositionBtn.disabled = true;
+                }
+            });
+        }
+
         try {
+            this.setToMyPositionBtn.classList.add('gm-gps-setToMyPosition-loading');
+            this.setToMyPositionBtn.disabled = true;
             const position = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             });
+            this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
+            this.setToMyPositionBtn.disabled = false;
 
             if (!position || !position.coords) {
                 return;
@@ -535,26 +551,12 @@ module.exports = class GPS extends OverlayPlugin {
                 this.map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
             }
         } catch (error) {
-            console.error('Error getting location:', error);
-        }
-    }
-
-    /**
-     * Check if geolocation is available.
-     * @returns {Promise<boolean>} True if geolocation is available.
-     */
-    async isMyLocAvailable() {
-        if (navigator.geolocation) {
-            try {
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject);
-                });
-                return true;
-            } catch {
-                return false;
+            if (error.code === 1) {
+                this.setToMyPositionBtn.disabled = true;
+                this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
             }
+            log.error('Error getting location:', error);
         }
-        return false;
     }
 
     /**
@@ -568,14 +570,14 @@ module.exports = class GPS extends OverlayPlugin {
         if (typeof google !== 'undefined') {
             this.map = new google.maps.Map(this.mapview, {
                 center: {
-                    lat: info.latitude || this.mapLat,
-                    lng: info.longitude || this.mapLng,
+                    lat: info.latitude,
+                    lng: info.longitude,
                 },
                 zoom: this.minimumZoomLevel,
             });
 
             // Add initial marker for selection from form
-            this.addMapMarker(info.latitude || this.mapLat, info.longitude || this.mapLng);
+            this.addMapMarker(info.latitude, info.longitude);
 
             // Listen for new location
             this.map.addListener('click', (event) => {
@@ -593,13 +595,15 @@ module.exports = class GPS extends OverlayPlugin {
      * @param {number} lng Longitude of the marker.
      */
     addMapMarker(lat, lng) {
-        this.mapLat = lat;
-        this.mapLng = lng;
+        const currentLat = Number(this.inputComponents.latitude.getValue());
+        const currentLng = Number(this.inputComponents.longitude.getValue());
+        lat = Number(lat);
+        lng = Number(lng);
 
         const marker = new google.maps.Marker({
             position: {
-                lat: this.mapLat,
-                lng: this.mapLng,
+                lat: lat,
+                lng: lng,
             },
             map: this.map,
         });
@@ -612,8 +616,12 @@ module.exports = class GPS extends OverlayPlugin {
         }
 
         // Update form fields
-        this.setFieldValue('latitude', lat);
-        this.setFieldValue('longitude', lng);
+        if (currentLat !== lat) {
+            this.setFieldValue('latitude', lat);
+        }
+        if (currentLng !== lng) {
+            this.setFieldValue('longitude', lng);
+        }
 
         if (this.elevationService) {
             const location = new google.maps.LatLng(lat, lng);
@@ -623,12 +631,14 @@ module.exports = class GPS extends OverlayPlugin {
                 },
                 (results, status) => {
                     if (status === 'OK' && results[0]) {
-                        this.elevation = results[0].elevation;
-                        this.setFieldValue('altitude', this.elevation);
+                        if (Number(this.inputComponents.altitude.getValue()) !== Number(results[0].elevation)) {
+                            this.setFieldValue('altitude', results[0].elevation);
+                        }
                     }
                 },
             );
         }
+        this.map.setCenter(marker.getPosition());
     }
 
     /**

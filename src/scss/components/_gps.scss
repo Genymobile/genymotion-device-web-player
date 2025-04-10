@@ -17,7 +17,9 @@
 
     .gm-gps-setToMyPosition-wrapper {
         display: flex;
-        justify-content: end;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: $spacing-s;
 
         .gm-gps-setToMyPosition {
             display: flex;
@@ -42,6 +44,14 @@
                 mask-position: center;
                 -webkit-mask-position: center;
             }
+            &.gm-gps-setToMyPosition-loading:before {
+                height: 20px;
+                width: 20px;
+                margin-right: 6px;
+                mask-image: url('../assets/images/ic_spinner-material.svg');
+                -webkit-mask-image: url('../assets/images/ic_spinner-material.svg');
+                background-color: var(--gm-primary-color) !important;
+            }
         }
     }
 
@@ -61,8 +71,8 @@
             justify-content: space-between;
             .gm-gps-bearing-slider,
             .gm-gps-accuracy-slider {
-                width: 112px;
                 margin-top: 12px;
+                margin-right: $spacing-gap;
             }
             .gm-gps-bearing-input,
             .gm-gps-accuracy-input {

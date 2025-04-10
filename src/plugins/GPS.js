@@ -149,6 +149,7 @@ module.exports = class GPS extends OverlayPlugin {
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^-?(?:[0-8]?\d(?:\.\d*)?|90(?:\.0*)?)$/,
             messageField: true,
+            unitText: 'o',
             onChange: () => {
                 this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.latitude.checkValidity()) {
@@ -173,6 +174,7 @@ module.exports = class GPS extends OverlayPlugin {
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^-?(?:(?:1[0-7]\d(?:\.\d*)?)|(?:[0-9]?\d(?:\.\d*)?)|180(?:\.0*)?)$/,
             messageField: true,
+            unitText: 'o',
             onChange: () => {
                 this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.longitude.checkValidity()) {
@@ -205,6 +207,7 @@ module.exports = class GPS extends OverlayPlugin {
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^-?(?:[0-9]\d{0,3}(?:\.\d*)?|10000(?:\.0*)?)$/,
             messageField: true,
+            unitText: 'm',
             onChange: () => {
                 this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.altitude.checkValidity()) {
@@ -229,6 +232,7 @@ module.exports = class GPS extends OverlayPlugin {
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^(?:1?\d{1,2}(?:\.\d*)?|200(?:\.0*)?)$/,
             messageField: true,
+            unitText: 'm',
             onChange: () => {
                 this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.accuracy.checkValidity()) {
@@ -261,6 +265,7 @@ module.exports = class GPS extends OverlayPlugin {
                 regexFilter: /^-?\d*\.?\d*$/,
                 regexValidField: /^(?:[0-2]?\d{1,2}(?:\.\d*)?|3[0-8]\d(?:\.\d*)?|399\.99)$/,
                 messageField: true,
+                unitText: 'm/s',
                 onChange: () => {
                     this.container.classList.remove('gm-gps-saved');
                     if (!this.inputComponents.speed.checkValidity()) {
@@ -294,6 +299,7 @@ module.exports = class GPS extends OverlayPlugin {
             regexFilter: /^-?\d*\.?\d*$/,
             regexValidField: /^(?:[0-2]?\d{1,2}(?:\.\d*)?|3[0-5]\d(?:\.\d*)?|360(?:\.0*)?)$/,
             messageField: true,
+            unitText: 'o',
             onChange: () => {
                 this.container.classList.remove('gm-gps-saved');
                 if (!this.inputComponents.bearing.checkValidity()) {

@@ -178,6 +178,7 @@ const slider = (() => {
  * @param {string} [options.value] - Optional initial value for the text input.
  * @param {RegExp} [options.regexFilter] - Optional regular expression to filter the input value.
  * @param {string} [options.appendText] - Optional text to append to the input field.
+ * @param {string} [options.unitText] - Optional text to show when there's no error message.
  * @returns {HTMLElement} - The text input component as an HTML element. setValue function is exposed to change the value of the text input.
  */
 
@@ -188,6 +189,7 @@ const textInput = (() => {
         regexFilter,
         regexValidField,
         appendText = '',
+        unitText = '',
         classes = '',
         placeholder = '',
         messageField = false,
@@ -197,14 +199,6 @@ const textInput = (() => {
         inputDiv.classList.add('text-input');
         const inputDivContainer = document.createElement('div');
         inputDivContainer.classList.add('text-input-container');
-
-        const inputMessage = document.createElement('div');
-        inputMessage.classList.add('text-input-message');
-        inputDiv.appendChild(inputDivContainer);
-        inputDiv.appendChild(inputMessage);
-        if (!messageField) {
-            inputMessage.style.display = 'none';
-        }
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -220,6 +214,31 @@ const textInput = (() => {
         }
 
         inputDivContainer.insertBefore(input, inputDivContainer.firstChild);
+        inputDiv.appendChild(inputDivContainer);
+
+        // Create bottom message container that will hold either error or unit text
+        const bottomContainer = document.createElement('div');
+        bottomContainer.classList.add('text-input-bottom');
+        // Hide bottom container if neither messageField nor unitText is present
+        bottomContainer.style.display = !messageField && !unitText ? 'none' : 'block';
+        inputDiv.appendChild(bottomContainer);
+
+        // Create error message element
+        const inputMessage = document.createElement('div');
+        inputMessage.classList.add('text-input-message');
+        bottomContainer.appendChild(inputMessage);
+
+        // Create unit text element
+        const unitTextSpan = document.createElement('div');
+        unitTextSpan.textContent = unitText;
+        unitTextSpan.classList.add('text-input-unit');
+        bottomContainer.appendChild(unitTextSpan);
+
+        // Initialize visibility based on presence of unit text
+        unitTextSpan.style.display = unitText ? 'block' : 'none';
+        if (!messageField) {
+            inputMessage.style.display = 'none';
+        }
 
         const setValue = (newValue, triggerOnChange = false) => {
             if (regexFilter && !regexFilter.test(newValue)) {
@@ -244,10 +263,14 @@ const textInput = (() => {
             if (!message) {
                 inputMessage.classList.remove('error');
                 inputMessage.removeAttribute('data-error');
+                inputMessage.style.display = 'none';
+                unitTextSpan.style.display = unitText ? 'block' : 'none';
                 return;
             }
             inputMessage.classList.add('error');
             inputMessage.setAttribute('data-error', message);
+            inputMessage.style.display = 'block';
+            unitTextSpan.style.display = 'none';
         };
 
         const checkValidity = () => {

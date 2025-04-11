@@ -130,7 +130,7 @@ const reducer = (state, action) => {
                  * to open several widgets at the same time
                  * widgetsOpened: [...state.overlay.widgetsOpened, overlayID],
                  */
-                state.overlay.widgetsOpened = [...state.overlay.widgetsOpened, overlayID];
+                state.overlay.widgetsOpened = [overlayID];
             } else {
                 if (overlayID) {
                     state.overlay.widgetsOpened = state.overlay.widgetsOpened.filter((id) => id !== overlayID);

@@ -122,13 +122,25 @@ class OverlayPlugin {
         const header = document.createElement('div');
         header.className = 'gm-modal-header';
 
+        // Create container for title and close button
+        const headerContent = document.createElement('div');
+        headerContent.className = 'gm-modal-header-content';
+
         const titleElement = document.createElement('div');
         titleElement.className = 'gm-modal-title';
         titleElement.innerHTML = title || '';
-        header.appendChild(titleElement);
+        headerContent.appendChild(titleElement);
 
         const closeButton = this.createCloseButton();
-        header.appendChild(closeButton);
+        headerContent.appendChild(closeButton);
+
+        // Add header content to header
+        header.appendChild(headerContent);
+
+        // Add separator
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+        header.appendChild(separator);
 
         return header;
     }
@@ -203,11 +215,13 @@ class OverlayPlugin {
 
         this.instance.addListener(dragHandle, 'mousedown', (event) => {
             isDragging = true;
+            let hasToResetPosition = false;
             const {x: initialX, y: initialY} = this.startDragging(modal);
 
             const offsetX = event.clientX - modal.offsetLeft;
             const offsetY = event.clientY - modal.offsetTop;
-            const wrapperRect = this.instance.videoWrapper.getBoundingClientRect();
+            const wrapperRect = this.instance.wrapper.getBoundingClientRect();
+            const wrapperVideoRect = this.instance.videoWrapper.getBoundingClientRect();
             const marginTopAndBottom = this.instance.videoWrapper.offsetTop * 2; // Because video is centered
 
             const removeMouseMoveListener = this.instance.addListener(document, 'mousemove', (e) => {
@@ -218,21 +232,29 @@ class OverlayPlugin {
                 requestAnimationFrame(() => {
                     let newX = e.clientX - offsetX;
                     let newY = e.clientY - offsetY;
+                    hasToResetPosition = false;
 
                     const modalWidth = modal.offsetWidth;
                     const modalHeight = modal.offsetHeight;
 
                     // Constrain x and y to be within the wrapper's bounds
-                    newX = Math.max(wrapperRect.left, Math.min(wrapperRect.right - modalWidth, newX));
+                    newX = Math.max(
+                        wrapperVideoRect.left - wrapperRect.left,
+                        Math.min(wrapperVideoRect.right - wrapperRect.left - modalWidth, newX),
+                    );
                     newY = Math.max(
                         0,
-                        Math.min(wrapperRect.bottom - modalHeight - wrapperRect.top + marginTopAndBottom, newY),
+                        Math.min(
+                            wrapperVideoRect.bottom - modalHeight - wrapperVideoRect.top + marginTopAndBottom,
+                            newY,
+                        ),
                     );
 
                     // Magnetic grid (snap to initial position if close)
                     if (Math.abs(initialX - newX) < 30 && Math.abs(initialY - newY) < 30) {
                         newX = initialX;
                         newY = initialY;
+                        hasToResetPosition = true;
                     }
 
                     modal.style.left = `${newX}px`;
@@ -243,8 +265,13 @@ class OverlayPlugin {
             const removeMouseUpListener = this.instance.addListener(document, 'mouseup', () => {
                 modal.style.userSelect = 'initial';
                 isDragging = false;
-                this.position.x = modal.style.left;
-                this.position.y = modal.style.top;
+                if (hasToResetPosition) {
+                    this.position.x = null;
+                    this.position.y = null;
+                } else {
+                    this.position.x = modal.style.left;
+                    this.position.y = modal.style.top;
+                }
 
                 removeMouseMoveListener();
                 removeMouseUpListener();
@@ -283,25 +310,29 @@ class OverlayPlugin {
         const triggerRect = triggerElement.getBoundingClientRect();
         const modalWidth = this.widget.offsetWidth || OVERLAY_DEFAULT_HEIGHT;
         const modalHeight = this.widget.offsetHeight || OVERLAY_DEFAULT_WIDTH;
-        const wrapperRect = this.instance.videoWrapper.getBoundingClientRect();
-        const marginTopAndBottom = this.instance.videoWrapper.offsetTop * 2; // Because video is centered
+        const wrapperRect = this.instance.wrapper.getBoundingClientRect();
+        const wrapperVideoRect = this.instance.videoWrapper.getBoundingClientRect();
+        const marginTopAndBottom =
+            modalHeight + triggerRect.top > wrapperVideoRect.bottom
+                ? this.instance.videoWrapper.offsetTop * 2
+                : this.instance.videoWrapper.offsetTop;
 
         let x = 0,
             y = 0;
 
         switch (toolbarPosition) {
             case 'left':
-                x = triggerRect.left + triggerElement.offsetWidth + OVERLAY_BORDER_MARGIN;
-                y = triggerRect.top - wrapperRect.top + marginTopAndBottom;
+                x = wrapperVideoRect.left - wrapperRect.left + OVERLAY_BORDER_MARGIN;
+                y = triggerRect.top - wrapperVideoRect.top + marginTopAndBottom;
 
                 // Adjust for vertical overflow
-                if (triggerRect.top + modalHeight > wrapperRect.bottom) {
+                if (triggerRect.top + modalHeight > wrapperVideoRect.bottom) {
                     y = Math.max(
                         0,
                         Math.min(
-                            wrapperRect.bottom -
+                            wrapperVideoRect.bottom -
                                 modalHeight -
-                                wrapperRect.top +
+                                wrapperVideoRect.top +
                                 marginTopAndBottom -
                                 OVERLAY_BORDER_MARGIN,
                             y,
@@ -311,17 +342,17 @@ class OverlayPlugin {
                 break;
             case 'right':
             default:
-                x = triggerRect.left - modalWidth - OVERLAY_BORDER_MARGIN;
-                y = triggerRect.top - wrapperRect.top + marginTopAndBottom;
+                x = wrapperVideoRect.width - modalWidth - OVERLAY_BORDER_MARGIN;
+                y = triggerRect.top - wrapperVideoRect.top + marginTopAndBottom;
 
                 // Adjust for vertical overflow
-                if (triggerRect.top + modalHeight > wrapperRect.bottom) {
+                if (triggerRect.top + modalHeight > wrapperVideoRect.bottom) {
                     y = Math.max(
                         0,
                         Math.min(
-                            wrapperRect.bottom -
+                            wrapperVideoRect.bottom -
                                 modalHeight -
-                                wrapperRect.top +
+                                wrapperVideoRect.top +
                                 marginTopAndBottom -
                                 OVERLAY_BORDER_MARGIN,
                             y,

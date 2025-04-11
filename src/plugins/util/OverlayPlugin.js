@@ -296,7 +296,10 @@ class OverlayPlugin {
         const modalWidth = this.widget.offsetWidth || OVERLAY_DEFAULT_HEIGHT;
         const modalHeight = this.widget.offsetHeight || OVERLAY_DEFAULT_WIDTH;
         const wrapperRect = this.instance.videoWrapper.getBoundingClientRect();
-        const marginTopAndBottom = this.instance.videoWrapper.offsetTop * 2; // Because video is centered
+        const marginTopAndBottom =
+            modalHeight + triggerRect.top > wrapperRect.bottom
+                ? this.instance.videoWrapper.offsetTop * 2
+                : this.instance.videoWrapper.offsetTop;
 
         let x = 0,
             y = 0;

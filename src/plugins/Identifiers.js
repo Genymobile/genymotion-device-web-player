@@ -74,7 +74,7 @@ module.exports = class Identifiers extends OverlayPlugin {
             title: this.i18n.IDENTIFIERS_TITLE || 'Identifiers',
             classes: 'gm-identifiers-plugin',
             width: 378,
-            height: 422,
+            height: 446,
         });
         this.container = container;
 
@@ -90,10 +90,17 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.androidInput = textInput.createTextInput({
             regexFilter: new RegExp(`^[${HEX}]{0,16}$`),
             regexValidField: new RegExp(`^[${HEX}]{16}$`),
+            placeholder: 'e.g. 2b76129a48d5eb49',
             classes: 'gm-identifiers-android-input',
+            messageField: true,
             onChange: () => {
                 this.container.classList.remove('gm-identifiers-saved');
                 this.checkIDsValidity();
+                if (!this.androidInput.checkValidity()) {
+                    this.androidInput.setErrorMessage('16 characters (0-9, A-F)');
+                } else {
+                    this.androidInput.setErrorMessage('');
+                }
             },
         });
         const generateAndroidIdBtn = document.createElement('div');
@@ -116,10 +123,17 @@ module.exports = class Identifiers extends OverlayPlugin {
         this.deviceInput = textInput.createTextInput({
             regexFilter: new RegExp(`^[${HEX}]{0,15}$`),
             regexValidField: new RegExp(`^[${HEX}]{14,15}$`),
+            placeholder: 'e.g. 194197097729256',
             classes: 'gm-identifiers-device-input',
+            messageField: true,
             onChange: () => {
                 this.container.classList.remove('gm-identifiers-saved');
                 this.checkIDsValidity();
+                if (!this.deviceInput.checkValidity()) {
+                    this.deviceInput.setErrorMessage('14-15 characters (0-9, A-F)');
+                } else {
+                    this.deviceInput.setErrorMessage('');
+                }
             },
         });
         const generateDeviceIdBtn = document.createElement('div');

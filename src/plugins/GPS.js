@@ -20,9 +20,8 @@ module.exports = class GPS extends OverlayPlugin {
      *
      * @param {Object}  instance     Associated instance.
      * @param {Object}  i18n         Translations keys for the UI.
-     * @param {boolean} speedSupport Enable speed support.
      */
-    constructor(instance, i18n, speedSupport) {
+    constructor(instance, i18n) {
         super(instance);
 
         // Reference instance
@@ -41,10 +40,7 @@ module.exports = class GPS extends OverlayPlugin {
             bearing: null,
         };
 
-        // Add speed field if supported
-        if (speedSupport) {
-            this.inputComponents.speed = null;
-        }
+        this.inputComponents.speed = null;
 
         // Map references
         this.map = null;
@@ -101,6 +97,7 @@ module.exports = class GPS extends OverlayPlugin {
             title: this.i18n.GPS_TITLE || 'GPS',
             classes: 'gm-gps-plugin',
             width: 498,
+            height: 850,
         });
 
         this.container = container;

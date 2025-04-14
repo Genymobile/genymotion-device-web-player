@@ -2,8 +2,7 @@
  * IO Throttling plugin styles
  */
 .device-renderer-instance .gm-iothrottling-plugin {
-    .gm-noThrottling,
-    .gm-customThrottling {
+    .gm-noThrottling {
         display: none;
     }
     .gm-iothrottling-none {
@@ -13,14 +12,6 @@
         }
         .gm-noThrottling {
             display: block;
-        }
-    }
-    .gm-iothrottling-custom {
-        .gm-customThrottling {
-            display: block;
-            //text italic
-            font-style: italic;
-            margin-top: $spacing-m;
         }
     }
 
@@ -35,15 +26,10 @@
     .gm-tag-success {
         display: none;
     }
-    .gm-iothrottling-notapplied-text {
-        display: block;
-    }
+
     .gm-iothrottling-saved {
         .gm-tag-success {
             display: block;
-        }
-        .gm-iothrottling-notapplied-text {
-            display: none;
         }
     }
 
@@ -53,8 +39,10 @@
     }
 
     .gm-fields {
-        margin-top: $spacing-m;
-        min-height: 40px;
+        margin-top: $spacing-l;
+        margin-bottom: $spacing-s;
+        min-height: 34px;
+        height: 34px;
         flex: 1;
         font-size: 13px;
 
@@ -74,25 +62,12 @@
         }
     }
 
+    .gm-iothrottling-apply {
+        margin-bottom: $spacing-s;
+    }
     .gm-iothrottling-clearcache {
         label {
-            margin-bottom: 0;
-        }
-    }
-    .gm-iothrottling-clearcache,
-    .gm-iothrottling-apply {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 60px;
-        .gm-iothrottling-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            .gm-iothrottling-notapplied-text {
-                font-style: italic;
-                color: var(--gm-tertiary-variant-color);
-            }
+            padding-bottom: 0;
         }
     }
 }

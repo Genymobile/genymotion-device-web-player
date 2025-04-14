@@ -2,9 +2,11 @@
  * Common renderer style
  */
 .device-renderer-instance {
+    position: relative;
     text-align: center;
     height: 100%;
     font-size: 14px;
+    line-height: initial;
 
     * {
         font-family: lato, sans-serif;
@@ -125,8 +127,13 @@
     }
 
     .gm-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
         background-color: var(--gm-background-color);
         height: 100%;
+        width: 100%;
+
         display: flex;
 
         > * {
@@ -143,6 +150,7 @@
             mask-position: center;
             background-size: 40%;
             background-color: var(--gm-on-background-color);
+            width: 100%;
             > * {
                 opacity: 0;
             }
@@ -221,7 +229,7 @@
 .gm-separator {
     width: 100%;
     border-bottom: 1px solid var(--gm-tertiary-color);
-    margin: $spacing-s 0;
+    margin: $spacing-m 0;
 }
 
 .gm-btn {
@@ -245,5 +253,8 @@
         color: var(--gm-tertiary-color);
         background: none;
         cursor: default;
+        &::before {
+            background-color: var(--gm-tertiary-color) !important;
+        }
     }
 }

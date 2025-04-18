@@ -27,7 +27,7 @@
 
         .gm-toolbar-wrapper {
             background-color: var(--gm-secondary-color);
-            min-width: 86px;
+            min-width: $toolbar-width;
             max-height: 100%;
             position: relative;
             &::-webkit-scrollbar {

@@ -63,6 +63,7 @@ module.exports = class DeviceRenderer {
         this.video = this.getChildByClass(this.root, 'gm-video');
         this.wrapper = this.getChildByClass(this.root, 'gm-wrapper');
         this.videoWrapper = this.getChildByClass(this.root, 'gm-video-wrapper');
+        this.playerScreenWrapper = this.root.querySelector('.player-screen-wrapper');
 
         // Event callbacks
         this.callbacks = {};

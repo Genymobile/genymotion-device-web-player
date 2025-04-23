@@ -151,11 +151,11 @@
     }
 
     &.gm-hidden {
-        visibility: hidden;
         opacity: 0;
+        transform: translate(-2000px, -2000px);
         transition:
             opacity 0.5s ease-in-out,
-            visibility 0s 0.5s;
+            transform 0.5s ease-in-out 0.5s;
     }
 
     .gm-section-line {

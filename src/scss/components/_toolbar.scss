@@ -33,305 +33,338 @@
             &::-webkit-scrollbar {
                 display: none;
             }
+        }
 
-            .gm-toolbar {
-                overflow: scroll;
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-                display: flex;
-                max-height: 100%;
-                flex-direction: column;
-                align-items: center;
-                &::-webkit-scrollbar {
-                    display: none;
-                }
+        .gm-floating-toolbar-wrapper {
+            width: fit-content;
+            margin: 25px auto;
+            height: $floatting-toolbar-height;
+            min-height: $floatting-toolbar-height;
+            background-color: var(--gm-secondary-color);
+            padding: 0 10px;
+            border-radius: 8px;
 
+            .gm-floating-toolbar {
+                height: 100%;
                 ul {
                     display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                    width: 100%;
+                    flex-direction: row;
+                    height: 100%;
+                    gap: 0px;
                     li {
-                        width: 100%;
-                        transition: background-color 0.3s;
-                        position: relative;
-                        height: 48px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        &:hover {
-                            cursor: pointer;
-                            .gm-icon-button {
-                                background-color: var(--gm-primary-color);
-                            }
-                        }
-                        &.gm-separator {
-                            width: 75%;
-                            height: 1px;
-                            margin-left: auto;
-                            margin-right: auto;
-                        }
-                        &:not(.gm-separator):hover {
-                            background-color: var(--gm-secondary-variant-color);
-                        }
-                        &:has(.gm-disabled-icon-button):hover {
-                            background-color: transparent;
-                        }
-                        &.gm-toolbar-dot {
-                            &-active {
-                                &::before {
-                                    content: ' ';
-                                    width: 8px;
-                                    height: 8px;
-                                    border-radius: 10px;
-                                    background-color: var(--gm-success-color);
-                                    position: absolute;
-                                    top: calc(50% - 4px);
-                                    left: 7px;
-                                }
-                            }
-                            &-notification {
-                                &::before {
-                                    content: ' ';
-                                    width: 8px;
-                                    height: 8px;
-                                    border-radius: 10px;
-                                    background-color: var(--gm-primary-color);
-                                    position: absolute;
-                                    top: calc(50% - 4px);
-                                    left: 7px;
-                                    z-index: 2;
-                                }
-                                &::after {
-                                    content: ' ';
-                                    position: absolute;
-                                    width: 18px;
-                                    height: 18px;
-                                    background-color: var(--gm-primary-color);
-                                    border-radius: 50%;
-                                    filter: blur(1px);
-                                    z-index: 1;
-                                    animation: notification-pulse 2s infinite ease-in-out;
-                                    top: calc(50% - 9px);
-                                    left: 2px;
-                                }
-                            }
-                        }
-                        .gm {
-                            &-icon-button {
-                                background-color: var(--gm-on-secondary-color);
-                                &:hover,
-                                &.gm-active {
-                                    cursor: pointer;
-                                    background-color: var(--gm-primary-color);
-                                }
-                            }
-                            &-disabled-icon-button {
-                                background-color: var(--gm-tertiary-color);
-                                pointer-events: none;
-                            }
-
-                            &-rotation {
-                                mask-image: url('../assets/images/ic_rotation.svg');
-                                -webkit-mask-image: url('../assets/images/ic_rotation.svg');
-                            }
-
-                            &-sound-up {
-                                mask-image: url('../assets/images/ic_sound_up.svg');
-                                -webkit-mask-image: url('../assets/images/ic_sound_up.svg');
-                            }
-
-                            &-sound-down {
-                                mask-image: url('../assets/images/ic_sound_down.svg');
-                                -webkit-mask-image: url('../assets/images/ic_sound_down.svg');
-                            }
-
-                            &-recent {
-                                mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
-                                -webkit-mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
-                            }
-
-                            &-home {
-                                mask-image: url('../assets/images/ic_nav_android_home.svg');
-                                -webkit-mask-image: url('../assets/images/ic_nav_android_home.svg');
-                            }
-
-                            &-back {
-                                mask-image: url('../assets/images/ic_nav_android_back.svg');
-                                -webkit-mask-image: url('../assets/images/ic_nav_android_back.svg');
-                            }
-
-                            &-battery-button {
-                                mask-image: url('../assets/images/ic_battery.svg');
-                                -webkit-mask-image: url('../assets/images/ic_battery.svg');
-                            }
-
-                            &-gamepad-button {
-                                mask-image: url('../assets/images/ic_gamepad.svg');
-                                -webkit-mask-image: url('../assets/images/ic_gamepad.svg');
-                            }
-
-                            &-power {
-                                mask-image: url('../assets/images/ic_power.svg');
-                                -webkit-mask-image: url('../assets/images/ic_power.svg');
-                            }
-
-                            &-camera-button {
-                                mask-image: url('../assets/images/ic_camera.svg');
-                                -webkit-mask-image: url('../assets/images/ic_camera.svg');
-                            }
-
-                            &-camera-mic-button {
-                                mask-image: url('../assets/images/ic_camera_mic.svg');
-                                -webkit-mask-image: url('../assets/images/ic_camera_mic.svg');
-                            }
-
-                            &-streamres-button {
-                                mask-image: url('../assets/images/ic_resolution.svg');
-                                -webkit-mask-image: url('../assets/images/ic_resolution.svg');
-                                outline: none;
-                                border: none;
-                                color: transparent;
-                                -webkit-appearance: none;
-                                -moz-appearance: none;
-
-                                &:focus {
-                                    outline-style: none;
-                                    box-shadow: none;
-                                    border-color: transparent;
-                                    color: var(--gm-on-secondary-color);
-                                    background: var(--gm-secondary-color);
-                                    opacity: 0;
-                                }
-                            }
-
-                            &-gps-button {
-                                mask-image: url('../assets/images/ic_location.svg');
-                                -webkit-mask-image: url('../assets/images/ic_location.svg');
-                            }
-
-                            &-fullscreen-button {
-                                mask-image: url('../assets/images/ic_fullscreen.svg');
-                                -webkit-mask-image: url('../assets/images/ic_fullscreen.svg');
-
-                                &.gm-active,
-                                &.gm-active:hover {
-                                    mask-image: url('../assets/images/ic_fullscreen_active.svg');
-                                    -webkit-mask-image: url('../assets/images/ic_fullscreen_active.svg');
-                                    background-color: var(--gm-primary-color);
-                                }
-                            }
-
-                            &-screencast-button {
-                                mask-image: url('../assets/images/ic_screenshot.svg');
-                                -webkit-mask-image: url('../assets/images/ic_screenshot.svg');
-                                &.gm-screencast-button-recording {
-                                    background-color: var(--gm-primary-color);
-                                }
-                            }
-
-                            &-identifiers-button {
-                                mask-image: url('../assets/images/ic_id.svg');
-                                -webkit-mask-image: url('../assets/images/ic_id.svg');
-                            }
-
-                            &-network-button {
-                                mask-image: url('../assets/images/ic_network.svg');
-                                -webkit-mask-image: url('../assets/images/ic_network.svg');
-                            }
-
-                            &-iothrottling-button {
-                                mask-image: url('../assets/images/ic_disk_IO.svg');
-                                -webkit-mask-image: url('../assets/images/ic_disk_IO.svg');
-                            }
-
-                            &-phone-button {
-                                mask-image: url('../assets/images/ic_text_and_call.svg');
-                                -webkit-mask-image: url('../assets/images/ic_text_and_call.svg');
-                            }
-
-                            &-sim-button {
-                                mask-image: url('../assets/images/ic_baseband.svg');
-                                -webkit-mask-image: url('../assets/images/ic_baseband.svg');
-                            }
-
-                            &-uploader-button {
-                                mask-image: url('../assets/images/ic_installation.svg');
-                                -webkit-mask-image: url('../assets/images/ic_installation.svg');
-                            }
-
-                            &-streamrate-chooser {
-                                mask-image: url('../assets/images/ic_hq.svg');
-                                -webkit-mask-image: url('../assets/images/ic_hq.svg');
-                            }
-
-                            &-clipboard-button {
-                                mask-image: url('../assets/images/ic_clipboard.svg');
-                                -webkit-mask-image: url('../assets/images/ic_clipboard.svg');
-                            }
-
-                            &-fingerprint-button {
-                                mask-image: url('../assets/images/ic_biometrics.svg');
-                                -webkit-mask-image: url('../assets/images/ic_biometrics.svg');
-
-                                &.fingerprint-require {
-                                    background-color: var(--gm-primary-color);
-                                    filter: invert(0) !important;
-                                    animation: blink 2s linear infinite;
-                                }
-
-                                &.fingerprint-autoValidation {
-                                    mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
-                                    -webkit-mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
-                                    background-color: var(--gm-primary-color);
-                                }
-                            }
-
-                            &-keymapping-button {
-                                mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
-                                -webkit-mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
-
-                                &.gm-active {
-                                    mask-image: url('../assets/images/ic_keymapping.svg');
-                                    -webkit-mask-image: url('../assets/images/ic_keymapping.svg');
-                                }
-                                &.keymapping-paused {
-                                    background-color: var(--gm-tertiary-color);
-                                }
-                            }
-
-                            &-default-turn-button {
-                                mask-image: url('../assets/images/ic_warning.svg');
-                                -webkit-mask-image: url('../assets/images/ic_warning.svg');
-                            }
+                        height: 100%;
+                        width: 68px;
+                        &.gm-v-separator {
+                            height: 75%;
+                            width: 1px;
+                            margin-left: 0;
+                            margin-right: 0;
+                            margin-top: auto;
+                            margin-bottom: auto;
                         }
                     }
                 }
             }
+        }
 
-            .gm-disabled-widget-pop-up {
-                &::before {
-                    position: fixed;
-                    /**
+        .gm-toolbar,
+        .gm-floating-toolbar {
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            display: flex;
+            max-height: 100%;
+            flex-direction: column;
+            align-items: center;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            ul {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+                li {
+                    width: 100%;
+                    transition: background-color 0.3s;
+                    position: relative;
+                    height: 48px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    &:hover {
+                        cursor: pointer;
+                        .gm-icon-button {
+                            background-color: var(--gm-primary-color);
+                        }
+                    }
+                    &.gm-separator {
+                        width: 75%;
+                        height: 1px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+                    &:not(.gm-separator):hover {
+                        background-color: var(--gm-secondary-variant-color);
+                    }
+                    &:has(.gm-disabled-icon-button):hover {
+                        background-color: transparent;
+                    }
+                    &.gm-toolbar-dot {
+                        &-active {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-success-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                            }
+                        }
+                        &-notification {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-primary-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                                z-index: 2;
+                            }
+                            &::after {
+                                content: ' ';
+                                position: absolute;
+                                width: 18px;
+                                height: 18px;
+                                background-color: var(--gm-primary-color);
+                                border-radius: 50%;
+                                filter: blur(1px);
+                                z-index: 1;
+                                animation: notification-pulse 2s infinite ease-in-out;
+                                top: calc(50% - 9px);
+                                left: 2px;
+                            }
+                        }
+                    }
+                    .gm {
+                        &-icon-button {
+                            background-color: var(--gm-on-secondary-color);
+                            &:hover,
+                            &.gm-active {
+                                cursor: pointer;
+                                background-color: var(--gm-primary-color);
+                            }
+                        }
+                        &-disabled-icon-button {
+                            background-color: var(--gm-tertiary-color);
+                            pointer-events: none;
+                        }
+
+                        &-rotation {
+                            mask-image: url('../assets/images/ic_rotation.svg');
+                            -webkit-mask-image: url('../assets/images/ic_rotation.svg');
+                        }
+
+                        &-sound-up {
+                            mask-image: url('../assets/images/ic_sound_up.svg');
+                            -webkit-mask-image: url('../assets/images/ic_sound_up.svg');
+                        }
+
+                        &-sound-down {
+                            mask-image: url('../assets/images/ic_sound_down.svg');
+                            -webkit-mask-image: url('../assets/images/ic_sound_down.svg');
+                        }
+
+                        &-recent {
+                            mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
+                            -webkit-mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
+                        }
+
+                        &-home {
+                            mask-image: url('../assets/images/ic_nav_android_home.svg');
+                            -webkit-mask-image: url('../assets/images/ic_nav_android_home.svg');
+                        }
+
+                        &-back {
+                            mask-image: url('../assets/images/ic_nav_android_back.svg');
+                            -webkit-mask-image: url('../assets/images/ic_nav_android_back.svg');
+                        }
+
+                        &-battery-button {
+                            mask-image: url('../assets/images/ic_battery.svg');
+                            -webkit-mask-image: url('../assets/images/ic_battery.svg');
+                        }
+
+                        &-gamepad-button {
+                            mask-image: url('../assets/images/ic_gamepad.svg');
+                            -webkit-mask-image: url('../assets/images/ic_gamepad.svg');
+                        }
+
+                        &-power {
+                            mask-image: url('../assets/images/ic_power.svg');
+                            -webkit-mask-image: url('../assets/images/ic_power.svg');
+                        }
+
+                        &-camera-button {
+                            mask-image: url('../assets/images/ic_camera.svg');
+                            -webkit-mask-image: url('../assets/images/ic_camera.svg');
+                        }
+
+                        &-camera-mic-button {
+                            mask-image: url('../assets/images/ic_camera_mic.svg');
+                            -webkit-mask-image: url('../assets/images/ic_camera_mic.svg');
+                        }
+
+                        &-streamres-button {
+                            mask-image: url('../assets/images/ic_resolution.svg');
+                            -webkit-mask-image: url('../assets/images/ic_resolution.svg');
+                            outline: none;
+                            border: none;
+                            color: transparent;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+
+                            &:focus {
+                                outline-style: none;
+                                box-shadow: none;
+                                border-color: transparent;
+                                color: var(--gm-on-secondary-color);
+                                background: var(--gm-secondary-color);
+                                opacity: 0;
+                            }
+                        }
+
+                        &-gps-button {
+                            mask-image: url('../assets/images/ic_location.svg');
+                            -webkit-mask-image: url('../assets/images/ic_location.svg');
+                        }
+
+                        &-fullscreen-button {
+                            mask-image: url('../assets/images/ic_fullscreen.svg');
+                            -webkit-mask-image: url('../assets/images/ic_fullscreen.svg');
+
+                            &.gm-active,
+                            &.gm-active:hover {
+                                mask-image: url('../assets/images/ic_fullscreen_active.svg');
+                                -webkit-mask-image: url('../assets/images/ic_fullscreen_active.svg');
+                                background-color: var(--gm-primary-color);
+                            }
+                        }
+
+                        &-screencast-button {
+                            mask-image: url('../assets/images/ic_screenshot.svg');
+                            -webkit-mask-image: url('../assets/images/ic_screenshot.svg');
+                            &.gm-screencast-button-recording {
+                                background-color: var(--gm-primary-color);
+                            }
+                        }
+
+                        &-identifiers-button {
+                            mask-image: url('../assets/images/ic_id.svg');
+                            -webkit-mask-image: url('../assets/images/ic_id.svg');
+                        }
+
+                        &-network-button {
+                            mask-image: url('../assets/images/ic_network.svg');
+                            -webkit-mask-image: url('../assets/images/ic_network.svg');
+                        }
+
+                        &-iothrottling-button {
+                            mask-image: url('../assets/images/ic_disk_IO.svg');
+                            -webkit-mask-image: url('../assets/images/ic_disk_IO.svg');
+                        }
+
+                        &-phone-button {
+                            mask-image: url('../assets/images/ic_text_and_call.svg');
+                            -webkit-mask-image: url('../assets/images/ic_text_and_call.svg');
+                        }
+
+                        &-sim-button {
+                            mask-image: url('../assets/images/ic_baseband.svg');
+                            -webkit-mask-image: url('../assets/images/ic_baseband.svg');
+                        }
+
+                        &-uploader-button {
+                            mask-image: url('../assets/images/ic_installation.svg');
+                            -webkit-mask-image: url('../assets/images/ic_installation.svg');
+                        }
+
+                        &-streamrate-chooser {
+                            mask-image: url('../assets/images/ic_hq.svg');
+                            -webkit-mask-image: url('../assets/images/ic_hq.svg');
+                        }
+
+                        &-clipboard-button {
+                            mask-image: url('../assets/images/ic_clipboard.svg');
+                            -webkit-mask-image: url('../assets/images/ic_clipboard.svg');
+                        }
+
+                        &-fingerprint-button {
+                            mask-image: url('../assets/images/ic_biometrics.svg');
+                            -webkit-mask-image: url('../assets/images/ic_biometrics.svg');
+
+                            &.fingerprint-require {
+                                background-color: var(--gm-primary-color);
+                                filter: invert(0) !important;
+                                animation: blink 2s linear infinite;
+                            }
+
+                            &.fingerprint-autoValidation {
+                                mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
+                                -webkit-mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
+                                background-color: var(--gm-primary-color);
+                            }
+                        }
+
+                        &-keymapping-button {
+                            mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
+                            -webkit-mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
+
+                            &.gm-active {
+                                mask-image: url('../assets/images/ic_keymapping.svg');
+                                -webkit-mask-image: url('../assets/images/ic_keymapping.svg');
+                            }
+                            &.keymapping-paused {
+                                background-color: var(--gm-tertiary-color);
+                            }
+                        }
+
+                        &-default-turn-button {
+                            mask-image: url('../assets/images/ic_warning.svg');
+                            -webkit-mask-image: url('../assets/images/ic_warning.svg');
+                        }
+                    }
+                }
+            }
+        }
+
+        .gm-disabled-widget-pop-up {
+            &::before {
+                position: fixed;
+                /**
                     * working var, changed by js
                     * TODO: evolve to a better solution in the story for tooltip
                     */
-                    right: var(--gm-working-disabled-widget-pop-up-x);
-                    font-size: 15px;
-                    z-index: 20;
-                    padding: 12px 20px;
-                    margin-right: 10px;
-                    background-color: var(--gm-secondary-color);
-                    color: var(--gm-on-secondary-color);
-                    vertical-align: middle;
-                    content: 'Not\00a0 currently\00a0 supported';
-                    display: none;
-                    width: 200px;
-                }
+                right: var(--gm-working-disabled-widget-pop-up-x);
+                font-size: 15px;
+                z-index: 20;
+                padding: 12px 20px;
+                margin-right: 10px;
+                background-color: var(--gm-secondary-color);
+                color: var(--gm-on-secondary-color);
+                vertical-align: middle;
+                content: 'Not\00a0 currently\00a0 supported';
+                display: none;
+                width: 200px;
+            }
 
-                &:hover::before {
-                    display: block;
-                }
+            &:hover::before {
+                display: block;
             }
         }
     }

@@ -8,9 +8,14 @@ class ToolbarManager {
     constructor(instance) {
         this.instance = instance;
         this.toolbar = document.querySelector('.gm-toolbar ul');
+        this.floatingToolbar = document.querySelector('.gm-floating-toolbar ul');
 
         if (!this.toolbar) {
             log.error('Toolbar container not found.');
+            return;
+        }
+        if (this.instance.options.floatingToolbar && !this.floatingToolbar) {
+            log.error('Floating toolbar container not found.');
             return;
         }
 
@@ -62,8 +67,9 @@ class ToolbarManager {
     /**
      * Render a registered button in the toolbar.
      * @param {string} id - The ID of the button to render.
+     * @param {boolean} isInfloatingBar - Whether the button is in a floating toolbar.
      */
-    renderButton(id) {
+    renderButton(id, isInfloatingBar = false) {
         if (!this.buttonRegistry.has(id)) {
             log.warn(`No button registered with ID "${id}".`);
             return;
@@ -82,7 +88,11 @@ class ToolbarManager {
         }
 
         button.appendChild(buttonIcon);
-        this.toolbar.appendChild(button);
+        if (isInfloatingBar) {
+            this.floatingToolbar.appendChild(button);
+        } else {
+            this.toolbar.appendChild(button);
+        }
 
         if (!isDisabled) {
             if (onClick) {
@@ -104,6 +114,7 @@ class ToolbarManager {
             ...this.buttonRegistry.get(id),
             button,
             buttonIcon,
+            isInfloatingBar,
         });
     }
 
@@ -251,11 +262,17 @@ class ToolbarManager {
 
     /**
      * Render a separator in the toolbar.
+     * @param {boolean} isInfloatingBar - Whether the separator is in a floating toolbar.
      */
-    renderSeparator() {
+    renderSeparator(isInfloatingBar = false) {
         const separator = document.createElement('li');
-        separator.className = 'gm-separator';
-        this.toolbar.appendChild(separator);
+        if (isInfloatingBar) {
+            separator.className = 'gm-v-separator';
+            this.floatingToolbar.appendChild(separator);
+        } else {
+            separator.className = 'gm-separator';
+            this.toolbar.appendChild(separator);
+        }
     }
 }
 

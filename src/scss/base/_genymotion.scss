@@ -210,12 +210,11 @@
             }
         }
 
-        .gm-floating-toolbar-wrapper {
+        .player-screen-wrapper {
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             flex: 1;
-            height: 100%;
-            width: 100%;
 
             .gm-video-wrapper {
                 display: flex;
@@ -224,6 +223,7 @@
                 max-height: 100%;
                 margin: 30px;
 
+                // Calculate aspect ratio of the video with js
                 aspect-ratio: 0;
                 .gm-video {
                     max-width: 100%;
@@ -231,14 +231,6 @@
                     align-self: center;
                     height: 100%;
                 }
-            }
-
-            .gm-floating-toolbar {
-                width: 150px;
-                height: $floatting-toolbar-height;
-                min-height: $floatting-toolbar-height;
-                background-color: red;
-                margin: 25px auto;
             }
         }
     }
@@ -265,6 +257,12 @@
     width: 100%;
     border-bottom: 1px solid var(--gm-tertiary-color);
     margin: $spacing-m 0;
+}
+
+.gm-v-separator {
+    height: 100%;
+    border-left: 1px solid var(--gm-tertiary-color);
+    margin: 0 $spacing-m;
 }
 
 .gm-btn {

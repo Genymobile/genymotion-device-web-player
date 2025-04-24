@@ -511,14 +511,6 @@ A device renderer instance can be configured using the `options` argument (objec
 <script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
 ```
 
-#### `gpsSpeedSupport`
-
--   **Type:** `Boolean`
--   **Default:** `false`
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enable or disable GPS speed support.
-
 #### identifiers <img align="right" src="./doc/assets/ic_id.svg">
 
 -   **Type:** `Boolean`

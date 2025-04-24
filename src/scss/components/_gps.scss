@@ -20,6 +20,7 @@
         align-items: center;
         justify-content: flex-end;
         margin-top: $spacing-s;
+        margin-bottom: $spacing-s;
 
         .gm-gps-setToMyPosition {
             display: flex;
@@ -56,6 +57,7 @@
     }
 
     .gm-section {
+        margin-bottom: $spacing-s;
         .gm-gps-section-line {
             display: flex;
             gap: $spacing-xl;
@@ -71,7 +73,7 @@
             justify-content: space-between;
             .gm-gps-bearing-slider,
             .gm-gps-accuracy-slider {
-                margin-top: 12px;
+                margin-top: 7px;
                 margin-right: $spacing-gap;
             }
             .gm-gps-bearing-input,
@@ -83,11 +85,6 @@
     }
 
     .gm-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 60px;
-
         .gm-tag-success {
             visibility: hidden;
         }

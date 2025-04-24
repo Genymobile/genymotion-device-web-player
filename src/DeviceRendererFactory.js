@@ -41,7 +41,6 @@ const defaultOptions = {
     clipboard: true,
     battery: true,
     gps: true,
-    gpsSpeedSupport: false,
     capture: true,
     identifiers: true,
     network: true,
@@ -106,7 +105,6 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.clipboard              Clipboard forwarding support activated. Default: true.
      * @param  {boolean}            options.battery                Battery support activated. Default: true.
      * @param  {boolean}            options.gps                    GPS support activated. Default: true.
-     * @param  {boolean}            options.gpsSpeedSupport        GPS speed support activated. Default: false.
      * @param  {boolean}            options.capture                Screen capture support activated. Default: true.
      * @param  {boolean}            options.identifiers            Identifiers (IMEI, etc...) support activated. Default: true.
      * @param  {boolean}            options.network                Network throttling support activated. Default: true.

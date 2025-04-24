@@ -80,7 +80,7 @@ module.exports = class Clipboard extends OverlayPlugin {
             title: this.i18n.CLIPBOARD_TITLE || 'Device Clipboard',
             classes: 'gm-clipboard-plugin',
             width: 378,
-            height: 484,
+            height: 495,
         });
         this.container = container;
 
@@ -88,7 +88,7 @@ module.exports = class Clipboard extends OverlayPlugin {
         text.innerHTML =
             this.i18n.CLIPBOARD_TEXT ||
             // eslint-disable-next-line max-len
-            'The content you type here will be copied to your virtual phone. The content you copy from your virtual phone will be added here as well.';
+            "The text you enter here will be copied to your virtual device's clipboard. Likewise, any text you copy from your virtual device will appear here.";
 
         this.clipboardInput = document.createElement('textarea');
         this.clipboardInput.className = 'gm-clipboard-input';

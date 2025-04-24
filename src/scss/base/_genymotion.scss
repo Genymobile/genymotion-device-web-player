@@ -221,7 +221,7 @@
 .gm-separator {
     width: 100%;
     border-bottom: 1px solid var(--gm-tertiary-color);
-    margin: $spacing-s 0;
+    margin: $spacing-m 0;
 }
 
 .gm-btn {
@@ -245,5 +245,8 @@
         color: var(--gm-tertiary-color);
         background: none;
         cursor: default;
+        &::before {
+            background-color: var(--gm-tertiary-color) !important;
+        }
     }
 }

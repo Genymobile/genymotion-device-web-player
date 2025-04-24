@@ -64,15 +64,19 @@ describe('GPS Plugin', () => {
                 ['longitude', -666],
                 ['altitude', 23456],
                 ['speed', 400],
+                ['bearing', 361],
+                ['accuracy', 5010],
             ];
             inputsInvalidValues.forEach(([field, value]) => {
-                test('button disabled', () => {
+                test(`button disabled when ${field} is invalid`, () => {
                     const fieldInput = gps.inputComponents[field];
                     const submitButton = document.querySelector('.gm-gps-update');
                     fieldInput.setValue(value, true);
-                    expect(
-                        fieldInput.element.querySelector('.text-input-message').classList.contains('hidden'),
-                    ).toBeFalsy();
+                    if (field !== 'accuracy' && field !== 'bearing') {
+                        expect(
+                            fieldInput.element.querySelector('.text-input-message').classList.contains('hidden'),
+                        ).toBeFalsy();
+                    }
                     expect(submitButton.disabled).toBeTruthy();
                 });
             });

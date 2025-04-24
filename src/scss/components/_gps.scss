@@ -64,7 +64,8 @@
         .gm-input-wrap {
             flex: 1;
         }
-        [class*='gm-gps-'][class*='-input-wrapper'] {
+        .gm-gps-accuracy-input-wrapper,
+        .gm-gps-bearing-input-wrapper {
             display: flex;
             align-items: center;
             justify-content: space-between;

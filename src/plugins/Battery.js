@@ -183,6 +183,11 @@ module.exports = class Battery extends OverlayPlugin {
                 this.updateUIBatteryChargingPercent(value);
                 this.sendDataToInstance();
             },
+            onBlur: (v) => {
+                if (v === '') {
+                    this.chargeInput.setValue('0', true);
+                }
+            },
         });
 
         // bind arrow keys to input, to increase/decrease value with arrow up/down

@@ -114,14 +114,25 @@ describe('BasebandRIL Plugin', () => {
             instance.emit('baseband', 'network operator 123456');
             const sendEventSpy = jest.spyOn(instance, 'sendEvent');
 
-            baseband.networkOperatorMMC.setValue('123456');
-            baseband.networkOperatorName.setValue('value');
-            baseband.simOperatorMMC.setValue('123456');
+            baseband.networkOperatorMMC.setValue('123456', true);
+            baseband.networkOperatorName.setValue('value', true);
+            baseband.simOperatorMMC.setValue('123456', true);
+            baseband.simOperatorName.setValue('value', true);
+            baseband.simMSIN.setValue('012345678', true);
+            baseband.simOperatorPhoneNumber.setValue('0011223344', true);
             baseband.submitBtn.click();
+
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 channel: 'baseband',
-                messages: ['network operator 123456', 'network operator_name value', 'sim operator 123456'],
+                messages: [
+                    'network operator 123456',
+                    'network operator_name value',
+                    'sim operator 123456',
+                    'sim operator_name value',
+                    'sim imsi_id 012345678',
+                    'sim phone_number 0011223344',
+                ],
             });
 
             baseband.simOperatorName.setValue('value');

@@ -3,8 +3,8 @@
         border-bottom: 1px solid var(--gm-tertiary-variant-color);
         color: var(--gm-on-secondary-color);
         display: flex;
+        padding-bottom: $spacing-m;
         align-items: center;
-        height: 34px;
 
         &:has(.text-input:read-only) {
             border-bottom: 1px solid transparent;
@@ -17,6 +17,7 @@
             border: none;
             background-color: transparent;
             color: var(--gm-on-secondary-color);
+            width: 100%;
             /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
             font-size: inherit;
 

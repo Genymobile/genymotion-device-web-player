@@ -68,6 +68,7 @@ module.exports = class Phone extends OverlayPlugin {
             placeholder: this.i18n.PHONE_CALL_PLACEHOLDER || 'Please enter the phone number',
             regexFilter: /^[0-9+\-().\s]{1,25}$/,
             regexValidField: /^[0-9+\-().\s]+$/,
+            messageField: true,
             onChange: () => {
                 if (this.phoneInput.checkValidity()) {
                     this.phoneBtn.disabled = false;
@@ -78,6 +79,11 @@ module.exports = class Phone extends OverlayPlugin {
                     this.textBtn.disabled = false;
                 } else {
                     this.textBtn.disabled = true;
+                }
+                if (this.phoneInput.checkValidity()) {
+                    this.phoneInput.setErrorMessage('');
+                } else {
+                    this.phoneInput.setErrorMessage('Invalid phone number');
                 }
             },
         });

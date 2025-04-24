@@ -122,37 +122,27 @@ module.exports = class Network extends OverlayPlugin {
             this.profilesForDropdownSignalStrength.find((ms) => ms.value === signalStrength[1]),
         );
 
-        this.updateDetail(
-            'downSpeed',
-            downSpeed[2] + ' b/s',
-            downSpeed[1] === 'disabled' || !this.mobileDataSwitch.getState(),
-        );
-        this.updateDetail(
-            'upSpeed',
-            upSpeed[2] + ' b/s',
-            upSpeed[1] === 'disabled' || !this.mobileDataSwitch.getState(),
-        );
-        this.updateDetail(
-            'downDelay',
-            downDelay[2] + ' s',
-            downDelay[1] === 'disabled' || !this.mobileDataSwitch.getState(),
-        );
-        this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || !this.mobileDataSwitch.getState());
+        // Disable signal strength dropdown and details if network type is none
+        this.hasTodisableSignalStrengthDropdownAndDetails();
+        // reset details if mobile data is off or if network type is none
+        const hasDetailsToBeReset = !this.mobileDataSwitch.getState() || mobileProfile[1] === 'none';
+
+        // Update details
+        this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled' || hasDetailsToBeReset);
+        this.updateDetail('upSpeed', upSpeed[2] + ' b/s', upSpeed[1] === 'disabled' || hasDetailsToBeReset);
+        this.updateDetail('downDelay', downDelay[2] + ' s', downDelay[1] === 'disabled' || hasDetailsToBeReset);
+        this.updateDetail('upDelay', upDelay[2] + ' s', upDelay[1] === 'disabled' || hasDetailsToBeReset);
         this.updateDetail(
             'downPacketLoss',
             downPacketLoss[2] + ' %',
-            downPacketLoss[1] === 'disabled' || !this.mobileDataSwitch.getState(),
+            downPacketLoss[1] === 'disabled' || hasDetailsToBeReset,
         );
         this.updateDetail(
             'upPacketLoss',
             upPacketLoss[2] + ' %',
-            upPacketLoss[1] === 'disabled' || !this.mobileDataSwitch.getState(),
+            upPacketLoss[1] === 'disabled' || hasDetailsToBeReset,
         );
-        this.updateDetail(
-            'dnsDelay',
-            dnsDelay[2] + ' s',
-            dnsDelay[1] === 'disabled' || !this.mobileDataSwitch.getState(),
-        );
+        this.updateDetail('dnsDelay', dnsDelay[2] + ' s', dnsDelay[1] === 'disabled' || hasDetailsToBeReset);
     }
 
     enable5G() {
@@ -242,13 +232,14 @@ module.exports = class Network extends OverlayPlugin {
         this.mobileDataSection.appendChild(this.dropdownNetworkType.element);
 
         const signalStrengthLabel = document.createElement('label');
+        signalStrengthLabel.className = 'gm-signal-strength-label';
         signalStrengthLabel.innerHTML = this.i18n.SIGNAL_STRENGTH || 'Signal strength';
         this.mobileDataSection.appendChild(signalStrengthLabel);
 
         this.selectMobileSignalStrength = dropdownSelect.createDropdown({
             items: this.profilesForDropdownSignalStrength,
             hasCheckmark: true,
-            dropdownMaxHeight: 245,
+            dropdownMaxHeight: 155,
             classes: 'gm-signal-strength-dropdown',
             onChange: (newValue) => {
                 const msgs = [];
@@ -314,6 +305,18 @@ module.exports = class Network extends OverlayPlugin {
         } else {
             this.mobileDataSection.classList.remove('disabled');
             this.dropdownNetworkType.setDisabled(false);
+            this.selectMobileSignalStrength.setDisabled(false);
+        }
+        this.hasTodisableSignalStrengthDropdownAndDetails();
+    }
+
+    hasTodisableSignalStrengthDropdownAndDetails() {
+        const isDisabled = !this.mobileDataSwitch.getState() || this.dropdownNetworkType.getValue() === 'none';
+        if (isDisabled) {
+            this.mobileDataSection.classList.add('disabledDetails');
+            this.selectMobileSignalStrength.setDisabled(isDisabled);
+        } else {
+            this.mobileDataSection.classList.remove('disabledDetails');
             this.selectMobileSignalStrength.setDisabled(false);
         }
     }

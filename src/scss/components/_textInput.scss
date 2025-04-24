@@ -35,12 +35,20 @@
             }
         }
     }
+    &:has(.input:read-only) .text-input-container {
+        border-bottom: none;
+        padding-bottom: 0;
+        .input {
+            height: calc(16px + $spacing-m);
+        }
+    }
     &:has(.text-input-message.error) .text-input-container {
         border-bottom: 1px solid var(--gm-error-color);
     }
     .text-input-bottom {
-        min-height: 20px;
+        min-height: 24px;
         position: relative;
+        padding-top: 4px;
 
         &.hidden {
             display: none;

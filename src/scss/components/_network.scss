@@ -48,15 +48,15 @@
                         -webkit-mask-image: url('../assets/images/ic_network-type-3G.svg');
                     }
                     &.two-G-edge {
-                        mask-image: url('../assets/images/ic_network-type-edge.svg');
+                        mask-image: url('../assets/images/ic_network-type-2G-edge.svg');
                         -webkit-mask-image: url('../assets/images/ic_network-type-2G-edge.svg');
                     }
                     &.two-G-gprs {
-                        mask-image: url('../assets/images/ic_network-type-gprs.svg');
+                        mask-image: url('../assets/images/ic_network-type-2G-gprs.svg');
                         -webkit-mask-image: url('../assets/images/ic_network-type-2G-gprs.svg');
                     }
                     &.two-G-gsm {
-                        mask-image: url('../assets/images/ic_network-type-gprs.svg');
+                        mask-image: url('../assets/images/ic_network-type-2G-gsm.svg');
                         -webkit-mask-image: url('../assets/images/ic_network-type-2G-gsm.svg');
                     }
                 }
@@ -71,6 +71,12 @@
         &.disabled {
             label,
             section {
+                color: var(--gm-tertiary-color);
+            }
+        }
+        &.disabledDetails {
+            section,
+            .gm-signal-strength-label {
                 color: var(--gm-tertiary-color);
             }
         }

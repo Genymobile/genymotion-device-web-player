@@ -92,7 +92,7 @@ module.exports = class BasebandRIL extends OverlayPlugin {
             title: this.i18n.BASEBAND_TITLE || 'Baseband',
             classes: 'gm-baseband-plugin',
             width: 378,
-            height: 551,
+            height: 611,
         });
 
         this.container = container;
@@ -131,7 +131,9 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.networkOperatorName = textInput.createTextInput({
             classes: 'gm-network-name',
             placeholder: 'eg: Verizon',
+            messageField: true,
             onChange: () => {
+                this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');
             },
         });
@@ -178,7 +180,9 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.simOperatorName = textInput.createTextInput({
             classes: 'gm-sim-name',
             placeholder: 'eg: AT&T',
+            messageField: true,
             onChange: () => {
+                this.checkIfFormIsValid();
                 this.container.classList.remove('gm-baseband-saved');
             },
         });
@@ -309,26 +313,36 @@ module.exports = class BasebandRIL extends OverlayPlugin {
         this.simOperatorMMC.setErrorMessage('');
         this.simMSIN.setErrorMessage('');
         this.simOperatorPhoneNumber.setErrorMessage('');
+        this.networkOperatorName.setErrorMessage('');
+        this.simOperatorName.setErrorMessage('');
 
         isValid = !this.checkSimImsiErrors();
 
-        if (this.networkOperatorMMC.getValue().length && !this.networkOperatorMMC.checkValidity()) {
-            this.networkOperatorMMC.setErrorMessage('Invalid value');
+        if (!this.networkOperatorMMC.getValue().length || !this.networkOperatorMMC.checkValidity()) {
+            this.networkOperatorMMC.setErrorMessage('5-6 digits');
             isValid = false;
         }
-        if (this.simOperatorMMC.getValue().length && !this.simOperatorMMC.checkValidity()) {
-            this.simOperatorMMC.setErrorMessage('Invalid value');
+        if (!this.simOperatorMMC.getValue().length || !this.simOperatorMMC.checkValidity()) {
+            this.simOperatorMMC.setErrorMessage('5-6 digits');
             isValid = false;
         }
-        if (this.simMSIN.getValue().length && !this.simMSIN.checkValidity()) {
-            this.simMSIN.setErrorMessage('Invalid value');
+        if (!this.simMSIN.getValue().length || !this.simMSIN.checkValidity()) {
+            this.simMSIN.setErrorMessage('9-10 digits');
             isValid = false;
         }
-        if (this.simOperatorPhoneNumber.getValue().length && !this.simOperatorPhoneNumber.checkValidity()) {
-            this.simOperatorPhoneNumber.setErrorMessage('Invalid value');
+        if (!this.simOperatorPhoneNumber.getValue().length || !this.simOperatorPhoneNumber.checkValidity()) {
+            this.simOperatorPhoneNumber.setErrorMessage('Invalid phone');
             isValid = false;
         }
 
+        if (!this.networkOperatorName.getValue().length) {
+            this.networkOperatorName.setErrorMessage('Required');
+            isValid = false;
+        }
+        if (!this.simOperatorName.getValue().length) {
+            this.simOperatorName.setErrorMessage('Required');
+            isValid = false;
+        }
         this.submitBtn.disabled = !isValid;
         return isValid;
     }

@@ -140,6 +140,7 @@
     -webkit-transition: top 0.25s ease-out;
     display: flex;
     flex-direction: column;
+    padding-bottom: $modal-y-padding;
 
     &.gm-visible {
         visibility: visible;
@@ -164,49 +165,64 @@
     label {
         color: var(--gm-primary-color);
         font-weight: bold;
-        margin-bottom: $modal-label-mb;
+        padding-top: $spacing-s;
+        padding-bottom: $spacing-l;
         display: block;
     }
     .gm-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 25px $modal-x-padding;
-        margin-bottom: $spacing-xl;
+        padding-left: $modal-x-padding;
+        padding-right: $modal-x-padding;
+        padding-top: $modal-y-padding;
+        margin-bottom: $spacing-s;
         font-size: 16px;
         font-weight: bold;
         letter-spacing: 0.1em;
-        border-bottom: 1px solid var(--gm-tertiary-color);
         // Disable text selection, in order to avoid to select the text when dragging the modal
         user-select: none;
-    }
 
-    .gm-modal-title {
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 16px;
-    }
+        .gm-modal-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: $spacing-s;
 
-    .gm-modal-close-btn {
-        mask-image: url('../assets/images/ic_close.svg');
-        mask-repeat: no-repeat;
-        mask-position: top center;
-        mask-size: contain;
-        -webkit-mask-image: url('../assets/images/ic_close.svg');
-        -webkit-mask-repeat: no-repeat;
-        -webkit-mask-position: top center;
-        -webkit-mask-size: contain;
-        background-color: var(--gm-on-secondary-color);
-        cursor: pointer;
-        width: 32px;
-        height: 32px;
+            .gm-modal-title {
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .gm-modal-close-btn {
+                mask-image: url('../assets/images/ic_close.svg');
+                mask-repeat: no-repeat;
+                mask-position: top center;
+                mask-size: contain;
+                -webkit-mask-image: url('../assets/images/ic_close.svg');
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: top center;
+                -webkit-mask-size: contain;
+                background-color: var(--gm-on-secondary-color);
+                cursor: pointer;
+                width: 24px;
+                height: 24px;
+            }
+        }
     }
 
     .gm-modal-body {
-        padding: 0 $modal-x-padding 19px;
+        padding-left: $modal-x-padding;
+        padding-right: $modal-x-padding;
         flex: 1;
         display: flex;
         flex-direction: column;
+        user-select: none;
+
+        .gm-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: $spacing-s;
+        }
     }
 
     .gm-separator {

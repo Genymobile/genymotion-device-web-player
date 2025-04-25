@@ -80,11 +80,12 @@ module.exports = class Clipboard extends OverlayPlugin {
             title: this.i18n.CLIPBOARD_TITLE || 'Device Clipboard',
             classes: 'gm-clipboard-plugin',
             width: 378,
-            height: 495,
+            height: 484,
         });
         this.container = container;
 
         const text = document.createElement('div');
+        text.className = 'gm-clipboard-text';
         text.innerHTML =
             this.i18n.CLIPBOARD_TEXT ||
             // eslint-disable-next-line max-len

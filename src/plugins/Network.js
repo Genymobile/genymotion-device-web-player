@@ -176,7 +176,7 @@ module.exports = class Network extends OverlayPlugin {
         const {container} = this.createTemplateModal({
             title: this.i18n.NETWORK_TITLE || 'Network',
             width: 378,
-            height: 550,
+            height: 610,
             classes: 'gm-network-plugin',
         });
 

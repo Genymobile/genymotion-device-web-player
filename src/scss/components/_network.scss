@@ -5,17 +5,18 @@
     .gm-network-wifi-section {
         display: flex;
         justify-content: space-between;
-        margin-bottom: $spacing-m;
+        margin-bottom: $spacing-s * 2;
+        margin-top: $spacing-s;
     }
     .gm-mobile-data-switch {
         display: flex;
         justify-content: space-between;
-        margin-top: $spacing-m;
-        margin-bottom: $spacing-m * 2;
+        margin-top: $spacing-l;
+        margin-bottom: $spacing-s * 2;
     }
 
     .gm-network-type-dropdown {
-        margin-bottom: $spacing-m * 2;
+        margin-bottom: $spacing-xl;
         .dropdown-menu {
             .dropdown-item {
                 display: flex;
@@ -66,7 +67,7 @@
 
     .gm-network-mobile-section {
         .gm-signal-strength-dropdown {
-            margin-bottom: $spacing-m * 2;
+            margin-bottom: $spacing-xl;
         }
         &.disabled {
             label,

@@ -53,7 +53,7 @@ module.exports = class Phone extends OverlayPlugin {
             title: this.i18n.PHONE_TITLE || 'Phone',
             classes: 'gm-phone-plugin',
             width: 378,
-            height: 617,
+            height: 642,
         });
 
         // Generate input rows

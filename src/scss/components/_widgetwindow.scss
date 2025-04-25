@@ -142,6 +142,10 @@
     flex-direction: column;
     padding-bottom: $modal-y-padding;
     z-index: 100;
+
+    // handle overflow when the modal is too high
+    overflow-y: auto;
+    max-height: 100%;
     &.gm-visible {
         opacity: 1;
         transition:
@@ -176,6 +180,11 @@
         font-size: 16px;
         font-weight: bold;
         letter-spacing: 0.1em;
+        // If the widget height is higher than the viewport height, the modal is scrollable but the header will be sticky
+        background: var(--gm-secondary-color);
+        position: sticky;
+        top: 0;
+        z-index: 200;
         // Disable text selection, in order to avoid to select the text when dragging the modal
         user-select: none;
 

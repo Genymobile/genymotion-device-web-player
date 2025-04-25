@@ -39,6 +39,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
             const divContainer = document.createElement('div');
             const label = document.createElement('div');
             const name = document.createElement('div');
+            name.style.marginRight = '5px';
             divContainer.appendChild(name);
             divContainer.appendChild(label);
             divContainer.style.display = 'flex';
@@ -88,7 +89,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
             title: this.i18n.IOTHROTTLING_TITLE || 'Disk I/O',
             classes: 'gm-iothrottling-plugin',
             width: 378,
-            height: 422,
+            height: 400,
         });
 
         this.container = container;
@@ -132,31 +133,22 @@ module.exports = class IOThrottling extends OverlayPlugin {
         const readByteRateSpeedNoneText = document.createElement('div');
         readByteRateSpeedNoneText.innerHTML = this.i18n.IOTHROTTLING_BYTERATE_NONE || 'No disk performance alteration';
         readByteRateSpeedNoneText.classList.add('gm-noThrottling');
-        const readByteRateSpeedCustomText = document.createElement('div');
-        readByteRateSpeedCustomText.innerHTML =
-            this.i18n.IOTHROTTLING_BYTERATE_CUSTOM || 'Enter the read speed limit you wish to emulate.';
-        readByteRateSpeedCustomText.classList.add('gm-customThrottling');
 
         readByteRateContainer.appendChild(readByteRateText);
         readByteRateContainer.appendChild(this.readByteRate.element);
         readByteRateContainer.appendChild(readByteRateSpeedText);
         readByteRateContainer.appendChild(readByteRateSpeedNoneText);
-        readByteRateDiv.appendChild(readByteRateSpeedCustomText);
 
         // Separator
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
         // Add apply button
         const applyBtnDiv = document.createElement('div');
-        applyBtnDiv.className = 'gm-iothrottling-apply';
+        applyBtnDiv.className = 'gm-iothrottling-apply gm-actions';
         const statusDiv = document.createElement('div');
         statusDiv.className = 'gm-iothrottling-status';
         const appliedTag = chipTag.createChip();
-        const statusNotApplied = document.createElement('div');
-        statusNotApplied.innerHTML = 'Not applied';
-        statusNotApplied.className = 'gm-iothrottling-notapplied-text';
 
-        statusDiv.appendChild(statusNotApplied);
         statusDiv.appendChild(appliedTag.element);
 
         const applyBtn = document.createElement('button');
@@ -169,7 +161,7 @@ module.exports = class IOThrottling extends OverlayPlugin {
 
         // Add clear cache button
         const clearCacheDiv = document.createElement('div');
-        clearCacheDiv.className = 'gm-iothrottling-clearcache';
+        clearCacheDiv.className = 'gm-iothrottling-clearcache gm-actions';
         const clearCacheLabel = this.i18n.CLEAR_CACHE_PROFILE || 'Disk cache';
         clearCacheDiv.innerHTML = '<label>' + clearCacheLabel + '</label>';
 
@@ -226,7 +218,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
     updateDiskIOValues(readSpeed) {
         this.container.classList.remove('gm-iothrottling-saved');
         this.container.classList.remove('gm-iothrottling-none');
-        this.container.classList.remove('gm-iothrottling-custom');
 
         // Handle the chipTag display. If readSpeed is custom (trigger from dropdown)
         const readSpeedIsCustom = readSpeed === PROFILE_CUSTOM_NAME;
@@ -259,7 +250,6 @@ module.exports = class IOThrottling extends OverlayPlugin {
             this.readByteRate.setValue(readSpeed);
         } else {
             // custom
-            this.container.classList.add('gm-iothrottling-custom');
             this.readByteRate.setReadOnly(false);
             const custom = this.profilesForDropdown.find((prof) => prof.value === PROFILE_CUSTOM_NAME);
             this.dropdownProfile.setValue(custom);

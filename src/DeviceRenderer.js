@@ -98,7 +98,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
-            {enabled: this.options.gps, class: GPS, params: [this.options.i18n, this.options.gpsSpeedSupport]},
+            {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
             {enabled: this.options.capture, class: Screencast, params: [this.options.i18n]},
             {enabled: this.options.streamResolution, class: StreamResolution},
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},

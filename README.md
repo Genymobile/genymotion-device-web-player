@@ -336,6 +336,13 @@ A device renderer instance can be configured using the `options` argument (objec
 -   `"left"` → Toolbar appears on the left side.
 -   `"right"` → Toolbar appears on the right side.
 
+### `floatingToolbar`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Details:**
+    When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display.
+
 #### `connectionFailedURL`
 
 -   **Type:** `String`

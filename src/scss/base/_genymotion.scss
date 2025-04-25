@@ -82,6 +82,7 @@
         }
 
         &-click-to-unmute {
+            z-index: 10;
             background-color: darken(#223140, 15%);
             background: darken(#223140, 15%) url('../assets/images/ic_icon_mute.svg') no-repeat center;
             background-position: 15px 20px;
@@ -91,7 +92,6 @@
             text-align: left;
             padding: 16px 20px 17px 60px;
             position: absolute;
-            z-index: 1;
             color: var(--gm-on-secondary-color);
             display: block;
             width: 80%;
@@ -157,52 +157,74 @@
         }
 
         &.phoneBorder {
-            .gm-video {
-                border: 8px solid #cbcecb;
-                border-radius: 27px;
-                outline: 7px solid #242424;
-                outline-offset: -13px;
+            .gm-video-wrapper {
+                position: relative;
+                z-index: 1;
+
+                .gm-phone-border {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    border: 8px solid #cbcecb;
+                    border-radius: 27px;
+                    outline: 7px solid #242424;
+                    outline-offset: -13px;
+                    z-index: 3;
+                    pointer-events: none;
+                }
+                .gm-phone-button {
+                    position: absolute;
+                    right: -12px;
+                    top: 10%;
+                    height: 90%;
+                    z-index: 1;
+                    margin: 0;
+                    pointer-events: none;
+
+                    &:before {
+                        content: ' ';
+                        display: block;
+                        width: 8px;
+                        height: clamp(33px, 70px, 10%);
+                        background: #a8b0ad;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    }
+
+                    &:after {
+                        content: ' ';
+                        display: block;
+                        width: 8px;
+                        height: clamp(50px, 87px, 15%);
+                        background: #a8b0ad;
+                        border-radius: 3px;
+                    }
+                }
             }
         }
 
-        .gm-video-wrapper {
-            flex: 1;
+        .player-screen-wrapper {
             display: flex;
-            justify-content: center;
-            max-height: 100%;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
 
-            margin: auto;
-            // calc through JS
-            aspect-ratio: 0;
-            .gm-video {
-                max-width: 100%;
+            .gm-video-wrapper {
+                display: flex;
+                justify-content: center;
+                min-height: 0;
                 max-height: 100%;
-                align-self: center;
+                margin: 30px;
 
-                height: 100%;
-                z-index: 0;
-            }
-            .gm-phone-button {
-                margin-left: -3px;
-                margin-top: clamp(50px, 15%, 85px);
-                margin-right: 10px;
-                &:before {
-                    content: ' ';
-                    display: block;
-                    width: 8px;
-                    height: clamp(50px, 70px, 5%);
-                    background: #a8b0ad;
-                    border-radius: 6px;
-                }
-                &:after {
-                    content: ' ';
-                    display: block;
-                    margin-top: 20px;
-                    width: 8px;
-                    height: clamp(80px, 120px, 10%);
-                    background: #a8b0ad;
-                    border-radius: 3px;
-                    max-height: 31%;
+                // Calculate aspect ratio of the video with js
+                aspect-ratio: 0;
+                .gm-video {
+                    max-width: 100%;
+                    max-height: 100%;
+                    align-self: center;
+                    height: 100%;
                 }
             }
         }
@@ -230,6 +252,12 @@
     width: 100%;
     border-bottom: 1px solid var(--gm-tertiary-color);
     margin: $spacing-m 0;
+}
+
+.gm-v-separator {
+    height: 100%;
+    border-left: 1px solid var(--gm-tertiary-color);
+    margin: 0 $spacing-m;
 }
 
 .gm-btn {

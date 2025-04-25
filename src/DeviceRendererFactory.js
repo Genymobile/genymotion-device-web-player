@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 'use strict';
 
 const DeviceRenderer = require('./DeviceRenderer');
@@ -25,6 +26,7 @@ const defaultOptions = {
         'ButtonsEvents_POWER',
     ],
     toolbarPosition: 'right',
+    floatingToolbar: true,
     touch: true,
     mouse: true,
     volume: true,
@@ -179,9 +181,21 @@ module.exports = class DeviceRendererFactory {
         dom.innerHTML = `
         <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''} 
         toolbarPosition-${options.toolbarPosition}">
-            <div class="gm-video-wrapper">
-                <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
-                ${options.showPhoneBorder ? '<div class="gm-phone-button"></div>' : ''}
+            <div class="player-screen-wrapper">
+                <div class="gm-video-wrapper">
+                    <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
+                    ${
+                        options.showPhoneBorder
+                            ? '<div class="gm-phone-button"></div><div class="gm-phone-border"></div>'
+                            : ''
+                    }
+                </div>
+                ${
+                    options.floatingToolbar
+                        ? // eslint-disable-next-line max-len
+                          '<div class="gm-floating-toolbar-wrapper"><div class="gm-floating-toolbar"><ul></ul></div></div>'
+                        : ''
+                }
             </div>
             <div class="gm-toolbar-wrapper">
                 <div class="gm-toolbar">
@@ -244,7 +258,8 @@ module.exports = class DeviceRendererFactory {
      * @param {DeviceRenderer} instance The DeviceRenderer instance.
      */
     loadToolbar(instance) {
-        const {toolbarOrder} = instance.options;
+        const {toolbarOrder, floatingToolbar} = instance.options;
+
         const orderMap = new Map(toolbarOrder.map((name, index) => [name, index]));
 
         const orderedButtons = [];
@@ -283,9 +298,36 @@ module.exports = class DeviceRendererFactory {
             sortedToolbarItems.push(...orderedButtons, ...unorderedButtons);
         }
 
+        // If floatingToolbar is true, we need to extract the floatingTool element from the toolbarOrder
+        if (floatingToolbar) {
+            const floatingToolbarOrder = [
+                'ButtonsEvents_ROTATE',
+                'separator',
+                'Camera',
+                'separator',
+                'Screencast',
+                'separator',
+                'Fullscreen',
+            ];
+
+            // Extract the floatingToolbarOrder from the toolbarOrder
+            sortedToolbarItems.forEach((name, index) => {
+                if (floatingToolbarOrder.includes(name.key)) {
+                    sortedToolbarItems.splice(index, 1);
+                }
+            });
+            floatingToolbarOrder.forEach((name) => {
+                if (name === 'separator') {
+                    instance.toolbarManager.renderSeparator(true);
+                } else {
+                    instance.toolbarManager.renderButton(name, true);
+                }
+            });
+        }
+
         sortedToolbarItems.forEach(({key, value}) => {
             if (value === 'separator') {
-                instance.toolbarManager.renderSeparator(key);
+                instance.toolbarManager.renderSeparator();
             } else {
                 instance.toolbarManager.renderButton(key);
             }

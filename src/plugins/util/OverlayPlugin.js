@@ -63,7 +63,7 @@ class OverlayPlugin {
                         OverlayPlugin.modalZIndex = 100;
                     }
                     if (this.widget) {
-                        this.widget.style.zIndex = 'unset';
+                        this.widget.style.zIndex = 10;
                     }
                     this.closeOverlay();
                 }
@@ -226,8 +226,8 @@ class OverlayPlugin {
             const offsetX = event.clientX - modal.offsetLeft;
             const offsetY = event.clientY - modal.offsetTop;
             const wrapperRect = this.instance.wrapper.getBoundingClientRect();
-            const wrapperVideoRect = this.instance.videoWrapper.getBoundingClientRect();
-            const marginTopAndBottom = this.instance.videoWrapper.offsetTop * 2; // Because video is centered
+            const wrapperVideoRect = this.instance.playerScreenWrapper.getBoundingClientRect();
+            const marginTopAndBottom = this.instance.playerScreenWrapper.offsetTop * 2; // Because video is centered
 
             const removeMouseMoveListener = this.instance.addListener(document, 'mousemove', (e) => {
                 if (!isDragging) {
@@ -311,7 +311,7 @@ class OverlayPlugin {
      * @returns {boolean} True if modal is outside video wrapper bounds, false otherwise
      */
     checkModalPositionOutsideVideoWrapper() {
-        const videoWrapperRect = this.instance.videoWrapper.getBoundingClientRect();
+        const videoWrapperRect = this.instance.playerScreenWrapper.getBoundingClientRect();
         const modalRect = this.widget.getBoundingClientRect();
 
         // Check if modal is outside video wrapper bounds
@@ -337,11 +337,11 @@ class OverlayPlugin {
         const modalWidth = this.widget.offsetWidth || OVERLAY_DEFAULT_HEIGHT;
         const modalHeight = this.widget.offsetHeight || OVERLAY_DEFAULT_WIDTH;
         const wrapperRect = this.instance.wrapper.getBoundingClientRect();
-        const wrapperVideoRect = this.instance.videoWrapper.getBoundingClientRect();
+        const wrapperVideoRect = this.instance.playerScreenWrapper.getBoundingClientRect();
         const marginTopAndBottom =
             modalHeight + triggerRect.top > wrapperVideoRect.bottom
-                ? this.instance.videoWrapper.offsetTop * 2
-                : this.instance.videoWrapper.offsetTop;
+                ? this.instance.playerScreenWrapper.offsetTop * 2
+                : this.instance.playerScreenWrapper.offsetTop;
 
         let x = 0,
             y = 0;
@@ -408,7 +408,8 @@ class OverlayPlugin {
             !event.target.closest('.gm-overlay') &&
             !event.target.closest('video') &&
             !event.target.closest('.gm-toolbar') &&
-            !event.target.classList.contains('gm-dont-close');
+            !event.target.classList.contains('gm-dont-close') &&
+            !event.target.closest('.gm-floating-toolbar');
 
         if (isValidClickTarget && this.instance.store.state.overlay.isOpen) {
             this.instance.store.dispatch({
@@ -462,7 +463,7 @@ class OverlayPlugin {
     closeOverlay() {
         if (this.widget && this.widget.classList.contains('gm-visible')) {
             this.widget.classList.add('gm-hidden');
-            this.widget.classList.remove('gm-visible', 'gm-positioned');
+            this.widget.classList.remove('gm-visible');
             if (this.widget.onclose) {
                 this.widget.onclose();
             }
@@ -487,7 +488,7 @@ class OverlayPlugin {
     applyModalPosition(position) {
         this.widget.style.left = `${position.x}px`;
         this.widget.style.top = `${position.y}px`;
-        this.widget.classList.add('gm-positioned', 'gm-visible');
+        this.widget.classList.add('gm-visible');
         this.widget.classList.remove('gm-hidden');
     }
 

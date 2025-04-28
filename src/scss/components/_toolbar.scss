@@ -62,6 +62,12 @@
                             margin-top: auto;
                             margin-bottom: auto;
                         }
+
+                        .gm-screenrecord-button {
+                            + .gm-screenrecord-timer {
+                                bottom: 6px;
+                            }
+                        }
                     }
                 }
             }
@@ -256,12 +262,24 @@
                             }
                         }
 
-                        &-screencast-button {
+                        &-screenrecord-button {
+                            mask-image: url('../assets/images/ic_screenrecord.svg');
+                            -webkit-mask-image: url('../assets/images/ic_screenrecord.svg');
+                            position: relative;
+                            + .gm-screenrecord-timer {
+                                position: absolute;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                font-size: 12px;
+                                color: var(--gm-on-secondary-color);
+                                white-space: nowrap;
+                                bottom: 0px;
+                                font-weight: bold;
+                            }
+                        }
+                        &-screenshot-button {
                             mask-image: url('../assets/images/ic_screenshot.svg');
                             -webkit-mask-image: url('../assets/images/ic_screenshot.svg');
-                            &.gm-screencast-button-recording {
-                                background-color: var(--gm-primary-color);
-                            }
                         }
 
                         &-identifiers-button {

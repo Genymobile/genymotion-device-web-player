@@ -27,14 +27,6 @@
         top: -1000px;
     }
 
-    // TODO delete when screencast and GPS will be reworked
-    .gm-wrap:after,
-    .gm-horizontal:after {
-        display: table;
-        content: ' ';
-        clear: both;
-    }
-
     .gm-title {
         text-align: center;
         margin-bottom: 30px;

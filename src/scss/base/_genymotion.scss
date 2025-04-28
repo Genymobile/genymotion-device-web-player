@@ -7,6 +7,7 @@
     height: 100%;
     font-size: 14px;
     line-height: initial;
+    background-color: var(--gm-background-color);
 
     * {
         font-family: lato, sans-serif;
@@ -130,7 +131,6 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-color: var(--gm-background-color);
         height: 100%;
         width: 100%;
 

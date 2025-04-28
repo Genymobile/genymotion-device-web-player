@@ -6,7 +6,8 @@ const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
 const Clipboard = require('./plugins/Clipboard');
 const StreamBitrate = require('./plugins/StreamBitrate');
-const Screencast = require('./plugins/Screencast');
+const Screenrecord = require('./plugins/Screenrecord');
+const Screenshot = require('./plugins/Screenshot');
 const StreamResolution = require('./plugins/StreamResolution');
 const CoordinateUtils = require('./plugins/CoordinateUtils');
 const KeyboardEvents = require('./plugins/KeyboardEvents');
@@ -123,7 +124,8 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
             {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
-            {enabled: this.options.capture, class: Screencast, params: [this.options.i18n]},
+            {enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n]},
+            {enabled: this.options.capture, class: Screenshot, params: [this.options.i18n]},
             {enabled: this.options.streamResolution, class: StreamResolution},
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},

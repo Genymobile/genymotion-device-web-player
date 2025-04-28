@@ -218,7 +218,3 @@ header {
     max-height: calc(100vh - 84px);
     background: var(--gm-background-color);
 }
-
-#fe-player .gm-video-wrapper {
-    padding: 10px 0 10px 10px;
-}

@@ -336,6 +336,13 @@ A device renderer instance can be configured using the `options` argument (objec
 -   `"left"` → Toolbar appears on the left side.
 -   `"right"` → Toolbar appears on the right side.
 
+### `floatingToolbar`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Details:**
+    When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display.
+
 #### `connectionFailedURL`
 
 -   **Type:** `String`
@@ -444,14 +451,14 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Enable or disable the clipboard widget. This widget allows you to share clipboard content between the local machine and the Android virtual device, enabling seamless copy-paste functionality in both directions.
 
-#### capture <img align="right" src="./doc/assets/ic_screencast.svg">
+#### capture <img align="right" src="./doc/assets/ic_screenshot.svg"><img align="right" src="./doc/assets/ic_screenrecord.svg">
 
 -   **Type:** `Boolean`
 -   **Default:** `true`
 -   **Toolbar name:** `Screencast`
 -   **Compatibility:** `PaaS`, `SaaS`
 -   **Details:**
-    Enable or disable the capture widget. This widget can be used to capture the screen of the Android virtual device (screenshot or screencast).
+    Enable or disable the capture widget. This widget adding two button to the toolbar for screenshot or screenrecord.
 
 #### diskIO <img align="right" src="./doc/assets/ic_diskIO.svg">
 
@@ -510,14 +517,6 @@ A device renderer instance can be configured using the `options` argument (objec
 <!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature -->
 <script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
 ```
-
-#### `gpsSpeedSupport`
-
--   **Type:** `Boolean`
--   **Default:** `false`
--   **Compatibility:** `PaaS`, `SaaS`
--   **Details:**
-    Enable or disable GPS speed support.
 
 #### identifiers <img align="right" src="./doc/assets/ic_id.svg">
 

@@ -1,99 +1,101 @@
-.text-input {
-    .text-input-container {
-        border-bottom: 1px solid var(--gm-tertiary-variant-color);
-        color: var(--gm-on-secondary-color);
-        display: flex;
-        padding-bottom: $spacing-m;
-        align-items: center;
-
-        &:has(.text-input:read-only) {
-            border-bottom: 1px solid transparent;
-        }
-
-        .input {
-            text-align: left;
-            padding-left: 0;
-            padding-right: 0;
-            border: none;
-            background-color: transparent;
+.device-renderer-instance {
+    .text-input {
+        .text-input-container {
+            border-bottom: 1px solid var(--gm-tertiary-variant-color);
             color: var(--gm-on-secondary-color);
-            width: 100%;
-            /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
-            font-size: inherit;
-
-            &::placeholder {
-                color: var(--gm-tertiary-color);
-            }
-            &:focus {
-                outline: none;
-            }
-
-            &:read-only {
-                background: var(--gm-tertiary-color);
-                border: none;
-                color: var(--gm-tertiary-variant-color);
-            }
-        }
-    }
-    &:has(.input:read-only) .text-input-container {
-        border-bottom: none;
-        padding-bottom: 0;
-        .input {
-            height: calc(16px + $spacing-m);
-        }
-    }
-    &:has(.text-input-message.error) .text-input-container {
-        border-bottom: 1px solid var(--gm-error-color);
-    }
-    .text-input-bottom {
-        min-height: 24px;
-        position: relative;
-        padding-top: 4px;
-
-        &.hidden {
-            display: none;
-        }
-    }
-    .text-input-unit {
-        color: var(--gm-text-color);
-        font-size: 12px;
-        text-align: right;
-        position: absolute;
-        right: 0;
-        top: 0;
-        &.hidden {
-            display: none;
-        }
-    }
-    .text-input-message {
-        display: none;
-        align-items: center;
-
-        &.hidden {
-            display: none;
-        }
-
-        &.error {
             display: flex;
-            justify-content: space-between;
+            padding-bottom: $spacing-m;
+            align-items: center;
 
-            &::before {
-                content: attr(data-error);
-                color: var(--gm-error-color);
+            &:has(.text-input:read-only) {
+                border-bottom: 1px solid transparent;
             }
-            &::after {
-                content: ' ';
-                mask-image: url('../assets/images/ic_alert.svg');
-                -webkit-mask-image: url('../assets/images/ic_alert.svg');
-                background-color: var(--gm-error-color);
-                -webkit-mask-size: contain;
-                mask-size: contain;
-                -webkit-mask-repeat: no-repeat;
-                mask-repeat: no-repeat;
-                -webkit-mask-position: center;
-                mask-position: center;
-                width: 20px;
-                height: 20px;
+
+            .input {
+                text-align: left;
+                padding-left: 0;
+                padding-right: 0;
+                border: none;
+                background-color: transparent;
+                color: var(--gm-on-secondary-color);
+                width: 100%;
+                /*** This is the line fix bad alignment of the text in the input in Battery, for i.e. ***/
+                font-size: inherit;
+
+                &::placeholder {
+                    color: var(--gm-tertiary-color);
+                }
+                &:focus {
+                    outline: none;
+                }
+
+                &:read-only {
+                    background: var(--gm-tertiary-color);
+                    border: none;
+                    color: var(--gm-tertiary-variant-color);
+                }
+            }
+        }
+        &:has(.input:read-only) .text-input-container {
+            border-bottom: none;
+            padding-bottom: 0;
+            .input {
+                height: calc(16px + $spacing-m);
+            }
+        }
+        &:has(.text-input-message.error) .text-input-container {
+            border-bottom: 1px solid var(--gm-error-color);
+        }
+        .text-input-bottom {
+            min-height: 24px;
+            position: relative;
+            padding-top: 4px;
+
+            &.hidden {
+                display: none;
+            }
+        }
+        .text-input-unit {
+            color: var(--gm-text-color);
+            font-size: 12px;
+            text-align: right;
+            position: absolute;
+            right: 0;
+            top: 0;
+            &.hidden {
+                display: none;
+            }
+        }
+        .text-input-message {
+            display: none;
+            align-items: center;
+
+            &.hidden {
+                display: none;
+            }
+
+            &.error {
+                display: flex;
+                justify-content: space-between;
+
+                &::before {
+                    content: attr(data-error);
+                    color: var(--gm-error-color);
+                }
+                &::after {
+                    content: ' ';
+                    mask-image: url('../assets/images/ic_alert.svg');
+                    -webkit-mask-image: url('../assets/images/ic_alert.svg');
+                    background-color: var(--gm-error-color);
+                    -webkit-mask-size: contain;
+                    mask-size: contain;
+                    -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+                    -webkit-mask-position: center;
+                    mask-position: center;
+                    width: 20px;
+                    height: 20px;
+                }
             }
         }
     }

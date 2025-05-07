@@ -117,21 +117,31 @@ const initPlayer = (webrtcAddress) => {
     const options = {
         token: jwtToken || apiToken,
         showPhoneBorder: true,
+        toolbarPosition: 'right',
+        floatingToolbar: true,
         streamBitrate: true,
-        keyboardMapping: false,
+        baseband: true,
+        keyboardMapping: true,
+        gpsSpeedSupport: true,
         toolbarOrder: [
             'ButtonsEvents_VOLUME_UP',
             'ButtonsEvents_VOLUME_DOWN',
             'ButtonsEvents_ROTATE',
             'separator',
-            'StreamResolution',
+            'Screenrecord',
+            'Screenshot',
             'Battery',
-            'FingerPrint',
-            'GPS',
-            'Camera',
+            'Identifiers',
+            'BasebandRIL',
             'Phone',
-            'Network',
+            'FingerPrint',
             'IOThrottling',
+            'Network',
+            'GPS',
+            'Clipboard',
+            'separator',
+            'StreamResolution',
+            'Camera',
             'separator',
             'ButtonsEvents_RECENT_APP',
             'ButtonsEvents_HOMEPAGE',
@@ -147,7 +157,7 @@ const initPlayer = (webrtcAddress) => {
     playerInstance = DRF.setupRenderer(document.querySelector('#fe-player'), webrtcAddress, options);
 
     // Attach return of player's instantiation to window to use it in the console
-    window.instance = playerInstance;
+    window.playerGenyMotion = playerInstance;
 };
 
 // stop the launched instance

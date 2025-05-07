@@ -303,19 +303,17 @@ module.exports = class DeviceRendererFactory {
             const floatingToolbarOrder = [
                 'ButtonsEvents_ROTATE',
                 'separator',
-                'Camera',
+                'Screenshot',
                 'separator',
-                'Screencast',
+                'Screenrecord',
                 'separator',
                 'Fullscreen',
             ];
 
             // Extract the floatingToolbarOrder from the toolbarOrder
-            sortedToolbarItems.forEach((name, index) => {
-                if (floatingToolbarOrder.includes(name.key)) {
-                    sortedToolbarItems.splice(index, 1);
-                }
-            });
+            const filteredToolbarItems = sortedToolbarItems.filter((item) => !floatingToolbarOrder.includes(item.key));
+            sortedToolbarItems.length = 0;
+            sortedToolbarItems.push(...filteredToolbarItems);
             floatingToolbarOrder.forEach((name) => {
                 if (name === 'separator') {
                     instance.toolbarManager.renderSeparator(true);
@@ -324,7 +322,6 @@ module.exports = class DeviceRendererFactory {
                 }
             });
         }
-
         sortedToolbarItems.forEach(({key, value}) => {
             if (value === 'separator') {
                 instance.toolbarManager.renderSeparator();

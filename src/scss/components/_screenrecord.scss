@@ -1,0 +1,10 @@
+/**
+ * Screenrecord plugin styles
+ */
+.device-renderer-instance {
+    transition: background-color 0.3s ease-in-out;
+
+    &.gm-screenrecord-recording {
+        background-color: var(--gm-primary-variant-color);
+    }
+}

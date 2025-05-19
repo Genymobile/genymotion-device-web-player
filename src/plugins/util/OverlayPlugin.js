@@ -274,8 +274,8 @@ class OverlayPlugin {
                     this.position.x = null;
                     this.position.y = null;
                 } else {
-                    this.position.x = modal.style.left;
-                    this.position.y = modal.style.top;
+                    this.position.x = parseInt(modal.style.left.replace('px', ''));
+                    this.position.y = parseInt(modal.style.top.replace('px', ''));
                 }
 
                 removeMouseMoveListener();
@@ -313,13 +313,27 @@ class OverlayPlugin {
     checkModalPositionOutsideVideoWrapper() {
         const videoWrapperRect = this.instance.playerScreenWrapper.getBoundingClientRect();
         const modalRect = this.widget.getBoundingClientRect();
-
+        // modal can be set outside by CSS, so if position is saved we take this position
+        const calcModalRect = {
+            left: modalRect.left,
+            top: modalRect.top,
+            right: modalRect.right,
+            bottom: modalRect.bottom,
+        };
+        if (this.position.x) {
+            calcModalRect.left = this.position.x;
+            calcModalRect.right = this.position.x + modalRect.width;
+        }
+        if (this.position.y) {
+            calcModalRect.top = this.position.y;
+            calcModalRect.bottom = this.position.y + modalRect.height;
+        }
         // Check if modal is outside video wrapper bounds
         if (
-            modalRect.right > videoWrapperRect.right ||
-            modalRect.left < videoWrapperRect.left ||
-            modalRect.bottom > videoWrapperRect.bottom ||
-            modalRect.top < videoWrapperRect.top
+            calcModalRect.right > videoWrapperRect.right ||
+            calcModalRect.left < videoWrapperRect.left ||
+            calcModalRect.bottom > videoWrapperRect.bottom ||
+            calcModalRect.top < videoWrapperRect.top
         ) {
             return true;
         }

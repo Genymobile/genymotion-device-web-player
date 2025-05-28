@@ -21,6 +21,13 @@
             padding-bottom: inherit;
             display: unset;
         }
+        &.gmaps-disabled {
+            background: var(--gm-secondary-variant-color);
+            color: var(--gm-tertiary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     }
 
     .gm-gps-setToMyPosition-wrapper {

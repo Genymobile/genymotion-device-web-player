@@ -586,6 +586,10 @@ module.exports = class GPS extends OverlayPlugin {
         const info = this.getLocationInfo();
 
         // Render map
+        if (typeof google === 'undefined') {
+            this.mapview.classList.add('gmaps-disabled');
+            this.mapview.innerHTML = 'Enable Google Maps with a valid API key to view the map.';
+        }
         if (typeof google !== 'undefined') {
             this.map = new google.maps.Map(this.mapview, {
                 center: {

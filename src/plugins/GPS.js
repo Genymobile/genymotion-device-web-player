@@ -66,6 +66,9 @@ module.exports = class GPS extends OverlayPlugin {
         // Create map view if google maps is available
         this.loadMap();
 
+        // Check if permission is already denied, in order to disable set position button
+        this.checkLocationPermission();
+
         // Listen for gps events: "<altitude/latitude/longitude/accuracy/bearing/status/speed?> <value>"
         this.instance.registerEventCallback('gps', (message) => {
             const values = message.split(' ');
@@ -461,6 +464,34 @@ module.exports = class GPS extends OverlayPlugin {
     }
 
     /**
+     * Check Location browser permissions
+     */
+    async checkLocationPermission() {
+        try {
+            this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
+            if (this.permissionStatus.state === 'denied') {
+                this.setToMyPositionBtn.disabled = true;
+            } else {
+                this.setToMyPositionBtn.disabled = false;
+            }
+
+            /*
+             * this is bugged in Firefox, change is never triggered,
+             * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
+             */
+            this.instance.addListener(this.permissionStatus, 'change', () => {
+                if (this.permissionStatus.state === 'granted') {
+                    this.setToMyPositionBtn.disabled = false;
+                } else {
+                    this.setToMyPositionBtn.disabled = true;
+                }
+            });
+        } catch (error) {
+            log.error('Error while asking permission: ', error);
+        }
+    }
+
+    /**
      * Extract location info from inputs.
      *
      * @return {Object} Geolocation data.
@@ -493,19 +524,7 @@ module.exports = class GPS extends OverlayPlugin {
 
         // Ask for geolocation permission
         if (!this.permissionStatus) {
-            this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
-
-            /*
-             * this is bugged in Firefox, change is never triggered,
-             * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
-             */
-            this.instance.addListener(this.permissionStatus, 'change', () => {
-                if (this.permissionStatus.state === 'granted') {
-                    this.setToMyPositionBtn.disabled = false;
-                } else {
-                    this.setToMyPositionBtn.disabled = true;
-                }
-            });
+            await this.checkLocationPermission();
         }
 
         try {

@@ -13,6 +13,14 @@
         height: 222px;
         width: 100%;
         overflow: hidden;
+        label {
+            cursor: inherit;
+            color: inherit;
+            font-weight: inherit;
+            padding-top: inherit;
+            padding-bottom: inherit;
+            display: unset;
+        }
     }
 
     .gm-gps-setToMyPosition-wrapper {

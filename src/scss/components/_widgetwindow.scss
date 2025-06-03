@@ -1,3 +1,5 @@
+@use '../base/variables' as *;
+
 /**
  * Widget window styles
  */
@@ -21,8 +23,10 @@
             left: 10% !important;
         }
 
-        transition: top 0.4s;
-        -webkit-transition: top 0.25s ease-out;
+        & {
+            transition: top 0.4s;
+            -webkit-transition: top 0.25s ease-out;
+        }
 
         &.gm-hidden {
             top: -1000px;

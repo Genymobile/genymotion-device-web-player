@@ -1,6 +1,7 @@
 @font-face {
-    font-family: 'Lato';
+    font-family: 'lato';
     font-style: normal;
     font-weight: 400;
-    src: url('../assets/fonts/lato-regular.ttf') format('truetype');
+    font-display: swap;
+    src: url('../assets/fonts/lato-regular.woff') format('woff');
 }

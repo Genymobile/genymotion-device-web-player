@@ -1,4 +1,17 @@
 /* eslint-disable indent */
+/**
+ * ⚠️ WARNING:
+ * This project uses PurgeCSS to remove unused CSS classes.
+ * Be aware that dynamically generated class names (e.g., via string concatenation or template literals)
+ * will NOT be detected automatically by PurgeCSS.
+ *
+ * To prevent important styles from being purged, make sure to:
+ * 1. Add any dynamically generated class patterns to the 'safelist' configuration.
+ * 2. Use regular expressions when needed to match dynamic patterns (e.g., /^gm-.*-fingerprint-image$/).
+ * 3. Consider including explicit references in HTML or comments as a fallback.
+ *
+ * Failure to do so may result in broken styles in production.
+ */
 'use strict';
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -105,8 +118,14 @@ module.exports = (env, argv) => {
                                 [
                                     '@babel/preset-env',
                                     {
-                                        targets:
-                                            'last 2 versions, not dead, not ie 11, not ie_mob 11, not op_mini all, not and_uc 12',
+                                        targets: [
+                                            'last 2 versions',
+                                            'not dead',
+                                            'not ie 11',
+                                            'not ie_mob 11',
+                                            'not op_mini all',
+                                            'not and_uc 12',
+                                        ],
                                     },
                                 ],
                             ],
@@ -118,6 +137,7 @@ module.exports = (env, argv) => {
                     use: [
                         MiniCssExtractPlugin.loader,
                         'css-loader',
+                        'postcss-loader',
                         {
                             loader: 'sass-loader',
                             options: {

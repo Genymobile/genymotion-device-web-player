@@ -136,7 +136,7 @@ describe('GAPPSInstall Plugin', () => {
 
             expect(browseButton.disabled).toBe(true);
             expect(dragDropArea.classList.contains('disabled')).toBe(true);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(true);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(true);
         });
 
         test('re-enables drag and drop after upload completion', () => {
@@ -147,7 +147,7 @@ describe('GAPPSInstall Plugin', () => {
 
             expect(browseButton.disabled).toBe(false);
             expect(dragDropArea.classList.contains('disabled')).toBe(false);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
         });
     });
 
@@ -217,12 +217,12 @@ describe('GAPPSInstall Plugin', () => {
         test('handles worker success message', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(true);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(true);
 
             const event = {data: {type: 'FILE_UPLOAD', code: 'SUCCESS'}};
             mockWorker.onmessage(event);
 
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
         });
 
         test('handles worker failure message', () => {
@@ -232,7 +232,7 @@ describe('GAPPSInstall Plugin', () => {
             const event = {data: {type: 'FILE_UPLOAD', code: 'FAIL'}};
             mockWorker.onmessage(event);
 
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
             expect(document.getElementsByClassName('gm-error-text')[0].innerHTML)
                 .toEqual(expect.stringContaining('TEST FILE SEND FAILED'));
         });
@@ -270,7 +270,7 @@ describe('GAPPSInstall Plugin', () => {
                 type: 'cancel'
             });
 
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
         });
     });
 });

@@ -3,6 +3,7 @@
 const OverlayPlugin = require('./util/OverlayPlugin');
 const log = require('loglevel');
 const {progressBar} = require('./util/components');
+const fileUploader = require('./util/fileUploader');
 log.setDefaultLevel('debug');
 
 // Views definitions
@@ -339,9 +340,6 @@ class InitialView {
         this.instance = plugin.instance;
         this.i18n = plugin.i18n;
         this.fileUploadWorker = null;
-        this.removeListerDragAndDropOver = null;
-        this.removeListerDragAndDropLeave = null;
-        this.removeListerDragAndDropDrop = null;
 
         try {
             this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
@@ -349,19 +347,19 @@ class InitialView {
                 const msg = event.data;
                 switch (msg.code) {
                     case 'SUCCESS':
-                        this.uploadingStop();
+                        this.fileUploaderComponent.uploadingStop();
+                        this.plugin.instance.root.classList.remove('gm-uploading-in-progess');
                         break;
                     case 'FAIL':
-                        this.uploadingStop();
-                        this.showUploadError(
+                        this.fileUploaderComponent.uploadingStop();
+                        this.fileUploaderComponent.showUploadError(
                             this.i18n.FILE_SEND_FAILED ||
                                 `Something went wrong while processing the APK file. 
                                 Please make sure the file is valid and try again.`,
                         );
                         break;
                     case 'PROGRESS':
-                        this.progressBarUploadAPK.setValue(msg.value * 100);
-                        this.uploadSizeText.innerHTML = `(${msg.uploadedSize} of ${msg.fileSize}Mo)`;
+                        this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
                         break;
                     default:
                         break;
@@ -455,135 +453,30 @@ class InitialView {
 
         apkSection.appendChild(apkHeader);
 
-        this.dragDropArea = document.createElement('div');
-        this.dragDropArea.className = 'gm-drag-drop-area';
-
-        // Create hidden file input
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.apk';
-        fileInput.style.display = 'none';
-        fileInput.onchange = (event) => {
-            this.checkFileBeforeUpload(event.target.files[0]);
-        };
-
-        const addFileIcon = document.createElement('i');
-        addFileIcon.className = 'gm-addFile-icon';
-
-        const dragDropText = document.createElement('div');
-        dragDropText.className = 'drop-text';
-        dragDropText.innerHTML = `<div class='drop-text-1'>
-            <b>
-                ${this.i18n.DRAG_DROP_TEXT || 'DRAG AND DROP TO INSTALL YOUR APPS'}
-            </b>
-            </div>
-            <div class='drop-text-2'>${this.i18n.UPLOAD_APK_TEXT || 'Upload an .apk (900Mo max)'} or</div>`;
-
-        this.browseButton = document.createElement('button');
-        this.browseButton.innerHTML = this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE';
-        this.browseButton.className = 'gm-btn gm-gradient-button';
-        this.browseButton.onclick = () => {
-            fileInput.click();
-        };
-
-        const dragOverContainer = document.createElement('div');
-        dragOverContainer.className = 'gm-drag-over-container';
-
-        const dragOverIcon = document.createElement('i');
-        dragOverIcon.className = 'gm-drag-placeholder-icon';
-
-        dragOverContainer.appendChild(dragOverIcon);
-        this.dragDropArea.appendChild(dragOverContainer);
-
-        this.dragDropArea.appendChild(fileInput);
-        this.dragDropArea.appendChild(addFileIcon);
-        this.dragDropArea.appendChild(dragDropText);
-        this.dragDropArea.appendChild(this.browseButton);
-
-        apkSection.appendChild(this.dragDropArea);
-
-        // File Upload Progress Section (initially hidden)
-        this.uploadProgressSection = document.createElement('div');
-        this.uploadProgressSection.className = 'gm-section gm-upload-apk-progress hidden';
-
-        const uploadProgressTitle = document.createElement('div');
-        uploadProgressTitle.className = 'gm-uploading-file-title';
-        uploadProgressTitle.innerHTML = this.i18n.UPLOAD_FILE_TITLE || 'Uploading files';
-
-        const uploadProgressInfoDiv = document.createElement('div');
-        uploadProgressInfoDiv.className = 'gm-info-flex';
-
-        const uploadProgressIcon = document.createElement('i');
-        uploadProgressIcon.className = 'gm-downloadFile-icon';
-
-        const uploadProgressTextContainer = document.createElement('div');
-        uploadProgressTextContainer.className = 'gm-progress-text-container';
-
-        const uploadStatusText = document.createElement('div');
-        uploadStatusText.className = 'gm-progress-text gm-dots-jump-loader';
-        uploadStatusText.innerHTML = this.i18n.UPLOADER_DOWNLOADING || 'Downloading';
-
-        this.uploadFileName = document.createElement('div');
-        this.uploadFileName.className = 'gm-file-name';
-
-        uploadProgressTextContainer.appendChild(uploadStatusText);
-        uploadProgressTextContainer.appendChild(this.uploadFileName);
-
-        const uploadCancelButton = document.createElement('i');
-        uploadCancelButton.className = 'gm-cancel-update-icon';
-        uploadCancelButton.onclick = () => {
-            const msg = {type: 'cancel'};
-            this.fileUploadWorker.postMessage(msg);
-            this.uploadingStop();
-        };
-
-        this.progressBarUploadAPK = progressBar.createProgressBar({
-            value: 0,
-            max: 100,
+        // Create file uploader component
+        this.fileUploaderComponent = fileUploader.createFileUploader({
+            onFileSelect: (file) => {
+                this.handleFileUpload(file);
+            },
+            onUploadComplete: () => {
+                this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                this.plugin.toolbarBtn.setIndicator('');
+                this.instance.root.classList.remove('gm-uploading-in-progess');
+            },
+            dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG AND DROP TO INSTALL YOUR APPS',
+            browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
+            accept: '.apk',
+            maxFileSize: 900,
+            classes: 'gm-apk-uploader'
         });
 
-        this.uploadSizeText = document.createElement('div');
-        this.uploadSizeText.className = 'gm-size-text';
-
-        uploadProgressInfoDiv.appendChild(uploadProgressIcon);
-        uploadProgressInfoDiv.appendChild(uploadProgressTextContainer);
-        uploadProgressInfoDiv.appendChild(uploadCancelButton);
-
-        this.uploadProgressSection.appendChild(uploadProgressTitle);
-        this.uploadProgressSection.appendChild(uploadProgressInfoDiv);
-        this.uploadProgressSection.appendChild(this.progressBarUploadAPK.element);
-        this.uploadProgressSection.appendChild(this.uploadSizeText);
-
-        // File Upload Error Section (initially hidden)
-        this.uploadErrorSection = document.createElement('div');
-        this.uploadErrorSection.className = 'gm-section gm-apk-upload-error hidden';
-
-        const uploadErrorInfoDiv = document.createElement('div');
-        uploadErrorInfoDiv.className = 'gm-info-flex';
-
-        const uploadErrorTitle = document.createElement('div');
-        uploadErrorTitle.className = 'gm-error-title';
-        uploadErrorTitle.innerHTML = this.i18n.ERROR_TITLE || 'Error';
-
-        const uploadErrorIcon = document.createElement('i');
-        uploadErrorIcon.className = 'gm-error-icon';
-
-        this.uploadErrorText = document.createElement('div');
-        this.uploadErrorText.className = 'gm-error-text';
-
-        uploadErrorInfoDiv.appendChild(uploadErrorIcon);
-        uploadErrorInfoDiv.appendChild(this.uploadErrorText);
-
-        this.uploadErrorSection.appendChild(uploadErrorTitle);
-        this.uploadErrorSection.appendChild(uploadErrorInfoDiv);
+        apkSection.appendChild(this.fileUploaderComponent.element);
 
         container.appendChild(introSection);
         container.appendChild(separator1);
         container.appendChild(gappsSection);
         container.appendChild(separator2);
         container.appendChild(apkSection);
-        container.appendChild(this.uploadProgressSection);
-        container.appendChild(this.uploadErrorSection);
 
         return container;
     }
@@ -593,116 +486,13 @@ class InitialView {
         this.installedDiv.classList.remove('hidden');
     }
 
-    checkFileBeforeUpload(file) {
-        if (file) {
-            if (file.name.toLowerCase().endsWith('.apk')) {
-                if (file.size > 900 * 1024 * 1024) {
-                    // 900MB in bytes
-                    this.showUploadError(
-                        this.i18n.FILE_TOO_LARGE ||
-                            `Your file "${file.name}" doesn't respect the conditions to be uploaded (900Mo max).
-                            Please try with another file.`,
-                    );
-                    return;
-                }
-                // If file is valid, hide error and show upload progress
-                this.hideUploadError();
-                this.showUploadProgress(file);
-                this.handleFileUpload(file);
-            } else {
-                this.showUploadError(
-                    this.i18n.FILE_TYPE_NOT_APK ||
-                        `Invalid file type. Only APK files are supported. 
-                        Please select a file with the .apk extension.`,
-                );
-            }
-        } else {
-            this.showUploadError(
-                this.i18n.WRONG_FILE_TYPE_ONLY_FILE_ACCEPTED ||
-                    'Invalid drop content. Please drag and drop a file, not text or other data.',
-            );
-        }
-    }
-
     handleFileUpload(file) {
         this.plugin.toolbarBtn.setIndicator('notification');
         this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
-        this.plugin.instance.root.classList.add('gm-uploadind-in-progess');
+        this.plugin.instance.root.classList.add('gm-uploading-in-progess');
 
         const msg = {type: 'upload', file};
         this.fileUploadWorker.postMessage(msg);
-    }
-
-    showUploadProgress(file) {
-        this.hideUploadError();
-        this.uploadProgressSection.classList.remove('hidden');
-        this.uploadFileName.innerHTML = file.name;
-    }
-
-    showUploadError(message) {
-        this.hideUploadProgress();
-        this.uploadErrorSection.classList.remove('hidden');
-        this.uploadErrorText.innerHTML = message;
-    }
-
-    hideUploadProgress() {
-        this.uploadProgressSection.classList.add('hidden');
-    }
-    hideUploadError() {
-        this.uploadErrorSection.classList.add('hidden');
-    }
-
-    disableDragOver() {
-        this.browseButton.disabled = true;
-        this.browseButton.classList.add('disabled');
-        this.dragDropArea.classList.add('disabled');
-        this.removeListerDragAndDropOver?.();
-        this.removeListerDragAndDropLeave?.();
-        this.removeListerDragAndDropDrop?.();
-    }
-
-    enableDragOver() {
-        this.removeListerDragAndDropOver?.();
-        this.removeListerDragAndDropLeave?.();
-        this.removeListerDragAndDropDrop?.();
-
-        this.removeListerDragAndDropOver = this.plugin.instance.addListener(this.dragDropArea, 'dragover', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            this.dragDropArea.classList.add('dragover');
-        });
-
-        this.removeListerDragAndDropLeave =
-            this.plugin.instance.addListener(this.dragDropArea, 'dragleave', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                this.dragDropArea.classList.remove('dragover');
-            });
-
-        this.removeListerDragAndDropDrop =
-            this.plugin.instance.addListener(this.dragDropArea, 'drop', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                this.dragDropArea.classList.remove('dragover');
-
-                this.checkFileBeforeUpload(event.dataTransfer.files[0]);
-            });
-        this.browseButton.disabled = false;
-        this.browseButton.classList.remove('disabled');
-        this.dragDropArea.classList.remove('disabled');
-    }
-
-    resetProgressBar(){
-        this.progressBarUploadAPK.setValue(0);
-        this.uploadSizeText.innerHTML = '';
-    }
-
-    uploadingStop(){
-        this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
-        this.hideUploadProgress();
-        this.resetProgressBar();
-        this.plugin.toolbarBtn.setIndicator('');
-        this.plugin.instance.root.classList.remove('gm-uploadind-in-progess');
     }
 }
 
@@ -790,17 +580,17 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
 
         const initialViewObject = this.instanciatedViews.get('InitialView');
         if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
-            initialViewObject.enableDragOver();
+            initialViewObject.fileUploaderComponent.setEnabled(true);
         } else {
-            initialViewObject.disableDragOver();
+            initialViewObject.fileUploaderComponent.setEnabled(false);
         }
 
         this.instance.store.subscribe(
             ({isDragAndDropForUploadFileEnabled}) => {
                 if (isDragAndDropForUploadFileEnabled){
-                    initialViewObject.enableDragOver();
+                    initialViewObject.fileUploaderComponent.setEnabled(true);
                 } else {
-                    initialViewObject.disableDragOver();
+                    initialViewObject.fileUploaderComponent.setEnabled(false);
                 }
             },
             ['isDragAndDropForUploadFileEnabled'],

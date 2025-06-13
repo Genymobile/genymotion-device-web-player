@@ -81,9 +81,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         const text = document.createElement('div');
         text.className = 'gm-text';
         text.innerHTML = this.i18n.FILE_UPLOAD_TEXT ||
-            `You can upload a file here. APK files will be installed, 
-            flashable archives will be flashed, and other files types will 
-            be pushed to the /sdcard/download folder on the device.`;
+            `You can upload files to the device from here.
+             Application APK files and flashable ZIP archives will be installed, 
+             other files types will be copied to <b>/sdcard/download</b> folder on the device.`;
         introSection.appendChild(text);
 
         // File Upload Section
@@ -108,7 +108,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                 this.toolbarBtn.setIndicator('');
                 this.instance.root.classList.remove('gm-uploading-in-progess');
             },
-            dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG AND DROP TO UPLOAD YOUR FILES',
+            dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP YOUR FILE',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             maxFileSize: 900,
         });

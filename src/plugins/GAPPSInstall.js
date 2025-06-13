@@ -77,6 +77,10 @@ class InstallingGAPPSView {
         cancelBtn.innerText = this.i18n.CANCEL_BUTTON_TEXT || 'CANCEL';
         cancelBtn.className = 'gm-btn gm-dont-close';
         cancelBtn.onclick = () => {
+            this.plugin.instance.sendEvent({
+                channel: 'systempatcher',
+                messages: ['cancel'],
+            });
             this.plugin.setView('InitialView');
         };
 
@@ -457,6 +461,9 @@ class InitialView {
         this.fileUploaderComponent = fileUploader.createFileUploader({
             onFileSelect: (file) => {
                 this.handleFileUpload(file);
+            },
+            onUploadCancelled:() => {
+                this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {
                 this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});

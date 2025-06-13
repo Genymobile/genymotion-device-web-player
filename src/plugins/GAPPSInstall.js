@@ -74,7 +74,7 @@ class InstallingGAPPSView {
 
         const cancelBtn = document.createElement('button');
         cancelBtn.innerText = this.i18n.CANCEL_BUTTON_TEXT || 'CANCEL';
-        cancelBtn.className = 'gm-btn gm-gradient-button gm-dont-close'; // Assuming similar button class
+        cancelBtn.className = 'gm-btn gm-dont-close';
         cancelBtn.onclick = () => {
             this.plugin.setView('InitialView');
         };

@@ -470,7 +470,7 @@ class InitialView {
                 this.plugin.toolbarBtn.setIndicator('');
                 this.instance.root.classList.remove('gm-uploading-in-progess');
             },
-            dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG AND DROP TO INSTALL YOUR APPS',
+            dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP APK FILE TO INSTALL',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             accept: '.apk',
             maxFileSize: 900,

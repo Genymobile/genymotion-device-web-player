@@ -31,7 +31,7 @@ const fileUploader = (() => {
         onUploadComplete = null,
         onUploadError = null,
         onUploadCancelled = null,
-        dragDropText = 'DRAG AND DROP FILES',
+        dragDropText = 'DRAG & DROP FILES',
         browseButtonText = 'BROWSE',
         accept = null,
         maxFileSize = 900,
@@ -68,7 +68,7 @@ const fileUploader = (() => {
         dragDropTextDiv.innerHTML = `<div class='drop-text-1'>
             <b>${dragDropText}</b>
             </div>
-            <div class='drop-text-2'>Upload a file (${maxFileSize}Mo max) or</div>`;
+            <div class='drop-text-2'>Upload max size: ${maxFileSize}Mo</div>`;
 
         const browseButton = document.createElement('button');
         browseButton.innerHTML = browseButtonText;
@@ -112,7 +112,7 @@ const fileUploader = (() => {
 
         const uploadStatusText = document.createElement('div');
         uploadStatusText.className = 'gm-progress-text gm-dots-jump-loader';
-        uploadStatusText.innerHTML = 'Downloading';
+        uploadStatusText.innerHTML = 'Uploading';
 
         const uploadFileName = document.createElement('div');
         uploadFileName.className = 'gm-file-name';

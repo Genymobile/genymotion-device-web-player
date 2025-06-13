@@ -11,6 +11,11 @@
     font-size: 14px;
     line-height: initial;
     background-color: var(--gm-background-color);
+    transition: background-color 0.3s ease-in-out;
+
+    &.gm-screenrecord-recording {
+        background-color: var(--gm-primary-variant-color);
+    }
 
     * {
         font-family: lato, sans-serif;

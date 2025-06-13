@@ -233,6 +233,10 @@
                     margin: $spacing-m 0;
                 }
             }
+            .gm-progress-actions {
+                justify-content: flex-end;
+                gap: $spacing-s;
+            }
         }
     
         .installation-success-view-container {

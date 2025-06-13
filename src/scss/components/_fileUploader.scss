@@ -31,6 +31,15 @@
             border: 1px dashed var(--gm-primary-color);
             position: relative;
             z-index: 1;
+           
+            /*
+            * HACK for Chrome:
+            * Chrome incorrectly fires a `dragleave` event when the mouse moves over a child element
+            * of the drag target. To prevent this, we disable pointer events on all children
+            * when `.dragover` is active, avoiding unintended `dragleave` triggers.
+            */
+            * {pointer-events: none;}
+            
             .gm-drag-over-container {
                 display: flex;
                 flex-direction: column;

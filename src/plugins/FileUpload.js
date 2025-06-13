@@ -15,9 +15,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.i18n = i18n || {};
         this.fileUploadWorker = null;
 
-        this.removeListerDragAndDropOver = null;
-        this.removeListerDragAndDropLeave = null;
-        this.removeListerDragAndDropDrop = null;
+        this.removeListenerDragAndDropOver = null;
+        this.removeListenerDragAndDropLeave = null;
+        this.removeListenerDragAndDropDrop = null;
 
         try {
             this.fileUploadWorker = this.instance.createFileUploadWorker();
@@ -145,18 +145,18 @@ module.exports = class FileUpload extends OverlayPlugin {
     }
 
     addListenerOnRoot() {
-        this.removeListerDragAndDropOver = this.instance.addListener(this.instance.root, 'dragover', (event) => {
+        this.removeListenerDragAndDropOver = this.instance.addListener(this.instance.root, 'dragover', (event) => {
             event.preventDefault();
             event.stopPropagation();
         });
 
-        this.removeListerDragAndDropLeave =
+        this.removeListenerDragAndDropLeave =
             this.instance.addListener(this.instance.root, 'dragleave', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
             });
 
-        this.removeListerDragAndDropDrop =
+        this.removeListenerDragAndDropDrop =
             this.instance.addListener(this.instance.root, 'drop', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -166,8 +166,8 @@ module.exports = class FileUpload extends OverlayPlugin {
     }
 
     removeListenerOnRoot() {
-        this.removeListerDragAndDropOver?.();
-        this.removeListerDragAndDropDrop?.();
-        this.removeListerDragAndDropLeave?.();
+        this.removeListenerDragAndDropOver?.();
+        this.removeListenerDragAndDropDrop?.();
+        this.removeListenerDragAndDropLeave?.();
     }
 };

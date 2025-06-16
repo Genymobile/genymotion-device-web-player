@@ -159,6 +159,30 @@
                                 left: 2px;
                             }
                         }
+                        &-success {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-success-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                            }
+                        }
+                        &-failed {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-error-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                            }
+                        }
                     }
                     .gm {
                         &-icon-button {

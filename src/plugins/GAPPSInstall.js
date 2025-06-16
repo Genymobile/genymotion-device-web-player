@@ -355,7 +355,7 @@ class InitialView {
                     case 'SUCCESS':
                         this.fileUploaderComponent.showUploadSuccess();
                         // setIndicator in toolbar id widget is closed
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.overlayID)){
+                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
                             this.plugin.toolbarBtn.setIndicator('success');
                         }
                         break;
@@ -366,6 +366,10 @@ class InitialView {
                             `Something went wrong while processing the APK file. 
                                 Please make sure the file is valid and try again.`,
                         );
+                        // setIndicator in toolbar id widget is closed
+                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
+                            this.plugin.toolbarBtn.setIndicator('failed');
+                        }
                         break;
                     case 'PROGRESS':
                         this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
@@ -466,6 +470,7 @@ class InitialView {
         this.fileUploaderComponent = fileUploader.createFileUploader({
             onFileSelect: (file) => {
                 this.handleFileUpload(file);
+                this.instance.root.classList.add('gm-uploading-in-progess');
             },
             onUploadCancelled:() => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
@@ -502,7 +507,6 @@ class InitialView {
     handleFileUpload(file) {
         this.plugin.toolbarBtn.setIndicator('notification');
         this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
-        this.plugin.instance.root.classList.add('gm-uploading-in-progess');
 
         const msg = {type: 'upload', file};
         this.fileUploadWorker.postMessage(msg);
@@ -615,7 +619,13 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
             id: this.constructor.name,
             iconClass: 'gm-gapps-button',
             title: this.i18n.GAPPS_TITLE || 'Install APPS',
-            onClick: this.toggleWidget.bind(this),
+            onClick: () => {
+                if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
+                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                    this.toolbarBtn.setIndicator('');
+                };
+                this.toggleWidget();
+            }
         });
     }
 

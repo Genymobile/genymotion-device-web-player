@@ -14,7 +14,7 @@ module.exports = {
             ],
             safelist: {
                 standard: [/^mdi-/, /^v-/, /^theme-/, /^layout-/, /^v-application/, 
-                    /^gm-tag-/, /^gm-.*-fingerprint-image$/],
+                    /^gm-tag-/, /^gm-.*-fingerprint-image$/, /^gm-toolbar-dot-/],
                 deep: [/^v-/, /^theme-/, /^layout-/],
                 greedy: [/^v-/, /^theme-/, /^layout-/],
             },

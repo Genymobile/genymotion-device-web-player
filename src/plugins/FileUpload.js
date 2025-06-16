@@ -25,7 +25,11 @@ module.exports = class FileUpload extends OverlayPlugin {
                 const msg = event.data;
                 switch (msg.code) {
                     case 'SUCCESS':
-                        this.fileUploader.uploadingStop();
+                        this.fileUploader.showUploadSuccess();
+                        // setIndicator in toolbar id widget is closed
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                            this.toolbarBtn.setIndicator('success');
+                        }
                         break;
                     case 'FAIL':
                         this.fileUploader.uploadingStop();
@@ -111,6 +115,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP YOUR FILE',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             maxFileSize: 900,
+            i18n: this.i18n,
         });
 
         fileUploadSection.appendChild(this.fileUploader.element);

@@ -131,7 +131,7 @@ class InstallationSuccessView {
         successSection.className = 'gm-section gm-success-message-section';
 
         const successIcon = document.createElement('i');
-        successIcon.className = 'gm-success-icon';
+        successIcon.className = 'gm-check-icon';
 
         const successText = document.createElement('div');
         successText.className = 'gm-success-text';
@@ -353,14 +353,17 @@ class InitialView {
                 const msg = event.data;
                 switch (msg.code) {
                     case 'SUCCESS':
-                        this.fileUploaderComponent.uploadingStop();
-                        this.plugin.instance.root.classList.remove('gm-uploading-in-progess');
+                        this.fileUploaderComponent.showUploadSuccess();
+                        // setIndicator in toolbar id widget is closed
+                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.overlayID)){
+                            this.plugin.toolbarBtn.setIndicator('success');
+                        }
                         break;
                     case 'FAIL':
                         this.fileUploaderComponent.uploadingStop();
                         this.fileUploaderComponent.showUploadError(
-                            this.i18n.FILE_SEND_FAILED ||
-                                `Something went wrong while processing the APK file. 
+                            this.i18n.FILE_SEND_APK_FAILED ||
+                            `Something went wrong while processing the APK file. 
                                 Please make sure the file is valid and try again.`,
                         );
                         break;
@@ -389,7 +392,7 @@ class InitialView {
         text.innerHTML =
             this.i18n.GAPPS_TEXT ||
             'You can install <b>Open GApps</b> to access <b>Google Play Store</b> ' +
-                'services, or <b>APK files</b> on your virtual device.';
+            'services, or <b>APK files</b> on your virtual device.';
         introSection.appendChild(text);
 
         const separator1 = document.createElement('div');
@@ -476,7 +479,8 @@ class InitialView {
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             accept: '.apk',
             maxFileSize: 900,
-            classes: 'gm-apk-uploader'
+            classes: 'gm-apk-uploader',
+            i18n: this.plugin.i18n,
         });
 
         apkSection.appendChild(this.fileUploaderComponent.element);
@@ -596,7 +600,7 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
 
         this.instance.store.subscribe(
             ({isDragAndDropForUploadFileEnabled}) => {
-                if (isDragAndDropForUploadFileEnabled){
+                if (isDragAndDropForUploadFileEnabled) {
                     initialViewObject.fileUploaderComponent.setEnabled(true);
                 } else {
                     initialViewObject.fileUploaderComponent.setEnabled(false);

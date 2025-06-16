@@ -2,19 +2,6 @@
 
 .device-renderer-instance {
     .gm-gapps-plugin {
-        [class^='gm-'][class$='-icon'] {
-            display: block;
-            width: 30px;
-            height: 30px;
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-            background-color: var(--gm-on-secondary-color);
-        }
-
         .gm-gapps-views-container {
             height: 100%;
         }
@@ -42,8 +29,6 @@
     
             .gm-downloadFile-icon {
                 margin-right: $spacing-s;
-                mask-image: url('../assets/images/ic_download_file.svg');
-                -webkit-mask-image: url('../assets/images/ic_download_file.svg');
             }
     
             .gm-gapps-installed-status {
@@ -51,12 +36,7 @@
                 align-items: center;
                 gap: $spacing-s;
                 font-weight: 900;
-    
-                .gm-check-icon {
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
-                    background-color: var(--gm-success-color);
-                }
+
             }
     
             .gm-apk-title {
@@ -71,10 +51,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            .gm-warning-icon {
-                mask-image: url('../assets/images/ic_alert.svg');
-                -webkit-mask-image: url('../assets/images/ic_alert.svg');
-            }
+
             .gm-disclaimer-header {
                 display: flex;
                 align-items: center;
@@ -135,10 +112,7 @@
                 align-items: center;
                 justify-content: center;
     
-                .gm-success-icon {
-                    background-color: var(--gm-success-color);
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
+                .gm-check-icon {
                     margin-bottom: $spacing-m;
                 }
                 .gm-success-text {
@@ -167,9 +141,6 @@
                 justify-content: center;
     
                 .gm-failed-icon {
-                    background-color: var(--gm-error-color);
-                    mask-image: url('../assets/images/ic_alert.svg');
-                    -webkit-mask-image: url('../assets/images/ic_alert.svg');
                     margin-bottom: $spacing-m;
                 }
     

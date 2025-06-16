@@ -20,6 +20,7 @@ const fileUploader = (() => {
      * @param {string} [options.accept=''] - File types to accept (e.g. '.apk' or not set for accept all files)
      * @param {number} [options.maxFileSize=900] - Maximum file size in MB
      * @param {string} [options.classes=''] - Additional CSS classes to apply
+     * @param {Object} i18n - i18n object translation
      * @returns {Object} Object containing the file uploader element and control methods
      * @property {HTMLElement} element - The file uploader DOM element
      * @property {Function} setEnabled - Method to enable/disable the file uploader
@@ -36,6 +37,7 @@ const fileUploader = (() => {
         accept = null,
         maxFileSize = 900,
         classes = '',
+        i18n= {}
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -55,6 +57,7 @@ const fileUploader = (() => {
             fileInput.accept = accept;
         }
         fileInput.style.display = 'none';
+
         fileInput.onchange = (event) => {
             // eslint-disable-next-line no-use-before-define
             checkFileBeforeUpload(event.target.files[0]);
@@ -118,6 +121,7 @@ const fileUploader = (() => {
         uploadFileName.className = 'gm-file-name';
 
         const uploadCancelButton = document.createElement('i');
+
         uploadCancelButton.className = 'gm-cancel-update-icon';
         uploadCancelButton.onclick = () => {
             fileInput.value= '';
@@ -173,13 +177,65 @@ const fileUploader = (() => {
         uploadErrorSection.appendChild(uploadErrorTitle);
         uploadErrorSection.appendChild(uploadErrorInfoDiv);
 
+        // Create success section (initially hidden)
+        const uploadSuccessSection = document.createElement('div');
+        uploadSuccessSection.className = 'gm-section gm-upload-success hidden';
+
+        const uploadSuccessInfoDiv = document.createElement('div');
+        uploadSuccessInfoDiv.className = 'gm-info-flex';
+
+        const uploadSuccessTitle = document.createElement('div');
+        uploadSuccessTitle.className = 'gm-uploading-file-title';
+        uploadSuccessTitle.innerHTML = 'Uploading files';
+
+        const uploadSuccessIcon = document.createElement('i');
+        uploadSuccessIcon.className = 'gm-downloadFile-icon';
+
+        const uploadSuccessText = document.createElement('div');
+        uploadSuccessText.className = 'gm-success-text';
+
+        const completedInfoDiv = document.createElement('div');
+        completedInfoDiv.className = 'gm-info-flex gm-completed-text';
+
+        const completedIcon = document.createElement('i');
+        completedIcon.className = 'gm-check-icon';
+
+        const completedText = document.createElement('div');
+        completedText.innerHTML = i18n.COMPLETED || 'Completed';
+
+        completedInfoDiv.appendChild(completedText);
+        completedInfoDiv.appendChild(completedIcon);
+
+        uploadSuccessInfoDiv.appendChild(uploadSuccessIcon);
+        uploadSuccessInfoDiv.appendChild(uploadSuccessText);
+        uploadSuccessInfoDiv.appendChild(completedInfoDiv);
+
+        uploadSuccessSection.appendChild(uploadSuccessTitle);
+        uploadSuccessSection.appendChild(uploadSuccessInfoDiv);
+
         // Add all sections to container
         container.appendChild(dragDropArea);
         container.appendChild(uploadProgressSection);
         container.appendChild(uploadErrorSection);
+        container.appendChild(uploadSuccessSection);
+
+        const getFileNameToDisplay = (name) => {
+            const truncateThreshold = 30;
+
+            let fileName = name;
+            if (fileName.length > truncateThreshold) {
+                const [nameWithoutExt, extension = ''] = fileName.split(/(?=\.[^.]+$)/);
+                fileName = `${nameWithoutExt.slice(0, truncateThreshold)}...` + extension;
+            }
+            return fileName;
+        };
 
         const hideUploadError = () => {
             uploadErrorSection.classList.add('hidden');
+        };
+
+        const hideUploadSuccess = () => {
+            uploadSuccessSection.classList.add('hidden');
         };
 
         const hideUploadProgress = () => {
@@ -188,6 +244,7 @@ const fileUploader = (() => {
 
         const showUploadError = (message) => {
             hideUploadProgress();
+            hideUploadSuccess();
             uploadErrorSection.classList.remove('hidden');
             uploadErrorText.innerHTML = message;
             if (onUploadError) {
@@ -195,16 +252,21 @@ const fileUploader = (() => {
             }
         };
 
+        const showUploadSuccess = () => {
+            hideUploadProgress();
+            hideUploadError();
+            uploadSuccessSection.classList.remove('hidden');
+            uploadSuccessText.innerHTML = uploadFileName.innerHTML;
+            if (onUploadComplete) {
+                onUploadComplete();
+            }
+        };
+
         const showUploadProgress = (file) => {
             hideUploadError();
+            hideUploadSuccess();
             uploadProgressSection.classList.remove('hidden');
-            const truncateThreshold = 30;
-            let fileName = file.name;
-            if (file.name.length > truncateThreshold) {
-                const [nameWithoutExt, extension = ''] = file.name.split(/(?=\.[^.]+$)/);
-                fileName =
-                    (nameWithoutExt.length > 15 ? `${nameWithoutExt.slice(0, 30)}...` : nameWithoutExt) + extension;
-            }
+            const fileName = getFileNameToDisplay(file.name);
             uploadFileName.innerHTML = fileName;
         };
 
@@ -215,6 +277,7 @@ const fileUploader = (() => {
 
         const uploadingStop = () => {
             hideUploadProgress();
+            hideUploadSuccess();
             resetProgressBar();
             if (onUploadComplete) {
                 onUploadComplete();
@@ -225,7 +288,7 @@ const fileUploader = (() => {
             if (file) {
                 if (!accept || (accept && file.name.toLowerCase().endsWith(accept))) {
                     if (file.size > maxFileSize * 1024 * 1024) {
-                        showUploadError(
+                        showUploadError(i18n.FILE_TOO_LARGE ||
                             `Your file "${file.name}" doesn't respect the conditions 
                             to be uploaded (${maxFileSize}Mo max).
                             Please try with another file.`,
@@ -234,12 +297,13 @@ const fileUploader = (() => {
                     }
                     // If file is valid, hide error and show upload progress
                     hideUploadError();
+                    hideUploadSuccess();
                     showUploadProgress(file);
                     if (onFileSelect) {
                         onFileSelect(file);
                     }
                 } else {
-                    showUploadError(
+                    showUploadError(i18n.FILE_TYPE_NOT_APK ||
                         `Invalid file type. Only ${accept} files are supported.
                         Please select a file with the correct extension.`,
                     );
@@ -305,6 +369,7 @@ const fileUploader = (() => {
         const reset = () => {
             uploadingStop();
             hideUploadError();
+            hideUploadSuccess();
             setEnabled(true);
         };
 
@@ -318,6 +383,7 @@ const fileUploader = (() => {
             updateProgress,
             uploadingStop,
             showUploadError,
+            showUploadSuccess,
             startUpload: checkFileBeforeUpload
         };
     };

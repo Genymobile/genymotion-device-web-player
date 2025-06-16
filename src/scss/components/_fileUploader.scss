@@ -1,19 +1,6 @@
 @use '../base/variables' as *;
 
 .device-renderer-instance .gm-file-uploader {
-    [class^='gm-'][class$='-icon'] {
-        display: block;
-        width: 30px;
-        height: 30px;
-        -webkit-mask-size: contain;
-        mask-size: contain;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        -webkit-mask-position: center;
-        mask-position: center;
-        background-color: var(--gm-on-secondary-color);
-    }
-
     .gm-drag-drop-area {
         position: relative;
         height: 241px;
@@ -104,9 +91,6 @@
 
         .gm-downloadFile-icon {
             margin-right: $spacing-s;
-
-            mask-image: url('../assets/images/ic_download_file.svg');
-            -webkit-mask-image: url('../assets/images/ic_download_file.svg');
         }
         
         .gm-info-flex {
@@ -161,6 +145,20 @@
             margin-right: $spacing-s;
             mask-image: url('../assets/images/ic_alert.svg');
             -webkit-mask-image: url('../assets/images/ic_alert.svg');
+        }
+    }
+    .gm-upload-success {
+        .gm-uploading-file-title {
+            color: var(--gm-primary-color);
+            font-weight: 900;
+            margin-bottom: $spacing-l;
+        }
+        .gm-downloadFile-icon {
+            margin-right: $spacing-s;
+        }
+        .gm-completed-text{
+            margin-left: auto;
+            font-weight: 900;
         }
     }
 }

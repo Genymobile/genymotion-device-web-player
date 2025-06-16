@@ -61,6 +61,7 @@ class ToolbarManager {
             removeClass: (className) => this.removeButtonClass(id, className),
             setActive: (isActive = true) => this.setButtonActive(id, isActive),
             setIndicator: (typeOfIndicator) => this.setButtonIndicator(id, typeOfIndicator),
+            getIndicator: () => this.getButtonIndicator(id),
         };
     }
 
@@ -242,14 +243,30 @@ class ToolbarManager {
             log.warn(`No rendered button found with ID "${id}".`);
             return;
         }
-        buttonData.button.classList.remove('gm-toolbar-dot-active');
-        buttonData.button.classList.remove('gm-toolbar-dot-notification');
+
+        // erase all class start with gm-toolbar-dot-
+        buttonData.indicator = '';
+        buttonData.button.className = [...buttonData.button.classList]
+            .filter((cls) => !cls.startsWith('gm-toolbar-dot-'))
+            .join(' ');
 
         if (typeOfIndicator && typeOfIndicator.length) {
+            buttonData.indicator = typeOfIndicator;
             buttonData.button.classList.add('gm-toolbar-dot-' + typeOfIndicator);
         }
     }
 
+    /**
+     * Gets the current indicator value for a specific button
+     * @param {string} id - The unique identifier of the button
+     * @returns {string} The current indicator value of the button, or an empty string if the button doesn't exist or has no indicator
+     */
+    getButtonIndicator(id) {
+        if (this.buttonRegistry.has(id)) {
+            return this.buttonRegistry.get(id).indicator ?? '';
+        }
+        return '';
+    }
     /**
      * Retrieves a button from the registry by its ID.
      *

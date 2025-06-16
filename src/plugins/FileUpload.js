@@ -38,6 +38,10 @@ module.exports = class FileUpload extends OverlayPlugin {
                                 `Something went wrong while processing the file. 
                                 Please make sure the file is valid and try again.`,
                         );
+                        // setIndicator in toolbar id widget is closed
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                            this.toolbarBtn.setIndicator('failed');
+                        }
                         break;
                     case 'PROGRESS':
                         this.fileUploader.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
@@ -64,7 +68,13 @@ module.exports = class FileUpload extends OverlayPlugin {
             id: this.constructor.name,
             iconClass: 'gm-uploader-button',
             title: this.i18n.UPLOADER_TITLE || 'File upload',
-            onClick: this.toggleWidget.bind(this),
+            onClick: () => {
+                if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
+                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                    this.toolbarBtn.setIndicator('');
+                };
+                this.toggleWidget();
+            }
         });
     }
 

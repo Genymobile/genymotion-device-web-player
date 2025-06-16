@@ -14,11 +14,6 @@ class InstallingGAPPSView {
         this.progressBar = null;
         this.progressPercentage = null;
         this.progressText = null;
-        const json = {
-            channel: 'systempatcher',
-            messages: ['install opengapps'],
-        };
-        this.plugin.instance.sendEvent(json);
     }
 
     render() {
@@ -92,6 +87,13 @@ class InstallingGAPPSView {
         container.appendChild(progressSection);
         container.appendChild(separator2);
         container.appendChild(actionsSection);
+
+        // send command to launch install
+        const json = {
+            channel: 'systempatcher',
+            messages: ['install opengapps'],
+        };
+        this.plugin.instance.sendEvent(json);
 
         return container;
     }

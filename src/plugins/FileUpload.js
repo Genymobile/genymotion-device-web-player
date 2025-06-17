@@ -19,6 +19,10 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.removeListenerDragAndDropLeave = null;
         this.removeListenerDragAndDropDrop = null;
 
+        // Render components
+        this.registerToolbarButton();
+        this.renderWidget();
+
         try {
             this.fileUploadWorker = this.instance.createFileUploadWorker();
             this.fileUploadWorker.onmessage = (event) => {
@@ -51,13 +55,9 @@ module.exports = class FileUpload extends OverlayPlugin {
                 }
             };
         } catch (error) {
-            log.error(error);
-            // TODO desactiver le plugin
+            log.error(error, this.toolbarBtn);
+            this.toolbarBtn.disable();
         }
-
-        // Render components
-        this.registerToolbarButton();
-        this.renderWidget();
     }
 
     /**

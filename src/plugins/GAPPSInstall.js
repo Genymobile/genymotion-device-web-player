@@ -472,7 +472,7 @@ class InitialView {
                 this.handleFileUpload(file);
                 this.instance.root.classList.add('gm-uploading-in-progess');
             },
-            onUploadCancelled:() => {
+            onUploadCanceled:() => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {
@@ -533,7 +533,7 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
 
         /*
          * Listen for systempatcher messages: "status <ready/downloading bytesDone totalBytes/installing> <opengapps>"
-         * or "last_result <success/cancelled/unavailable/network_error/corrupted_archive/install>_error <error message>"
+         * or "last_result <success/canceled/unavailable/network_error/corrupted_archive/install>_error <error message>"
          */
         this.instance.registerEventCallback('systempatcher', (message) => {
             this.toolbarBtn.setIndicator('');

@@ -116,7 +116,7 @@ module.exports = function () {
             self.hasError = false;
             const msg = {
                 type: 'FILE_UPLOAD',
-                code: 'CANCELLED',
+                code: 'CANCELED',
             };
             postMessage(msg);
             if (self.socket) {

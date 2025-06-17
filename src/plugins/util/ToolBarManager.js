@@ -76,7 +76,7 @@ class ToolbarManager {
             return;
         }
 
-        const {iconClass, title, onClick, onMousedown, onMouseup, dataAttributes, isDisabled} =
+        const {iconClass, title, dataAttributes, isDisabled, indicator} =
             this.buttonRegistry.get(id);
 
         const button = document.createElement('li');
@@ -95,21 +95,6 @@ class ToolbarManager {
             this.toolbar.appendChild(button);
         }
 
-        if (!isDisabled) {
-            if (onClick) {
-                button.onclick = onClick;
-            }
-            if (onMousedown) {
-                button.onmousedown = onMousedown;
-            }
-            if (onMouseup) {
-                button.onmouseup = onMouseup;
-            }
-        } else {
-            button.classList.add('gm-disabled-widget-pop-up');
-            buttonIcon.classList.add('gm-disabled-icon-button');
-        }
-
         // Update registry with the DOM elements
         this.buttonRegistry.set(id, {
             ...this.buttonRegistry.get(id),
@@ -117,6 +102,16 @@ class ToolbarManager {
             buttonIcon,
             isInfloatingBar,
         });
+
+        if (!isDisabled) {
+            this.enableButton(id);
+        } else {
+            this.disableButton(id);
+        }
+
+        if (indicator) {
+            this.setButtonIndicator(id, indicator);
+        }
     }
 
     /**
@@ -125,7 +120,14 @@ class ToolbarManager {
      */
     disableButton(id) {
         const buttonData = this.buttonRegistry.get(id);
-        if (!buttonData || !buttonData.button) {
+        if (!buttonData) {
+            log.error(`No registred button found with ID "${id}".`);
+            return;
+        }
+
+        buttonData.isDisabled = true;
+
+        if (!buttonData.button) {
             log.warn(`No rendered button found with ID "${id}".`);
             return;
         }
@@ -150,8 +152,6 @@ class ToolbarManager {
         button.onclick = null;
         button.onmousedown = null;
         button.onmouseup = null;
-
-        buttonData.isDisabled = true;
     }
 
     /**
@@ -160,7 +160,14 @@ class ToolbarManager {
      */
     enableButton(id) {
         const buttonData = this.buttonRegistry.get(id);
-        if (!buttonData || !buttonData.button) {
+        if (!buttonData) {
+            log.error(`No registred button found with ID "${id}".`);
+            return;
+        }
+
+        buttonData.isDisabled = false;
+
+        if (!buttonData.button) {
             log.warn(`No rendered button found with ID "${id}".`);
             return;
         }
@@ -178,8 +185,6 @@ class ToolbarManager {
         if (onMouseup) {
             button.onmouseup = onMouseup;
         }
-
-        buttonData.isDisabled = false;
     }
 
     /**
@@ -239,19 +244,25 @@ class ToolbarManager {
     setButtonIndicator(id, typeOfIndicator) {
         const buttonData = this.buttonRegistry.get(id);
 
-        if (!buttonData || !buttonData.button) {
+        if (!buttonData) {
+            log.error(`No registred button found with ID "${id}".`);
+            return;
+        }
+
+        buttonData.indicator = typeOfIndicator;
+
+        // button registred but nor rendered yet
+        if (!buttonData.button) {
             log.warn(`No rendered button found with ID "${id}".`);
             return;
         }
 
         // erase all class starting with gm-toolbar-dot-
-        buttonData.indicator = '';
         buttonData.button.className = [...buttonData.button.classList]
             .filter((cls) => !cls.startsWith('gm-toolbar-dot-'))
             .join(' ');
 
         if (typeOfIndicator && typeOfIndicator.length) {
-            buttonData.indicator = typeOfIndicator;
             buttonData.button.classList.add('gm-toolbar-dot-' + typeOfIndicator);
         }
     }

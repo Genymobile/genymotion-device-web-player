@@ -286,7 +286,7 @@ const fileUploader = (() => {
 
         const checkFileBeforeUpload = (file) => {
             if (file) {
-                if (!accept || (accept && file.name.toLowerCase().endsWith(accept))) {
+                if (!accept || (accept && file.name.toLowerCase().endsWith(accept.toLowerCase()))) {
                     if (file.size > maxFileSize * 1024 * 1024) {
                         showUploadError(i18n.FILE_TOO_LARGE ||
                             `Your file "${file.name}" doesn't respect the conditions 

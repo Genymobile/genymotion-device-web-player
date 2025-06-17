@@ -114,7 +114,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                 const msg = {type: 'upload', file};
                 this.fileUploadWorker.postMessage(msg);
             },
-            onUploadCancelled:() => {
+            onUploadCanceled:() => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {

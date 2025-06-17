@@ -14,7 +14,7 @@ const fileUploader = (() => {
      * @param {Function} [options.onUploadProgress] - Callback function triggered when upload progress changes
      * @param {Function} [options.onUploadComplete] - Callback function triggered when upload is complete
      * @param {Function} [options.onUploadError] - Callback function triggered when an error occurs
-     * @param {Function} [options.onUploadCancelled] - Callback function triggered when upload is cancelled
+     * @param {Function} [options.onUploadCanceled] - Callback function triggered when upload is canceled
      * @param {string} [options.dragDropText='DRAG AND DROP FILES'] - Text to display in the drag & drop area
      * @param {string} [options.browseButtonText='BROWSE'] - Text to display on the browse button
      * @param {string} [options.accept=''] - File types to accept (e.g. '.apk' or not set for accept all files)
@@ -31,7 +31,7 @@ const fileUploader = (() => {
         onUploadProgress = null,
         onUploadComplete = null,
         onUploadError = null,
-        onUploadCancelled = null,
+        onUploadCanceled = null,
         dragDropText = 'DRAG & DROP FILES',
         browseButtonText = 'BROWSE',
         accept = null,
@@ -125,8 +125,8 @@ const fileUploader = (() => {
         uploadCancelButton.className = 'gm-cancel-update-icon';
         uploadCancelButton.onclick = () => {
             fileInput.value= '';
-            if (onUploadCancelled) {
-                onUploadCancelled();
+            if (onUploadCanceled) {
+                onUploadCanceled();
             }
             // eslint-disable-next-line no-use-before-define
             uploadingStop();

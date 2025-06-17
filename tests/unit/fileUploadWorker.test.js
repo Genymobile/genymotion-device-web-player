@@ -114,7 +114,7 @@ describe('FileUploaderWorker', () => {
             expect(worker.hasError).toBe(false);
             expect(global.self.postMessage).toHaveBeenCalledWith({
                 type: 'FILE_UPLOAD',
-                code: 'CANCELLED'
+                code: 'CANCELED'
             });
             expect(mockSocket.close).toHaveBeenCalled();
         });

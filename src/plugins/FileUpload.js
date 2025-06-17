@@ -26,7 +26,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                 switch (msg.code) {
                     case 'SUCCESS':
                         this.fileUploader.showUploadSuccess();
-                        // setIndicator in toolbar id widget is closed
+                        // Show the indicator in the toolbar if the widget is closed.
                         if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
                             this.toolbarBtn.setIndicator('success');
                         }
@@ -38,7 +38,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                                 `Something went wrong while processing the file. 
                                 Please make sure the file is valid and try again.`,
                         );
-                        // setIndicator in toolbar id widget is closed
+                        // Show the indicator in the toolbar if the widget is closed.
                         if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
                             this.toolbarBtn.setIndicator('failed');
                         }
@@ -97,7 +97,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         text.innerHTML = this.i18n.FILE_UPLOAD_TEXT ||
             `You can upload files to the device from here.
              Application APK files and flashable ZIP archives will be installed, 
-             other files types will be copied to <b>/sdcard/download</b> folder on the device.`;
+             other file types will be copied to <b>/sdcard/download</b> folder on the device.`;
         introSection.appendChild(text);
 
         // File Upload Section

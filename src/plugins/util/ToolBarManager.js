@@ -244,7 +244,7 @@ class ToolbarManager {
             return;
         }
 
-        // erase all class start with gm-toolbar-dot-
+        // erase all class starting with gm-toolbar-dot-
         buttonData.indicator = '';
         buttonData.button.className = [...buttonData.button.classList]
             .filter((cls) => !cls.startsWith('gm-toolbar-dot-'))

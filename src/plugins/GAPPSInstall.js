@@ -354,7 +354,7 @@ class InitialView {
                 switch (msg.code) {
                     case 'SUCCESS':
                         this.fileUploaderComponent.showUploadSuccess();
-                        // setIndicator in toolbar id widget is closed
+                        // Show the indicator in the toolbar if the widget is closed.
                         if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
                             this.plugin.toolbarBtn.setIndicator('success');
                         }
@@ -366,7 +366,7 @@ class InitialView {
                             `Something went wrong while processing the APK file. 
                                 Please make sure the file is valid and try again.`,
                         );
-                        // setIndicator in toolbar id widget is closed
+                        // Show the indicator in the toolbar if the widget is closed.
                         if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
                             this.plugin.toolbarBtn.setIndicator('failed');
                         }

@@ -360,7 +360,7 @@ const fileUploader = (() => {
 
         const updateProgress = (percentage, uploadedSize, fileSize) => {
             progressBarUpload.setValue(percentage);
-            uploadSizeText.innerHTML = `(${uploadedSize} of ${fileSize}Mo)`;
+            uploadSizeText.innerHTML = `(${uploadedSize} ${i18n.OF || 'of'} ${fileSize}Mo)`;
             if (onUploadProgress) {
                 onUploadProgress(percentage, uploadedSize, fileSize);
             }

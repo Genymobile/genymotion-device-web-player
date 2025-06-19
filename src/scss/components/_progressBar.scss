@@ -1,0 +1,16 @@
+.device-renderer-instance {
+    .gm-progress-container {
+        width: 100%;
+        height: 2px;
+        background-color: var(--gm-primary-variant-color);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .gm-progress-bar {
+        height: 100%;
+        width: 0%;
+        background-color: var(--gm-primary-color);
+        transition: width 0.3s ease;
+    }
+}

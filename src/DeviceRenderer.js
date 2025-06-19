@@ -125,6 +125,22 @@ module.exports = class DeviceRenderer {
             const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
             this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
         }
+
+        // Disable drag and drop (plugins will attach their own callback if needed)
+        this.addListener(this.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.addListener(this.root, 'dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.addListener(this.root, 'drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
     }
 
     /**

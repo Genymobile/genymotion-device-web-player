@@ -701,11 +701,10 @@ module.exports = class DeviceRenderer {
         if (data.sdp) {
             try {
                 const sdp = new RTCSessionDescription(data);
-                this.peerConnection.setRemoteDescription(
-                    sdp,
-                    this.onWebRTCConnectionEstablished.bind(this),
-                    this.onWebRTCConnectionError.bind(this),
-                );
+                this.peerConnection
+                    .setRemoteDescription(sdp)
+                    .then(this.onWebRTCConnectionEstablished.bind(this))
+                    .catch(this.onWebRTCConnectionError.bind(this));
             } catch (error) {
                 log.warn('Failed to create SDP ', error.message);
             }

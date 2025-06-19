@@ -478,6 +478,16 @@ A device renderer instance can be configured using the `options` argument (objec
 -   **Details:**
     Enable or disable the fileUpload widget and drag & drop. This widget can be used to forward local file to the Android virtual device. When dragging & dropping APK or ZIP files, it will install them.
 
+
+#### gappsInstall <img align="right" src="./doc/assets/ic_installation.svg">
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+-   **Toolbar name:** `GAPPSInstall`
+-   **Compatibility:** `PaaS`, `SaaS`
+-   **Details:**
+  Enable or disable the gappsInstall widget and drag & drop. This widget can be used to forward local apk to the Android virtual device or to install the gApps.
+
 #### `fileUploadUrl`
 
 -   **Type:** `String`

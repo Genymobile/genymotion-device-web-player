@@ -172,6 +172,11 @@
             &:hover::before {
                 opacity: 1;
             }
+
+            &.disabled{
+                color: var(--gm-tertiary-variant-color);
+                background-color: var(--gm-tertiary-color);
+            }
         }
 
         &-video-overlay {

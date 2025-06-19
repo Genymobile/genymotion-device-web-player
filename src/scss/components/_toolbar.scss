@@ -355,6 +355,11 @@
                             }
                         }
 
+                        &-gapps-button {
+                            mask-image: url('../assets/images/ic_gapps.svg');
+                            -webkit-mask-image: url('../assets/images/ic_gapps.svg');
+                        }
+
                         &-default-turn-button {
                             mask-image: url('../assets/images/ic_warning.svg');
                             -webkit-mask-image: url('../assets/images/ic_warning.svg');

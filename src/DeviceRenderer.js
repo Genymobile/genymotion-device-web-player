@@ -86,6 +86,9 @@ module.exports = class DeviceRenderer {
         this.x = 0;
         this.y = 0;
 
+        // file upload src worker
+        this.fileUploaderWorkerBlobSRC = null;
+
         // fix size of wrapper stick to the video size
         if (this.options.showPhoneBorder) {
             // When the window is resized, we need to resize the video wrapper to fit the new size
@@ -108,6 +111,20 @@ module.exports = class DeviceRenderer {
             },
             {once: true},
         );
+
+        // Prepare source for the upload worker
+        if (window.Worker) {
+            /*
+             *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
+             * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
+             */
+            let fileUploaderWorkerBlob = require('./worker/FileUploaderWorker');
+            fileUploaderWorkerBlob = fileUploaderWorkerBlob
+                .toString()
+                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
+            const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
+            this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
+        }
     }
 
     /**
@@ -364,11 +381,6 @@ module.exports = class DeviceRenderer {
         if (this.signalingDataChannel) {
             this.signalingDataChannel.close();
             this.signalingDataChannel = null;
-        }
-
-        if (typeof this.fileUpload !== 'undefined') {
-            const msg = {type: 'close'};
-            this.fileUpload.loaderWorker.postMessage(msg);
         }
     }
 
@@ -744,18 +756,6 @@ module.exports = class DeviceRenderer {
         } else {
             this.dispatchEvent('successConnection', {msg: 'Connection established'});
         }
-
-        if (this.fileUpload) {
-            const msg = {
-                type: 'address',
-                fileUploadAddress: this.options.fileUploadUrl,
-                token: this.options.token,
-            };
-
-            if (this.fileUpload.loaderWorker) {
-                this.fileUpload.loaderWorker.postMessage(msg);
-            }
-        }
     }
 
     /**
@@ -960,6 +960,48 @@ module.exports = class DeviceRenderer {
         delete this.wrapper;
         delete this.videoWrapper;
         delete this.root;
+    }
+
+    // Get an instance of upload worker and handle connect / close
+    createFileUploadWorker() {
+        if (!this.fileUploaderWorkerBlobSRC || !this.options.fileUploadUrl?.length) {
+            let msgError = null;
+            if (!this.fileUploaderWorkerBlobSRC) {
+                msgError = "Worker source can't be loaded";
+            }
+            if (!this.options.fileUploadUrl?.length) {
+                msgError = 'File upload url not set';
+            }
+            throw new Error("Worker can't be created, error:", msgError);
+        }
+        const worker = new Worker(this.fileUploaderWorkerBlobSRC);
+
+        if (this.store.state.isWebRTCConnectionReady) {
+            const msg = {
+                type: 'address',
+                fileUploadAddress: this.options.fileUploadUrl,
+                token: this.options.token,
+            };
+            worker.postMessage(msg);
+        }
+        this.store.subscribe(
+            ({isWebRTCConnectionReady}) => {
+                if (isWebRTCConnectionReady) {
+                    const msg = {
+                        type: 'address',
+                        fileUploadAddress: this.options.fileUploadUrl,
+                        token: this.options.token,
+                    };
+                    worker.postMessage(msg);
+                } else {
+                    const msg = {type: 'close'};
+                    worker.postMessage(msg);
+                }
+            },
+            ['isWebRTCConnectionReady'],
+        );
+
+        return worker;
     }
 
     // Manages border on resize to mimic the phone border

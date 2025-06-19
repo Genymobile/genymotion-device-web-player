@@ -39,16 +39,13 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.hasError = false;
         this.flashing = false;
         this.canvasContext = null;
+        this.loaderWorker = null;
         this.opengappsInstalled = false;
         this.capabilityAvailable = false;
 
         if (window.Worker) {
-            let fileUploaderWorker = require('../worker/FileUploaderWorker');
-            fileUploaderWorker = fileUploaderWorker
-                .toString()
-                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
-            const src = new Blob([fileUploaderWorker], {type: 'application/javascript'});
-            this.loaderWorker = new Worker(URL.createObjectURL(src));
+            this.loaderWorker = this.instance.createFileUploadWorker();
+
             this.loaderWorker.onmessage = (event) => {
                 const msg = event.data;
                 switch (msg.code) {

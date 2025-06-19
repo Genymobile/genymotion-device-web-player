@@ -235,7 +235,7 @@ const connectInstance = async (wsAddress) => {
     instanceUuid = instance.uuid;
     await getJWTToken(instanceUuid);
 
-    initPlayer(instance.publicWebrtcUrl, instance.file_upload_url);
+    initPlayer(instance.webrtc_url, instance.file_upload_url);
 };
 
 const snackbar = (error) => {

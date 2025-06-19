@@ -10,20 +10,18 @@
 @use 'components/widgetwindow';
 @use 'components/fullscreen';
 @use 'components/toolbar';
-@use 'components/upload';
 @use 'components/gappsInstall';
 @use 'components/battery';
 @use 'components/gps';
-@use 'components/screenrecord';
 @use 'components/imei';
 @use 'components/network';
 @use 'components/iothrottling';
 @use 'components/phone';
 @use 'components/baseband';
-@use 'components/uploader';
 @use 'components/clipboard';
 @use 'components/turn';
 @use 'components/fingerprints';
+@use 'components/fileUpload';
 @use 'components/slider';
 @use 'components/switchButton';
 @use 'components/textInput';
@@ -31,3 +29,6 @@
 @use 'components/chipTag';
 @use 'components/textArea';
 @use 'components/progressBar';
+
+
+@use 'components/fileUploader';

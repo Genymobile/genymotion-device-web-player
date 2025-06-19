@@ -417,9 +417,7 @@ class OverlayPlugin {
      */
     handleClickOutsideOverlay(event) {
         const isValidClickTarget =
-            // todo delete gm-overlay when all widgets are refactored
             !event.target.closest('.gm-modal') &&
-            !event.target.closest('.gm-overlay') &&
             !event.target.closest('video') &&
             !event.target.closest('.gm-toolbar') &&
             !event.target.classList.contains('gm-dont-close') &&

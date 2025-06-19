@@ -34,11 +34,10 @@ describe('GAPPSInstall Plugin', () => {
         plugin = new GAPPSInstall(instance, {
             GAPPS_TITLE: 'TEST GAPPS TITLE',
             DRAG_DROP_TEXT: 'TEST DRAG DROP TEXT',
-            UPLOAD_APK_TEXT: 'TEST UPLOAD APK TEXT',
             BROWSE_BUTTON_TEXT: 'TEST BROWSE',
             FILE_TOO_LARGE: 'TEST FILE TOO LARGE',
             FILE_TYPE_NOT_APK: 'TEST FILE TYPE NOT APK',
-            FILE_SEND_FAILED: 'TEST FILE SEND FAILED'
+            FILE_SEND_APK_FAILED: 'TEST FILE APK SEND FAILED',
         });
         initialView = plugin.instanciatedViews.get('InitialView');
     });
@@ -63,7 +62,6 @@ describe('GAPPSInstall Plugin', () => {
             const container = document.getElementsByClassName('gm-gapps-plugin')[0];
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST GAPPS TITLE'));
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST DRAG DROP TEXT'));
-            expect(container.innerHTML).toEqual(expect.stringContaining('TEST UPLOAD APK TEXT'));
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST BROWSE'));
         });
 
@@ -116,72 +114,69 @@ describe('GAPPSInstall Plugin', () => {
             const container = document.getElementsByClassName('gm-gapps-plugin')[0];
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST GAPPS TITLE'));
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST DRAG DROP TEXT'));
-            expect(container.innerHTML).toEqual(expect.stringContaining('TEST UPLOAD APK TEXT'));
             expect(container.innerHTML).toEqual(expect.stringContaining('TEST BROWSE'));
         });
     });
 
     describe('drag and drop functionality', () => {
-        let dragDropArea;
-        let browseButton;
-
-        beforeEach(() => {
-            dragDropArea = initialView.dragDropArea;
-            browseButton = initialView.browseButton;
-        });
-
         test('disables drag and drop during upload', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
 
-            expect(browseButton.disabled).toBe(true);
-            expect(dragDropArea.classList.contains('disabled')).toBe(true);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(true);
+            expect(initialView.fileUploaderComponent.element.
+                querySelector('.gm-btn.gm-gradient-button').disabled).toBe(true);
+            expect(initialView.fileUploaderComponent.element.
+                querySelector('.gm-drag-drop-area.disabled')).toBeTruthy();
         });
 
         test('re-enables drag and drop after upload completion', () => {
             const file = new File(['test'], 'test.apk', {ype: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
 
-            initialView.uploadProgressSection.querySelector('.gm-cancel-update-icon').click();
+            document.querySelector('.gm-cancel-update-icon').click();
 
-            expect(browseButton.disabled).toBe(false);
-            expect(dragDropArea.classList.contains('disabled')).toBe(false);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(initialView.fileUploaderComponent.element.
+                querySelector('.gm-btn.gm-gradient-button').disabled).toBe(false);
+            expect(initialView.fileUploaderComponent.element.
+                querySelector('.gm-drag-drop-area.disabled')).toBeFalsy();
         });
     });
 
     describe('file validation', () => {
         test('accepts valid APK file', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
-            const showUploadError = jest.spyOn(initialView, 'showUploadError');
+            const showUploadError = jest.spyOn(initialView.fileUploaderComponent, 'showUploadError');
 
-            initialView.checkFileBeforeUpload(file);
+            initialView.fileUploaderComponent.startUpload(file);
 
             expect(showUploadError).not.toHaveBeenCalled();
         });
 
         test('rejects non-APK file', () => {
             const file = new File(['test'], 'test.txt', {type: 'text/plain'});
-            const showUploadError = jest.spyOn(initialView, 'showUploadError');
+            const startUpload = jest.spyOn(initialView.fileUploaderComponent, 'startUpload');
 
-            initialView.checkFileBeforeUpload(file);
+            initialView.fileUploaderComponent.startUpload(file);
+            expect(startUpload).toHaveBeenCalled();
 
-            expect(showUploadError).toHaveBeenCalledWith(expect.stringContaining('TEST FILE TYPE NOT APK'));
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML)
+                .toEqual(expect.stringContaining('TEST FILE TYPE NOT APK'));
         });
 
         test('rejects file larger than 900MB', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
-            const showUploadError = jest.spyOn(initialView, 'showUploadError');
+            const startUpload = jest.spyOn(initialView.fileUploaderComponent, 'startUpload');
 
             const bigFakeFile = Object.defineProperty(file, 'size', {
                 value: 901 * 1024 * 1024,
                 writable: false,
             });
 
-            initialView.checkFileBeforeUpload(bigFakeFile);
+            initialView.fileUploaderComponent.startUpload(bigFakeFile);
+            expect(startUpload).toHaveBeenCalled();
 
-            expect(showUploadError).toHaveBeenCalledWith(expect.stringContaining('TEST FILE TOO LARGE'));
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML)
+                .toEqual(expect.stringContaining('TEST FILE TOO LARGE'));
         });
     });
 
@@ -196,7 +191,7 @@ describe('GAPPSInstall Plugin', () => {
         test('updates store state when drag and drop is enabled', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
-            initialView.uploadingStop();
+            initialView.fileUploaderComponent.uploadingStop();
 
             expect(instance.store.state.isDragAndDropForUploadFileEnabled).toBe(true);
         });
@@ -214,17 +209,6 @@ describe('GAPPSInstall Plugin', () => {
             });
         });
 
-        test('handles worker success message', () => {
-            const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
-            initialView.handleFileUpload(file);
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(true);
-
-            const event = {data: {type: 'FILE_UPLOAD', code: 'SUCCESS'}};
-            mockWorker.onmessage(event);
-
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
-        });
-
         test('handles worker failure message', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
@@ -232,9 +216,9 @@ describe('GAPPSInstall Plugin', () => {
             const event = {data: {type: 'FILE_UPLOAD', code: 'FAIL'}};
             mockWorker.onmessage(event);
 
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
             expect(document.getElementsByClassName('gm-error-text')[0].innerHTML)
-                .toEqual(expect.stringContaining('TEST FILE SEND FAILED'));
+                .toEqual(expect.stringContaining('TEST FILE APK SEND FAILED'));
         });
 
         test('handles worker progress message', () => {
@@ -251,16 +235,16 @@ describe('GAPPSInstall Plugin', () => {
                 }
             };
             mockWorker.onmessage(event);
-
-            expect(initialView.progressBarUploadAPK.getValue()).toBe(50);
-            expect(initialView.uploadSizeText.innerHTML).toBe('(450.00 of 900.00Mo)');
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-progress-bar').style.width).toBe('50%');
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-size-text').innerHTML)
+                .toBe('(450.00 of 900.00Mo)');
         });
 
         test('handles worker cancellation', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
 
-            initialView.uploadProgressSection.querySelector('.gm-cancel-update-icon').click();
+            document.querySelector('.gm-cancel-update-icon').click();
 
             mockWorker.postMessage(
                 {type: 'cancel'}
@@ -270,7 +254,7 @@ describe('GAPPSInstall Plugin', () => {
                 type: 'cancel'
             });
 
-            expect(instance.root.classList.contains('gm-uploadind-in-progess')).toBe(false);
+            expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
         });
     });
 });

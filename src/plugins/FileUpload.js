@@ -1,6 +1,7 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
+const log = require('loglevel');
 
 const LEFT = 0;
 const RIGHT = 1;
@@ -48,30 +49,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.removeListerDragAndDropLeave = null;
         this.removeListerDragAndDropDrop = null;
 
-        if (window.Worker) {
-            this.loaderWorker = this.instance.createFileUploadWorker();
-
-            this.loaderWorker.onmessage = (event) => {
-                const msg = event.data;
-                switch (msg.code) {
-                    case 'SUCCESS':
-                        this.onUploadSuccess();
-                        this.toolbarBtn.setIndicator('');
-                        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
-                        break;
-                    case 'FAIL':
-                        this.onUploadFailure();
-                        this.toolbarBtn.setIndicator('');
-                        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
-                        break;
-                    case 'PROGRESS':
-                        this.setUploadProgress(msg.value);
-                        break;
-                    default:
-                        break;
-                }
-            };
-        }
+        this.isDesactivated = false;
 
         if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
             this.enableDragOver();
@@ -98,6 +76,36 @@ module.exports = class FileUpload extends OverlayPlugin {
         // Render components
         this.registerToolbarButton();
         this.renderWidget();
+
+        if (window.Worker) {
+            try {
+                this.loaderWorker = this.instance.createFileUploadWorker();
+
+                this.loaderWorker.onmessage = (event) => {
+                    const msg = event.data;
+                    switch (msg.code) {
+                        case 'SUCCESS':
+                            this.onUploadSuccess();
+                            this.toolbarBtn.setIndicator('');
+                            this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                            break;
+                        case 'FAIL':
+                            this.onUploadFailure();
+                            this.toolbarBtn.setIndicator('');
+                            this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                            break;
+                        case 'PROGRESS':
+                            this.setUploadProgress(msg.value);
+                            break;
+                        default:
+                            break;
+                    }
+                };
+            } catch (error) {
+                log.error(error);
+                this.isDesactivated = true;
+            }
+        }
 
         /*
          * Listen for systempatcher messages: "status <ready/downloading/installing> <opengapps>"
@@ -394,6 +402,9 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     setAvailability(available) {
         this.capabilityAvailable = available;
+        if (this.isDesactivated){
+            this.toolbarBtn.disable();
+        }
     }
 
     /**

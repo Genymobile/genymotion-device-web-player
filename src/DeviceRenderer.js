@@ -18,6 +18,7 @@ const Gamepad = require('./plugins/Gamepad');
 const Camera = require('./plugins/Camera');
 const GPS = require('./plugins/GPS');
 const FileUpload = require('./plugins/FileUpload');
+const GAPPSInstall = require('./plugins/GAPPSInstall');
 const Battery = require('./plugins/Battery');
 const Identifiers = require('./plugins/Identifiers');
 const Network = require('./plugins/Network');
@@ -155,6 +156,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
             {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
+            {enabled: this.options.gappsInstall, class: GAPPSInstall, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
             {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
             {enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n]},
@@ -879,6 +881,10 @@ module.exports = class DeviceRenderer {
                     disable: (widget) => {
                         widget.setAvailability(false);
                     },
+                },
+                {
+                    widget: this.gappsInstall,
+                    capability: data.message.systemPatcher,
                 },
                 {
                     widget: this.fingerprint,

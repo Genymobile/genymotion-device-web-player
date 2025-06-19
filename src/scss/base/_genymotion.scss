@@ -49,6 +49,11 @@
     }
 
     .gm {
+        &-info-flex {
+            display: flex;
+            align-items: center;
+        }
+
         &-icon-button {
             display: block;
             width: 30px;
@@ -60,6 +65,113 @@
             mask-repeat: no-repeat;
             -webkit-mask-position: center;
             mask-position: center;
+        }
+
+        &-loader {
+            position: relative;
+            &::after {
+                content: '';
+                background-color: var(--gm-primary-color);
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                mask-image: url('../assets/images/ic_spinner-material.svg');
+                -webkit-mask-image: url('../assets/images/ic_spinner-material.svg');
+                width: 20px;
+                height: 20px;
+            }
+        }
+        &-dots-jump-loader {
+            &::after {
+                content: '';
+                margin-left: 2px;
+                display: inline-block;
+                width: 16px;
+                aspect-ratio: 2;
+                vertical-align: bottom;
+
+                --_g: no-repeat radial-gradient(circle closest-side, currentColor, 90%, transparent);
+                background:
+                    var(--_g) 0% 50%,
+                    var(--_g) 50% 50%,
+                    var(--_g) 100% 50%;
+                background-size: calc(100% / 3) 50%;
+                animation: dots-jump-loader 1s infinite linear;
+            }
+        }
+
+        &-separator {
+            width: 100%;
+            border-bottom: 1px solid var(--gm-tertiary-color);
+            margin: $spacing-m 0;
+        }
+
+        &-v-separator {
+            height: 100%;
+            border-left: 1px solid var(--gm-tertiary-color);
+            margin: 0 $spacing-m;
+        }
+
+        &-btn {
+            max-height: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            text-transform: uppercase;
+            color: var(--gm-on-secondary-color);
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+
+            &:hover {
+                background: var(--gm-primary-variant-color);
+                color: var(--gm-primary-color);
+            }
+            &:disabled {
+                color: var(--gm-tertiary-color);
+                background: none;
+                cursor: default;
+                &::before {
+                    background-color: var(--gm-tertiary-color) !important;
+                }
+            }
+        }
+
+        &-gradient-button {
+            position: relative;
+            overflow: hidden;
+            color: var(--gm-on-gradient-1);
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 1;
+            background: var(--gm-gradient-1);
+
+            &:hover {
+                color: var(--gm-on-gradient-1);
+                background: var(--gm-gradient-1);
+            }
+
+            &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gm-gradient-1-animated);
+                transition: opacity 0.5s ease;
+                opacity: 0;
+                z-index: -1;
+            }
+
+            &:hover::before {
+                opacity: 1;
+            }
         }
 
         &-video-overlay {
@@ -231,62 +343,6 @@
                     height: 100%;
                 }
             }
-        }
-    }
-}
-.gm-loader {
-    position: relative;
-    &::after {
-        content: '';
-        background-color: var(--gm-primary-color);
-        -webkit-mask-size: contain;
-        mask-size: contain;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        -webkit-mask-position: center;
-        mask-position: center;
-        mask-image: url('../assets/images/ic_spinner-material.svg');
-        -webkit-mask-image: url('../assets/images/ic_spinner-material.svg');
-        width: 20px;
-        height: 20px;
-    }
-}
-
-.gm-separator {
-    width: 100%;
-    border-bottom: 1px solid var(--gm-tertiary-color);
-    margin: $spacing-m 0;
-}
-
-.gm-v-separator {
-    height: 100%;
-    border-left: 1px solid var(--gm-tertiary-color);
-    margin: 0 $spacing-m;
-}
-
-.gm-btn {
-    max-height: 40px;
-    height: 40px;
-    border: none;
-    background: none;
-    text-transform: uppercase;
-    color: var(--gm-on-secondary-color);
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-
-    &:hover {
-        background: var(--gm-primary-variant-color);
-        color: var(--gm-primary-color);
-    }
-    &:disabled {
-        color: var(--gm-tertiary-color);
-        background: none;
-        cursor: default;
-        &::before {
-            background-color: var(--gm-tertiary-color) !important;
         }
     }
 }

@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use 'variables' as *;
+
 /**
  * Common renderer style
  */
@@ -84,8 +87,9 @@
 
         &-click-to-unmute {
             z-index: 10;
-            background-color: darken(#223140, 15%);
-            background: darken(#223140, 15%) url('../assets/images/ic_icon_mute.svg') no-repeat center;
+            background-color: color.adjust(#223140, $lightness: -15%);
+            background: color.adjust(#223140, $lightness: -15%) url('../assets/images/ic_icon_mute.svg') no-repeat
+                center;
             background-position: 15px 20px;
             background-size: 30px;
             border-radius: 8px;

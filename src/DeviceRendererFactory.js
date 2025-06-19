@@ -39,6 +39,7 @@ const defaultOptions = {
     camera: true,
     microphone: false,
     fileUpload: true,
+    gappsInstall: true,
     streamBitrate: false,
     clipboard: true,
     battery: true,
@@ -102,6 +103,7 @@ module.exports = class DeviceRendererFactory {
      * @param  {boolean}            options.camera                 Camera support activated. Default: true.
      * @param  {boolean}            options.microphone             Microphone support activated. Default: false.
      * @param  {boolean}            options.fileUpload             File upload support activated. Default: true.
+     * @param  {boolean}            options.gappsInstall           gapps and APK install support activated. Default: true.
      * @param  {string}             options.fileUploadUrl          File upload URL. Required if fileUpload===true.
      * @param  {boolean}            options.streamBitrate          Stream bitrate control support activated. Default: false.
      * @param  {boolean}            options.clipboard              Clipboard forwarding support activated. Default: true.
@@ -151,13 +153,18 @@ module.exports = class DeviceRendererFactory {
         store(instance);
 
         // Add a class to the wrapper when we are waiting for the stream to be ready in order to display a loader
-        instance.store.subscribe(({isWebRTCConnectionReady}) => {
-            if (isWebRTCConnectionReady) {
-                instance.wrapper.classList.remove('waitingForStream');
-            } else {
-                instance.wrapper.classList.add('waitingForStream');
-            }
-        });
+        instance.store.subscribe(
+            ({isWebRTCConnectionReady}) => {
+                if (instance?.wrapper) {
+                    if (isWebRTCConnectionReady) {
+                        instance.wrapper.classList.remove('waitingForStream');
+                    } else {
+                        instance.wrapper.classList.add('waitingForStream');
+                    }
+                }
+            },
+            ['isWebRTCConnectionReady'],
+        );
 
         instance.apiManager = new APIManager(instance);
         instance.toolbarManager = new ToolbarManager(instance);

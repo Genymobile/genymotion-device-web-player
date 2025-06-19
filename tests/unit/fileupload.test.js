@@ -23,9 +23,19 @@ describe('FileUpload Plugin', () => {
         });
 
         it('should attach ondragover, ondragenter, and ondragleave to root', () => {
-            expect(typeof instance.videoWrapper.ondragover).toBe('function');
-            expect(typeof instance.videoWrapper.ondragleave).toBe('function');
-            expect(typeof instance.videoWrapper.ondragenter).toBe('function');
+            const addEventListenerSpy = jest.spyOn(instance.root, 'addEventListener');
+            instance = new Instance();
+
+            uploader = new FileUpload(instance, {
+                UPLOADER_INSTALLING: 'TEST UPLOADER PLUGIN INSTALLING...',
+            });
+
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, 'dragover', expect.any(Function),
+                {});
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, 'dragleave', expect.any(Function),
+                {});
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, 'drop', expect.any(Function),
+                {});
         });
     });
 

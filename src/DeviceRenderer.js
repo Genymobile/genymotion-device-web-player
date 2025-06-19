@@ -488,10 +488,12 @@ module.exports = class DeviceRenderer {
             // Get the PeerConnection Statistics after 3 seconds
             new PeerConnectionStats(this, this.peerConnection, 3000);
 
+            // TODO move this code on its own plugin with a subscribe to the store
             if (this.touchEventsEnabled) {
                 this.touchEvents.addTouchCallbacks();
             }
 
+            // TODO move this code on its own plugin with a subscribe to the store
             if (this.gamepadEventsEnabled) {
                 this.gamepadManager.addGamepadCallbacks();
             }

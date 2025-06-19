@@ -1,0 +1,11 @@
+@use '../base/variables' as *;
+
+.device-renderer-instance {
+    .gm-uploader-plugin {
+        .file-upload-view-container{
+            margin-top: $spacing-s;
+            padding-top: $spacing-s;
+        }
+    }
+}
+

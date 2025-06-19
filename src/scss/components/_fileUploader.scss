@@ -1,0 +1,164 @@
+@use '../base/variables' as *;
+
+.device-renderer-instance .gm-file-uploader {
+    .gm-drag-drop-area {
+        position: relative;
+        height: 241px;
+        padding: $spacing-xl;
+        margin-top: $spacing-xl;
+        margin-bottom: $spacing-xl;
+        border-radius: 4px;
+        border: 1px dashed var(--gm-tertiary-color);
+        background: var(--gm-secondary-variant-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &.dragover {
+            border: 1px dashed var(--gm-primary-color);
+            position: relative;
+            z-index: 1;
+           
+            /*
+            * HACK for Chrome:
+            * Chrome incorrectly fires a `dragleave` event when the mouse moves over a child element
+            * of the drag target. To prevent this, we disable pointer events on all children
+            * when `.dragover` is active, avoiding unintended `dragleave` triggers.
+            */
+            * {pointer-events: none;}
+            
+            .gm-drag-over-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: var(--gm-secondary-variant-color);
+                z-index: 100;
+            }
+        }
+
+        &.disabled {
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: transparent;
+                z-index: 10;
+            }
+        }
+
+        .gm-drag-over-container {
+            display: none;
+        }
+
+        .gm-drag-placeholder-icon {
+            width: 50px;
+            height: 49px;
+            background-image: url('../assets/images/ic_drag_placeholder.svg');
+            background-color: transparent;
+        }
+
+        .gm-addFile-icon {
+            mask-image: url('../assets/images/ic_add_file.svg');
+            -webkit-mask-image: url('../assets/images/ic_add_file.svg');
+        }
+
+        .drop-text {
+            margin-top: $spacing-xl;
+            margin-bottom: $spacing-xl;
+            text-align: center;
+        }
+
+        .drop-text-1 {
+            margin-bottom: $spacing-s;
+        }
+    }
+
+    .gm-upload-progress {
+        .gm-uploading-file-title {
+            color: var(--gm-primary-color);
+            font-weight: 900;
+            margin-bottom: $spacing-l;
+        }
+
+        .gm-downloadFile-icon {
+            margin-right: $spacing-s;
+        }
+        
+        .gm-info-flex {
+            display: flex;
+            align-items: self-start;
+            gap: $spacing-s;
+        }
+
+        .gm-wrapper-uploading-text-and-progress{
+            flex:1;
+            .gm-progress-text-container {
+                display: flex;
+                gap: $spacing-s;
+                align-items:  center;
+                margin-bottom: $spacing-s;
+                .gm-file-name {
+                    font-style: italic;
+                    flex:1;
+                }
+            }
+    
+            .gm-cancel-update-icon {
+                cursor: pointer;
+                mask-image: url('../assets/images/ic_cross.svg');
+                -webkit-mask-image: url('../assets/images/ic_cross.svg');
+            }
+    
+            .gm-size-text {
+                text-align: right;
+                margin-top: $spacing-s;
+            }
+        }
+
+    }
+
+    .gm-upload-error {
+        .gm-error-title {
+            color: var(--gm-error-color);
+            font-weight: 900;
+            margin-bottom: $spacing-l;
+        }
+
+        .gm-info-flex {
+            display: flex;
+            align-items: center;
+            gap: $spacing-s;
+        }
+
+        .gm-error-icon {
+            background-color: var(--gm-error-color);
+            min-width: 30px;
+            margin-right: $spacing-s;
+            mask-image: url('../assets/images/ic_alert.svg');
+            -webkit-mask-image: url('../assets/images/ic_alert.svg');
+        }
+    }
+    .gm-upload-success {
+        .gm-uploading-file-title {
+            color: var(--gm-primary-color);
+            font-weight: 900;
+            margin-bottom: $spacing-l;
+        }
+        .gm-downloadFile-icon {
+            margin-right: $spacing-s;
+        }
+        .gm-completed-text{
+            margin-left: auto;
+            font-weight: 900;
+        }
+    }
+}

@@ -1,29 +1,11 @@
 @use '../base/variables' as *;
 
 .device-renderer-instance {
-    transition: background-color 0.3s ease-in-out;
-    &.gm-uploadind-in-progess{
-        background-color: var(--gm-tertiary-variant-color);
-    }
-
     .gm-gapps-plugin {
-
-
-        [class^='gm-'][class$='-icon'] {
-            display: block;
-            width: 30px;
-            height: 30px;
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-            background-color: var(--gm-on-secondary-color);
-        }
         .gm-gapps-views-container {
             height: 100%;
         }
+
         .initial-view-container {
             height: 100%;
     
@@ -47,9 +29,6 @@
     
             .gm-downloadFile-icon {
                 margin-right: $spacing-s;
-    
-                mask-image: url('../assets/images/ic_download_file.svg');
-                -webkit-mask-image: url('../assets/images/ic_download_file.svg');
             }
     
             .gm-gapps-installed-status {
@@ -57,12 +36,7 @@
                 align-items: center;
                 gap: $spacing-s;
                 font-weight: 900;
-    
-                .gm-check-icon {
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
-                    background-color: var(--gm-success-color);
-                }
+
             }
     
             .gm-apk-title {
@@ -71,125 +45,13 @@
                 padding-top: $spacing-s;
                 font-weight: 900;
             }
-    
-            .gm-drag-drop-area {
-                position: relative;
-                height: 241px;
-                padding: $spacing-xl;
-                margin-top: $spacing-xl;
-                margin-bottom: $spacing-xl;
-                border-radius: 4px;
-                border: 1px dashed var(--gm-tertiary-color);
-                background: var(--gm-secondary-variant-color);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-    
-                &.dragover {
-                    border: 1px dashed var(--gm-primary-color);
-                    position: relative;
-                    z-index: 1;
-                    .gm-drag-over-container {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: var(--gm-secondary-variant-color);
-                        z-index: 100;
-                    }
-                }
-    
-                &.disabled {
-                    &::before{
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: transparent;
-                        z-index: 10;
-                    }
-                }
-    
-                .gm-drag-over-container {
-                    display: none;
-                }
-    
-                .gm-drag-placeholder-icon {
-                    width: 50px;
-                    height: 49px;
-                    background-image: url('../assets/images/ic_drag_placeholder.svg');
-                    background-color: transparent;
-                }
-    
-                .gm-addFile-icon {
-                    mask-image: url('../assets/images/ic_add_file.svg');
-                    -webkit-mask-image: url('../assets/images/ic_add_file.svg');
-                }
-                .drop-text {
-                    margin-top: $spacing-xl;
-                    margin-bottom: $spacing-xl;
-                    text-align: center;
-                }
-                .drop-text-1 {
-                    margin-bottom: $spacing-s;
-                }
-            }
-    
-            .gm-upload-apk-progress {
-                .gm-uploading-file-title {
-                    color: var(--gm-primary-color);
-                    font-weight: 900;
-                    margin-bottom: $spacing-l;
-                }
-                .gm-progress-text-container {
-                    flex: 1;
-                    display: flex;
-                    gap: $spacing-s;
-                    .gm-file-name {
-                        font-style: italic;
-                    }
-                }
-                .gm-cancel-update-icon {
-                    cursor: pointer;
-                    mask-image: url('../assets/images/ic_cross.svg');
-                    -webkit-mask-image: url('../assets/images/ic_cross.svg');
-                }
-                .gm-size-text {
-                    text-align: right;
-                    margin-top: $spacing-s;
-                }
-            }
-            .gm-apk-upload-error {
-                .gm-error-title {
-                    color: var(--gm-error-color);
-                    font-weight: 900;
-                    margin-bottom: $spacing-l;
-                }
-                .gm-error-icon {
-                    background-color: var(--gm-error-color);
-                    min-width: 30px;
-                    margin-right: $spacing-s;
-                    mask-image: url('../assets/images/ic_alert.svg');
-                    -webkit-mask-image: url('../assets/images/ic_alert.svg');
-                }
-            }
         }
     
         .disclaimer-view-container {
             height: 100%;
             display: flex;
             flex-direction: column;
-            .gm-warning-icon {
-                mask-image: url('../assets/images/ic_alert.svg');
-                -webkit-mask-image: url('../assets/images/ic_alert.svg');
-            }
+
             .gm-disclaimer-header {
                 display: flex;
                 align-items: center;
@@ -233,6 +95,10 @@
                     margin: $spacing-m 0;
                 }
             }
+            .gm-progress-actions {
+                justify-content: flex-end;
+                gap: $spacing-s;
+            }
         }
     
         .installation-success-view-container {
@@ -246,10 +112,7 @@
                 align-items: center;
                 justify-content: center;
     
-                .gm-success-icon {
-                    background-color: var(--gm-success-color);
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
+                .gm-check-icon {
                     margin-bottom: $spacing-m;
                 }
                 .gm-success-text {
@@ -265,6 +128,7 @@
                 gap: $spacing-s;
             }
         }
+
         .installation-failed-view-container {
             height: 100%;
             display: flex;
@@ -277,9 +141,6 @@
                 justify-content: center;
     
                 .gm-failed-icon {
-                    background-color: var(--gm-error-color);
-                    mask-image: url('../assets/images/ic_alert.svg');
-                    -webkit-mask-image: url('../assets/images/ic_alert.svg');
                     margin-bottom: $spacing-m;
                 }
     
@@ -297,7 +158,5 @@
             }
         }
     }
-    
-    
 }
 

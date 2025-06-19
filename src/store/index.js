@@ -11,7 +11,7 @@ const initialState = {
     },
     isKeyboardEventsEnabled: false,
     isMouseEventsEnabled: false,
-    isDragAndDropForUploadFileEnabled: false,
+    isDragAndDropForUploadFileEnabled: true,
     trackedEvents: {
         isActive: false,
         events: [],

@@ -11,6 +11,7 @@
 @use 'components/fullscreen';
 @use 'components/toolbar';
 @use 'components/upload';
+@use 'components/gappsInstall';
 @use 'components/battery';
 @use 'components/gps';
 @use 'components/screenrecord';
@@ -29,3 +30,4 @@
 @use 'components/dropdown';
 @use 'components/chipTag';
 @use 'components/textArea';
+@use 'components/progressBar';

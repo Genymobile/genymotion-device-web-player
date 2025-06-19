@@ -1,24 +1,20 @@
 'use strict';
 const log = require('loglevel');
-
 /**
- * Factory function to create a custom switch button.
- * @namespace
- * @typedef {Object} SwitchButton
- * @property {Function} createSwitch - Function to create and return the switch button component.
- * @property {Function} slider - Function to create and return the slider component.
+ * Module for creating custom switch button components.
+ * @module switchButton
  */
-
-/**
- * Creates a custom switch button component.
- * @function
- * @memberof SwitchButton
- * @param {Object} options - Options for configuring the switch button.
- * @param {Function} [options.onChange] - Optional callback function to be executed when the switch state changes.
- * @returns {HTMLElement} - The switch button component as an HTML element. setState function is exposed to change the state of the switch button.
- */
-
 const switchButton = (() => {
+    /**
+     * Creates a custom switch button component.
+     * @param {Object} options - Configuration options for the switch button
+     * @param {Function} [options.onChange] - Callback function triggered when switch state changes
+     * @param {string} [options.classes] - Additional CSS classes to apply to the switch button
+     * @returns {Object} Object containing the switch button element and control methods
+     * @property {HTMLElement} element - The switch button DOM element
+     * @property {Function} setState - Method to programmatically set the switch state
+     * @property {Function} getState - Method to get the current switch state
+     */
     const createSwitch = ({onChange = null, classes = ''}) => {
         const switchDiv = document.createElement('div');
         switchDiv.className = classes + ' switch';
@@ -61,15 +57,25 @@ const switchButton = (() => {
 })();
 
 /**
- * Creates a custom slider component to set a value between a range.
- * @function
- * @param {Object} options - Options for configuring the slider.
- * @param {Function} [options.onChange] - Optional callback function to be executed when the slider value changes.
- * @param {boolean} [options.triggerOnChange] - Whether or not to trigger onChange when setting the value programmatically.
- * @returns {HTMLElement} - The slider component as an HTML element. setValue function is exposed to change the value of the slider.
+ * Module for creating custom slider components.
+ * @module slider
  */
-
 const slider = (() => {
+    /**
+     * Creates a custom slider component to set a value between a range.
+     * @function
+     * @param {Object} options - Options for configuring the slider
+     * @param {Function} [options.onChange] - Optional callback function to be executed when the slider value changes
+     * @param {Function} [options.onCursorMove] - Optional callback function to be executed when the cursor moves
+     * @param {number} [options.min=0] - Minimum value of the slider
+     * @param {number} [options.max=100] - Maximum value of the slider
+     * @param {number} [options.value=50] - Initial value of the slider
+     * @param {string} [options.classes=''] - Additional CSS classes to apply to the slider
+     * @returns {Object} Object containing the slider element and control methods
+     * @property {HTMLElement} element - The slider DOM element
+     * @property {Function} setValue - Method to programmatically set the slider value
+     * @property {Function} getValue - Method to get the current slider value
+     */
     const createSlider = ({onChange = null, onCursorMove = null, min = 0, max = 100, value = 50, classes = ''}) => {
         if (min >= max) {
             throw new Error('`min` must be less than `max`.');
@@ -172,18 +178,32 @@ const slider = (() => {
 })();
 
 /**
- * Creates a custom text input component.
- * @function
- * @param {Object} options - Options for configuring the text input.
- * @param {Function} [options.onChange] - Optional callback function to be executed when the text input value changes.
- * @param {string} [options.value] - Optional initial value for the text input.
- * @param {RegExp} [options.regexFilter] - Optional regular expression to filter the input value.
- * @param {string} [options.appendText] - Optional text to append to the input field.
- * @param {string} [options.unitText] - Optional text to show when there's no error message.
- * @returns {HTMLElement} - The text input component as an HTML element. setValue function is exposed to change the value of the text input.
+ * Module for creating custom text input components.
+ * @module textInput
  */
 
 const textInput = (() => {
+    /**
+     * Creates a custom text input component.
+     * @param {Object} options - Configuration options for the text input
+     * @param {Function} [options.onChange] - Callback function triggered when input value changes
+     * @param {Function} [options.onBlur] - Callback function triggered when input loses focus
+     * @param {string} [options.value=''] - Initial value for the text input
+     * @param {RegExp} [options.regexFilter] - Regular expression to filter input values
+     * @param {RegExp} [options.regexValidField] - Regular expression to validate input values
+     * @param {string} [options.appendText=''] - Text to append to the input field
+     * @param {string} [options.unitText=''] - Text shown when there's no error message
+     * @param {string} [options.classes=''] - Additional CSS classes for the input container
+     * @param {string} [options.placeholder=''] - Placeholder text for the input
+     * @param {boolean} [options.messageField=false] - Whether to show message field
+     * @returns {Object} Object containing the text input component and methods
+     * @returns {HTMLElement} returns.element - The text input component as an HTML element
+     * @returns {Function} returns.setValue - Function to update the input value
+     * @returns {Function} returns.checkValidity - Function to check if the input value is valid
+     * @returns {Function} returns.setReadOnly - Function to set the read-only status of the input
+     * @returns {Function} returns.setErrorMessage - Function to set the error message of the input
+     */
+
     const createTextInput = ({
         onChange = null,
         onBlur = null,
@@ -325,6 +345,11 @@ const textInput = (() => {
     return {createTextInput};
 })();
 
+/**
+ * Module for creating custom dropdown components.
+ * @module dropdownSelect
+ */
+
 const dropdownSelect = (() => {
     /**
      * Creates a custom dropdown component.
@@ -336,6 +361,11 @@ const dropdownSelect = (() => {
      * @param {string} [options.classes] - Additional classes to apply to the dropdown.
      * @param {number} [options.dropdownMaxHeight] - Maximum height of the dropdown menu.
      * @returns {Object} - Dropdown component with methods to interact with it.
+     * @property {HTMLElement} element - The dropdown DOM element
+     * @property {Function} getValue - Method to get the current selected value
+     * @property {Function} setValue - Method to set the selected value
+     * @property {Function} updateOptions - Method to update the options displayed in the dropdown menu
+     * @property {Function} setDisabled - Method to set the disabled status of the dropdown
      */
     const createDropdown = ({
         items = [],
@@ -514,8 +544,23 @@ const dropdownSelect = (() => {
     return {createDropdown};
 })();
 
+/**
+ * Module for creating custom chip tag components.
+ * @module chipTag
+ */
+
 const chipTag = (() => {
     let tagDiv = null;
+    /**
+     * Creates a custom chip tag component.
+     * @param {Object} options - Configuration options for the chip tag
+     * @param {string} [options.type='success'] - Type of the chip tag
+     * @param {string} [options.text='Applied'] - Text to display in the chip tag
+     * @returns {Object} Object containing the chip tag element and methods
+     * @property {HTMLElement} element - The chip tag DOM element
+     * @property {Function} setType - Method to set the type of the chip tag
+     * @property {Function} setValue - Method to set the text of the chip tag
+     */
     const createChip = ({type = 'success', text = 'Applied'} = {}) => {
         tagDiv = document.createElement('div');
         tagDiv.className = 'gm-tag-' + type;
@@ -543,4 +588,63 @@ const chipTag = (() => {
     return {createChip};
 })();
 
-module.exports = {switchButton, slider, textInput, dropdownSelect, chipTag};
+/**
+ * Module for creating custom progress bar components.
+ * @module progressBar
+ */
+
+const progressBar = (() => {
+    /**
+     * Creates a custom progress bar component.
+     * @param {Object} options - Configuration options
+     * @param {Function} [options.onChange] - Callback function triggered when progress value changes
+     * @param {number} [options.value=0] - Initial value
+     * @param {number} [options.max=100] - Maximum value
+     * @returns {Object} - Progress bar instance
+     */
+    const createProgressBar = ({value = 0, onChange = null, max = 100} = {}) => {
+        // Create container
+        const container = document.createElement('div');
+        container.className = 'gm-progress-container';
+
+        // Create bar
+        const bar = document.createElement('div');
+        bar.className = 'gm-progress-bar';
+        container.appendChild(bar);
+
+        // Update the bar width
+        const update = () => {
+            const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+            bar.style.width = `${percentage}%`;
+        };
+
+        const setValue = (newValue) => {
+            value = Math.max(0, Math.min(newValue, max));
+            update();
+            if (onChange) {
+                onChange(value);
+            }
+        };
+
+        if (onChange) {
+            onChange(value);
+        }
+
+        // Initial render
+        update();
+
+        return {
+            element: container,
+            setValue,
+            getValue: () => value,
+            setMax: (newMax) => {
+                max = newMax;
+                update();
+            },
+        };
+    };
+
+    return {createProgressBar};
+})();
+
+module.exports = {switchButton, slider, textInput, dropdownSelect, chipTag, progressBar};

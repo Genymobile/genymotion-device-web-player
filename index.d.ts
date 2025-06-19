@@ -92,6 +92,7 @@ interface RendererSetupOptions {
     connectionFailedURL?: string;
     diskIO?: boolean; // Default: true
     fileUpload?: boolean; // Default: true
+    gappsInstall?: boolean; // Default: true
     fileUploadUrl?: string;
     fullscreen?: boolean; // Default: true
     gamepad?: boolean; // Default: true

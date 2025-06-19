@@ -1,6 +1,7 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
+const log = require('loglevel');
 
 const LEFT = 0;
 const RIGHT = 1;
@@ -32,6 +33,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         // Register plugin
         this.instance.fileUpload = this;
 
+        this.toolbarBtn = null;
         this.root = this.instance.videoWrapper;
         this.stepper = {};
         this.currentStep = 'homeScreen';
@@ -39,56 +41,34 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.hasError = false;
         this.flashing = false;
         this.canvasContext = null;
+        this.loaderWorker = null;
         this.opengappsInstalled = false;
         this.capabilityAvailable = false;
 
-        if (window.Worker) {
-            let fileUploaderWorker = require('../worker/FileUploaderWorker');
-            fileUploaderWorker = fileUploaderWorker
-                .toString()
-                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
-            const src = new Blob([fileUploaderWorker], {type: 'application/javascript'});
-            this.loaderWorker = new Worker(URL.createObjectURL(src));
-            this.loaderWorker.onmessage = (event) => {
-                const msg = event.data;
-                switch (msg.code) {
-                    case 'SUCCESS':
-                        this.onUploadSuccess();
-                        break;
-                    case 'FAIL':
-                        this.onUploadFailure();
-                        break;
-                    case 'PROGRESS':
-                        this.setUploadProgress(msg.value);
-                        break;
-                    default:
-                        break;
-                }
-            };
+        this.removeListerDragAndDropOver = null;
+        this.removeListerDragAndDropLeave = null;
+        this.removeListerDragAndDropDrop = null;
+
+        this.isDesactivated = false;
+
+        if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
+            this.enableDragOver();
+        } else {
+            this.disableDragOver();
         }
 
-        this.root.ondragenter = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
+        this.instance.store.subscribe(
+            ({isDragAndDropForUploadFileEnabled}) => {
+                if (isDragAndDropForUploadFileEnabled){
+                    this.enableDragOver();
+                } else {
+                    this.disableDragOver();
+                }
+            },
+            ['isDragAndDropForUploadFileEnabled'],
+        );
 
-        this.root.ondragover = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
-
-        this.root.ondragleave = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
-
-        this.root.ondrop = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            if (!this.isUploading) {
-                this.upload(event.dataTransfer.files);
-            }
-        };
+        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
 
         // create stepper
         this.createStepper();
@@ -96,6 +76,36 @@ module.exports = class FileUpload extends OverlayPlugin {
         // Render components
         this.registerToolbarButton();
         this.renderWidget();
+
+        if (window.Worker) {
+            try {
+                this.loaderWorker = this.instance.createFileUploadWorker();
+
+                this.loaderWorker.onmessage = (event) => {
+                    const msg = event.data;
+                    switch (msg.code) {
+                        case 'SUCCESS':
+                            this.onUploadSuccess();
+                            this.toolbarBtn.setIndicator('');
+                            this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                            break;
+                        case 'FAIL':
+                            this.onUploadFailure();
+                            this.toolbarBtn.setIndicator('');
+                            this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                            break;
+                        case 'PROGRESS':
+                            this.setUploadProgress(msg.value);
+                            break;
+                        default:
+                            break;
+                    }
+                };
+            } catch (error) {
+                log.error(error);
+                this.isDesactivated = true;
+            }
+        }
 
         /*
          * Listen for systempatcher messages: "status <ready/downloading/installing> <opengapps>"
@@ -115,7 +125,7 @@ module.exports = class FileUpload extends OverlayPlugin {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-uploader-button',
             title: this.i18n.UPLOADER_TITLE || 'File upload',
@@ -177,6 +187,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         if (files.length <= 0) {
             return;
         }
+
+        this.toolbarBtn.setIndicator('notification');
+        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
 
         this.createUploadProgressCanvas();
         this.setUploadProgress(0);
@@ -389,6 +402,9 @@ module.exports = class FileUpload extends OverlayPlugin {
      */
     setAvailability(available) {
         this.capabilityAvailable = available;
+        if (this.isDesactivated){
+            this.toolbarBtn.disable();
+        }
     }
 
     /**
@@ -773,5 +789,36 @@ module.exports = class FileUpload extends OverlayPlugin {
         textCloud.className = className;
         textCloud.innerHTML = text;
         return textCloud;
+    }
+
+    disableDragOver() {
+        this.removeListerDragAndDropOver?.();
+        this.removeListerDragAndDropDrop?.();
+        this.removeListerDragAndDropLeave?.();
+    }
+
+    enableDragOver() {
+        this.disableDragOver();
+
+        this.removeListerDragAndDropOver = this.instance.addListener(this.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.removeListerDragAndDropLeave =
+            this.instance.addListener(this.root, 'dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+        this.removeListerDragAndDropDrop =
+            this.instance.addListener(this.root, 'drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (!this.isUploading) {
+                    this.upload(event.dataTransfer.files);
+                }
+            });
     }
 };

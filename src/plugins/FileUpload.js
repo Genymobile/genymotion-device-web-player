@@ -32,6 +32,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         // Register plugin
         this.instance.fileUpload = this;
 
+        this.toolbarBtn = null;
         this.root = this.instance.videoWrapper;
         this.stepper = {};
         this.currentStep = 'homeScreen';
@@ -43,6 +44,10 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.opengappsInstalled = false;
         this.capabilityAvailable = false;
 
+        this.removeListerDragAndDropOver = null;
+        this.removeListerDragAndDropLeave = null;
+        this.removeListerDragAndDropDrop = null;
+
         if (window.Worker) {
             this.loaderWorker = this.instance.createFileUploadWorker();
 
@@ -51,9 +56,13 @@ module.exports = class FileUpload extends OverlayPlugin {
                 switch (msg.code) {
                     case 'SUCCESS':
                         this.onUploadSuccess();
+                        this.toolbarBtn.setIndicator('');
+                        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
                         break;
                     case 'FAIL':
                         this.onUploadFailure();
+                        this.toolbarBtn.setIndicator('');
+                        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
                         break;
                     case 'PROGRESS':
                         this.setUploadProgress(msg.value);
@@ -64,28 +73,24 @@ module.exports = class FileUpload extends OverlayPlugin {
             };
         }
 
-        this.root.ondragenter = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
+        if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
+            this.enableDragOver();
+        } else {
+            this.disableDragOver();
+        }
 
-        this.root.ondragover = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
+        this.instance.store.subscribe(
+            ({isDragAndDropForUploadFileEnabled}) => {
+                if (isDragAndDropForUploadFileEnabled){
+                    this.enableDragOver();
+                } else {
+                    this.disableDragOver();
+                }
+            },
+            ['isDragAndDropForUploadFileEnabled'],
+        );
 
-        this.root.ondragleave = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        };
-
-        this.root.ondrop = (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            if (!this.isUploading) {
-                this.upload(event.dataTransfer.files);
-            }
-        };
+        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
 
         // create stepper
         this.createStepper();
@@ -112,7 +117,7 @@ module.exports = class FileUpload extends OverlayPlugin {
      * Add the button to the renderer toolbar.
      */
     registerToolbarButton() {
-        this.instance.toolbarManager.registerButton({
+        this.toolbarBtn = this.instance.toolbarManager.registerButton({
             id: this.constructor.name,
             iconClass: 'gm-uploader-button',
             title: this.i18n.UPLOADER_TITLE || 'File upload',
@@ -174,6 +179,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         if (files.length <= 0) {
             return;
         }
+
+        this.toolbarBtn.setIndicator('notification');
+        this.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
 
         this.createUploadProgressCanvas();
         this.setUploadProgress(0);
@@ -770,5 +778,36 @@ module.exports = class FileUpload extends OverlayPlugin {
         textCloud.className = className;
         textCloud.innerHTML = text;
         return textCloud;
+    }
+
+    disableDragOver() {
+        this.removeListerDragAndDropOver?.();
+        this.removeListerDragAndDropDrop?.();
+        this.removeListerDragAndDropLeave?.();
+    }
+
+    enableDragOver() {
+        this.disableDragOver();
+
+        this.removeListerDragAndDropOver = this.instance.addListener(this.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.removeListerDragAndDropLeave =
+            this.instance.addListener(this.root, 'dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+        this.removeListerDragAndDropDrop =
+            this.instance.addListener(this.root, 'drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (!this.isUploading) {
+                    this.upload(event.dataTransfer.files);
+                }
+            });
     }
 };

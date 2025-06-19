@@ -63,6 +63,38 @@ module.exports = class APIManager {
                 'Enable or disable the tracking of analytic events. If disabled, all tracked events will be cleared.',
         });
 
+        // Register open a widget
+        this.registerFunction({
+            name: 'openWidget',
+            category: 'widget',
+            fn: (widgetName) => {
+                this.instance.store.dispatch({
+                    type: 'OVERLAY_OPEN',
+                    payload: {
+                        overlayID: widgetName,
+                        toOpen: true,
+                    },
+                });
+            },
+            description: 'Open the modal of a widget by specifying its constructor name.',
+        });
+
+        // Register close a widget
+        this.registerFunction({
+            name: 'closeWidget',
+            category: 'widget',
+            fn: (widgetName) => {
+                this.instance.store.dispatch({
+                    type: 'OVERLAY_OPEN',
+                    payload: {
+                        overlayID: widgetName,
+                        toOpen: false,
+                    },
+                });
+            },
+            description: 'Close the modal of a widget by specifying its constructor name.',
+        });
+
         // Register a function to process tracked events
         this.registerFunction({
             name: 'trackEvents',

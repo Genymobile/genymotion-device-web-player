@@ -16,7 +16,7 @@ class OverlayPlugin {
     constructor(instance) {
         // Core instance properties
         this.instance = instance;
-        this.overlayID = generateUID();
+        this.overlayID = this.constructor.name || generateUID();
 
         // Modal state management
         this.widget = null;

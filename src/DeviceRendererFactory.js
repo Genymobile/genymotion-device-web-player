@@ -151,13 +151,18 @@ module.exports = class DeviceRendererFactory {
         store(instance);
 
         // Add a class to the wrapper when we are waiting for the stream to be ready in order to display a loader
-        instance.store.subscribe(({isWebRTCConnectionReady}) => {
+        instance.store.subscribe(
+            ({isWebRTCConnectionReady}) => {
+                if (instance?.wrapper) {
             if (isWebRTCConnectionReady) {
                 instance.wrapper.classList.remove('waitingForStream');
             } else {
                 instance.wrapper.classList.add('waitingForStream');
             }
-        });
+                }
+            },
+            ['isWebRTCConnectionReady'],
+        );
 
         instance.apiManager = new APIManager(instance);
         instance.toolbarManager = new ToolbarManager(instance);

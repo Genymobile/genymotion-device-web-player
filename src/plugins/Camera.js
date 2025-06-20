@@ -43,7 +43,14 @@ module.exports = class Camera extends OverlayPlugin {
             title: this.instance.options.microphone
                 ? this.i18n.CAMERA_MIC_TITLE || 'Camera and microphone injection'
                 : this.i18n.CAMERA_TITLE || 'Camera injection',
-            onClick: () => this.instance.mediaManager.toggleVideoStreaming(),
+            onClick: async() => {
+                await this.instance.mediaManager.toggleVideoStreaming();
+                if (this.instance.mediaManager.videoStreaming) {
+                    this.toolbarBtn.setIndicator('active');
+                } else {
+                    this.toolbarBtn.setIndicator('');
+                }
+            },
         });
     }
 

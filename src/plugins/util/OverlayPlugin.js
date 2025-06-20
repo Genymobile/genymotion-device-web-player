@@ -315,25 +315,22 @@ class OverlayPlugin {
         const modalRect = this.widget.getBoundingClientRect();
         // modal can be set outside by CSS, so if position is saved we take this position
         const calcModalRect = {
-            left: modalRect.left,
-            top: modalRect.top,
             right: modalRect.right,
             bottom: modalRect.bottom,
         };
-        if (this.position.x) {
+        if (this.position.x !== null) {
             calcModalRect.left = this.position.x;
             calcModalRect.right = this.position.x + modalRect.width;
         }
-        if (this.position.y) {
+        if (this.position.y !== null) {
             calcModalRect.top = this.position.y;
             calcModalRect.bottom = this.position.y + modalRect.height;
         }
+
         // Check if modal is outside video wrapper bounds
         if (
-            calcModalRect.right > videoWrapperRect.right ||
-            calcModalRect.left < videoWrapperRect.left ||
-            calcModalRect.bottom > videoWrapperRect.bottom ||
-            calcModalRect.top < videoWrapperRect.top
+            calcModalRect.right > videoWrapperRect.width ||
+            calcModalRect.bottom > videoWrapperRect.height
         ) {
             return true;
         }
@@ -444,6 +441,7 @@ class OverlayPlugin {
     openOverlay() {
         const {button: toolbarButton} = this.instance.toolbarManager.getButtonById(this.constructor.name);
         const isModalOutsideVideoWrapper = this.checkModalPositionOutsideVideoWrapper();
+
         if (isModalOutsideVideoWrapper) {
             this.position.x = null;
             this.position.y = null;

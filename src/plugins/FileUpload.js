@@ -57,6 +57,11 @@ module.exports = class FileUpload extends OverlayPlugin {
         } catch (error) {
             log.error(error, this.toolbarBtn);
             this.toolbarBtn.disable();
+            this.instance.tooltipManager.setTooltip(
+                this.toolbarBtn.htmlElement,
+                i18n.ERROR_ON_LOAD_FILE_UPLOAD || "Upload worker can't be load, check the fileUploadUrl option",
+                this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+            );
         }
     }
 

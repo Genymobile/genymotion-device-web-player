@@ -42,7 +42,27 @@ class ToolbarManager {
             return null;
         }
 
-        // Store the button definition in the registry
+        // Create HTML element
+        const button = document.createElement('li');
+        const buttonIcon = document.createElement('div');
+        buttonIcon.className = `gm-icon-button ${iconClass}`;
+        buttonIcon.title = title;
+        for (const [key, value] of Object.entries(dataAttributes)) {
+            buttonIcon.setAttribute(`data-${key}`, value);
+        }
+        button.appendChild(buttonIcon);
+
+        if (onClick) {
+            button.onclick = onClick;
+        }
+        if (onMousedown) {
+            button.onmousedown = onMousedown;
+        }
+        if (onMouseup) {
+            button.onmouseup = onMouseup;
+        }
+
+        // Store the button definition and elements in the registry
         this.buttonRegistry.set(id, {
             iconClass,
             title,
@@ -51,6 +71,8 @@ class ToolbarManager {
             onMouseup,
             dataAttributes,
             isDisabled,
+            button,
+            buttonIcon
         });
 
         // Return control functions for future manipulation
@@ -62,6 +84,7 @@ class ToolbarManager {
             setActive: (isActive = true) => this.setButtonActive(id, isActive),
             setIndicator: (typeOfIndicator) => this.setButtonIndicator(id, typeOfIndicator),
             getIndicator: () => this.getButtonIndicator(id),
+            htmlElement: button
         };
     }
 
@@ -76,42 +99,21 @@ class ToolbarManager {
             return;
         }
 
-        const {iconClass, title, dataAttributes, isDisabled, indicator} =
-            this.buttonRegistry.get(id);
+        const buttonData = this.buttonRegistry.get(id);
+        const {button} = buttonData;
 
-        const button = document.createElement('li');
-        const buttonIcon = document.createElement('div');
-        buttonIcon.className = `gm-icon-button ${iconClass}`;
-        buttonIcon.title = title;
-
-        for (const [key, value] of Object.entries(dataAttributes)) {
-            buttonIcon.setAttribute(`data-${key}`, value);
-        }
-
-        button.appendChild(buttonIcon);
+        // Adding HTML element to the DOM
         if (isInfloatingBar) {
             this.floatingToolbar.appendChild(button);
         } else {
             this.toolbar.appendChild(button);
         }
 
-        // Update registry with the DOM elements
+        // Update registry with isInfloatingBar
         this.buttonRegistry.set(id, {
-            ...this.buttonRegistry.get(id),
-            button,
-            buttonIcon,
+            ...buttonData,
             isInfloatingBar,
         });
-
-        if (!isDisabled) {
-            this.enableButton(id);
-        } else {
-            this.disableButton(id);
-        }
-
-        if (indicator) {
-            this.setButtonIndicator(id, indicator);
-        }
     }
 
     /**
@@ -133,21 +135,12 @@ class ToolbarManager {
         }
 
         const {button, buttonIcon} = buttonData;
-        button.classList.add('gm-disabled-widget-pop-up');
+        this.instance.tooltipManager.setTooltip(
+            button,
+            this.instance.options.i18n.NOT_SUPPORTED || 'Not currently supported',
+            this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+        );
         buttonIcon.classList.add('gm-disabled-icon-button');
-        /*
-         * Calculate location of the button to display the pop-up next
-         * and update the CSS variable.
-         * This trick is used to position the pop-up next to the button in the toolbar which has an overflow.
-         */
-        const rect = button.getBoundingClientRect();
-        let x = 0;
-        if (this.instance.options.toolbarPosition === 'right') {
-            x = parseFloat(rect.width) + 20;
-        } else {
-            x = parseFloat(rect.left) + 20;
-        }
-        button.style.setProperty('--gm-working-disabled-widget-pop-up-x', x + 'px');
 
         button.onclick = null;
         button.onmousedown = null;
@@ -173,7 +166,9 @@ class ToolbarManager {
         }
 
         const {button, buttonIcon, onClick, onMousedown, onMouseup} = buttonData;
-        button.classList.remove('gm-disabled-widget-pop-up');
+
+        this.instance.tooltipManager.removeTooltip(button);
+
         buttonIcon.classList.remove('gm-disabled-icon-button');
 
         if (onClick) {

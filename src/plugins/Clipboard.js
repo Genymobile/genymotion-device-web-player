@@ -49,10 +49,7 @@ module.exports = class Clipboard extends OverlayPlugin {
                 if (this.clipboard !== this.clipboardInput.value) {
                     this.container.classList.remove('gm-clipboard-saved');
                 }
-                if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
-                    // if the widget is not opened, we update the clipboard input
-                    this.clipboardInput.value = this.clipboard;
-                }
+                this.clipboardInput.value = this.clipboard;
             } catch (error) {
                 log.warn('Malformed clipboard content');
             }

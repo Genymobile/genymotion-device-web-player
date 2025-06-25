@@ -170,7 +170,7 @@ module.exports = (env, argv) => {
                 template: './example/geny-window.html',
                 filename: 'example/geny-window.html',
                 inject: false,
-                minify: argv.mode === 'production',
+                minify: false,
                 templateParameters: {version: version},
             }),
             new CopyWebpackPlugin({
@@ -186,6 +186,7 @@ module.exports = (env, argv) => {
             minimize: argv.mode === 'production',
             minimizer: [
                 new TerserPlugin({
+                    exclude: /geny-window\.js$/,
                     extractComments: false,
                     terserOptions: {
                         compress: {
@@ -196,6 +197,7 @@ module.exports = (env, argv) => {
                 ...(argv.mode === 'production'
                     ? [
                           new CssMinimizerPlugin({
+                              exclude: /geny-window\.css$/,
                               minimizerOptions: {
                                   preset: [
                                       'default',

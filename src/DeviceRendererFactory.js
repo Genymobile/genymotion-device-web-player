@@ -189,6 +189,7 @@ module.exports = class DeviceRendererFactory {
     loadTemplate(dom, options) {
         dom.innerHTML = `
         <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''} 
+        ${options.floatingToolbar ? 'floatingBarDisplayed' : ''}
         toolbarPosition-${options.toolbarPosition}">
             <div class="player-screen-wrapper">
                 <div class="gm-video-wrapper">

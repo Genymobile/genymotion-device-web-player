@@ -487,7 +487,6 @@ class InitialView {
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP APK FILE TO INSTALL',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             accept: '.apk',
-            maxFileSize: 900,
             classes: 'gm-apk-uploader',
             i18n: this.plugin.i18n,
         });

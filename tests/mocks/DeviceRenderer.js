@@ -3,6 +3,7 @@
 const Original = require('../../src/DeviceRenderer');
 const DeviceRendererFactory = require('../../src/DeviceRendererFactory');
 const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
+const OriginalTooltipManager = require('../../src/plugins/util/TooltipManager');
 const OriginalApiManager = require('../../src/APIManager');
 
 const store = require('../../src/store/index');
@@ -25,6 +26,9 @@ class ToolBarManager extends OriginalToolbarManager {
 }
 module.exports = class DeviceRenderer extends Original {
     constructor(options = {}) {
+        if (!options.i18n){
+            options.i18n = {};
+        }
         // we use the factory to load the template, like in production, this way the template generated takes the options
         const factory = new DeviceRendererFactory();
 
@@ -40,6 +44,7 @@ module.exports = class DeviceRenderer extends Original {
         this.outgoingMessages = [];
         this.apiManager = new OriginalApiManager(this);
         this.toolbarManager = new ToolBarManager(this);
+        this.tooltipManager = new OriginalTooltipManager();
         // Load store since it's deviceRendererFactory which load it
         store(this);
     }

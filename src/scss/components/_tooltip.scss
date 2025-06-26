@@ -1,0 +1,57 @@
+@use '../base/variables' as *;
+
+.gm-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: var(--gm-secondary-variant-color);
+  color: var(--gm-on-secondary-color);
+  padding: 8px 14px;
+  border-radius: 4px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 0.18s ease-in-out, transform 0.18s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  left: -2000px;
+  top: -2000px;
+}
+
+.gm-tooltip.gm-showTooltip {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  left: unset;
+  top: unset;
+}
+
+.gm-tooltip-arrow {
+  width: 16px;
+  height: 16px;
+  background: var(--gm-secondary-variant-color);
+  position: absolute;
+  z-index: -1;
+  transform: rotate(45deg);
+}
+
+.gm-tooltip.bottom .gm-tooltip-arrow {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+.gm-tooltip.top .gm-tooltip-arrow {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+.gm-tooltip.left .gm-tooltip-arrow {
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+.gm-tooltip.right .gm-tooltip-arrow {
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}

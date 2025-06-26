@@ -304,6 +304,7 @@
             transition: opacity 0.5s;
         }
         &.waitingForStream {
+            pointer-events: none;
             mask-image: url('../assets/images/loader.svg');
             -webkit-mask-image: url('../assets/images/loader.svg');
             -webkit-mask-size: contain;

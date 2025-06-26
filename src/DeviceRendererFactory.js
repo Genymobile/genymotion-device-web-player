@@ -7,6 +7,7 @@ const defaultsDeep = require('lodash/defaultsDeep');
 const store = require('./store');
 const APIManager = require('./APIManager');
 const ToolbarManager = require('./plugins/util/ToolBarManager');
+const TooltipManager = require('./plugins/util/TooltipManager');
 
 const log = require('loglevel');
 log.setDefaultLevel('debug');
@@ -168,6 +169,7 @@ module.exports = class DeviceRendererFactory {
 
         instance.apiManager = new APIManager(instance);
         instance.toolbarManager = new ToolbarManager(instance);
+        instance.tooltipManager = new TooltipManager(instance);
 
         this.instances.push(instance);
 

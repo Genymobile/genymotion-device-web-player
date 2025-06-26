@@ -347,6 +347,10 @@ class InitialView {
         this.i18n = plugin.i18n;
         this.fileUploadWorker = null;
 
+        this.removeListenerDragAndDropOver = null;
+        this.removeListenerDragAndDropLeave = null;
+        this.removeListenerDragAndDropDrop = null;
+
         try {
             this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
             this.fileUploadWorker.onmessage = (event) => {
@@ -496,6 +500,28 @@ class InitialView {
         container.appendChild(separator2);
         container.appendChild(apkSection);
 
+        // Attach the drag and drop events on root to handle the drag of an apk
+        if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
+            this.fileUploaderComponent.setEnabled(true);
+            this.addListenerOnRoot();
+        } else {
+            this.fileUploaderComponent.setEnabled(false);
+            this.removeListenerOnRoot();
+        }
+
+        this.instance.store.subscribe(
+            ({isDragAndDropForUploadFileEnabled}) => {
+                if (isDragAndDropForUploadFileEnabled) {
+                    this.fileUploaderComponent.setEnabled(true);
+                    this.addListenerOnRoot();
+                } else {
+                    this.fileUploaderComponent.setEnabled(false);
+                    this.removeListenerOnRoot();
+                }
+            },
+            ['isDragAndDropForUploadFileEnabled'],
+        );
+
         return container;
     }
 
@@ -510,6 +536,36 @@ class InitialView {
 
         const msg = {type: 'upload', file};
         this.fileUploadWorker.postMessage(msg);
+    }
+
+    addListenerOnRoot() {
+        this.removeListenerDragAndDropOver = this.instance.addListener(this.instance.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.removeListenerDragAndDropLeave =
+            this.instance.addListener(this.instance.root, 'dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+        this.removeListenerDragAndDropDrop =
+            this.instance.addListener(this.instance.root, 'drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const file = event.dataTransfer.files[0];
+                if (file && file.name && file.name.toLowerCase().endsWith('.apk')) {
+                    this.fileUploaderComponent.startUpload(file);
+                }
+            });
+    }
+
+    removeListenerOnRoot() {
+        this.removeListenerDragAndDropOver?.();
+        this.removeListenerDragAndDropDrop?.();
+        this.removeListenerDragAndDropLeave?.();
     }
 }
 

@@ -164,6 +164,7 @@ module.exports = class FileUpload extends OverlayPlugin {
         return container;
     }
 
+    // Attach the drag and drop events on root to handle the drag of all file except apk (which is handle in gapps plugin)
     addListenerOnRoot() {
         this.removeListenerDragAndDropOver = this.instance.addListener(this.instance.root, 'dragover', (event) => {
             event.preventDefault();
@@ -181,7 +182,9 @@ module.exports = class FileUpload extends OverlayPlugin {
                 event.preventDefault();
                 event.stopPropagation();
 
-                this.fileUploader.startUpload(event.dataTransfer.files[0]);
+                if (!event.dataTransfer.files[0].name.toLowerCase().endsWith('.apk')) {
+                    this.fileUploader.startUpload(event.dataTransfer.files[0]);
+                }
             });
     }
 

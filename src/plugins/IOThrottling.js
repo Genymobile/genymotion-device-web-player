@@ -125,6 +125,17 @@ module.exports = class IOThrottling extends OverlayPlugin {
             value: '50',
             classes: 'gm-iothrottling-readbyterate',
             regexFilter: /^[0-9]*$/,
+            messageField: true,
+            onChange: (value) => {
+                const num = Number(value);
+                if (isNaN(num) || num < 0 || num > 4095) {
+                    this.readByteRate.setErrorMessage('0 to 4095');
+                    this.applyBtn.disabled = true;
+                } else {
+                    this.readByteRate.setErrorMessage('');
+                    this.applyBtn.disabled = false;
+                }
+            }
         });
 
         const readByteRateSpeedText = document.createElement('div');
@@ -151,13 +162,13 @@ module.exports = class IOThrottling extends OverlayPlugin {
 
         statusDiv.appendChild(appliedTag.element);
 
-        const applyBtn = document.createElement('button');
-        applyBtn.className = 'gm-btn';
-        applyBtn.innerHTML = this.i18n.IOTHROTTLING_UPDATE || 'Apply';
-        applyBtn.onclick = this.sendDataToInstance.bind(this);
+        this.applyBtn = document.createElement('button');
+        this.applyBtn.className = 'gm-btn';
+        this.applyBtn.innerHTML = this.i18n.IOTHROTTLING_UPDATE || 'Apply';
+        this.applyBtn.onclick = this.sendDataToInstance.bind(this);
 
         applyBtnDiv.appendChild(statusDiv);
-        applyBtnDiv.appendChild(applyBtn);
+        applyBtnDiv.appendChild(this.applyBtn);
 
         // Add clear cache button
         const clearCacheDiv = document.createElement('div');

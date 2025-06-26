@@ -129,7 +129,6 @@ module.exports = class FileUpload extends OverlayPlugin {
             },
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP YOUR FILE',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
-            maxFileSize: 900,
             i18n: this.i18n,
         });
 

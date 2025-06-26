@@ -50,6 +50,16 @@ module.exports = class FileUpload extends OverlayPlugin {
                     case 'PROGRESS':
                         this.fileUploader.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
                         break;
+                    case 'SOCKET_FAIL':
+                        this.fileUploader.showUploadError(
+                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                            'Something went wrong while connecting to the ws file upload url.'
+                        );
+                        this.fileUploader.setEnabled(false);
+                        break;
+                    case 'SOCKET_SUCCESS':
+                        this.fileUploader.reset();
+                        break;
                     default:
                         break;
                 }

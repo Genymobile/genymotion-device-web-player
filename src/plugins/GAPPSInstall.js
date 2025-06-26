@@ -378,6 +378,16 @@ class InitialView {
                     case 'PROGRESS':
                         this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
                         break;
+                    case 'SOCKET_FAIL':
+                        this.fileUploaderComponent.showUploadError(
+                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                            'Something went wrong while connecting to the ws file upload url.'
+                        );
+                        this.fileUploaderComponent.setEnabled(false);
+                        break;
+                    case 'SOCKET_SUCCESS':
+                        this.fileUploaderComponent.reset();
+                        break;
                     default:
                         break;
                 }

@@ -76,7 +76,7 @@ describe('FileUploaderWorker', () => {
             expect(global.WebSocket).toHaveBeenCalledWith('ws://test.com');
             expect(mockSocket.binaryType).toBe('arraybuffer');
             expect(mockSocket.onopen).toBe(worker.onOpen);
-            expect(mockSocket.onerror).toBe(worker.onFailure);
+            expect(mockSocket.onerror).toBe(worker.onSocketFailure);
             expect(mockSocket.onmessage).toBe(worker.onSocketMsg);
             expect(mockSocket.onclose).toBe(worker.onClose);
         });
@@ -152,11 +152,11 @@ describe('FileUploaderWorker', () => {
         });
 
         test('handles connection failure', () => {
-            worker.onFailure();
+            worker.onSocketFailure();
 
             expect(global.self.postMessage).toHaveBeenCalledWith({
                 type: 'FILE_UPLOAD',
-                code: 'FAIL'
+                code: 'SOCKET_FAIL'
             });
             expect(worker.isUploading).toBe(false);
         });

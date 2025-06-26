@@ -52,14 +52,19 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            /* override the input error component css to keep the vertical align */
+            .text-input-bottom{
+                position: absolute;
+                width: 96px;
+            }
             .gm-iothrottling-readbyterate {
-                width: 49px;
+                width: 96px;
                 input {
                     text-align: center;
                 }
             }
             .gm-units {
-                margin-left: 20px;
+                margin-left: 8px;
             }
         }
     }

@@ -67,8 +67,9 @@ const fileUploader = (() => {
         const dragDropTextDiv = document.createElement('div');
         dragDropTextDiv.className = 'drop-text';
         dragDropTextDiv.innerHTML = `<div class='drop-text-1'>
-            <b>${dragDropText}</b>`;
-
+            <b>${dragDropText}</b>
+            </div>
+            <div class='drop-text-2'>${i18n.OR || 'or'}</div>`;
         const browseButton = document.createElement('button');
         browseButton.innerHTML = browseButtonText;
         browseButton.className = 'gm-btn gm-gradient-button';

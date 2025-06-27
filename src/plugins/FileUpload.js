@@ -50,6 +50,16 @@ module.exports = class FileUpload extends OverlayPlugin {
                     case 'PROGRESS':
                         this.fileUploader.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
                         break;
+                    case 'SOCKET_FAIL':
+                        this.fileUploader.showUploadError(
+                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                            'Something went wrong while connecting to the server.'
+                        );
+                        this.fileUploader.setEnabled(false);
+                        break;
+                    case 'SOCKET_SUCCESS':
+                        this.fileUploader.reset();
+                        break;
                     default:
                         break;
                 }
@@ -100,9 +110,9 @@ module.exports = class FileUpload extends OverlayPlugin {
         const text = document.createElement('div');
         text.className = 'gm-text';
         text.innerHTML = this.i18n.FILE_UPLOAD_TEXT ||
-            `You can upload files to the device from here.
-             Application APK files and flashable ZIP archives will be installed, 
-             other file types will be copied to <b>/sdcard/download</b> folder on the device.`;
+            `You can upload files from here.
+             Application (APK) files and flashable ZIP archives will be installed;
+             other file types will be copied to the Download folder (/sdcard/Download) on the device.`;
         introSection.appendChild(text);
 
         // File Upload Section
@@ -129,7 +139,6 @@ module.exports = class FileUpload extends OverlayPlugin {
             },
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP YOUR FILE',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
-            maxFileSize: 900,
             i18n: this.i18n,
         });
 

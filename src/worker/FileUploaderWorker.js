@@ -28,6 +28,12 @@ module.exports = function () {
             token: self.token,
         };
         self.socket.send(JSON.stringify(tokenRequest));
+
+        const msg = {
+            type: 'FILE_UPLOAD',
+            code: 'SOCKET_SUCCESS',
+        };
+        postMessage(msg);
     };
 
     self.onClose = function () {
@@ -40,9 +46,18 @@ module.exports = function () {
         self.socket = new WebSocket(address);
         self.socket.binaryType = 'arraybuffer';
         self.socket.onopen = self.onOpen;
-        self.socket.onerror = self.onFailure;
+        self.socket.onerror = self.onSocketFailure;
         self.socket.onmessage = self.onSocketMsg;
         self.socket.onclose = self.onClose;
+    };
+
+    self.onSocketFailure = function () {
+        const msg = {
+            type: 'FILE_UPLOAD',
+            code: 'SOCKET_FAIL',
+        };
+        self.isUploading = false;
+        postMessage(msg);
     };
 
     self.onFailure = function () {

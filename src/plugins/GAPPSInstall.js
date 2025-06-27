@@ -378,6 +378,16 @@ class InitialView {
                     case 'PROGRESS':
                         this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
                         break;
+                    case 'SOCKET_FAIL':
+                        this.fileUploaderComponent.showUploadError(
+                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                            'Something went wrong while connecting to the server.'
+                        );
+                        this.fileUploaderComponent.setEnabled(false);
+                        break;
+                    case 'SOCKET_SUCCESS':
+                        this.fileUploaderComponent.reset();
+                        break;
                     default:
                         break;
                 }
@@ -487,7 +497,6 @@ class InitialView {
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP APK FILE TO INSTALL',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             accept: '.apk',
-            maxFileSize: 900,
             classes: 'gm-apk-uploader',
             i18n: this.plugin.i18n,
         });

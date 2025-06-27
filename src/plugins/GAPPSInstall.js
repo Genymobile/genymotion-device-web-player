@@ -381,7 +381,7 @@ class InitialView {
                     case 'SOCKET_FAIL':
                         this.fileUploaderComponent.showUploadError(
                             this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
-                            'Something went wrong while connecting to the ws file upload url.'
+                            'Something went wrong while connecting to the server.'
                         );
                         this.fileUploaderComponent.setEnabled(false);
                         break;

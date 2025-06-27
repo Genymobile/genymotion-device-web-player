@@ -3,7 +3,7 @@
 .device-renderer-instance .gm-file-uploader {
     .gm-drag-drop-area {
         position: relative;
-        height: 241px;
+        height: 231px;
         padding: $spacing-xl;
         margin-top: $spacing-xl;
         margin-bottom: $spacing-xl;
@@ -73,11 +73,15 @@
 
         .drop-text {
             margin-top: $spacing-xl;
-            margin-bottom: $spacing-xl;
+            margin-bottom: $spacing-s;
             text-align: center;
         }
 
         .drop-text-1 {
+            margin-bottom: $spacing-s;
+        }
+        .drop-text-2 {
+            color: var(--gm-tertiary-color);
             margin-bottom: $spacing-s;
         }
     }

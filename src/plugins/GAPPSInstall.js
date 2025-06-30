@@ -161,7 +161,7 @@ class InstallationSuccessView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         const restartBtn = document.createElement('button');
@@ -174,7 +174,7 @@ class InstallationSuccessView {
             };
             this.plugin.instance.sendEvent(json);
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -243,7 +243,7 @@ class InstallationFailedView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -591,6 +591,7 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
         this.instance.gappsInstall = this;
         this.instanciatedViews = new Map(); // Store rendered elements by view type
         this.currentViewType = null;
+        this.viewAtNextopening = null;
         this.GAPPSInstalled = false;
 
         this.registerToolbarButton();
@@ -749,6 +750,10 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
     }
 
     toggleWidget() {
+        // if widget is opening laod the right view is needed
+        if (this.viewAtNextopening && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
+            this.setView(this.viewAtNextopening);
+        }
         super.toggleWidget();
     }
 };

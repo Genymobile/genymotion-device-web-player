@@ -67,16 +67,14 @@ class TooltipManager {
      * @param {string} [preferredPosition] - Preferred position ('top', 'bottom', 'left', 'right')
      */
     showTooltip(target, text, preferredPosition) {
-        this.tooltipElement.classList.add('gm-showTooltip');
         this.tooltipElement.querySelector('.gm-tooltip-body').textContent = text;
-        // We need to wait for the next tick so the tooltip has its size
-        setTimeout(() => {
-            const pos = this.computePosition(target, preferredPosition);
-            this.tooltipElement.style.left = pos.left + 'px';
-            this.tooltipElement.style.top = pos.top + 'px';
-            this.tooltipElement.classList.remove('top', 'bottom', 'left', 'right');
-            this.tooltipElement.classList.add(pos.position);
-        }, 0);
+        this.tooltipElement.classList.remove('top', 'bottom', 'left', 'right');
+
+        const pos = this.computePosition(target, preferredPosition);
+        this.tooltipElement.style.left = pos.left + 'px';
+        this.tooltipElement.style.top = pos.top + 'px';
+        this.tooltipElement.classList.add(pos.position);
+        this.tooltipElement.classList.add('gm-showTooltip');
     }
 
     /**

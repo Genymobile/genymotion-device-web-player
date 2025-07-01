@@ -377,5 +377,36 @@
                 }
             }
         }
+        .gm-toolbar{
+            ul{
+                li{
+                    &.gm-toolbar-dot {
+                        &-active {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                        &-notification {
+                            &::before {
+                                left: 12px;
+                            }
+                            &::after {
+                                left: 7px;
+                            }
+                        }
+                        &-success {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                        &-failed {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

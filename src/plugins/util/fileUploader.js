@@ -303,25 +303,6 @@ const fileUploader = (() => {
         };
 
         const enableDragOver = () => {
-            handleDragOver = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.add('dragover');
-            };
-
-            handleDragLeave = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.remove('dragover');
-            };
-
-            handleDrop = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.remove('dragover');
-                checkFileBeforeUpload(event.dataTransfer.files[0]);
-            };
-
             dragDropArea.addEventListener('dragover', handleDragOver);
             dragDropArea.addEventListener('dragleave', handleDragLeave);
             dragDropArea.addEventListener('drop', handleDrop);
@@ -360,6 +341,25 @@ const fileUploader = (() => {
             hideUploadError();
             hideUploadSuccess();
             setEnabled(true);
+        };
+
+        handleDragOver = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.add('dragover');
+        };
+
+        handleDragLeave = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.remove('dragover');
+        };
+
+        handleDrop = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.remove('dragover');
+            checkFileBeforeUpload(event.dataTransfer.files[0]);
         };
 
         // Initialize drag & drop

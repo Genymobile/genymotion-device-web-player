@@ -46,7 +46,6 @@ class ToolbarManager {
         const button = document.createElement('li');
         const buttonIcon = document.createElement('div');
         buttonIcon.className = `gm-icon-button ${iconClass}`;
-        buttonIcon.title = title;
         for (const [key, value] of Object.entries(dataAttributes)) {
             buttonIcon.setAttribute(`data-${key}`, value);
         }
@@ -100,7 +99,7 @@ class ToolbarManager {
         }
 
         const buttonData = this.buttonRegistry.get(id);
-        const {button} = buttonData;
+        const {button, title} = buttonData;
 
         // Adding HTML element to the DOM
         if (isInfloatingBar) {
@@ -114,6 +113,13 @@ class ToolbarManager {
             ...buttonData,
             isInfloatingBar,
         });
+
+        this.instance.tooltipManager.setTooltip(
+            button,
+            title,
+            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left':'right',
+            'toolbarTitleWidget'
+        );
     }
 
     /**
@@ -166,8 +172,6 @@ class ToolbarManager {
         }
 
         const {button, buttonIcon, onClick, onMousedown, onMouseup} = buttonData;
-
-        this.instance.tooltipManager.removeTooltip(button);
 
         buttonIcon.classList.remove('gm-disabled-icon-button');
 

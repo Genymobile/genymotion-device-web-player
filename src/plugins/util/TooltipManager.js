@@ -33,15 +33,16 @@ class TooltipManager {
      * @param {HTMLElement} element - The target element
      * @param {string} text - The tooltip text
      * @param {string} [position] - 'top'|'bottom'|'left'|'right' - Optional. Preferred position for the element. If not specified, the position will be determined in the following order of preference: 'bottom', 'left', 'right', 'top'.
+     *  @param {string} [classes] - Optional. Additional classes to add to the tooltip.
      */
-    setTooltip(element, text, position) {
+    setTooltip(element, text, position, classes=null) {
         if (!element) {
             return;
         }
 
         this.removeTooltip(element); // Clean up first if already present
-        const mouseEnter = () => this.showTooltip(element, text, position);
-        const mouseLeave = () => this.hideTooltip();
+        const mouseEnter = () => this.showTooltip(element, text, position, classes);
+        const mouseLeave = () => this.hideTooltip(classes);
 
         element.gmTooltipListeners = {mouseEnter, mouseLeave};
         element.addEventListener('mouseenter', mouseEnter);
@@ -66,7 +67,13 @@ class TooltipManager {
      * @param {string} text - The text to display
      * @param {string} [preferredPosition] - Preferred position ('top', 'bottom', 'left', 'right')
      */
-    showTooltip(target, text, preferredPosition) {
+
+    showTooltip(target, text, preferredPosition, classes) {
+        if (classes) {
+            classes.split(' ').forEach((cl) => {
+                this.tooltipElement.classList.add(cl);
+            });
+        }
         this.tooltipElement.querySelector('.gm-tooltip-body').textContent = text;
         this.tooltipElement.classList.remove('top', 'bottom', 'left', 'right');
 
@@ -74,14 +81,32 @@ class TooltipManager {
         this.tooltipElement.style.left = pos.left + 'px';
         this.tooltipElement.style.top = pos.top + 'px';
         this.tooltipElement.classList.add(pos.position);
+        this.tooltipElement.classList.remove('gm-hideTooltip');
         this.tooltipElement.classList.add('gm-showTooltip');
     }
 
     /**
      * Hides the tooltip
+     * @param {string|string[]} [classes] - Optional class or array of classes to remove from the tooltip element
      */
-    hideTooltip() {
+    hideTooltip(classes) {
         this.tooltipElement.classList.remove('gm-showTooltip');
+        this.tooltipElement.classList.add('gm-hideTooltip');
+        if (classes) {
+            /*
+             * ⚠️ Chrome may skip CSS transitions if style changes happen too quickly
+             * Using two requestAnimationFrame calls to ensure consistent animation start,
+             * especially across browsers like Firefox and Chrome.
+             * This gives the browser enough time to apply initial styles before transitioning.
+             */
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    classes.split(' ').forEach((cl) => {
+                        this.tooltipElement.classList.remove(cl);
+                    });
+                });
+            });
+        }
     }
 
     /**

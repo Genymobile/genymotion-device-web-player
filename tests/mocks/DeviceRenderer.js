@@ -1,14 +1,15 @@
 'use strict';
 
 const Original = require('../../src/DeviceRenderer');
+const DeviceRendererFactory = require('../../src/DeviceRendererFactory');
 const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
 const OriginalApiManager = require('../../src/APIManager');
 
 const store = require('../../src/store/index');
 
 class ToolBarManager extends OriginalToolbarManager {
-    constructor() {
-        super();
+    constructor(instance) {
+        super(instance);
     }
     registerButton(args) {
         const button = super.registerButton(args);
@@ -23,32 +24,22 @@ class ToolBarManager extends OriginalToolbarManager {
     }
 }
 module.exports = class DeviceRenderer extends Original {
-    constructor(options) {
-        document.body.innerHTML = `
-<div class="gm-wrapper">
-    <div class="gm-renderer">
-        <div class="gm-video-wrapper">
-            <video class="gm-video" autoplay preload="none">
-                Your browser does not support the VIDEO tag
-            </video>
-        </div>
-        <div class="gm-toolbars">
-            <div class="gm-toolbar">
-                <ul>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>`;
+    constructor(options = {}) {
+        // we use the factory to load the template, like in production, this way the template generated takes the options
+        const factory = new DeviceRendererFactory();
+
+        const htmlFromFactory = document.createElement('div');
+        factory.loadTemplate(htmlFromFactory, options);
+        document.body.innerHTML = htmlFromFactory.outerHTML;
+        super(document.body, options);
 
         navigator.mediaDevices = {
             getUserMedia: jest.fn().mockReturnValue(Promise.resolve(null)),
         };
 
-        super(document.body, options || {});
         this.outgoingMessages = [];
         this.apiManager = new OriginalApiManager(this);
-        this.toolbarManager = new ToolBarManager();
+        this.toolbarManager = new ToolBarManager(this);
         // Load store since it's deviceRendererFactory which load it
         store(this);
     }

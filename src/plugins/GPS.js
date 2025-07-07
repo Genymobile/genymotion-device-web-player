@@ -1,9 +1,9 @@
 'use strict';
 
 const OverlayPlugin = require('./util/OverlayPlugin');
-
+const {textInput, chipTag} = require('./util/components');
+const {slider} = require('./util/components');
 const log = require('loglevel');
-log.setDefaultLevel('debug');
 
 /* global google */
 
@@ -20,9 +20,8 @@ module.exports = class GPS extends OverlayPlugin {
      *
      * @param {Object}  instance     Associated instance.
      * @param {Object}  i18n         Translations keys for the UI.
-     * @param {boolean} speedSupport Enable speed support.
      */
-    constructor(instance, i18n, speedSupport) {
+    constructor(instance, i18n) {
         super(instance);
 
         // Reference instance
@@ -32,11 +31,16 @@ module.exports = class GPS extends OverlayPlugin {
         // Register plugin
         this.instance.gps = this;
 
-        // Location fields
-        this.fields = ['altitude', 'longitude', 'latitude', 'accuracy', 'bearing'];
-        if (speedSupport) {
-            this.fields.push('speed');
-        }
+        // Input components
+        this.inputComponents = {
+            altitude: null,
+            longitude: null,
+            latitude: null,
+            accuracy: null,
+            bearing: null,
+        };
+
+        this.inputComponents.speed = null;
 
         // Map references
         this.map = null;
@@ -57,15 +61,21 @@ module.exports = class GPS extends OverlayPlugin {
 
         // Display widget
         this.registerToolbarButton();
-        this.renderGPSForm();
-        this.renderMapView();
+        this.renderWidget();
+
+        // Create map view if google maps is available
+        this.loadMap();
+
+        // Check if permission is already denied, in order to disable set position button
+        this.checkLocationPermission();
 
         // Listen for gps events: "<altitude/latitude/longitude/accuracy/bearing/status/speed?> <value>"
         this.instance.registerEventCallback('gps', (message) => {
             const values = message.split(' ');
-            if (this.fields.includes(values[0]) && values.length >= 2) {
-                this.setFieldValue('gm-gps-' + values[0], values[1]);
+            if (Object.keys(this.inputComponents).includes(values[0]) && values.length >= 2) {
+                this.setFieldValue(values[0], values[1]);
             }
+            this.container.classList.add('gm-gps-saved');
         });
     }
 
@@ -77,39 +87,495 @@ module.exports = class GPS extends OverlayPlugin {
             id: this.constructor.name,
             iconClass: 'gm-gps-button',
             title: this.i18n.GPS_TITLE || 'GPS',
-            onClick: this.toggleForm.bind(this),
+            onClick: this.toggleWidget.bind(this),
         });
     }
 
     /**
-     * Render the widget: map view.
+     * Render the widget.
      */
-    renderMapView() {
+    renderWidget() {
         // Create elements
-        this.mapWidget = document.createElement('div');
+        const {container} = this.createTemplateModal({
+            title: this.i18n.GPS_TITLE || 'GPS',
+            classes: 'gm-gps-plugin',
+            width: 498,
+            height: 850,
+        });
+
+        this.container = container;
+
+        // Maps
         this.mapview = document.createElement('div');
-
-        // Add capture button
-        const capture = document.createElement('button');
-        capture.innerHTML = this.i18n.GPS_CAPTURE || 'Capture';
-        capture.className = 'gm-gps-mapview-capture';
-        capture.onclick = this.onMapClicked.bind(this);
-
-        // Add cancel button
-        const cancel = document.createElement('button');
-        cancel.innerHTML = this.i18n.GPS_CANCEL || 'Cancel';
-        cancel.className = 'gm-gps-mapview-cancel';
-        cancel.onclick = this.onHideMapButtonClicked.bind(this);
-
-        // Setup
         this.mapview.className = 'gm-mapview';
-        this.mapWidget.className = 'gm-overlay gm-gps-mapview gm-hidden';
-        this.mapWidget.appendChild(this.mapview);
-        this.mapWidget.appendChild(capture);
-        this.mapWidget.appendChild(cancel);
 
-        // Render into document
-        this.instance.root.appendChild(this.mapWidget);
+        // set my positon button
+        const setToMyPositionWrapper = document.createElement('div');
+        setToMyPositionWrapper.className = 'gm-gps-setToMyPosition-wrapper';
+
+        this.setToMyPositionBtn = document.createElement('button');
+        this.setToMyPositionBtn.className = 'gm-btn gm-gps-setToMyPosition';
+        this.setToMyPositionBtn.innerHTML = this.i18n.GPS_SET_TO_MY_POSITION || 'Set to my position';
+
+        this.setToMyPositionBtn.onclick = this.getLocation.bind(this);
+
+        setToMyPositionWrapper.appendChild(this.setToMyPositionBtn);
+
+        this.container.appendChild(this.mapview);
+        this.container.appendChild(setToMyPositionWrapper);
+        const sep1 = document.createElement('div');
+        sep1.className = 'gm-separator';
+        this.container.appendChild(sep1);
+
+        // Form
+        const form = document.createElement('form');
+
+        // Position Section
+        const positionSection = document.createElement('div');
+        positionSection.className = 'gm-section';
+
+        // First line: Latitude & Longitude
+        const positionFirstLine = document.createElement('div');
+        positionFirstLine.className = 'gm-section-line gm-gps-section-line';
+
+        // Latitude input
+        const latitudeDiv = document.createElement('div');
+        latitudeDiv.className = 'gm-input-wrap';
+        const latitudeLabel = document.createElement('label');
+        latitudeLabel.innerHTML = this.i18n.GPS_LATITUDE || 'Latitude';
+        latitudeDiv.appendChild(latitudeLabel);
+
+        this.inputComponents.latitude = textInput.createTextInput({
+            value: this.mapLat.toString(),
+            regexFilter: /^-?\d*\.?\d*$/,
+            // Validate latitude (-90 to 90) - regex generated by ai
+            regexValidField: /^-?(?:[0-8]?\d(?:\.\d*)?|90(?:\.0*)?)$/,
+            messageField: true,
+            unitText: 'o',
+            onChange: () => {
+                if (!this.inputComponents.latitude.checkValidity()) {
+                    this.inputComponents.latitude.setErrorMessage('Between -90 and 90');
+                } else {
+                    this.inputComponents.latitude.setErrorMessage('');
+                }
+                this.checkErrors();
+                this.clearMarkers();
+                this.addMapMarker(this.inputComponents.latitude.getValue(), this.inputComponents.longitude.getValue());
+            },
+        });
+        latitudeDiv.appendChild(this.inputComponents.latitude.element);
+
+        // Longitude input
+        const longitudeDiv = document.createElement('div');
+        longitudeDiv.className = 'gm-input-wrap';
+        const longitudeLabel = document.createElement('label');
+        longitudeLabel.innerHTML = this.i18n.GPS_LONGITUDE || 'Longitude';
+        longitudeDiv.appendChild(longitudeLabel);
+
+        this.inputComponents.longitude = textInput.createTextInput({
+            value: this.mapLng.toString(),
+            regexFilter: /^-?\d*\.?\d*$/,
+            // Validate longitude (-180 to 180) - regex generated by ai
+            regexValidField: /^-?(?:(?:1[0-7]\d(?:\.\d*)?)|(?:[0-9]?\d(?:\.\d*)?)|180(?:\.0*)?)$/,
+            messageField: true,
+            unitText: 'o',
+            onChange: () => {
+                if (!this.inputComponents.longitude.checkValidity()) {
+                    this.inputComponents.longitude.setErrorMessage('Between -180 and 180');
+                } else {
+                    this.inputComponents.longitude.setErrorMessage('');
+                }
+                this.checkErrors();
+                this.clearMarkers();
+                this.addMapMarker(this.inputComponents.latitude.getValue(), this.inputComponents.longitude.getValue());
+            },
+        });
+        longitudeDiv.appendChild(this.inputComponents.longitude.element);
+
+        positionFirstLine.appendChild(latitudeDiv);
+        positionFirstLine.appendChild(longitudeDiv);
+        positionSection.appendChild(positionFirstLine);
+
+        // Second line: Altitude & Accuracy
+        const positionSecondLine = document.createElement('div');
+        positionSecondLine.className = 'gm-section-line gm-gps-section-line';
+
+        // Altitude input
+        const altitudeDiv = document.createElement('div');
+        altitudeDiv.className = 'gm-input-wrap';
+        const altitudeLabel = document.createElement('label');
+        altitudeLabel.innerHTML = this.i18n.GPS_ALTITUDE || 'Altitude';
+        altitudeDiv.appendChild(altitudeLabel);
+
+        this.inputComponents.altitude = textInput.createTextInput({
+            value: this.elevation.toString(),
+            regexFilter: /^-?\d*\.?\d*$/,
+            // Validate altitude (-10000 to 10000) - regex generated by ai
+            regexValidField: /^-?(?:[0-9]\d{0,3}(?:\.\d*)?|10000(?:\.0*)?)$/,
+            messageField: true,
+            unitText: 'm',
+            onChange: () => {
+                if (!this.inputComponents.altitude.checkValidity()) {
+                    this.inputComponents.altitude.setErrorMessage('Between -10,000 and 10,000');
+                } else {
+                    this.inputComponents.altitude.setErrorMessage('');
+                }
+                this.checkErrors();
+            },
+        });
+        altitudeDiv.appendChild(this.inputComponents.altitude.element);
+
+        // Accuracy input
+        const accuracyDiv = document.createElement('div');
+        accuracyDiv.className = 'gm-input-wrap';
+        const accuracyLabel = document.createElement('label');
+        accuracyLabel.innerHTML = this.i18n.GPS_ACCURACY || 'Accuracy';
+        accuracyDiv.appendChild(accuracyLabel);
+
+        // Create a flex wrapper for accuracy input and slider
+        const accuracyWrapper = document.createElement('div');
+        accuracyWrapper.className = 'gm-gps-accuracy-input-wrapper';
+
+        // Create the accuracy slider
+        this.accuracySlider = slider.createSlider({
+            min: 0,
+            max: 200,
+            value: 0,
+            classes: 'gm-gps-accuracy-slider',
+            onChange: (value) => {
+                this.inputComponents.accuracy.setValue(value);
+                this.checkErrors();
+            },
+            onCursorMove: (value) => {
+                // Update UI without sending data to instance
+                this.inputComponents.accuracy.setValue(value);
+                this.checkErrors();
+            },
+        });
+
+        // Add the slider to the wrapper
+        accuracyWrapper.appendChild(this.accuracySlider.element);
+
+        this.inputComponents.accuracy = textInput.createTextInput({
+            classes: 'gm-gps-accuracy-input',
+            value: '0',
+            regexFilter: /^$|^(0?[0-9]{1,2}|1[0-9]{2}|200)$/,
+            // Validate accuracy (0 to 200)
+            regexValidField: /^$|^(0?[0-9]{1,2}|1[0-9]{2}|200)$/,
+            unitText: 'm',
+            onChange: (v) => {
+                // Update slider when input changes
+                const value = parseFloat(v) || 0;
+                this.accuracySlider.setValue(value);
+                this.checkErrors();
+            },
+            onBlur: (v) => {
+                if (v === '') {
+                    this.inputComponents.accuracy.setValue('0');
+                    this.accuracySlider.setValue(0);
+                }
+            },
+        });
+
+        // Add the input to the wrapper
+        accuracyWrapper.appendChild(this.inputComponents.accuracy.element);
+
+        // Add the wrapper to the accuracy div
+        accuracyDiv.appendChild(accuracyWrapper);
+
+        positionSecondLine.appendChild(altitudeDiv);
+        positionSecondLine.appendChild(accuracyDiv);
+        positionSection.appendChild(positionSecondLine);
+
+        const positionThirdLine = document.createElement('div');
+        positionThirdLine.className = 'gm-section-line gm-gps-section-line';
+
+        // Speed input (optional)
+        if (Object.keys(this.inputComponents).includes('speed')) {
+            const speedDiv = document.createElement('div');
+            speedDiv.className = 'gm-input-wrap';
+            const speedLabel = document.createElement('label');
+            speedLabel.innerHTML = this.i18n.GPS_SPEED || 'Speed';
+            speedDiv.appendChild(speedLabel);
+
+            this.inputComponents.speed = textInput.createTextInput({
+                value: '0',
+                regexFilter: /^-?\d*\.?\d*$/,
+                // Validate speed (0 to 399.99) - regex generated by ai
+                regexValidField: /^(?:[0-9]|[1-9][0-9]|[1-3][0-9]{2})(?:\.\d{0,2})?$/,
+                messageField: true,
+                unitText: 'm/s',
+                onChange: () => {
+                    if (!this.inputComponents.speed.checkValidity()) {
+                        this.inputComponents.speed.setErrorMessage('Between 0 and 399.99');
+                    } else {
+                        this.inputComponents.speed.setErrorMessage('');
+                    }
+                    this.checkErrors();
+                },
+            });
+            speedDiv.appendChild(this.inputComponents.speed.element);
+            positionThirdLine.appendChild(speedDiv);
+        }
+
+        // Bearing input
+        const bearingDiv = document.createElement('div');
+        bearingDiv.className = 'gm-input-wrap';
+        const bearingLabel = document.createElement('label');
+        bearingLabel.innerHTML = this.i18n.GPS_BEARING || 'Bearing';
+        bearingDiv.appendChild(bearingLabel);
+
+        // Create a flex wrapper for bearing input and slider
+        const bearingWrapper = document.createElement('div');
+        bearingWrapper.className = 'gm-gps-bearing-input-wrapper';
+
+        // Create the bearing slider
+        this.bearingSlider = slider.createSlider({
+            min: 0,
+            max: 360,
+            value: 0,
+            classes: 'gm-gps-bearing-slider',
+            onChange: (value) => {
+                this.inputComponents.bearing.setValue(value);
+                this.checkErrors();
+            },
+            onCursorMove: (value) => {
+                // Update UI without sending data to instance
+                this.inputComponents.bearing.setValue(value);
+                this.checkErrors();
+            },
+        });
+
+        // Add the slider to the wrapper
+        bearingWrapper.appendChild(this.bearingSlider.element);
+
+        this.inputComponents.bearing = textInput.createTextInput({
+            value: '0',
+            classes: 'gm-gps-bearing-input',
+            regexFilter: /^$|^(0?[0-9]{1,2}|[1-2][0-9]{2}|3[0-5][0-9]|360)$/,
+            // Validate bearing (0 to 360)
+            regexValidField: /^$|^(0?[0-9]{1,2}|[1-2][0-9]{2}|3[0-5][0-9]|360)$/,
+            messageField: true,
+            unitText: 'o',
+            onChange: (v) => {
+                // Update slider when input changes
+                const value = parseFloat(v) || 0;
+                this.bearingSlider.setValue(value);
+                this.checkErrors();
+            },
+            onBlur: (v) => {
+                if (v === '') {
+                    this.inputComponents.bearing.setValue('0');
+                    this.accuracySlider.setValue(0);
+                }
+            },
+        });
+
+        // Add the input to the wrapper
+        bearingWrapper.appendChild(this.inputComponents.bearing.element);
+
+        // Add the wrapper to the bearing div
+        bearingDiv.appendChild(bearingWrapper);
+
+        positionThirdLine.appendChild(bearingDiv);
+        positionSection.appendChild(positionThirdLine);
+
+        // Build form
+        form.appendChild(positionSection);
+
+        // Actions
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'gm-actions';
+
+        const appliedTag = chipTag.createChip();
+        actionsDiv.appendChild(appliedTag.element);
+
+        // Submit button
+        this.submitBtn = document.createElement('button');
+        this.submitBtn.innerHTML = this.i18n.GPS_APPLY || 'Apply';
+        this.submitBtn.className = 'gm-btn gm-gps-update';
+        this.submitBtn.onclick = this.sendDataToInstance.bind(this);
+        this.submitBtn.disabled = true;
+        actionsDiv.appendChild(this.submitBtn);
+
+        // Build final layout
+        this.container.appendChild(form);
+        const sep2 = document.createElement('div');
+        sep2.className = 'gm-separator';
+        this.container.appendChild(sep2);
+        this.container.appendChild(actionsDiv);
+    }
+
+    /**
+     * Input form validation.
+     */
+    checkErrors() {
+        this.container.classList.remove('gm-gps-saved');
+
+        const gotAnError = Object.keys(this.inputComponents).some(
+            (field) => !this.inputComponents[field].checkValidity(),
+        );
+
+        this.submitBtn.disabled = gotAnError;
+    }
+
+    /**
+     * Set the value of the given form input.
+     *
+     * @param {string} field Field name to update.
+     * @param {string} value Value to set.
+     */
+    setFieldValue(field, value) {
+        value = Number(value);
+        if (Number.isNaN(value) || !this.inputComponents[field]) {
+            return;
+        }
+
+        this.inputComponents[field].setValue(value.toString(), true);
+    }
+
+    /**
+     * Send information to instance.
+     *
+     * @param {Event} event Event.
+     */
+    sendDataToInstance(event) {
+        event.preventDefault();
+
+        if (this.submitBtn.disabled) {
+            return;
+        }
+
+        const json = {channel: 'gps', messages: []};
+        const info = this.getLocationInfo();
+
+        for (const field of Object.keys(this.inputComponents)) {
+            if (field in info) {
+                json.messages.push('set ' + field + ' ' + info[field]);
+            }
+        }
+
+        if (json.messages.length) {
+            // make sure GPS is started
+            json.messages.push('enable');
+            this.instance.sendEvent(json);
+            this.container.classList.add('gm-gps-saved');
+        }
+    }
+
+    /**
+     * Check Location browser permissions
+     */
+    async checkLocationPermission() {
+        try {
+            this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
+            if (this.permissionStatus.state === 'denied') {
+                this.setToMyPositionBtn.disabled = true;
+            } else {
+                this.setToMyPositionBtn.disabled = false;
+            }
+
+            /*
+             * this is bugged in Firefox, change is never triggered,
+             * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
+             */
+            this.instance.addListener(this.permissionStatus, 'change', () => {
+                if (this.permissionStatus.state === 'granted') {
+                    this.setToMyPositionBtn.disabled = false;
+                } else {
+                    this.setToMyPositionBtn.disabled = true;
+                }
+            });
+        } catch (error) {
+            log.error('Error while asking permission: ', error);
+        }
+    }
+
+    /**
+     * Extract location info from inputs.
+     *
+     * @return {Object} Geolocation data.
+     */
+    getLocationInfo() {
+        const info = {};
+
+        for (const field of Object.keys(this.inputComponents)) {
+            const component = this.inputComponents[field];
+            if (!component) {
+                continue;
+            }
+
+            const value = Number(component.getValue());
+            if (!Number.isNaN(value)) {
+                info[field] = value;
+            }
+        }
+
+        return info;
+    }
+
+    /**
+     * Get client geolocation.
+     */
+    async getLocation() {
+        if (!navigator.geolocation) {
+            return;
+        }
+
+        // Ask for geolocation permission
+        if (!this.permissionStatus) {
+            await this.checkLocationPermission();
+        }
+
+        try {
+            this.setToMyPositionBtn.classList.add('gm-gps-setToMyPosition-loading');
+            this.setToMyPositionBtn.disabled = true;
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+            this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
+            this.setToMyPositionBtn.disabled = false;
+
+            if (!position || !position.coords) {
+                return;
+            }
+
+            Object.keys(this.inputComponents).forEach((field) => {
+                if (position.coords[field]) {
+                    this.setFieldValue(field, position.coords[field]);
+                }
+            });
+
+            // Get altitude from elevation service if we don't have any
+            if (
+                !position.coords.altitude &&
+                this.elevationService &&
+                position.coords.latitude &&
+                position.coords.longitude
+            ) {
+                const location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                const results = await this.elevationService.getElevationForLocations({
+                    locations: [location],
+                });
+                if (results.status === 'OK' && results[0]) {
+                    this.setFieldValue('altitude', results[0].elevation);
+                }
+            }
+
+            // Update map
+            if (this.map) {
+                this.clearMarkers();
+                this.addMapMarker(position.coords.latitude, position.coords.longitude);
+                this.map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
+            }
+        } catch (error) {
+            // if permission was denied, disable the button
+            if (error.code === 1) {
+                this.setToMyPositionBtn.disabled = true;
+                this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
+            }
+            log.error('Error getting location:', error);
+        }
     }
 
     /**
@@ -120,6 +586,10 @@ module.exports = class GPS extends OverlayPlugin {
         const info = this.getLocationInfo();
 
         // Render map
+        if (typeof google === 'undefined') {
+            this.mapview.classList.add('gmaps-disabled');
+            this.mapview.innerHTML = 'Enable Google Maps with a valid API key to view the map.';
+        }
         if (typeof google !== 'undefined') {
             this.map = new google.maps.Map(this.mapview, {
                 center: {
@@ -142,411 +612,65 @@ module.exports = class GPS extends OverlayPlugin {
     }
 
     /**
-     * Display or hide the map view.
-     */
-    toggleMapview() {
-        this.mapWidget.classList.toggle('gm-hidden');
-    }
-
-    /**
-     * Create a form field element.
-     *
-     * @param  {string}      name  Input name.
-     * @param  {string}      label Input label.
-     * @param  {string}      value Input value.
-     * @param  {string}      min   Input min attribute.
-     * @param  {string}      max   Input max attribute.
-     * @return {HTMLElement}       The created input.
-     */
-    generateInput(name, label, value, min, max) {
-        const inputWrap = document.createElement('div');
-
-        const lab = document.createElement('label');
-        lab.innerHTML = label;
-        inputWrap.appendChild(lab);
-
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.defaultValue = value;
-        input.min = min;
-        input.max = max;
-        input.className = 'gm-gps-' + name;
-        input.step = 'any';
-        this.instance.addListener(input, 'keyup', this.checkErrors.bind(this));
-        inputWrap.appendChild(input);
-
-        return inputWrap;
-    }
-
-    /**
-     * Input form validation.
-     */
-    checkErrors() {
-        let gotAnError = false;
-        this.fields.forEach((field) => {
-            const input = this.instance.getChildByClass(this.instance.root, 'gm-gps-' + field);
-            if (input.checkValidity() === false) {
-                input.classList.add('gm-error');
-                gotAnError = true;
-            } else {
-                input.classList.remove('gm-error');
-            }
-        });
-
-        this.instance.getChildByClass(this.instance.root, 'gm-gps-submit').disabled = gotAnError;
-    }
-
-    /**
-     * Render the widget: controls view.
-     */
-    renderGPSForm() {
-        // Create elements
-        const {modal, container} = this.createTemplateModal({
-            title: this.i18n.GPS_TITLE || 'GPS',
-            classes: 'gm-gps-controls',
-        });
-
-        // TODO delete this line in the PR which will refacto this plugin, keep for css compatibility
-        modal.classList.add('gm-overlay');
-
-        this.form = document.createElement('form');
-        const formWrap = document.createElement('div');
-
-        // Generate form inputs
-        const inputs = document.createElement('div');
-        inputs.className = 'gm-col';
-
-        const latitudeLabel = this.i18n.GPS_LATITUDE || 'Latitude (°)';
-        inputs.appendChild(this.generateInput('latitude', latitudeLabel, this.mapLat, -90.0, 90.0));
-
-        const longitudeLabel = this.i18n.GPS_LONGITUDE || 'Longitude (°)';
-        inputs.appendChild(this.generateInput('longitude', longitudeLabel, this.mapLng, -180.0, 180.0));
-
-        const altitudeLabel = this.i18n.GPS_ALTITUDE || 'Altitude (m)';
-        inputs.appendChild(this.generateInput('altitude', altitudeLabel, this.elevation, -10000, 10000));
-
-        const accuracyLabel = this.i18n.GPS_ACCURACY || 'Accuracy (m)';
-        inputs.appendChild(this.generateInput('accuracy', accuracyLabel, 0, 0, 200));
-
-        const bearingLabel = this.i18n.GPS_BEARING || 'Bearing (°)';
-        inputs.appendChild(this.generateInput('bearing', bearingLabel, 0, 0, 360));
-
-        if (this.fields.includes('speed')) {
-            const speedLabel = this.i18n.GPS_SPEED || 'Speed (m/s)';
-            inputs.appendChild(this.generateInput('speed', speedLabel, 0, 0, 399.99));
-        }
-
-        // Generate right side of form
-        const right = document.createElement('div');
-        const rightMapWrap = document.createElement('div');
-        const map = document.createElement('button');
-        this.rightGeolocWrap = document.createElement('div');
-        this.geolocBtn = document.createElement('button');
-
-        right.className = 'gm-col';
-        rightMapWrap.className = 'map-wrap';
-
-        map.className = 'map';
-        map.innerHTML = this.i18n.GPS_MAP || 'MAP';
-        map.onclick = this.onOpenMapButtonClicked.bind(this);
-
-        if (!this.elevationService) {
-            map.disabled = true;
-        }
-
-        this.rightGeolocWrap.className = 'gm-geoloc-wrap';
-        this.geolocBtn.className = 'gm-gps-geoloc';
-        this.geolocBtn.innerHTML = this.i18n.GPS_GEOLOC || 'My position';
-        this.geolocBtn.onclick = this.onGeolocButtonClicked.bind(this);
-
-        rightMapWrap.appendChild(map);
-        this.rightGeolocWrap.appendChild(this.geolocBtn);
-        right.appendChild(rightMapWrap);
-        right.appendChild(this.rightGeolocWrap);
-
-        // Build form
-        formWrap.className = 'gm-wrap';
-        formWrap.appendChild(inputs);
-        formWrap.appendChild(right);
-        this.form.appendChild(formWrap);
-
-        // Attach submit button
-        const button = document.createElement('button');
-        button.innerHTML = this.i18n.GPS_SUBMIT || 'Submit';
-        button.className = 'gm-gps-submit';
-        button.onclick = this.sendDataToInstance.bind(this);
-        this.form.appendChild(button);
-
-        container.appendChild(this.form);
-    }
-
-    /**
-     * Display or hide the controls view.
-     */
-    toggleForm() {
-        this.toggleWidget();
-        this.checkForGeolocation();
-
-        // TODO refacto this with 2 different overlay (gps and map)
-        this.mapWidget.classList.add('gm-hidden');
-    }
-
-    /**
-     * Set geolocation button availability.
-     *
-     * @param {boolean} enabled Geolocation availability.
-     */
-    setGeolocButtonAvailability(enabled) {
-        this.geolocBtn.disabled = !enabled;
-        if (enabled) {
-            this.rightGeolocWrap.title = this.i18n.GPS_GEOLOC_TOOLTIP || 'Get my position from browser location';
-        } else {
-            this.rightGeolocWrap.title = this.i18n.GPS_NOGEOLOC_TOOLTIP || 'Geolocation not supported';
-        }
-    }
-
-    /**
-     * Open map view clicked.
-     *
-     * @param {Event} event Event.
-     */
-    onOpenMapButtonClicked(event) {
-        event.preventDefault();
-        this.toggleMapview();
-        this.loadMap();
-    }
-
-    /**
-     * Geolocation button clicked.
-     *
-     * @param {Event} event Event.
-     */
-    onGeolocButtonClicked(event) {
-        event.preventDefault();
-        this.getLocation();
-    }
-
-    /**
-     * Map view clicked.
-     *
-     * @param {Event} event Event.
-     */
-    onMapClicked(event) {
-        event.preventDefault();
-
-        // Update fields
-        this.setFieldValue('gm-gps-latitude', this.mapLat);
-        this.setFieldValue('gm-gps-longitude', this.mapLng);
-        this.setFieldValue('gm-gps-altitude', this.elevation);
-
-        // Hide mapview
-        this.toggleMapview();
-    }
-
-    /**
-     * Hide map view button clicked.
-     *
-     * @param {Event} event Event.
-     */
-    onHideMapButtonClicked(event) {
-        event.preventDefault();
-
-        this.mapWidget.classList.add('gm-hidden');
-    }
-
-    /**
-     * Send information to instance.
-     *
-     * @param {Event} event Event.
-     */
-    sendDataToInstance(event) {
-        event.preventDefault();
-
-        const json = this.buildEventJson();
-        if (json.messages.length) {
-            this.instance.sendEvent(json);
-        }
-
-        this.toggleForm();
-    }
-
-    /**
-     * Get client geolocation.
-     */
-    getLocation() {
-        if (!navigator.geolocation) {
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition((position) => {
-            if (!position || !position.coords) {
-                return;
-            }
-
-            this.fields.forEach((field) => {
-                if (position.coords[field]) {
-                    this.setFieldValue('gm-gps-' + field, position.coords[field]);
-                }
-            });
-            // Get altitude from elevation service if we don't have any
-            if (
-                !position.coords.altitude &&
-                this.elevationService &&
-                position.coords.latitude &&
-                position.coords.longitude
-            ) {
-                const location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                this.elevationService.getElevationForLocations(
-                    {
-                        locations: [location],
-                    },
-                    (results, status) => {
-                        if (status === 'OK') {
-                            // Retrieve the first result
-                            if (results[0]) {
-                                this.setFieldValue('gm-gps-altitude', results[0].elevation);
-                            }
-                        }
-                    },
-                );
-            }
-        });
-    }
-
-    /**
-     * Check browser geolocation capability and update UI accordingly.
-     */
-    checkForGeolocation() {
-        if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                () => {
-                    this.setGeolocButtonAvailability(true);
-                },
-                () => {
-                    this.setGeolocButtonAvailability(false);
-                },
-            );
-        } else {
-            this.setGeolocButtonAvailability(false);
-        }
-    }
-
-    /**
-     * Set the value of the given form input according.
-     *
-     * @param {HTMLElement} field Form input to update.
-     * @param {string}      value Value to set.
-     */
-    setFieldValue(field, value) {
-        value = Number(value);
-        if (Number.isNaN(value)) {
-            return;
-        }
-
-        const inputField = this.instance.getChildByClass(this.instance.root, field);
-        if (!inputField) {
-            return;
-        }
-
-        if (inputField.max) {
-            value = Math.min(value, inputField.max);
-        }
-        if (inputField.min) {
-            value = Math.max(value, inputField.min);
-        }
-
-        inputField.value = value;
-    }
-
-    /**
-     * Extract location info from inputs.
-     *
-     * @return {Object} Geolocation data.
-     */
-    getLocationInfo() {
-        const info = {};
-        this.fields.forEach((fieldName) => {
-            const field = this.instance.getChildByClass(this.instance.root, 'gm-gps-' + fieldName);
-            if (!field) {
-                log.debug(fieldName + ' field not found.');
-                return;
-            }
-            let value = Number(field.value);
-            if (Number.isNaN(value)) {
-                return;
-            }
-
-            if (field.max) {
-                value = Math.min(value, field.max);
-            }
-            if (field.min) {
-                value = Math.max(value, field.min);
-            }
-
-            info[fieldName] = value;
-        });
-        return info;
-    }
-
-    /**
-     * Format GPS event to be send to the instance.
-     *
-     * @return {Object} GPS event.
-     */
-    buildEventJson() {
-        const event = {channel: 'gps', messages: []};
-        const info = this.getLocationInfo();
-        this.fields.forEach((field) => {
-            event.messages.push('set ' + field + ' ' + info[field]);
-        });
-
-        if (event.messages.length) {
-            // make sure GPS is started
-            event.messages.push('enable');
-        }
-        return event;
-    }
-
-    /**
      * Adds new marker at given coords.
      *
      * @param {number} lat Latitude of the marker.
      * @param {number} lng Longitude of the marker.
      */
     addMapMarker(lat, lng) {
-        this.mapLat = lat;
-        this.mapLng = lng;
+        if (typeof google === 'undefined') {
+            return;
+        }
+
+        // Convert values to numbers once
+        const numLat = Number(lat);
+        const numLng = Number(lng);
+        const currentNumLat = Number(this.inputComponents.latitude.getValue());
+        const currentNumLng = Number(this.inputComponents.longitude.getValue());
 
         const marker = new google.maps.Marker({
             position: {
-                lat: this.mapLat,
-                lng: this.mapLng,
+                lat: numLat,
+                lng: numLng,
             },
             map: this.map,
         });
         this.markers.push(marker);
 
-        // Center map and zoom on position when needed
-        if (this.map && this.map.getZoom() < this.minimumZoomLevel) {
-            this.map.setCenter(marker.getPosition());
-            this.map.setZoom(this.minimumZoomLevel);
+        // Update form fields only if the value changed
+        if (currentNumLat !== numLat) {
+            this.setFieldValue('latitude', numLat);
+        }
+        if (currentNumLng !== numLng) {
+            this.setFieldValue('longitude', numLng);
         }
 
+        // Get elevation if service is available
         if (this.elevationService) {
-            const location = new google.maps.LatLng(lat, lng);
+            const location = new google.maps.LatLng(numLat, numLng);
             this.elevationService.getElevationForLocations(
                 {
                     locations: [location],
                 },
                 (results, status) => {
-                    if (status === 'OK') {
-                        // Retrieve the first result
-                        if (results[0]) {
-                            this.elevation = results[0].elevation;
+                    if (status === 'OK' && results && results[0]) {
+                        const currentAltitude = Number(this.inputComponents.altitude.getValue());
+                        const newElevation = Number(results[0].elevation);
+                        if (currentAltitude !== newElevation) {
+                            this.setFieldValue('altitude', newElevation);
                         }
                     }
                 },
             );
+        }
+
+        // Center map on the new marker and zoom if needed
+        if (this.map) {
+            const currentZoom = this.map.getZoom();
+            this.map.setCenter(marker.getPosition()); // Always center on the marker
+            if (currentZoom < this.minimumZoomLevel) {
+                this.map.setZoom(this.minimumZoomLevel);
+            }
         }
     }
 

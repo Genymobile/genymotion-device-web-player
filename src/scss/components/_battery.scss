@@ -1,46 +1,8 @@
 /**
  * Battery plugin styles
  */
- .device-renderer-instance .gm-battery-plugin {
+.device-renderer-instance .gm-battery-plugin {
     .gm {
-        &-charging-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            > div:nth-child(2) {
-                flex-grow: 1;
-            }
-
-            .gm-charging-image {
-                width: 38px;
-                height: 38px;
-                margin-left: -9px;
-                mask-image: url('../assets/images/ic_battery_not_charging.svg');
-                -webkit-mask-image: url('../assets/images/ic_battery_not_charging.svg');
-                -webkit-mask-size: contain;
-                mask-size: contain;
-                -webkit-mask-repeat: no-repeat;
-                mask-repeat: no-repeat;
-                -webkit-mask-position: center;
-                mask-position: center;
-                background-color: var(--gm-tertiary-variant-color);
-                
-                &.charging {
-                    mask-image: url('../assets/images/ic_battery_charging.svg');
-                    -webkit-mask-image: url('../assets/images/ic_battery_charging.svg');
-                    background-color: var(--gm-on-secondary-color);
-                }
-            }
-
-            .gm-charging-status {
-                height: 32px;
-                line-height: 32px;
-                font-weight: bold;
-                margin-left: 10px;
-            }
-        }
-
         &-charge-level-group {
             display: flex;
             justify-content: space-around;
@@ -53,26 +15,27 @@
             }
 
             &.low {
-                .gm-charge-image,.gm-charge-image-overlay {
+                .gm-charge-image,
+                .gm-charge-image-overlay {
                     background-color: var(--gm-error-color) !important;
-
                 }
                 .text-input-container {
                     color: var(--gm-error-color);
                     border-color: var(--gm-error-color);
-                    input { 
+                    input {
                         color: var(--gm-error-color);
                     }
                 }
             }
             &.medium {
-                .gm-charge-image,.gm-charge-image-overlay {
+                .gm-charge-image,
+                .gm-charge-image-overlay {
                     background-color: var(--gm-warning-color) !important;
                 }
                 .text-input-container {
                     color: var(--gm-warning-color);
                     border-color: var(--gm-warning-color);
-                    input { 
+                    input {
                         color: var(--gm-warning-color);
                     }
                 }
@@ -85,11 +48,11 @@
                     position: absolute;
                     left: 29%;
                     bottom: 13.2%;
-                    width: 40%;
+                    width: 42%;
                     height: 63.5%;
                     display: flex;
                     margin-left: -4px;
-    
+
                     .gm-charge-image-overlay {
                         height: 0;
                         width: 100%;
@@ -97,7 +60,7 @@
                         background-color: var(--gm-on-secondary-color);
                     }
                 }
-    
+
                 .gm-charge-image {
                     position: relative;
                     display: block;
@@ -120,8 +83,46 @@
                 width: 39px;
                 margin-top: -30px;
                 input {
-                   text-align: right;
+                    text-align: right;
                 }
+            }
+        }
+        &-charging-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: $spacing-s;
+
+            > div:nth-child(2) {
+                flex-grow: 1;
+            }
+
+            .gm-charging-image {
+                width: 38px;
+                height: 38px;
+                margin-left: -9px;
+                mask-image: url('../assets/images/ic_battery_not_charging.svg');
+                -webkit-mask-image: url('../assets/images/ic_battery_not_charging.svg');
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                background-color: var(--gm-tertiary-variant-color);
+
+                &.charging {
+                    mask-image: url('../assets/images/ic_battery_charging.svg');
+                    -webkit-mask-image: url('../assets/images/ic_battery_charging.svg');
+                    background-color: var(--gm-on-secondary-color);
+                }
+            }
+
+            .gm-charging-status {
+                height: 32px;
+                line-height: 32px;
+                font-weight: bold;
+                margin-left: 10px;
             }
         }
     }

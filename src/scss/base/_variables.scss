@@ -42,18 +42,27 @@
  * SASS variables
  */
 
+// Toolbar
+$toolbar-width: 86px;
+$floatting-toolbar-height: 64px;
+
 // Responsive breakpoint
 $breakpoint-mobile: 650px;
 
 // Spacing
 $spacing-xxs: 2px;
 $spacing-xs: 5px;
-$spacing-s: 8px;
-$spacing-m: 13px;
-$spacing-l: 18px;
-$spacing-xl: 28px;
+$spacing-s: 10px;
+$spacing-m: 12px;
+$spacing-l: 16px;
+$spacing-xl: 30px;
+$spacing-xxl: 40px;
+
+$spacing-gap: 34px;
+
+$spacing-gap: 34px;
 
 // Modal
+$modal-y-padding: 30px;
 $modal-x-padding: 30px;
-$modal-section-mb: $spacing-xl;
-$modal-label-mb: $spacing-m;
+$modal-section-mb: 30px;

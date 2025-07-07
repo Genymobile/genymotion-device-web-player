@@ -6,7 +6,8 @@ const ButtonsEvents = require('./plugins/ButtonsEvents');
 const Fullscreen = require('./plugins/Fullscreen');
 const Clipboard = require('./plugins/Clipboard');
 const StreamBitrate = require('./plugins/StreamBitrate');
-const Screencast = require('./plugins/Screencast');
+const Screenrecord = require('./plugins/Screenrecord');
+const Screenshot = require('./plugins/Screenshot');
 const StreamResolution = require('./plugins/StreamResolution');
 const CoordinateUtils = require('./plugins/CoordinateUtils');
 const KeyboardEvents = require('./plugins/KeyboardEvents');
@@ -63,6 +64,7 @@ module.exports = class DeviceRenderer {
         this.video = this.getChildByClass(this.root, 'gm-video');
         this.wrapper = this.getChildByClass(this.root, 'gm-wrapper');
         this.videoWrapper = this.getChildByClass(this.root, 'gm-video-wrapper');
+        this.playerScreenWrapper = this.root.querySelector('.player-screen-wrapper');
 
         // Event callbacks
         this.callbacks = {};
@@ -83,6 +85,29 @@ module.exports = class DeviceRenderer {
         // last accessed x/y position
         this.x = 0;
         this.y = 0;
+
+        // fix size of wrapper stick to the video size
+        if (this.options.showPhoneBorder) {
+            // When the window is resized, we need to resize the video wrapper to fit the new size
+            this.addListener(window, 'resize', this.resizeAndAlignBorder.bind(this));
+
+            // when the video is resized, we need to resize the video wrapper to fit the new size (rotation, fullscreen, etc)
+            const resizeObserver = new ResizeObserver((entries) => {
+                this.videoWrapper.style.aspectRatio =
+                    entries[0].target.videoWidth + '/' + entries[0].target.videoHeight;
+                this.resizeAndAlignBorder();
+            });
+
+            this.videoResizeObserver = resizeObserver.observe(this.video);
+        }
+        this.addListener(
+            this.video,
+            ['loadeddata', 'loadedmetadata'],
+            () => {
+                this.videoWrapper.style.aspectRatio = this.video.videoWidth + '/' + this.video.videoHeight;
+            },
+            {once: true},
+        );
     }
 
     /**
@@ -98,8 +123,9 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
-            {enabled: this.options.gps, class: GPS, params: [this.options.i18n, this.options.gpsSpeedSupport]},
-            {enabled: this.options.capture, class: Screencast, params: [this.options.i18n]},
+            {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
+            {enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n]},
+            {enabled: this.options.capture, class: Screenshot, params: [this.options.i18n]},
             {enabled: this.options.streamResolution, class: StreamResolution},
             {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
             {enabled: this.options.keyboard, class: KeyboardEvents},
@@ -456,14 +482,7 @@ module.exports = class DeviceRenderer {
 
             log.debug('Added remote video track using ontrack');
             this.video.srcObject = event.streams[0];
-            // Set aspect ratio of the video element to match the video stream
-            this.video.addEventListener(
-                'loadedmetadata',
-                () => {
-                    this.videoWrapper.style.aspectRatio = this.video.videoWidth + '/' + this.video.videoHeight;
-                },
-                {once: true},
-            );
+
             this.video.setAttribute('playsinline', true); // needed on iOs
 
             // Get the PeerConnection Statistics after 3 seconds
@@ -934,10 +953,56 @@ module.exports = class DeviceRenderer {
         this.removeAllListeners();
         this.disconnect();
         this.peerConnectionStats?.destroy();
+        this.videoResizeObserver?.disconnect();
         delete this.peerConnectionStats;
         delete this.video;
         delete this.wrapper;
         delete this.videoWrapper;
         delete this.root;
+    }
+
+    // Manages border on resize to mimic the phone border
+    resizeAndAlignBorder() {
+        const borderDiv = this.videoWrapper.querySelector('.gm-phone-border');
+        const buttonDiv = this.videoWrapper.querySelector('.gm-phone-button');
+        const videoRect = this.video.getBoundingClientRect();
+        const videoBorderWidth = 8;
+        const videoOutlineWidth = 7;
+
+        // Set margin for the video wrapper (using original calculation for safety)
+        this.videoWrapper.style.margin = videoBorderWidth * 2 + videoOutlineWidth * 2 + 'px';
+
+        // Apply styles to the border div (using original calculation for safety)
+        borderDiv.style.borderWidth = videoBorderWidth + 'px';
+        borderDiv.style.outlineWidth = videoOutlineWidth + 'px';
+
+        const calculatedBorderLeft = this.video.offsetLeft - videoBorderWidth - videoOutlineWidth + 2;
+        const calculatedBorderTop = this.video.offsetTop - videoBorderWidth - videoOutlineWidth + 2;
+        const calculatedBorderWidth = videoRect.width + videoBorderWidth * 2 + videoOutlineWidth + 3;
+        const calculatedBorderHeight = videoRect.height + videoBorderWidth * 2 + videoOutlineWidth + 3;
+
+        borderDiv.style.left = calculatedBorderLeft + 'px';
+        borderDiv.style.top = calculatedBorderTop + 'px';
+        borderDiv.style.width = calculatedBorderWidth + 'px';
+        borderDiv.style.height = calculatedBorderHeight + 'px';
+
+        // generated by ai
+
+        // Calculate the position of the border's calculated right edge
+        const borderRightEdge = calculatedBorderLeft + calculatedBorderWidth;
+
+        /*
+         * Position the button's left edge relative to the border's calculated right edge.
+         * Add a small pixel offset if needed for visual spacing.
+         */
+        const buttonOffset = 2; // Adjust as needed
+        buttonDiv.style.left = borderRightEdge + buttonOffset - 5 + 'px';
+
+        // Keep original top/height relative to wrapper
+        buttonDiv.style.top = '10%';
+        buttonDiv.style.height = '90%';
+
+        // Ensure 'right' style from CSS is overridden/removed
+        buttonDiv.style.right = '';
     }
 };

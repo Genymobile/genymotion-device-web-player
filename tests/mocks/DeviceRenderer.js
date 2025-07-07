@@ -44,7 +44,7 @@ module.exports = class DeviceRenderer extends Original {
         this.outgoingMessages = [];
         this.apiManager = new OriginalApiManager(this);
         this.toolbarManager = new ToolBarManager(this);
-        this.tooltipManager = new OriginalTooltipManager();
+        this.tooltipManager = new OriginalTooltipManager(this);
         // Load store since it's deviceRendererFactory which load it
         store(this);
     }

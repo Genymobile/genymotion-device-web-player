@@ -6,7 +6,8 @@
  * Usage: tooltipManager.setTooltip(element, 'Tooltip text', 'top');
  */
 class TooltipManager {
-    constructor() {
+    constructor(instance) {
+        this.instance = instance;
         this.tooltipElement = null;
         this.createTooltipElement();
     }
@@ -17,7 +18,8 @@ class TooltipManager {
     createTooltipElement() {
         this.tooltipElement = document.createElement('div');
         this.tooltipElement.className = 'gm-tooltip';
-        document.body.appendChild(this.tooltipElement);
+
+        this.instance.root.appendChild(this.tooltipElement);
 
         const body = document.createElement('div');
         body.className = 'gm-tooltip-body';

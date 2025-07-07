@@ -93,6 +93,8 @@ module.exports = function () {
                     break;
                 }
                 case 'PROGRESS':
+                    msg.fileSize = (self.file.size / 1024 / 1000).toFixed(2);
+                    msg.uploadedSize = (self.uploadedSize / 1024 / 1000).toFixed(2);
                     postMessage(msg);
                     break;
                 case 'SUCCESS':
@@ -104,6 +106,21 @@ module.exports = function () {
                     break;
                 default:
                     break;
+            }
+        }
+    };
+
+    self.cancelUpload = function () {
+        if (self.isUploading) {
+            self.isUploading = false;
+            self.hasError = false;
+            const msg = {
+                type: 'FILE_UPLOAD',
+                code: 'CANCELED',
+            };
+            postMessage(msg);
+            if (self.socket) {
+                self.socket.close();
             }
         }
     };
@@ -123,6 +140,9 @@ module.exports = function () {
                     self.socket.onclose = null;
                     self.socket.close();
                 }
+                break;
+            case 'cancel':
+                self.cancelUpload();
                 break;
             case 'upload':
                 if (!self.isUploading) {

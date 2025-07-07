@@ -11,6 +11,7 @@ const initialState = {
     },
     isKeyboardEventsEnabled: false,
     isMouseEventsEnabled: false,
+    isDragAndDropForUploadFileEnabled: true,
     trackedEvents: {
         isActive: false,
         events: [],
@@ -155,6 +156,9 @@ const reducer = (state, action) => {
             break;
         case 'FLUSH_TRACKED_EVENTS':
             state.trackedEvents.events.length = 0;
+            break;
+        case 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED':
+            state.isDragAndDropForUploadFileEnabled = action.payload;
             break;
         default:
             log.debug('Store not updated, action type :', action.type, ' unknown');

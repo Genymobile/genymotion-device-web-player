@@ -24,18 +24,12 @@
     --gm-background-success-color: rgba(17, 185, 32, 0.1);
     --gm-warning-color: rgba(255, 204, 0, 1);
     --gm-background-warning-color: rgba(255, 204, 0, 0.1);
-    --gm-gradiant-1: linear-gradient(142.33deg, #e6195e 4.58%, #2b41ea 122.31%);
-    --gm-on-gradiant-1: rgba(255, 255, 255, 1);
-    --gm-gradiant-2: linear-gradient(275.69deg, #e6195e 10.31%, #2b41ea 136.09%);
-    --gm-on-gradiant-2: rgba(255, 255, 255, 1);
+    --gm-gradient-1: linear-gradient(142.33deg, #e6195e 4.58%, #2b41ea 122.31%);
+    --gm-gradient-1-animated: linear-gradient(142.33deg, #2b41ea 4.58%, #e6195e 122.31%);
+    --gm-on-gradient-1: rgba(255, 255, 255, 1);
+    --gm-gradient-2: linear-gradient(275.69deg, #e6195e 10.31%, #2b41ea 136.09%);
+    --gm-on-gradient-2: rgba(255, 255, 255, 1);
 
-    /* Keep for compatibility while all plugin aren't refacto*/
-    /** Button **/
-    --gm-btn-text-color: var(--gm-text-color);
-    --gm-btn-bg-color: var(--gm-primary-color);
-    --gm-btn-bg-color-hover: var(--gm-primary-color);
-    --gm-btn-bg-color-disabled: rgba(179, 179, 179, 0.24); // TODO
-    --gm-btn-bg-color-disabled-hover: #828282;
 }
 
 /**

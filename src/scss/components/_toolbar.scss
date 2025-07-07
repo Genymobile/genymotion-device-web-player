@@ -1,3 +1,5 @@
+@use '../base/variables' as *;
+
 /**
  * renderer toolbar styles
  */
@@ -115,6 +117,7 @@
                         background-color: var(--gm-secondary-variant-color);
                     }
                     &:has(.gm-disabled-icon-button):hover {
+                        cursor: auto;
                         background-color: transparent;
                     }
                     &.gm-toolbar-dot {
@@ -156,6 +159,30 @@
                                 left: 2px;
                             }
                         }
+                        &-success {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-success-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                            }
+                        }
+                        &-failed {
+                            &::before {
+                                content: ' ';
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 10px;
+                                background-color: var(--gm-error-color);
+                                position: absolute;
+                                top: calc(50% - 4px);
+                                left: 7px;
+                            }
+                        }
                     }
                     .gm {
                         &-icon-button {
@@ -165,10 +192,10 @@
                                 cursor: pointer;
                                 background-color: var(--gm-primary-color);
                             }
-                        }
-                        &-disabled-icon-button {
-                            background-color: var(--gm-tertiary-color);
-                            pointer-events: none;
+                            &.gm-disabled-icon-button {
+                                background-color: var(--gm-tertiary-color);
+                                pointer-events: none;
+                            }
                         }
 
                         &-rotation {
@@ -352,6 +379,11 @@
                             }
                         }
 
+                        &-gapps-button {
+                            mask-image: url('../assets/images/ic_gapps.svg');
+                            -webkit-mask-image: url('../assets/images/ic_gapps.svg');
+                        }
+
                         &-default-turn-button {
                             mask-image: url('../assets/images/ic_warning.svg');
                             -webkit-mask-image: url('../assets/images/ic_warning.svg');
@@ -367,6 +399,7 @@
                 /**
                     * working var, changed by js
                     * TODO: evolve to a better solution in the story for tooltip
+                    * issue with y when the toolbar is scrolled
                     */
                 right: var(--gm-working-disabled-widget-pop-up-x);
                 font-size: 15px;

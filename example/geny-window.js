@@ -69,7 +69,7 @@ const start = async (recipeUuid) => {
 
         // init player
         const webrtcAddress = recipe.webrtc_url;
-        initPlayer(webrtcAddress);
+        initPlayer(webrtcAddress, recipe.file_upload_url);
     } catch (error) {
         snackbar(error);
     }
@@ -107,7 +107,7 @@ const startInstance = async (recipeUuid) => {
 };
 
 // initPlayer
-const initPlayer = (webrtcAddress) => {
+const initPlayer = (webrtcAddress, fileUploadUrl = null) => {
     // clean up previous player if it exist, in order to avoid memories leaks
     if (playerInstance) {
         playerInstance.VM_communication.disconnect();
@@ -123,11 +123,14 @@ const initPlayer = (webrtcAddress) => {
         baseband: true,
         keyboardMapping: true,
         gpsSpeedSupport: true,
+        fileUpload: fileUploadUrl ? true : false,
+        fileUploadUrl: fileUploadUrl,
         toolbarOrder: [
             'ButtonsEvents_VOLUME_UP',
             'ButtonsEvents_VOLUME_DOWN',
             'ButtonsEvents_ROTATE',
             'separator',
+            'GAPPSInstall',
             'Screenrecord',
             'Screenshot',
             'Battery',
@@ -231,7 +234,8 @@ const connectInstance = async (wsAddress) => {
     const instance = await response.json();
     instanceUuid = instance.uuid;
     await getJWTToken(instanceUuid);
-    initPlayer(instance.publicWebrtcUrl);
+
+    initPlayer(instance.webrtc_url, instance.file_upload_url);
 };
 
 const snackbar = (error) => {

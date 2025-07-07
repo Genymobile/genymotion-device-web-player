@@ -18,6 +18,7 @@ const Gamepad = require('./plugins/Gamepad');
 const Camera = require('./plugins/Camera');
 const GPS = require('./plugins/GPS');
 const FileUpload = require('./plugins/FileUpload');
+const GAPPSInstall = require('./plugins/GAPPSInstall');
 const Battery = require('./plugins/Battery');
 const Identifiers = require('./plugins/Identifiers');
 const Network = require('./plugins/Network');
@@ -86,6 +87,9 @@ module.exports = class DeviceRenderer {
         this.x = 0;
         this.y = 0;
 
+        // file upload src worker
+        this.fileUploaderWorkerBlobSRC = null;
+
         // fix size of wrapper stick to the video size
         if (this.options.showPhoneBorder) {
             // When the window is resized, we need to resize the video wrapper to fit the new size
@@ -108,6 +112,36 @@ module.exports = class DeviceRenderer {
             },
             {once: true},
         );
+
+        // Prepare source for the upload worker
+        if (window.Worker) {
+            /*
+             *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
+             * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
+             */
+            let fileUploaderWorkerBlob = require('./worker/FileUploaderWorker');
+            fileUploaderWorkerBlob = fileUploaderWorkerBlob
+                .toString()
+                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
+            const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
+            this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
+        }
+
+        // Disable drag and drop (plugins will attach their own callback if needed)
+        this.addListener(this.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.addListener(this.root, 'dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.addListener(this.root, 'drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
     }
 
     /**
@@ -122,6 +156,7 @@ module.exports = class DeviceRenderer {
             {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
             {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
             {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
+            {enabled: this.options.gappsInstall, class: GAPPSInstall, params: [this.options.i18n]},
             {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
             {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
             {enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n]},
@@ -365,11 +400,6 @@ module.exports = class DeviceRenderer {
             this.signalingDataChannel.close();
             this.signalingDataChannel = null;
         }
-
-        if (typeof this.fileUpload !== 'undefined') {
-            const msg = {type: 'close'};
-            this.fileUpload.loaderWorker.postMessage(msg);
-        }
     }
 
     /**
@@ -488,10 +518,12 @@ module.exports = class DeviceRenderer {
             // Get the PeerConnection Statistics after 3 seconds
             new PeerConnectionStats(this, this.peerConnection, 3000);
 
+            // TODO move this code on its own plugin with a subscribe to the store
             if (this.touchEventsEnabled) {
                 this.touchEvents.addTouchCallbacks();
             }
 
+            // TODO move this code on its own plugin with a subscribe to the store
             if (this.gamepadEventsEnabled) {
                 this.gamepadManager.addGamepadCallbacks();
             }
@@ -701,11 +733,10 @@ module.exports = class DeviceRenderer {
         if (data.sdp) {
             try {
                 const sdp = new RTCSessionDescription(data);
-                this.peerConnection.setRemoteDescription(
-                    sdp,
-                    this.onWebRTCConnectionEstablished.bind(this),
-                    this.onWebRTCConnectionError.bind(this),
-                );
+                this.peerConnection
+                    .setRemoteDescription(sdp)
+                    .then(this.onWebRTCConnectionEstablished.bind(this))
+                    .catch(this.onWebRTCConnectionError.bind(this));
             } catch (error) {
                 log.warn('Failed to create SDP ', error.message);
             }
@@ -742,18 +773,6 @@ module.exports = class DeviceRenderer {
             this.reconnecting = false;
         } else {
             this.dispatchEvent('successConnection', {msg: 'Connection established'});
-        }
-
-        if (this.fileUpload) {
-            const msg = {
-                type: 'address',
-                fileUploadAddress: this.options.fileUploadUrl,
-                token: this.options.token,
-            };
-
-            if (this.fileUpload.loaderWorker) {
-                this.fileUpload.loaderWorker.postMessage(msg);
-            }
         }
     }
 
@@ -864,6 +883,10 @@ module.exports = class DeviceRenderer {
                     },
                 },
                 {
+                    widget: this.gappsInstall,
+                    capability: data.message.systemPatcher,
+                },
+                {
                     widget: this.fingerprint,
                     capability: data.message.biometrics,
                 },
@@ -959,6 +982,48 @@ module.exports = class DeviceRenderer {
         delete this.wrapper;
         delete this.videoWrapper;
         delete this.root;
+    }
+
+    // Get an instance of upload worker and handle connect / close
+    createFileUploadWorker() {
+        if (!this.fileUploaderWorkerBlobSRC || !this.options.fileUploadUrl?.length) {
+            let msgError = null;
+            if (!this.fileUploaderWorkerBlobSRC) {
+                msgError = "Worker source can't be loaded";
+            }
+            if (!this.options.fileUploadUrl?.length) {
+                msgError = 'File upload url not set';
+            }
+            throw new Error("Worker can't be created, error:", msgError);
+        }
+        const worker = new Worker(this.fileUploaderWorkerBlobSRC);
+
+        if (this.store.state.isWebRTCConnectionReady) {
+            const msg = {
+                type: 'address',
+                fileUploadAddress: this.options.fileUploadUrl,
+                token: this.options.token,
+            };
+            worker.postMessage(msg);
+        }
+        this.store.subscribe(
+            ({isWebRTCConnectionReady}) => {
+                if (isWebRTCConnectionReady) {
+                    const msg = {
+                        type: 'address',
+                        fileUploadAddress: this.options.fileUploadUrl,
+                        token: this.options.token,
+                    };
+                    worker.postMessage(msg);
+                } else {
+                    const msg = {type: 'close'};
+                    worker.postMessage(msg);
+                }
+            },
+            ['isWebRTCConnectionReady'],
+        );
+
+        return worker;
     }
 
     // Manages border on resize to mimic the phone border

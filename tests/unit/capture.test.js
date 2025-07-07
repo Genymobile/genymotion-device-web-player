@@ -3,6 +3,7 @@
 const Instance = require('../mocks/DeviceRenderer');
 const Screenshot = require('../../src/plugins/Screenshot');
 const Screenrecord = require('../../src/plugins/Screenrecord');
+global.MediaRecorder = function () {};
 
 describe('Capture Plugin', () => {
     let instance;
@@ -24,9 +25,16 @@ describe('Capture Plugin', () => {
         it('should add Screenshot and Screenrecord buttons to toolbar', () => {
             const screenshotButton = document.querySelector('.gm-screenshot-button');
             const screenrecordButton = document.querySelector('.gm-screenrecord-button');
+            const tooltip = document.querySelector('.gm-tooltip');
 
-            expect(screenshotButton.title).toEqual(expect.stringContaining('TEST CAPTURE PLUGIN BUTTON TITLE'));
-            expect(screenrecordButton.title).toEqual(expect.stringContaining('TEST CAPTURE PLUGIN BUTTON TITLE'));
+            screenshotButton.parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST CAPTURE PLUGIN BUTTON TITLE'));
+            screenshotButton.parentElement.dispatchEvent(new Event('mouseleave'));
+
+            screenrecordButton.parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST CAPTURE PLUGIN BUTTON TITLE'));
+            screenrecordButton.parentElement.dispatchEvent(new Event('mouseleave'));
+
             expect(screenshotButton).toBeTruthy();
             expect(screenrecordButton).toBeTruthy();
         });

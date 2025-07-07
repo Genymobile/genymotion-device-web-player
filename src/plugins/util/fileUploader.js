@@ -18,7 +18,6 @@ const fileUploader = (() => {
      * @param {string} [options.dragDropText='DRAG AND DROP FILES'] - Text to display in the drag & drop area
      * @param {string} [options.browseButtonText='BROWSE'] - Text to display on the browse button
      * @param {string} [options.accept=''] - File types to accept (e.g. '.apk' or not set for accept all files)
-     * @param {number} [options.maxFileSize=900] - Maximum file size in MB
      * @param {string} [options.classes=''] - Additional CSS classes to apply
      * @param {Object} i18n - i18n object translation
      * @returns {Object} Object containing the file uploader element and control methods
@@ -35,7 +34,6 @@ const fileUploader = (() => {
         dragDropText = 'DRAG & DROP FILES',
         browseButtonText = 'BROWSE',
         accept = null,
-        maxFileSize = 900,
         classes = '',
         i18n= {}
     }) => {
@@ -71,8 +69,7 @@ const fileUploader = (() => {
         dragDropTextDiv.innerHTML = `<div class='drop-text-1'>
             <b>${dragDropText}</b>
             </div>
-            <div class='drop-text-2'>Upload max size: ${maxFileSize}Mo</div>`;
-
+            <div class='drop-text-2'>${i18n.OR || 'or'}</div>`;
         const browseButton = document.createElement('button');
         browseButton.innerHTML = browseButtonText;
         browseButton.className = 'gm-btn gm-gradient-button';
@@ -287,14 +284,6 @@ const fileUploader = (() => {
         const checkFileBeforeUpload = (file) => {
             if (file) {
                 if (!accept || (accept && file.name.toLowerCase().endsWith(accept.toLowerCase()))) {
-                    if (file.size > maxFileSize * 1024 * 1024) {
-                        showUploadError(i18n.FILE_TOO_LARGE ||
-                            `Your file "${file.name}" doesn't respect the conditions 
-                            to be uploaded (${maxFileSize}Mo max).
-                            Please try with another file.`,
-                        );
-                        return;
-                    }
                     // If file is valid, hide error and show upload progress
                     hideUploadError();
                     hideUploadSuccess();
@@ -314,25 +303,6 @@ const fileUploader = (() => {
         };
 
         const enableDragOver = () => {
-            handleDragOver = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.add('dragover');
-            };
-
-            handleDragLeave = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.remove('dragover');
-            };
-
-            handleDrop = (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dragDropArea.classList.remove('dragover');
-                checkFileBeforeUpload(event.dataTransfer.files[0]);
-            };
-
             dragDropArea.addEventListener('dragover', handleDragOver);
             dragDropArea.addEventListener('dragleave', handleDragLeave);
             dragDropArea.addEventListener('drop', handleDrop);
@@ -371,6 +341,25 @@ const fileUploader = (() => {
             hideUploadError();
             hideUploadSuccess();
             setEnabled(true);
+        };
+
+        handleDragOver = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.add('dragover');
+        };
+
+        handleDragLeave = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.remove('dragover');
+        };
+
+        handleDrop = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dragDropArea.classList.remove('dragover');
+            checkFileBeforeUpload(event.dataTransfer.files[0]);
         };
 
         // Initialize drag & drop

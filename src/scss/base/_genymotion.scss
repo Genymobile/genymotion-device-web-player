@@ -304,6 +304,7 @@
             transition: opacity 0.5s;
         }
         &.waitingForStream {
+            pointer-events: none;
             mask-image: url('../assets/images/loader.svg');
             -webkit-mask-image: url('../assets/images/loader.svg');
             -webkit-mask-size: contain;
@@ -368,19 +369,25 @@
                 }
             }
         }
+        &:not(.floatingBarDisplayed){
+            .player-screen-wrapper {
+                padding-bottom: 30px;
+            }
+        }
 
         .player-screen-wrapper {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             flex: 1;
+            padding-top: 30px;
 
             .gm-video-wrapper {
                 display: flex;
                 justify-content: center;
                 min-height: 0;
                 max-height: 100%;
-                margin: 30px;
+                margin: auto 30px;
 
                 // Calculate aspect ratio of the video with js
                 aspect-ratio: 0;

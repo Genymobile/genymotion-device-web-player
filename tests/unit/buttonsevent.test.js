@@ -66,6 +66,7 @@ describe('ButtonsEvents Plugin', () => {
                 navbar: true,
                 power: true,
             });
+
             new ButtonsEvents(
                 instance,
                 {
@@ -81,14 +82,35 @@ describe('ButtonsEvents Plugin', () => {
             );
 
             // Toolbar buttons
-            const plugin = document.body;
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS ROTATE BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS SOUND_DOWN BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS SOUND_UP BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS RECENT_APPS BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS HOME BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS BACK BUTTON'));
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS POWER BUTTON'));
+            const tooltip = document.querySelector('.gm-tooltip');
+
+            document.querySelector('.gm-rotation').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS ROTATE BUTTON'));
+            document.querySelector('.gm-rotation').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-sound-down').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS SOUND_DOWN BUTTON'));
+            document.querySelector('.gm-sound-down').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-sound-up').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS SOUND_UP BUTTON'));
+            document.querySelector('.gm-sound-up').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-recent').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS RECENT_APPS BUTTON'));
+            document.querySelector('.gm-recent').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-home').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS HOME BUTTON'));
+            document.querySelector('.gm-home').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-back').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS BACK BUTTON'));
+            document.querySelector('.gm-back').parentElement.dispatchEvent(new Event('mouseleave'));
+
+            document.querySelector('.gm-power').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST BUTTONS EVENTS POWER BUTTON'));
+            document.querySelector('.gm-power').parentElement.dispatchEvent(new Event('mouseleave'));
         });
     });
 

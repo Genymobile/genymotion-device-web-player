@@ -7,21 +7,6 @@
     .gm-wrapper {
         &.toolbarPosition-left {
             flex-direction: row-reverse;
-            .gm-disabled-widget-pop-up {
-                &::before {
-                    /**
-                    * working var, changed by js
-                    * TODO: evolve to a better solution in the story for tooltip
-                    */
-                    left: var(--gm-working-disabled-widget-pop-up-x);
-                    margin-right: 0px;
-                    margin-left: 60px;
-                }
-
-                &:hover::before {
-                    display: block;
-                }
-            }
         }
         /*
         * &.toolbarPosition-right {} is the default, so no need to add it
@@ -392,30 +377,35 @@
                 }
             }
         }
-
-        .gm-disabled-widget-pop-up {
-            &::before {
-                position: fixed;
-                /**
-                    * working var, changed by js
-                    * TODO: evolve to a better solution in the story for tooltip
-                    * issue with y when the toolbar is scrolled
-                    */
-                right: var(--gm-working-disabled-widget-pop-up-x);
-                font-size: 15px;
-                z-index: 20;
-                padding: 12px 20px;
-                margin-right: 10px;
-                background-color: var(--gm-secondary-color);
-                color: var(--gm-on-secondary-color);
-                vertical-align: middle;
-                content: 'Not\00a0 currently\00a0 supported';
-                display: none;
-                width: 200px;
-            }
-
-            &:hover::before {
-                display: block;
+        .gm-toolbar{
+            ul{
+                li{
+                    &.gm-toolbar-dot {
+                        &-active {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                        &-notification {
+                            &::before {
+                                left: 12px;
+                            }
+                            &::after {
+                                left: 7px;
+                            }
+                        }
+                        &-success {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                        &-failed {
+                            &::before {
+                                left: 12px;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

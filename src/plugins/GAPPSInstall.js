@@ -161,7 +161,7 @@ class InstallationSuccessView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         const restartBtn = document.createElement('button');
@@ -174,7 +174,7 @@ class InstallationSuccessView {
             };
             this.plugin.instance.sendEvent(json);
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -243,7 +243,7 @@ class InstallationFailedView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.setView('InitialView');
+            this.plugin.viewAtNextopening='InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -347,6 +347,10 @@ class InitialView {
         this.i18n = plugin.i18n;
         this.fileUploadWorker = null;
 
+        this.removeListenerDragAndDropOver = null;
+        this.removeListenerDragAndDropLeave = null;
+        this.removeListenerDragAndDropDrop = null;
+
         try {
             this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
             this.fileUploadWorker.onmessage = (event) => {
@@ -373,6 +377,16 @@ class InitialView {
                         break;
                     case 'PROGRESS':
                         this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
+                        break;
+                    case 'SOCKET_FAIL':
+                        this.fileUploaderComponent.showUploadError(
+                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                            'Something went wrong while connecting to the server.'
+                        );
+                        this.fileUploaderComponent.setEnabled(false);
+                        break;
+                    case 'SOCKET_SUCCESS':
+                        this.fileUploaderComponent.reset();
                         break;
                     default:
                         break;
@@ -483,7 +497,6 @@ class InitialView {
             dragDropText: this.i18n.DRAG_DROP_TEXT || 'DRAG & DROP APK FILE TO INSTALL',
             browseButtonText: this.i18n.BROWSE_BUTTON_TEXT || 'BROWSE',
             accept: '.apk',
-            maxFileSize: 900,
             classes: 'gm-apk-uploader',
             i18n: this.plugin.i18n,
         });
@@ -495,6 +508,28 @@ class InitialView {
         container.appendChild(gappsSection);
         container.appendChild(separator2);
         container.appendChild(apkSection);
+
+        // Attach the drag and drop events on root to handle the drag of an apk
+        if (this.instance.store.state.isDragAndDropForUploadFileEnabled) {
+            this.fileUploaderComponent.setEnabled(true);
+            this.addListenerOnRoot();
+        } else {
+            this.fileUploaderComponent.setEnabled(false);
+            this.removeListenerOnRoot();
+        }
+
+        this.instance.store.subscribe(
+            ({isDragAndDropForUploadFileEnabled}) => {
+                if (isDragAndDropForUploadFileEnabled) {
+                    this.fileUploaderComponent.setEnabled(true);
+                    this.addListenerOnRoot();
+                } else {
+                    this.fileUploaderComponent.setEnabled(false);
+                    this.removeListenerOnRoot();
+                }
+            },
+            ['isDragAndDropForUploadFileEnabled'],
+        );
 
         return container;
     }
@@ -511,6 +546,36 @@ class InitialView {
         const msg = {type: 'upload', file};
         this.fileUploadWorker.postMessage(msg);
     }
+
+    addListenerOnRoot() {
+        this.removeListenerDragAndDropOver = this.instance.addListener(this.instance.root, 'dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this.removeListenerDragAndDropLeave =
+            this.instance.addListener(this.instance.root, 'dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+        this.removeListenerDragAndDropDrop =
+            this.instance.addListener(this.instance.root, 'drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const file = event.dataTransfer.files[0];
+                if (file && file.name && file.name.toLowerCase().endsWith('.apk')) {
+                    this.fileUploaderComponent.startUpload(file);
+                }
+            });
+    }
+
+    removeListenerOnRoot() {
+        this.removeListenerDragAndDropOver?.();
+        this.removeListenerDragAndDropDrop?.();
+        this.removeListenerDragAndDropLeave?.();
+    }
 }
 
 // Plugin main class
@@ -526,6 +591,7 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
         this.instance.gappsInstall = this;
         this.instanciatedViews = new Map(); // Store rendered elements by view type
         this.currentViewType = null;
+        this.viewAtNextopening = null;
         this.GAPPSInstalled = false;
 
         this.registerToolbarButton();
@@ -684,6 +750,10 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
     }
 
     toggleWidget() {
+        // if widget is opening laod the right view is needed
+        if (this.viewAtNextopening && !this.instance.store.getters.isWidgetOpened(this.overlayID)) {
+            this.setView(this.viewAtNextopening);
+        }
         super.toggleWidget();
     }
 };

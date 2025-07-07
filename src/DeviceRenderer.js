@@ -1034,9 +1034,6 @@ module.exports = class DeviceRenderer {
         const videoBorderWidth = 8;
         const videoOutlineWidth = 7;
 
-        // Set margin for the video wrapper (using original calculation for safety)
-        this.videoWrapper.style.margin = videoBorderWidth * 2 + videoOutlineWidth * 2 + 'px';
-
         // Apply styles to the border div (using original calculation for safety)
         borderDiv.style.borderWidth = videoBorderWidth + 'px';
         borderDiv.style.outlineWidth = videoOutlineWidth + 'px';

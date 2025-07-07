@@ -35,7 +35,6 @@ describe('GAPPSInstall Plugin', () => {
             GAPPS_TITLE: 'TEST GAPPS TITLE',
             DRAG_DROP_TEXT: 'TEST DRAG DROP TEXT',
             BROWSE_BUTTON_TEXT: 'TEST BROWSE',
-            FILE_TOO_LARGE: 'TEST FILE TOO LARGE',
             FILE_TYPE_NOT_APK: 'TEST FILE TYPE NOT APK',
             FILE_SEND_APK_FAILED: 'TEST FILE APK SEND FAILED',
         });
@@ -161,22 +160,6 @@ describe('GAPPSInstall Plugin', () => {
 
             expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML)
                 .toEqual(expect.stringContaining('TEST FILE TYPE NOT APK'));
-        });
-
-        test('rejects file larger than 900MB', () => {
-            const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
-            const startUpload = jest.spyOn(initialView.fileUploaderComponent, 'startUpload');
-
-            const bigFakeFile = Object.defineProperty(file, 'size', {
-                value: 901 * 1024 * 1024,
-                writable: false,
-            });
-
-            initialView.fileUploaderComponent.startUpload(bigFakeFile);
-            expect(startUpload).toHaveBeenCalled();
-
-            expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML)
-                .toEqual(expect.stringContaining('TEST FILE TOO LARGE'));
         });
     });
 

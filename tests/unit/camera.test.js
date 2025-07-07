@@ -32,8 +32,11 @@ describe('Camera Plugin', () => {
         });
 
         test('has translations', () => {
-            const plugin = document.body;
-            expect(plugin.innerHTML).toEqual(expect.stringContaining('TEST CAMERA PLUGIN BUTTON TITLE'));
+            const tooltip = document.querySelector('.gm-tooltip');
+
+            document.querySelector('.gm-camera-button').parentElement.dispatchEvent(new Event('mouseenter'));
+            expect(tooltip.innerHTML).toEqual(expect.stringContaining('TEST CAMERA PLUGIN BUTTON TITLE'));
+            document.querySelector('.gm-camera-button').parentElement.dispatchEvent(new Event('mouseleave'));
         });
     });
 });

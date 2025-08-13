@@ -45,7 +45,7 @@
                 height: calc(16px + $spacing-m);
             }
         }
-        &:has(.text-input-message.error) .text-input-container {
+        &:has(.text-input-message.gm-error) .text-input-container {
             border-bottom: 1px solid var(--gm-error-color);
         }
         .text-input-bottom {
@@ -76,7 +76,7 @@
                 display: none;
             }
 
-            &.error {
+            &.gm-error {
                 display: flex;
                 justify-content: space-between;
 

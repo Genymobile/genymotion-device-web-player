@@ -287,7 +287,7 @@ const textInput = (() => {
 
         const setErrorMessage = (message) => {
             if (!message) {
-                inputMessage.classList.remove('error');
+                inputMessage.classList.remove('gm-error');
                 inputMessage.removeAttribute('data-error');
                 inputMessage.classList.add('hidden');
                 if (unitText) {
@@ -297,7 +297,7 @@ const textInput = (() => {
                 }
                 return;
             }
-            inputMessage.classList.add('error');
+            inputMessage.classList.add('gm-error');
             inputMessage.setAttribute('data-error', message);
             inputMessage.classList.remove('hidden');
             unitTextSpan.classList.add('hidden');

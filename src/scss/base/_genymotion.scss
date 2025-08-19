@@ -371,7 +371,7 @@
         }
         &:not(.floatingBarDisplayed){
             .player-screen-wrapper {
-                padding-bottom: 30px;
+                padding-bottom: 25px;
             }
         }
 
@@ -380,7 +380,7 @@
             flex-direction: column;
             justify-content: space-between;
             flex: 1;
-            padding-top: 30px;
+            padding-top: 25px;
 
             .gm-video-wrapper {
                 display: flex;

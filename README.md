@@ -89,10 +89,12 @@ const {DeviceRendererFactory} = require('genymotion/device-web-player');
 
 ## ⚡ Quick Start Guide
 
-Use `DeviceRendererFactory` to instantiate one or more device renderers.
-All you need is an HTML element to use as a container. See example below.
-To find your instance WebRTC address, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
+Use `DeviceRendererFactory` to instantiate one or more device renderers, all you need is an HTML element to use as a container and a valid token.
+
+To find your instance **WebRTC address**, use the [SaaS API](https://developer.genymotion.com/saas/#operation/getInstance)
 or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requirements/), based on your device provider.
+
+See the example below or explore our [detailed example](https://github.com/Genymobile/genymotion-device-web-player/tree/main/example)
 
 ```html
 <!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature
@@ -108,7 +110,7 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
     // See "Features & options" section for more details about options
     const options = {
-        token: 'i-XXXXXXXXXX', // token is the shared secret to connect to your VM
+        token: 'XXXXXXXXXX', // token is the shared secret to connect to your VM
         fileUpload: false, // requires fileUploadUrl
     };
 
@@ -127,6 +129,10 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
     });
 </script>
 ```
+
+### 🔑 A word about the token
+
+To connect a [SaaS](https://docs.genymotion.com/saas/) instance you need to generate and use a specific token. This must be done by using our [endpoint API](https://developer.genymotion.com/saas/#tag/Instances-v1/operation/accessToken). When using this API, don't forget to include the x-api-token HTTP header with a valid [Bearer](https://developer.genymotion.com/saas/#tag/Users-v1/operation/login) or [API Token](https://www.genymotion.com/blog/api-tokens-for-genymotion-saas/)
 
 ## 🎨 Style and CSS
 

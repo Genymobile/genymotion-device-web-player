@@ -63,28 +63,23 @@ class ReplacePlayerUrlsPlugin {
     }
 
     apply(compiler) {
-        let baseURL = '../dist/';
+        let baseURL = '..';
         if (this.mode === 'production') {
             baseURL = `https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@${version}/dist`;
-        } else if (this.mode === 'development') {
-            baseURL = '';
         }
 
         compiler.hooks.compilation.tap('ReplacePlayerUrlsPlugin', (compilation) => {
             const hooks = require('html-webpack-plugin').getHooks(compilation);
 
             hooks.afterTemplateExecution.tap('ReplacePlayerUrlsPlugin', (data) => {
-                // Supprime toutes les balises script et link existantes pour les fichiers du player
+                // Replace local file with file located on jsdelivr
                 data.html = data.html
-                    .replace(/<link[^>]*device-renderer\.min\.css[^>]*>/g, '')
-                    .replace(/<script[^>]*device-renderer\.min\.js[^>]*><\/script>/g, '');
-
-                const cssTag = `<link rel="stylesheet" href="${baseURL}/css/device-renderer.min.css">`;
-                const jsTag = `<script src="${baseURL}/js/device-renderer.min.js"></script>`;
-
-                data.html = data.html.replace('</head>', `${cssTag}\n</head>`);
-                data.html = data.html.replace('</body>', `${jsTag}\n</body>`);
-
+                    .replace(/<link[^>]*device-renderer\.min\.css[^>]*>/g,
+                        `<link rel="stylesheet" href="${baseURL}/css/device-renderer.min.css">`
+                    )
+                    .replace(/<script[^>]*device-renderer\.min\.js[^>]*><\/script>/g, 
+                        `<script src="${baseURL}/js/device-renderer.min.js"></script>`
+                    );
                 return data;
             });
         });

@@ -1,6 +1,6 @@
 {
     "name": "@genymotion/device-web-player",
-    "version": "4.1.5",
+    "version": "4.2.0",
     "description": "Genymotion Virtual Device Web Renderer",
     "main": "dist/js/device-renderer.min.js",
     "files": [

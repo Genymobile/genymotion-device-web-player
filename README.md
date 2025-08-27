@@ -82,9 +82,9 @@ const {DeviceRendererFactory} = require('genymotion/device-web-player');
 ```html
 <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.0/dist/css/device-renderer.min.css"
+    href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.1/dist/css/device-renderer.min.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.0/dist/js/device-renderer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.1/dist/js/device-renderer.min.js"></script>
 ```
 
 ## ⚡ Quick Start Guide

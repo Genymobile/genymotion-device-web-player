@@ -565,7 +565,7 @@ module.exports = class GPS extends OverlayPlugin {
             // Update map
             if (this.map) {
                 this.clearMarkers();
-                this.addMapMarker(position.coords.latitude, position.coords.longitude);
+                this.addMapMarker(position.coords.latitude, position.coords.longitude, true);
                 this.map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
             }
         } catch (error) {
@@ -597,6 +597,8 @@ module.exports = class GPS extends OverlayPlugin {
                     lng: info.longitude,
                 },
                 zoom: this.minimumZoomLevel,
+                streetViewControl: false,
+                mapTypeControl: false,
             });
 
             // Add initial marker for selection from form
@@ -606,7 +608,7 @@ module.exports = class GPS extends OverlayPlugin {
             this.map.addListener('click', (event) => {
                 this.clearMarkers();
                 // Add new marker / capture coords for click location
-                this.addMapMarker(event.latLng.lat(), event.latLng.lng());
+                this.addMapMarker(event.latLng.lat(), event.latLng.lng(), true);
             });
         }
     }
@@ -616,8 +618,9 @@ module.exports = class GPS extends OverlayPlugin {
      *
      * @param {number} lat Latitude of the marker.
      * @param {number} lng Longitude of the marker.
+     * @param {boolean} setAltitudeAuto Retrieve and set altitude from gmaps.
      */
-    addMapMarker(lat, lng) {
+    addMapMarker(lat, lng, setAltitudeAuto=false) {
         if (typeof google === 'undefined') {
             return;
         }
@@ -646,7 +649,7 @@ module.exports = class GPS extends OverlayPlugin {
         }
 
         // Get elevation if service is available
-        if (this.elevationService) {
+        if (this.elevationService && setAltitudeAuto) {
             const location = new google.maps.LatLng(numLat, numLng);
             this.elevationService.getElevationForLocations(
                 {

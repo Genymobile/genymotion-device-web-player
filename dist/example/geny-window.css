@@ -1,0 +1,221 @@
+/*! Version: 4.2.0 */
+/* Variables */
+:root {
+    --primaryColor: #e6195e;
+    --errorColor: #dc3545;
+    --errorBgColor: #f8d7da;
+}
+
+/* CSS helper */
+.mb-1 {
+    margin-bottom: 5px;
+}
+
+.mb-3 {
+    margin-bottom: 15px;
+}
+
+.ml-1 {
+    margin-left: 5px;
+}
+
+.mr-1 {
+    margin-right: 5px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+.align-items-baseline {
+    align-items: baseline;
+}
+
+/* global */
+* {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+h3 {
+    font-family: sans-serif;
+    font-weight: 300;
+}
+
+a {
+    color: #19e6a1;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primaryColor);
+}
+
+ul {
+    padding: 5px 15px;
+}
+hr {
+    color: var(--primaryColor);
+    width: 100%;
+}
+
+#sidebar summary,
+#sidebar label {
+    cursor: pointer;
+}
+
+#sidebar input[type='text'] {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    box-sizing: border-box;
+}
+
+#sidebar input[type='checkbox'] {
+    cursor: pointer;
+}
+#sidebar .note {
+    font-size: 14px;
+    color: #110f0f;
+    background-color: #fffacd;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    padding: 5px 10px;
+    border-radius: 2px;
+}
+
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: var(--errorBgColor);
+    color: var(--errorColor);
+    text-align: center;
+    margin: 0 auto;
+    height: auto;
+    border-radius: 5px;
+    display: flex;
+    padding: 5px 15px;
+    align-items: center;
+    width: auto;
+    flex-grow: 1;
+    margin: 0px 100px;
+}
+#snackbar.show {
+    visibility: visible;
+}
+
+#themeCtrl {
+    align-self: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Page */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    padding: 10px 0;
+    background-color: #292929;
+    display: flex;
+    justify-content: flex-start;
+}
+
+#logo {
+    height: 64px;
+    min-width: 225px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url('./logo.png');
+    margin: 0 0 0 10px;
+    flex-grow: 0;
+}
+
+#main {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    max-width: 300px;
+    background-color: #292929;
+    color: #fff;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-top: 20px;
+    height: calc(100vh - 84px);
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+#sidebar .actions {
+    display: flex;
+    justify-content: space-around;
+}
+
+#sidebar .actions > button {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+#advancedSettings > * {
+    margin-bottom: 10px;
+}
+
+/** Player */
+.light header,
+.light #sidebar {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.light #player {
+    /* Light Theme Variables */
+    --gm-primary-color: rgba(230, 25, 94, 1);
+    --gm-on-primary-color: rgba(255, 255, 255, 1);
+    --gm-primary-variant-color: rgba(230, 25, 94, 0.2);
+    --gm-on-primary-variant-color: rgba(230, 25, 94, 1);
+    --gm-secondary-color: #ffffff;
+    --gm-on-secondary-color: #292929;
+    --gm-secondary-variant-color: #f7f7ff;
+    --gm-on-secondary-variant-color: #1a1a1a;
+    --gm-tertiary-color: #c4c4c44d;
+    --gm-on-tertiary-color: #1a1a1a;
+    --gm-tertiary-variant-color: #c4c4c4;
+    --gm-on-tertiary-variant-color: #1a1a1a;
+    --gm-background-color: #e7e7f3;
+    --gm-on-background-color: #1a1a1a;
+    --gm-surface-color: #f7f7f7;
+    --gm-on-surface-color: #1a1a1a;
+    --gm-error-color: rgba(255, 17, 17, 1);
+    --gm-background-error-color: rgba(255, 17, 17, 0.1);
+    --gm-success-color: rgba(17, 185, 32, 1);
+    --gm-background-success-color: rgba(17, 185, 32, 0.1);
+    --gm-warning-color: rgba(255, 204, 0, 1);
+    --gm-background-warning-color: rgba(255, 204, 0, 0.1);
+    --gm-gradient-1: linear-gradient(142.33deg, #e6195e 4.58%, #2b41ea 122.31%);
+    --gm-on-gradient-1: rgba(255, 255, 255, 1);
+    --gm-gradient-2: linear-gradient(275.69deg, #e6195e 10.31%, #2b41ea 136.09%);
+    --gm-on-gradient-2: rgba(255, 255, 255, 1);
+}
+#player {
+    box-sizing: border-box;
+    margin: 0 auto;
+    flex-grow: 1;
+    max-height: calc(100vh - 84px);
+    background: var(--gm-background-color);
+}

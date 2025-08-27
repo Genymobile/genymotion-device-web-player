@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+    <head>
+        <title>geny SaaS example</title>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="geny-window.css" />
+        <script src="geny-window.js"></script>
+
+        <!--load the player files -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.0/dist/css/device-renderer.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/@genymotion/device-web-player@4.2.0/dist/js/device-renderer.min.js"></script>
+
+        <!-- 
+        //to use maps option in gps widget you need to load google maps api and forward you google pai key
+        <script src="https://maps.googleapis.com/maps/api/js?key=YOURGOOGLEAPIKEY" async defer></script>
+        -->
+    </head>
+
+    <body>
+        <header>
+            <a href="https://www.genymotion.com/" target="_blank" id="logo"></a>
+            <div id="snackbar"></div>
+            <div id="themeCtrl" class="mr-1"></div>
+        </header>
+
+        <div id="main">
+            <div id="sidebar">
+                <h3>Start a new instance</h3>
+                <input type="password" id="apiToken" placeholder="Your Api Token" value="" />
+                <a href="https://www.genymotion.com/blog/api-tokens-for-genymotion-saas/" target="_blank" class="mb-3">
+                    👉 How to get an API token
+                </a>
+
+                <input type="text" id="recipeUuid" placeholder="Recipe uuid" class="mb-3" />
+
+                <div>
+                    ☝️ Recipe uuid from <a href="https://cloud.geny.io/recipes" target="_blank"> SaaS </a>
+                    or
+                    <a href="https://docs.genymotion.com/gmsaas/03_Commands/#list-recipes" target="_blank"> gmsaas </a>
+                </div>
+                <div class="mb-3">👇 Or Select a device from here</div>
+                <select id="listRecipes" class="mb-3" place>
+                    <option value="" selected disabled>No recipes fetched, give a valid api token</option>
+                </select>
+                <div class="actions mb-3">
+                    <button id="start">▶</button>
+                    <button id="stop">⏹</button>
+                </div>
+                <hr />
+                <h3>Connect to an existing instance</h3>
+                <input
+                    type="text"
+                    id="wsAddress"
+                    placeholder="Instance uuid or Websocket address"
+                    value=""
+                    class="mb-3"
+                    list="instances-history"
+                />
+                <datalist id="instances-history"></datalist>
+                <div class="note" id="input-note">
+                    <ul>
+                        <li>
+                            <strong>Instance uuid:</strong> the uuid of a launched device.
+                            <strong>(Genymotion SaaS only)</strong>
+                        </li>
+                        <li>
+                            <strong>WebSocket address:</strong> the WebSocket address ("<i>wss://public ip address</i>")
+                            of the device. <strong>(Genymotion Device Image only)</strong>
+                        </li>
+                    </ul>
+                </div>
+                <div class="actions">
+                    <button id="connectExistingInstance">🔌</button>
+                </div>
+                <hr />
+                <h3>More about geny's products and integration</h3>
+                <a href="https://www.genymotion.com" target="_blank" class="mb-1"> 👉 Our products </a>
+                <a href="https://docs.genymotion.com/gmsaas/" target="_blank" class="mb-1"> 👉 Our CLI, gmsaas </a>
+                <a href="https://github.com/Genymobile/genymotion-device-web-player" target="_blank" class="mb-1">
+                    👉 Player documentation
+                </a>
+                <hr />
+                <h3>Advanced settings</h3>
+                <details id="advancedSettings">
+                    <summary>⚡⚙️</summary>
+                    <div class="d-flex justify-content-between">
+                        <label for="saveToken"> Save the token </label>
+                        <input name="saveToken" id="saveToken" type="checkbox" />
+                    </div>
+                    <div class="note">⚠️ can be read by anyone with access to local storage</div>
+
+                    <div class="d-flex justify-content-between">
+                        <label for="saveInstanceHistory"> Save instances history </label>
+                        <input name="saveInstanceHistory" id="saveInstanceHistory" type="checkbox" />
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <input
+                            name="apiBaseUrl"
+                            id="apiBaseUrl"
+                            type="text"
+                            placeholder="API base url (empty to fallback default)"
+                        />
+                        <div class="actions ml-1">
+                            <button id="saveAPIBaseUrl">💾</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            <div id="player">
+                <div id="fe-player"></div>
+            </div>
+        </div>
+    </body>
+</html>

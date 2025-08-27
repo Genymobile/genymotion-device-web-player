@@ -112,7 +112,18 @@ const slider = (() => {
 
         // Update UI based on the current slider value
         const updateUI = () => {
-            requestAnimationFrame(() => {
+            requestAnimationFrame(async() => {
+                // if CSS isn't ready cursorWidth & sliderWidth haven't size, so we loop to waiting CSS ready
+                const start = performance.now();
+                while (sliderCursor.offsetWidth === 0 || sliderDiv.offsetWidth === 0) {
+                    // After 10s we stop the loop
+                    if (performance.now() - start > 5000) {
+                        log.warn('Timeout: CSS not applied');
+                        break;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 200));
+                }
+
                 const val = parseFloat(input.value);
                 const percentage = ((val - min) / (max - min)) * 100;
                 const cursorWidth = sliderCursor.offsetWidth;
@@ -124,7 +135,7 @@ const slider = (() => {
                 progressBar.style.width = `${percentage}%`;
                 sliderCursor.style.left = adjustedPercentage;
 
-                const calc = ((percentage / 100) * 16 - 8) * -1;
+                const calc = ((percentage / 100) * sliderCursor.offsetWidth / 2) * -1;
                 sliderCursor.style.transform = `translate(${calc}px, -50%)`;
             });
         };

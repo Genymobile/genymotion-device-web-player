@@ -24,5 +24,10 @@ const genyDeviceWebPlayer = {
     GamepadManager,
 };
 
+// Expose to window for UMD/Dev compatibility
+if (typeof window !== 'undefined') {
+    window.genyDeviceWebPlayer = genyDeviceWebPlayer;
+}
+
 export default genyDeviceWebPlayer;
 

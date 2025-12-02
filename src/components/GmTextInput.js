@@ -191,7 +191,7 @@ export class GmTextInput extends HTMLElement {
         if (!this.messageElement) return;
 
         if (message) {
-            this.messageElement.textContent = message; // Legacy used data-error attribute mostly for CSS content?
+
             this.messageElement.setAttribute('data-error', message);
             this.messageElement.classList.add('gm-error');
             this.messageElement.classList.remove('hidden');

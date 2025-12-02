@@ -1,5 +1,4 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { dropdownSelect } from './util/components';
 
 /**
  * Instance battery plugin.
@@ -60,16 +59,19 @@ export default class Battery extends OverlayPlugin {
             title: this.i18n.BATTERY_TITLE || 'Battery',
             classes: 'gm-battery-plugin',
             width: 378,
-            height: 330,
+            height: 360,
         });
 
         // Charge level
         this.chargeGroup = document.createElement('div');
-        this.chargeGroup.className = 'gm-battery-charge-group';
 
         const chargeLabel = document.createElement('label');
         chargeLabel.innerHTML = this.i18n.BATTERY_CHARGE_LEVEL || 'Charge level';
         this.chargeGroup.appendChild(chargeLabel);
+
+        // Container for the row (Icon, Slider, Input)
+        const levelRow = document.createElement('div');
+        levelRow.className = 'gm-charge-level-group';
 
         const chargeImageGroup = document.createElement('div');
         chargeImageGroup.className = 'gm-charge-image-group';
@@ -81,16 +83,15 @@ export default class Battery extends OverlayPlugin {
         this.chargeImageOverlay = document.createElement('div');
         chargeImage.className = 'gm-charge-image';
         this.chargeImageOverlay.className = 'gm-charge-image-overlay';
-        this.chargeImageOverlay.style.height = '50%;';
+        this.chargeImageOverlay.style.height = '50%';
+
         chargeImageGroup.appendChild(chargeImage);
         chargeImageOverlayContainer.appendChild(this.chargeImageOverlay);
         chargeImageGroup.appendChild(chargeImageOverlayContainer);
-        this.chargeGroup.appendChild(chargeImageGroup);
 
-        const sliderGroup = document.createElement('div');
-        sliderGroup.style.display = 'flex';
+        levelRow.appendChild(chargeImageGroup);
 
-        // slider range for battery level
+        // 2. Slider
         this.chargeSlider = document.createElement('gm-slider');
         this.chargeSlider.setAttribute('min', '0');
         this.chargeSlider.setAttribute('max', '100');
@@ -110,9 +111,9 @@ export default class Battery extends OverlayPlugin {
             this.updateUIBatteryChargingPercent(value);
         });
 
-        sliderGroup.appendChild(this.chargeSlider);
+        levelRow.appendChild(this.chargeSlider);
 
-        // Charge level input
+        // 3. Input
         this.chargeInput = document.createElement('gm-text-input');
         this.chargeInput.setAttribute('append-text', '%');
         this.chargeInput.setAttribute('value', '50');
@@ -126,9 +127,9 @@ export default class Battery extends OverlayPlugin {
             this.sendDataToInstance();
         });
 
-        sliderGroup.appendChild(this.chargeInput);
-        this.chargeGroup.appendChild(sliderGroup);
+        levelRow.appendChild(this.chargeInput);
 
+        this.chargeGroup.appendChild(levelRow);
         container.appendChild(this.chargeGroup);
 
         const separator = document.createElement('div');
@@ -137,28 +138,35 @@ export default class Battery extends OverlayPlugin {
 
         // Charging state
         const chargingGroup = document.createElement('div');
-        chargingGroup.className = 'gm-battery-charging-group';
 
         const chargingLabel = document.createElement('label');
-        chargingLabel.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
+        chargingLabel.innerHTML = this.i18n.BATTERY_STATE_OF_CHARGE || 'State of charge';
         chargingGroup.appendChild(chargingLabel);
 
+        // Container for the row (Icon, Status, Switch)
+        const chargingRow = document.createElement('div');
+        chargingRow.className = 'gm-charging-group';
+
+        // 1. Charging Image
+        this.chargingImage = document.createElement('div');
+        this.chargingImage.className = 'gm-charging-image';
+        chargingRow.appendChild(this.chargingImage);
+
+        // 2. Charging Status Text
         this.chargingStatus = document.createElement('div');
         this.chargingStatus.className = 'gm-charging-status';
         this.chargingStatus.innerHTML = 'Not charging';
+        chargingRow.appendChild(this.chargingStatus);
 
-        // Switch button for charging state
+        // 3. Switch
         this.chargingInput = document.createElement('gm-switch');
         this.chargingInput.addEventListener('gm-change', () => {
             this.sendDataToInstance();
             this.updateUIBatteryChargingState();
         });
+        chargingRow.appendChild(this.chargingInput);
 
-        this.chargingStatus.className = 'gm-charging-status';
-        this.chargingStatus.innerHTML = 'Not charging';
-
-        chargingGroup.appendChild(this.chargingStatus);
-        chargingGroup.appendChild(this.chargingInput);
+        chargingGroup.appendChild(chargingRow);
         container.appendChild(chargingGroup);
     }
 
@@ -192,10 +200,12 @@ export default class Battery extends OverlayPlugin {
             this.chargingInput.checked = true;
             this.chargingStatus.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
             this.chargingStatus.classList.add('charging');
+            this.chargingImage.classList.add('charging');
         } else {
             this.chargingInput.checked = false;
             this.chargingStatus.innerHTML = this.i18n.BATTERY_NOT_CHARGING || 'Not charging';
             this.chargingStatus.classList.remove('charging');
+            this.chargingImage.classList.remove('charging');
         }
     }
 
@@ -215,9 +225,11 @@ export default class Battery extends OverlayPlugin {
         if (this.chargingInput.checked) {
             this.chargingStatus.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
             this.chargingStatus.classList.add('charging');
+            this.chargingImage.classList.add('charging');
         } else {
             this.chargingStatus.innerHTML = this.i18n.BATTERY_NOT_CHARGING || 'Not charging';
             this.chargingStatus.classList.remove('charging');
+            this.chargingImage.classList.remove('charging');
         }
     }
 }

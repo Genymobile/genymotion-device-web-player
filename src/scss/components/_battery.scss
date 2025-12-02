@@ -96,6 +96,11 @@
                     text-align: right;
                 }
             }
+
+            .battery-slider {
+                margin: 0 $spacing-s;
+                width: calc(100% - 2 * #{$spacing-s});
+            }
         }
 
         &-charging-group {

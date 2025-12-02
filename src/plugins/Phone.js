@@ -1,5 +1,4 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { chipTag } from './util/components';
 
 /**
  * Instance phone plugin.

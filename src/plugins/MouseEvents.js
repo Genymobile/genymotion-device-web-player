@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * Instance mouse plugin.
  * Forward touch events to instance.
  */
-module.exports = class MouseEvents {
+export default class MouseEvents {
     static get name() {
         return 'MouseEvents';
     }
@@ -24,7 +23,7 @@ module.exports = class MouseEvents {
 
         this.leftButtonPressed = false;
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
-        this.removeMouseUpListener = () => {};
+        this.removeMouseUpListener = () => { };
 
         this.instance.store.subscribe(
             ({isMouseEventsEnabled}) => {

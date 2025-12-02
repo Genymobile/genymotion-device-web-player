@@ -21,11 +21,12 @@
         flex-direction: column;
         padding-bottom: $modal-y-padding;
         z-index: 100;
-        box-shadow: 0px 1px 20px 0px rgba(0,0,0, 0.40);
+        box-shadow: 0px 1px 20px 0px rgba(0, 0, 0, 0.40);
 
         // handle overflow when the modal is too high
         overflow-y: auto;
         max-height: 100%;
+
         &.gm-visible {
             opacity: 1;
             transition:
@@ -62,7 +63,7 @@
         &::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.5);
         }
-        
+
         .gm-section-line {
             margin-top: $spacing-s;
         }
@@ -74,6 +75,7 @@
             padding-bottom: $spacing-l;
             display: block;
         }
+
         .gm-modal-header {
             padding-left: $modal-x-padding;
             padding-right: $modal-x-padding;
@@ -103,11 +105,11 @@
                 }
 
                 .gm-modal-close-btn {
-                    mask-image: url('../assets/images/ic_cross.svg');
+                    mask-image: url('../../assets/images/ic_cross.svg');
                     mask-repeat: no-repeat;
                     mask-position: top center;
                     mask-size: contain;
-                    -webkit-mask-image: url('../assets/images/ic_cross.svg');
+                    -webkit-mask-image: url('../../assets/images/ic_cross.svg');
                     -webkit-mask-repeat: no-repeat;
                     -webkit-mask-position: top center;
                     -webkit-mask-size: contain;

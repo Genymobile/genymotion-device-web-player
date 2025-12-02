@@ -1,4 +1,3 @@
-'use strict';
 
 /**
  * List of invisible key that can be pressed.
@@ -42,7 +41,7 @@ const CTRL_SHORTCUT_KEYS = {
  * Instance keyboard plugin.
  * Translate and forward keyboard events to instance.
  */
-module.exports = class KeyboardEvents {
+export default class KeyboardEvents {
     static get name() {
         return 'KeyboardEvents';
     }

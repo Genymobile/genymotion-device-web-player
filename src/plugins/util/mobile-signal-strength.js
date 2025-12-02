@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * List of possible network signal strengths to send to the VM.
  * Used only for android versions greater or equal to 8.
  */
-module.exports = [
+export default [
     {
         id: 4,
         name: 'great',

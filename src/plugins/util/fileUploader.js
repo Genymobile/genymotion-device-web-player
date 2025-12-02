@@ -1,6 +1,5 @@
-'use strict';
 
-const {progressBar} = require('./components');
+import {progressBar} from './components';
 
 /**
  * Module for creating custom file uploader components with drag & drop functionality.
@@ -35,7 +34,7 @@ const fileUploader = (() => {
         browseButtonText = 'BROWSE',
         accept = null,
         classes = '',
-        i18n= {}
+        i18n = {}
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -121,7 +120,7 @@ const fileUploader = (() => {
 
         uploadCancelButton.className = 'gm-cancel-update-icon';
         uploadCancelButton.onclick = () => {
-            fileInput.value= '';
+            fileInput.value = '';
             if (onUploadCanceled) {
                 onUploadCanceled();
             }
@@ -380,4 +379,4 @@ const fileUploader = (() => {
     return {createFileUploader};
 })();
 
-module.exports = fileUploader;
+export default fileUploader;

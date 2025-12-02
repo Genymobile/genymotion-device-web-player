@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * Stream bitrate plugin.
  * Provides video stream quality (audio and video bitrates) control.
  */
-module.exports = class StreamBitrate {
+export default class StreamBitrate {
     static get name() {
         return 'StreamBitrate';
     }

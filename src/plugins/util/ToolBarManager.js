@@ -1,6 +1,6 @@
-'use strict';
-const log = require('loglevel');
-class ToolbarManager {
+
+import log from 'loglevel';
+export default class ToolbarManager {
     /**
      * Initialize ToolbarManager
      * @param {Object} instance - The instance to be managed.
@@ -117,7 +117,7 @@ class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             title,
-            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left':'right',
+            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
             'toolbarTitleWidget'
         );
     }
@@ -144,7 +144,7 @@ class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             this.instance.options.i18n.NOT_SUPPORTED || 'Not currently supported',
-            this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+            this.instance.options.toolbarPosition === 'right' ? 'left' : 'right'
         );
         buttonIcon.classList.add('gm-disabled-icon-button');
 
@@ -303,4 +303,3 @@ class ToolbarManager {
     }
 }
 
-module.exports = ToolbarManager;

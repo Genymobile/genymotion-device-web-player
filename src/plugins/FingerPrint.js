@@ -1,8 +1,7 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {switchButton} = require('./util/components');
-const log = require('loglevel');
+import OverlayPlugin from './util/OverlayPlugin';
+import {switchButton} from './util/components';
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
@@ -34,7 +33,7 @@ const FINGERPRINT_MESSAGES = {
         AUTO_RECOGNIZE_TRUE: 'auto_recognize true',
     },
 };
-module.exports = class FingerPrint extends OverlayPlugin {
+export default class FingerPrint extends OverlayPlugin {
     static get name() {
         return 'FingerPrint';
     }

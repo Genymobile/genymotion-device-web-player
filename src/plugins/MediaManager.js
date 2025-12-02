@@ -1,9 +1,8 @@
-'use strict';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
-module.exports = class MediaManager {
+export default class MediaManager {
     /**
      * Constructor to this MediaManager class
      * @param {DeviceRenderer} instance root instance

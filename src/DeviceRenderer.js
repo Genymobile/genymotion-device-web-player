@@ -1,43 +1,42 @@
-'use strict';
+import MultiTouchEvents from './plugins/MultiTouchEvents';
+import ButtonsEvents from './plugins/ButtonsEvents';
+import Fullscreen from './plugins/Fullscreen';
+import Clipboard from './plugins/Clipboard';
+import StreamBitrate from './plugins/StreamBitrate';
+import Screenrecord from './plugins/Screenrecord';
+import Screenshot from './plugins/Screenshot';
+import StreamResolution from './plugins/StreamResolution';
+import CoordinateUtils from './plugins/CoordinateUtils';
+import KeyboardEvents from './plugins/KeyboardEvents';
+import KeyboardMapping from './plugins/KeyboardMapping';
+import MouseEvents from './plugins/MouseEvents';
+import PeerConnectionStats from './plugins/PeerConnectionStats';
+import Gamepad from './plugins/Gamepad';
+import Camera from './plugins/Camera';
+import GPS from './plugins/GPS';
+import FileUpload from './plugins/FileUpload';
+import GAPPSInstall from './plugins/GAPPSInstall';
+import Battery from './plugins/Battery';
+import Identifiers from './plugins/Identifiers';
+import Network from './plugins/Network';
+import Phone from './plugins/Phone';
+import BasebandRIL from './plugins/BasebandRIL';
+import IOThrottling from './plugins/IOThrottling';
+import GamepadManager from './plugins/GamepadManager';
+import FingerPrint from './plugins/FingerPrint';
+import MediaManager from './plugins/MediaManager';
 
-// Plugins
-const MultiTouchEvents = require('./plugins/MultiTouchEvents');
-const ButtonsEvents = require('./plugins/ButtonsEvents');
-const Fullscreen = require('./plugins/Fullscreen');
-const Clipboard = require('./plugins/Clipboard');
-const StreamBitrate = require('./plugins/StreamBitrate');
-const Screenrecord = require('./plugins/Screenrecord');
-const Screenshot = require('./plugins/Screenshot');
-const StreamResolution = require('./plugins/StreamResolution');
-const CoordinateUtils = require('./plugins/CoordinateUtils');
-const KeyboardEvents = require('./plugins/KeyboardEvents');
-const KeyboardMapping = require('./plugins/KeyboardMapping');
-const MouseEvents = require('./plugins/MouseEvents');
-const PeerConnectionStats = require('./plugins/PeerConnectionStats');
-const Gamepad = require('./plugins/Gamepad');
-const Camera = require('./plugins/Camera');
-const GPS = require('./plugins/GPS');
-const FileUpload = require('./plugins/FileUpload');
-const GAPPSInstall = require('./plugins/GAPPSInstall');
-const Battery = require('./plugins/Battery');
-const Identifiers = require('./plugins/Identifiers');
-const Network = require('./plugins/Network');
-const Phone = require('./plugins/Phone');
-const BasebandRIL = require('./plugins/BasebandRIL');
-const IOThrottling = require('./plugins/IOThrottling');
-const GamepadManager = require('./plugins/GamepadManager');
-const FingerPrint = require('./plugins/FingerPrint');
-const MediaManager = require('./plugins/MediaManager');
+import { generateUID } from './utils/helpers';
+import log from 'loglevel';
+import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
-const {generateUID} = require('./utils/helpers');
-const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
  * Device renderer instance.
  * Initialize a renderer for a specific VM instance
  */
-module.exports = class DeviceRenderer {
+export default class DeviceRenderer {
     /**
      * Renderer instance initialization.
      *
@@ -110,7 +109,7 @@ module.exports = class DeviceRenderer {
             () => {
                 this.videoWrapper.style.aspectRatio = this.video.videoWidth + '/' + this.video.videoHeight;
             },
-            {once: true},
+            { once: true },
         );
 
         // Prepare source for the upload worker
@@ -119,11 +118,9 @@ module.exports = class DeviceRenderer {
              *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
              * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
              */
-            let fileUploaderWorkerBlob = require('./worker/FileUploaderWorker');
-            fileUploaderWorkerBlob = fileUploaderWorkerBlob
-                .toString()
-                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
-            const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
+            const workerFn = fileUploaderWorkerBlob.toString();
+            const workerBody = workerFn.substring(workerFn.indexOf('{') + 1, workerFn.lastIndexOf('}'));
+            const src = new Blob([workerBody], { type: 'application/javascript' });
             this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
         }
 
@@ -150,35 +147,35 @@ module.exports = class DeviceRenderer {
      */
     getPlugins() {
         const pluginInitMap = [
-            {enabled: this.options.touch, class: MultiTouchEvents},
-            {enabled: this.options.fullscreen, class: Fullscreen},
-            {enabled: this.options.clipboard, class: Clipboard, params: [this.options.i18n]},
-            {enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n]},
-            {enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager]},
-            {enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n]},
-            {enabled: this.options.gappsInstall, class: GAPPSInstall, params: [this.options.i18n]},
-            {enabled: this.options.battery, class: Battery, params: [this.options.i18n]},
-            {enabled: this.options.gps, class: GPS, params: [this.options.i18n]},
-            {enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n]},
-            {enabled: this.options.capture, class: Screenshot, params: [this.options.i18n]},
-            {enabled: this.options.streamResolution, class: StreamResolution},
-            {enabled: this.options.touch || this.options.mouse, class: CoordinateUtils},
-            {enabled: this.options.keyboard, class: KeyboardEvents},
-            {enabled: this.options.keyboardMapping, class: KeyboardMapping},
-            {enabled: this.options.mouse, class: MouseEvents},
+            { enabled: this.options.touch, class: MultiTouchEvents },
+            { enabled: this.options.fullscreen, class: Fullscreen },
+            { enabled: this.options.clipboard, class: Clipboard, params: [this.options.i18n] },
+            { enabled: this.options.streamBitrate, class: StreamBitrate, params: [this.options.i18n] },
+            { enabled: this.options.camera, class: Camera, params: [this.options.i18n], dependencies: [MediaManager] },
+            { enabled: this.options.fileUpload, class: FileUpload, params: [this.options.i18n] },
+            { enabled: this.options.gappsInstall, class: GAPPSInstall, params: [this.options.i18n] },
+            { enabled: this.options.battery, class: Battery, params: [this.options.i18n] },
+            { enabled: this.options.gps, class: GPS, params: [this.options.i18n] },
+            { enabled: this.options.capture, class: Screenrecord, params: [this.options.i18n] },
+            { enabled: this.options.capture, class: Screenshot, params: [this.options.i18n] },
+            { enabled: this.options.streamResolution, class: StreamResolution },
+            { enabled: this.options.touch || this.options.mouse, class: CoordinateUtils },
+            { enabled: this.options.keyboard, class: KeyboardEvents },
+            { enabled: this.options.keyboardMapping, class: KeyboardMapping },
+            { enabled: this.options.mouse, class: MouseEvents },
             {
                 enabled: this.options.gamepad,
                 class: Gamepad,
                 params: [this.options.i18n],
                 dependencies: [GamepadManager],
             },
-            {enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n]},
-            {enabled: this.options.network, class: Network, params: [this.options.i18n]},
-            {enabled: this.options.phone, class: Phone, params: [this.options.i18n]},
-            {enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n]},
-            {enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n]},
-            {enabled: this.options.biometrics, class: FingerPrint},
-            {enabled: this.options.microphone, dependencies: [MediaManager]},
+            { enabled: this.options.identifiers, class: Identifiers, params: [this.options.i18n] },
+            { enabled: this.options.network, class: Network, params: [this.options.i18n] },
+            { enabled: this.options.phone, class: Phone, params: [this.options.i18n] },
+            { enabled: this.options.baseband, class: BasebandRIL, params: [this.options.i18n] },
+            { enabled: this.options.diskIO, class: IOThrottling, params: [this.options.i18n] },
+            { enabled: this.options.biometrics, class: FingerPrint },
+            { enabled: this.options.microphone, dependencies: [MediaManager] },
             {
                 enabled: this.options.buttons,
                 class: ButtonsEvents,
@@ -196,7 +193,7 @@ module.exports = class DeviceRenderer {
      * @param {Object} payload Event payload.
      */
     dispatchEvent(name, payload) {
-        window.dispatchEvent(new CustomEvent(name, {detail: payload}));
+        window.dispatchEvent(new CustomEvent(name, { detail: payload }));
     }
 
     /**
@@ -303,7 +300,7 @@ module.exports = class DeviceRenderer {
         const store = this.store;
 
         this.webRTCWebsocket.onclose = (event) => {
-            store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
+            store.dispatch({ type: 'WEBRTC_CONNECTION_READY', payload: false });
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
@@ -312,7 +309,7 @@ module.exports = class DeviceRenderer {
                 case 1001:
                 case 1005:
                     log.debug('Closing websocket');
-                    this.dispatchEvent('closeConnection', {msg: 'Closing connection'});
+                    this.dispatchEvent('closeConnection', { msg: 'Closing connection' });
                     break;
 
                 case 1002:
@@ -328,7 +325,7 @@ module.exports = class DeviceRenderer {
                 case 1014:
                 case 1015: {
                     // Might be interesting to be able to setup polling debounce in the object configuration (DOM / Frontend Portal)
-                    this.dispatchEvent('closeConnectionUnavailable', {msg: "Can't connect to the WebSocket"});
+                    this.dispatchEvent('closeConnectionUnavailable', { msg: "Can't connect to the WebSocket" });
                     log.debug('Retrying in 3 seconds...');
 
                     const timeout = setTimeout(() => {
@@ -339,7 +336,7 @@ module.exports = class DeviceRenderer {
                     break;
                 }
                 case 4242: // wrong token provided
-                    this.dispatchEvent('closeWrongToken', {msg: "Wrong token, can't establish connection"});
+                    this.dispatchEvent('closeWrongToken', { msg: "Wrong token, can't establish connection" });
                     break;
 
                 case 4243: // token no longer valid
@@ -349,11 +346,11 @@ module.exports = class DeviceRenderer {
                     break;
 
                 case 4244: // server is shutting down
-                    this.dispatchEvent('closeServerShutdown', {msg: 'Server is shutting down...'});
+                    this.dispatchEvent('closeServerShutdown', { msg: 'Server is shutting down...' });
                     break;
 
                 default:
-                    this.dispatchEvent('defaultCloseConnection', {msg: 'Default close connection'});
+                    this.dispatchEvent('defaultCloseConnection', { msg: 'Default close connection' });
                     // Do nothing (for now)
                     break;
             }
@@ -536,28 +533,28 @@ module.exports = class DeviceRenderer {
             playWithSound
                 .then(() => {
                     log.debug('Playing video with sound enabled');
-                    this.dispatchEvent('video', {msg: 'play automatically allowed with sound'});
+                    this.dispatchEvent('video', { msg: 'play automatically allowed with sound' });
                 })
                 .catch(() => {
                     log.debug("Can't play video with sound enabled");
-                    this.dispatchEvent('video', {msg: 'play with sound denied'});
+                    this.dispatchEvent('video', { msg: 'play with sound denied' });
                     this.video.muted = true;
                     const playWithoutSound = this.video.play();
                     playWithoutSound
                         .then(() => {
                             log.debug('Playing video with sound disabled');
-                            this.dispatchEvent('video', {msg: 'play automatically allowed without sound'});
+                            this.dispatchEvent('video', { msg: 'play automatically allowed without sound' });
                             const popup = document.createElement('div');
                             popup.classList.add('gm-click-to-unmute');
                             popup.innerHTML =
                                 this.options.i18n.UNMUTE_INVITE ||
                                 'By default, the sound has been turned off, ' +
-                                    'please click anywhere to re-enable audio';
+                                'please click anywhere to re-enable audio';
                             this.videoWrapper.prepend(popup);
                             const addSound = () => {
                                 this.video.muted = false;
                                 this.removeAddSoundListener();
-                                this.dispatchEvent('video', {msg: 'sound manually allowed by click'});
+                                this.dispatchEvent('video', { msg: 'sound manually allowed by click' });
                                 popup.remove();
                                 log.debug('Playing video with sound enabled has been authorized due to user click');
                             };
@@ -565,7 +562,7 @@ module.exports = class DeviceRenderer {
                         })
                         .catch(() => {
                             log.debug("Can't play video, even with sound disabled");
-                            this.dispatchEvent('video', {msg: 'play denied even without sound'});
+                            this.dispatchEvent('video', { msg: 'play denied even without sound' });
                             const div = document.createElement('div');
                             this.classList.add('gm-click-to-display');
                             this.classList.add('gm-video-overlay');
@@ -574,7 +571,7 @@ module.exports = class DeviceRenderer {
                                 this.removeAllowPlayListener();
                                 this.video.play();
                                 div.remove();
-                                this.dispatchEvent('video', {msg: 'play manually allowed by click'});
+                                this.dispatchEvent('video', { msg: 'play manually allowed by click' });
                                 log.debug('Playing video with sound disabled has been authorized due to user click');
                             };
                             this.removeAllowPlayListener = this.addListener(div, ['click', 'touchend'], allowPlay);
@@ -587,7 +584,7 @@ module.exports = class DeviceRenderer {
                 ? this.peerConnection.iceConnectionState
                 : 'No peerConnection';
             log.debug('iceConnectionState: ', iceConnectionState);
-            this.dispatchEvent('iceConnectionState', {msg: iceConnectionState});
+            this.dispatchEvent('iceConnectionState', { msg: iceConnectionState });
 
             if (iceConnectionState !== 'failed') {
                 return;
@@ -607,7 +604,7 @@ module.exports = class DeviceRenderer {
                 );
                 const openDocumentationLink = () => {
                     this.removeOpenDocListener();
-                    this.dispatchEvent('iceConnectionStateDocumentation', {msg: 'clicked'});
+                    this.dispatchEvent('iceConnectionStateDocumentation', { msg: 'clicked' });
                     div.remove();
                     window.open(this.options.connectionFailedURL, '_blank');
                 };
@@ -653,7 +650,7 @@ module.exports = class DeviceRenderer {
         };
         this.signalingDataChannel.onopen = () => {
             // Adding status to store, this way all logic for new connection can be handled by plugin
-            this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: true});
+            this.store.dispatch({ type: 'WEBRTC_CONNECTION_READY', payload: true });
             log.debug('Data Channel opened');
         };
 
@@ -772,7 +769,7 @@ module.exports = class DeviceRenderer {
         if (this.reconnecting) {
             this.reconnecting = false;
         } else {
-            this.dispatchEvent('successConnection', {msg: 'Connection established'});
+            this.dispatchEvent('successConnection', { msg: 'Connection established' });
         }
     }
 
@@ -803,7 +800,7 @@ module.exports = class DeviceRenderer {
     handleMessage(data) {
         if (data.type === 'USERS') {
             if (data.code === 'SUCCESS') {
-                this.dispatchEvent('userListUpdated', {msg: data.message});
+                this.dispatchEvent('userListUpdated', { msg: data.message });
             }
         } else if (data.type === 'VERSION') {
             if (data.code === 'SUCCESS') {
@@ -934,7 +931,7 @@ module.exports = class DeviceRenderer {
         const id = generateUID();
         eventArray.forEach((event) => {
             object.addEventListener(event, handler, options);
-            this.allListeners.push({id, object, event, handler, options});
+            this.allListeners.push({ id, object, event, handler, options });
         });
 
         return () => {
@@ -952,7 +949,7 @@ module.exports = class DeviceRenderer {
      * Removes all listeners that were added through `addListener`
      */
     removeAllListeners() {
-        this.allListeners.forEach(({object, event, handler, options}) => {
+        this.allListeners.forEach(({ object, event, handler, options }) => {
             object.removeEventListener(event, handler, options);
         });
         this.allListeners.length = 0;
@@ -1007,7 +1004,7 @@ module.exports = class DeviceRenderer {
             worker.postMessage(msg);
         }
         this.store.subscribe(
-            ({isWebRTCConnectionReady}) => {
+            ({ isWebRTCConnectionReady }) => {
                 if (isWebRTCConnectionReady) {
                     const msg = {
                         type: 'address',
@@ -1016,7 +1013,7 @@ module.exports = class DeviceRenderer {
                     };
                     worker.postMessage(msg);
                 } else {
-                    const msg = {type: 'close'};
+                    const msg = { type: 'close' };
                     worker.postMessage(msg);
                 }
             },

@@ -1,7 +1,5 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import log from 'loglevel';
-import {progressBar} from './util/components';
 import fileUploader from './util/fileUploader';
 log.setDefaultLevel('debug');
 
@@ -51,14 +49,13 @@ class InstallingGAPPSView {
         progressTextContainer.appendChild(this.progressText);
         progressTextContainer.appendChild(this.progressPercentage);
 
-        this.progressBar = progressBar.createProgressBar({
-            value: 0,
-            max: 100,
-        });
+        this.progressBar = document.createElement('gm-progress');
+        this.progressBar.value = 0;
+        this.progressBar.max = 100;
 
         progressSection.appendChild(androidIcon);
         progressSection.appendChild(progressTextContainer);
-        progressSection.appendChild(this.progressBar.element);
+        progressSection.appendChild(this.progressBar);
 
         const separator2 = document.createElement('div');
         separator2.className = 'gm-separator';
@@ -100,7 +97,7 @@ class InstallingGAPPSView {
     updateProgress(percentage, text) {
         this.progressPercentage.innerHTML = `${percentage}%`;
         this.progressText.innerHTML = text;
-        this.progressBar.setValue(percentage);
+        this.progressBar.value = percentage;
     }
 }
 
@@ -393,7 +390,7 @@ class InitialView {
             };
         } catch (error) {
             log.error(error);
-            this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+            this.plugin.instance.store.dispatch({ type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false });
         }
     }
 
@@ -486,10 +483,10 @@ class InitialView {
                 this.instance.root.classList.add('gm-uploading-in-progess');
             },
             onUploadCanceled: () => {
-                this.fileUploadWorker.postMessage({type: 'cancel'});
+                this.fileUploadWorker.postMessage({ type: 'cancel' });
             },
             onUploadComplete: () => {
-                this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true});
+                this.plugin.instance.store.dispatch({ type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: true });
                 this.plugin.toolbarBtn.setIndicator('');
                 this.instance.root.classList.remove('gm-uploading-in-progess');
             },
@@ -518,7 +515,7 @@ class InitialView {
         }
 
         this.instance.store.subscribe(
-            ({isDragAndDropForUploadFileEnabled}) => {
+            ({ isDragAndDropForUploadFileEnabled }) => {
                 if (isDragAndDropForUploadFileEnabled) {
                     this.fileUploaderComponent.setEnabled(true);
                     this.addListenerOnRoot();
@@ -540,9 +537,9 @@ class InitialView {
 
     handleFileUpload(file) {
         this.plugin.toolbarBtn.setIndicator('notification');
-        this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+        this.plugin.instance.store.dispatch({ type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false });
 
-        const msg = {type: 'upload', file};
+        const msg = { type: 'upload', file };
         this.fileUploadWorker.postMessage(msg);
     }
 
@@ -668,7 +665,7 @@ export default class GAPPSInstall extends OverlayPlugin {
         }
 
         this.instance.store.subscribe(
-            ({isDragAndDropForUploadFileEnabled}) => {
+            ({ isDragAndDropForUploadFileEnabled }) => {
                 if (isDragAndDropForUploadFileEnabled) {
                     initialViewObject.fileUploaderComponent.setEnabled(true);
                 } else {
@@ -695,7 +692,7 @@ export default class GAPPSInstall extends OverlayPlugin {
     }
 
     renderWidget() {
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.GAPPS_TITLE || 'Install APPS',
             classes: 'gm-gapps-plugin',
             width: 486,

@@ -1,5 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { chipTag } from './util/components';
+
 
 import PROFILES from './util/iothrottling-profiles';
 const PROFILE_CUSTOM_NAME = 'Custom';
@@ -157,9 +157,8 @@ export default class IOThrottling extends OverlayPlugin {
         applyBtnDiv.className = 'gm-iothrottling-apply gm-actions';
         const statusDiv = document.createElement('div');
         statusDiv.className = 'gm-iothrottling-status';
-        const appliedTag = chipTag.createChip();
-
-        statusDiv.appendChild(appliedTag.element);
+        const appliedTag = document.createElement('gm-chip');
+        statusDiv.appendChild(appliedTag);
 
         this.applyBtn = document.createElement('button');
         this.applyBtn.className = 'gm-btn';

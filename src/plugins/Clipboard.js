@@ -1,6 +1,5 @@
 
 import OverlayPlugin from './util/OverlayPlugin';
-import {chipTag} from './util/components';
 
 import log from 'loglevel';
 log.setDefaultLevel('debug');
@@ -72,7 +71,7 @@ export default class Clipboard extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.CLIPBOARD_TITLE || 'Device Clipboard',
             classes: 'gm-clipboard-plugin',
             width: 378,
@@ -101,9 +100,8 @@ export default class Clipboard extends OverlayPlugin {
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
-        const appliedTag = chipTag.createChip({
-            text: this.i18n.CLIPBOARD_COPIED || 'Copied',
-        });
+        const appliedTag = document.createElement('gm-chip');
+        appliedTag.value = this.i18n.CLIPBOARD_COPIED || 'Copied';
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.CLIPBOARD_COPY || 'Copy to device';
@@ -113,7 +111,7 @@ export default class Clipboard extends OverlayPlugin {
             this.sendDataToInstance();
         };
 
-        actionsDiv.appendChild(appliedTag.element);
+        actionsDiv.appendChild(appliedTag);
         actionsDiv.appendChild(this.submitBtn);
 
         // Setup

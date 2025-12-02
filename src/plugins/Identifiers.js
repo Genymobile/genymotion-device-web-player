@@ -1,5 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { chipTag } from './util/components';
+
 
 const HEX = '0123456789abcdef';
 const DIGITS = '0123456789';
@@ -111,7 +111,7 @@ export default class Identifiers extends OverlayPlugin {
         };
 
         this.generateRandomAndroidId.bind(this);
-        androidInputDiv.appendChild(this.androidInput.element);
+        androidInputDiv.appendChild(this.androidInput);
         androidInputDiv.appendChild(generateAndroidIdBtn);
         inputs.appendChild(labelAndroidId);
         inputs.appendChild(androidInputDiv);
@@ -144,7 +144,7 @@ export default class Identifiers extends OverlayPlugin {
             this.container.classList.remove('gm-identifiers-saved');
             this.generateRandomDeviceId();
         };
-        deviceInputDiv.appendChild(this.deviceInput.element);
+        deviceInputDiv.appendChild(this.deviceInput);
         deviceInputDiv.appendChild(generateDeviceIdBtn);
         inputs.appendChild(labelDeviceId);
         inputs.appendChild(deviceInputDiv);
@@ -154,8 +154,8 @@ export default class Identifiers extends OverlayPlugin {
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
 
-        const appliedTag = chipTag.createChip();
-        actionsDiv.appendChild(appliedTag.element);
+        const appliedTag = document.createElement('gm-chip');
+        actionsDiv.appendChild(appliedTag);
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.IDENTIFIERS_APPLY || 'Apply';

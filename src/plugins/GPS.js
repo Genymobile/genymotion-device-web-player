@@ -1,6 +1,6 @@
 
 import OverlayPlugin from './util/OverlayPlugin';
-import { chipTag } from './util/components';
+
 import log from 'loglevel';
 
 /* global google */
@@ -373,8 +373,8 @@ export default class GPS extends OverlayPlugin {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
 
-        const appliedTag = chipTag.createChip();
-        actionsDiv.appendChild(appliedTag.element);
+        const appliedTag = document.createElement('gm-chip');
+        actionsDiv.appendChild(appliedTag);
 
         // Submit button
         this.submitBtn = document.createElement('button');

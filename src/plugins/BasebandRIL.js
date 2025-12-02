@@ -1,6 +1,6 @@
 
 import OverlayPlugin from './util/OverlayPlugin';
-import { chipTag } from './util/components';
+
 
 /**
  * Instance Baseband/RIL plugin.
@@ -236,8 +236,8 @@ export default class BasebandRIL extends OverlayPlugin {
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
 
-        const appliedTag = chipTag.createChip();
-        actionsDiv.appendChild(appliedTag.element);
+        const appliedTag = document.createElement('gm-chip');
+        actionsDiv.appendChild(appliedTag);
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.BASEBAND_APPLY || 'Apply';

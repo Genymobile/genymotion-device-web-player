@@ -3,6 +3,8 @@ import { GmSwitch } from './components/GmSwitch';
 import { GmSlider } from './components/GmSlider';
 import { GmTextInput } from './components/GmTextInput';
 import { GmDropdown } from './components/GmDropdown';
+import { GmChip } from './components/GmChip';
+import { GmProgress } from './components/GmProgress';
 
 import DeviceRenderer from './DeviceRenderer';
 import DeviceRendererFactory from './DeviceRendererFactory';

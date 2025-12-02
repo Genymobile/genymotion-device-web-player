@@ -1,6 +1,5 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
-import {textInput, chipTag} from './util/components';
+import { chipTag } from './util/components';
 
 const HEX = '0123456789abcdef';
 const DIGITS = '0123456789';
@@ -42,11 +41,11 @@ export default class Identifiers extends OverlayPlugin {
 
             const deviceId = values[1].match(/(device_id:)(\w+)/);
             if (deviceId) {
-                this.deviceInput.setValue(deviceId[2]);
+                this.deviceInput.value = deviceId[2];
             }
             const androidId = values[1].match(/(android_id:)(\w+)/);
             if (androidId) {
-                this.androidInput.setValue(androidId[2]);
+                this.androidInput.value = androidId[2];
             }
             this.container.classList.add('gm-identifiers-saved');
         });
@@ -69,7 +68,7 @@ export default class Identifiers extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.IDENTIFIERS_TITLE || 'Identifiers',
             classes: 'gm-identifiers-plugin',
             width: 378,
@@ -86,22 +85,24 @@ export default class Identifiers extends OverlayPlugin {
         androidInputDiv.className = 'gm-identifier-android';
         const labelAndroidId = document.createElement('label');
         labelAndroidId.innerHTML = 'Android ID';
-        this.androidInput = textInput.createTextInput({
-            regexFilter: new RegExp(`^[${HEX}]{0,16}$`),
-            regexValidField: new RegExp(`^[${HEX}]{16}$`),
-            placeholder: 'e.g. 2b76129a48d5eb49',
-            classes: 'gm-identifiers-android-input',
-            messageField: true,
-            onChange: () => {
-                this.container.classList.remove('gm-identifiers-saved');
-                this.checkIDsValidity();
-                if (!this.androidInput.checkValidity()) {
-                    this.androidInput.setErrorMessage('16 characters (0-9, A-F)');
-                } else {
-                    this.androidInput.setErrorMessage('');
-                }
-            },
+        this.androidInput = document.createElement('gm-text-input');
+        this.androidInput.setAttribute('value', '8c0566972363f1d2');
+        this.androidInput.setAttribute('placeholder', 'e.g. 2b76129a48d5eb49');
+        this.androidInput.setAttribute('class', 'gm-identifiers-android-input');
+        this.androidInput.setAttribute('message-field', 'true');
+        this.androidInput.regexFilter = new RegExp(`^[${HEX}]{0,16}$`);
+        this.androidInput.regexValidField = new RegExp(`^[${HEX}]{16}$`);
+
+        this.androidInput.addEventListener('gm-input', (e) => {
+            this.container.classList.remove('gm-identifiers-saved');
+            this.checkIDsValidity();
+            if (!this.androidInput.checkValidity()) {
+                this.androidInput.setErrorMessage(this.i18n.IDENTIFIERS_ANDROID_ID_ERROR || '16 hexadecimal characters');
+            } else {
+                this.androidInput.setErrorMessage('');
+            }
         });
+
         const generateAndroidIdBtn = document.createElement('div');
         generateAndroidIdBtn.className = 'gm-icon-button gm-identifiers-android-generate';
         generateAndroidIdBtn.onclick = () => {
@@ -119,22 +120,24 @@ export default class Identifiers extends OverlayPlugin {
         deviceInputDiv.className = 'gm-identifier-device';
         const labelDeviceId = document.createElement('label');
         labelDeviceId.innerHTML = 'Device ID (IMEI/MEID)';
-        this.deviceInput = textInput.createTextInput({
-            regexFilter: new RegExp(`^[${HEX}]{0,15}$`),
-            regexValidField: new RegExp(`^[${HEX}]{14,15}$`),
-            placeholder: 'e.g. 194197097729256',
-            classes: 'gm-identifiers-device-input',
-            messageField: true,
-            onChange: () => {
-                this.container.classList.remove('gm-identifiers-saved');
-                this.checkIDsValidity();
-                if (!this.deviceInput.checkValidity()) {
-                    this.deviceInput.setErrorMessage('14-15 characters (0-9, A-F)');
-                } else {
-                    this.deviceInput.setErrorMessage('');
-                }
-            },
+        this.deviceInput = document.createElement('gm-text-input');
+        this.deviceInput.setAttribute('value', '0000000000000000');
+        this.deviceInput.setAttribute('placeholder', 'e.g. 194197097729256');
+        this.deviceInput.setAttribute('class', 'gm-identifiers-device-input');
+        this.deviceInput.setAttribute('message-field', 'true');
+        this.deviceInput.regexFilter = new RegExp(`^[${HEX}]{0,15}$`);
+        this.deviceInput.regexValidField = new RegExp(`^[${HEX}]{14,15}$`);
+
+        this.deviceInput.addEventListener('gm-input', (e) => {
+            this.container.classList.remove('gm-identifiers-saved');
+            this.checkIDsValidity();
+            if (!this.deviceInput.checkValidity()) {
+                this.deviceInput.setErrorMessage(this.i18n.IDENTIFIERS_DEVICE_ID_ERROR || '14-15 characters (0-9, A-F)');
+            } else {
+                this.deviceInput.setErrorMessage('');
+            }
         });
+
         const generateDeviceIdBtn = document.createElement('div');
         generateDeviceIdBtn.className = 'gm-icon-button gm-identifiers-device-generate';
         generateDeviceIdBtn.onclick = () => {
@@ -174,8 +177,8 @@ export default class Identifiers extends OverlayPlugin {
     sendDataToInstance(event) {
         event.preventDefault();
 
-        const androidId = this.androidInput.getValue();
-        const deviceId = this.deviceInput.getValue();
+        const androidId = this.androidInput.value;
+        const deviceId = this.deviceInput.value;
 
         if (androidId) {
             const json = {

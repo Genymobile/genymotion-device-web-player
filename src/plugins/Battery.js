@@ -1,5 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { dropdownSelect, textInput } from './util/components';
+import { dropdownSelect } from './util/components';
 
 /**
  * Instance battery plugin.
@@ -113,18 +113,20 @@ export default class Battery extends OverlayPlugin {
         sliderGroup.appendChild(this.chargeSlider);
 
         // Charge level input
-        this.chargeInput = textInput.createTextInput({
-            appendText: '%',
-            value: '50',
-            regexFilter: /^(0?[0-9]{1,2}|100)$/,
-            classes: 'gm-charge-input',
-            onChange: (value) => {
-                this.chargeSlider.value = value;
-                this.updateUIBatteryChargingPercent(value);
-                this.sendDataToInstance();
-            },
+        this.chargeInput = document.createElement('gm-text-input');
+        this.chargeInput.setAttribute('append-text', '%');
+        this.chargeInput.setAttribute('value', '50');
+        this.chargeInput.className = 'gm-charge-input';
+        this.chargeInput.regexFilter = /^(0?[0-9]{1,2}|100)$/;
+
+        this.chargeInput.addEventListener('gm-input', (e) => {
+            const value = e.detail.value;
+            this.chargeSlider.value = value;
+            this.updateUIBatteryChargingPercent(value);
+            this.sendDataToInstance();
         });
-        sliderGroup.appendChild(this.chargeInput.element);
+
+        sliderGroup.appendChild(this.chargeInput);
         this.chargeGroup.appendChild(sliderGroup);
 
         container.appendChild(this.chargeGroup);

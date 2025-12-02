@@ -1,5 +1,5 @@
 
-import {generateUID} from '../../utils/helpers';
+import { generateUID } from '../../utils/helpers';
 
 /**
  * Base class for overlay widget management with drag-and-drop and positioning capabilities
@@ -47,7 +47,7 @@ export default class OverlayPlugin {
      */
     subscribeToOverlayStateChanges() {
         this.instance.store.subscribe(
-            ({overlay}, {overlay: previousOverlay}) => {
+            ({ overlay }, { overlay: previousOverlay }) => {
                 const isOpening =
                     overlay.widgetsOpened.includes(this.overlayID) &&
                     !previousOverlay.widgetsOpened.includes(this.overlayID);
@@ -105,7 +105,7 @@ export default class OverlayPlugin {
      * @returns {HTMLElement} container - The modal body container.
      */
     createTemplateModal(options = {}) {
-        const {title = null, classes = '', width = null, height = null} = options;
+        const { title = null, classes = '', width = null, height = null } = options;
 
         const modalElement = this.createModalElement(classes, width, height);
         const modalBody = this.createModalBody();
@@ -115,7 +115,7 @@ export default class OverlayPlugin {
         modalElement.appendChild(modalBody);
 
         this.initializeModalBehavior(modalElement, modalHeader);
-        return {modal: modalElement, container: modalBody};
+        return { modal: modalElement, container: modalBody };
     }
 
     /**
@@ -221,7 +221,7 @@ export default class OverlayPlugin {
         this.instance.addListener(dragHandle, 'mousedown', (event) => {
             isDragging = true;
             let hasToResetPosition = false;
-            const {x: initialX, y: initialY} = this.startDragging(modal);
+            const { x: initialX, y: initialY } = this.startDragging(modal);
 
             const offsetX = event.clientX - modal.offsetLeft;
             const offsetY = event.clientY - modal.offsetTop;
@@ -290,7 +290,7 @@ export default class OverlayPlugin {
      * @returns {Object} Initial x/y coordinates
      */
     startDragging(modal) {
-        const {button: toolbarButton} = this.instance.toolbarManager.getButtonById(this.constructor.name);
+        const { button: toolbarButton } = this.instance.toolbarManager.getButtonById(this.constructor.name);
         const initialPosition = this.calculateModalPosition(toolbarButton, this.instance.options.toolbarPosition);
 
         modal.style.position = 'absolute';
@@ -399,7 +399,7 @@ export default class OverlayPlugin {
                 break;
         }
 
-        return {x, y};
+        return { x, y };
     }
 
     /*
@@ -423,7 +423,7 @@ export default class OverlayPlugin {
         if (isValidClickTarget && this.instance.store.state.overlay.isOpen) {
             this.instance.store.dispatch({
                 type: 'OVERLAY_OPEN',
-                payload: {toOpen: false},
+                payload: { toOpen: false },
             });
         }
     }
@@ -439,7 +439,7 @@ export default class OverlayPlugin {
      * private method, trigger the store action to open the overlay instead of calling this method directly
      */
     openOverlay() {
-        const {button: toolbarButton} = this.instance.toolbarManager.getButtonById(this.constructor.name);
+        const { button: toolbarButton } = this.instance.toolbarManager.getButtonById(this.constructor.name);
         const isModalOutsideVideoWrapper = this.checkModalPositionOutsideVideoWrapper();
 
         if (isModalOutsideVideoWrapper) {
@@ -487,7 +487,7 @@ export default class OverlayPlugin {
     closeAllOverlays() {
         this.instance.store.dispatch({
             type: 'OVERLAY_OPEN',
-            payload: {toOpen: false},
+            payload: { toOpen: false },
         });
     }
 

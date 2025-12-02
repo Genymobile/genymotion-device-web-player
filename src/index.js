@@ -1,5 +1,6 @@
 import './scss/main.scss';
-import './components/GmSwitch';
+import { GmSwitch } from './components/GmSwitch';
+import { GmSlider } from './components/GmSlider';
 
 import DeviceRenderer from './DeviceRenderer';
 import DeviceRendererFactory from './DeviceRendererFactory';

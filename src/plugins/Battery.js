@@ -1,9 +1,9 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import { slider, textInput } from './util/components';
+import { dropdownSelect, textInput } from './util/components';
 
 /**
  * Instance battery plugin.
- * Provides battery level and state control.
+ * Provides battery control.
  */
 export default class Battery extends OverlayPlugin {
     static get name() {
@@ -25,26 +25,17 @@ export default class Battery extends OverlayPlugin {
         // Register plugin
         this.instance.battery = this;
 
-        // Display widget
+        // Render components
         this.registerToolbarButton();
         this.renderWidget();
 
-        // Listen for battery messages: "state mode <discharging/charging/full> <value>"
+        // Listen for battery events: "battery <status> <level> <mode>"
         this.instance.registerEventCallback('battery', (message) => {
-            const values = message.split(' ').splice(-2);
-
-            if (values.length !== 2) {
+            const values = message.split(' ');
+            if (values.length !== 4) {
                 return;
             }
-
-            // Update only UI
-            this.chargingInput.setState(values[0] !== 'discharging');
-
-            this.updateUIBatteryChargingState();
-
-            this.chargeSlider.setValue(values[1], false);
-            this.chargeInput.setValue(values[1]);
-            this.updateUIBatteryChargingPercent(values[1]);
+            this.updateUIBatteryState(values[1], values[2], values[3]);
         });
     }
 
@@ -56,7 +47,7 @@ export default class Battery extends OverlayPlugin {
             id: this.constructor.name,
             iconClass: 'gm-battery-button',
             title: this.i18n.BATTERY_TITLE || 'Battery',
-            onClick: () => this.toggleWidget(),
+            onClick: this.toggleWidget.bind(this),
         });
     }
 
@@ -69,74 +60,24 @@ export default class Battery extends OverlayPlugin {
             title: this.i18n.BATTERY_TITLE || 'Battery',
             classes: 'gm-battery-plugin',
             width: 378,
-            height: 331,
+            height: 330,
         });
 
-        // Generate input rows
-        const inputs = document.createElement('div');
-        inputs.className = 'gm-inputs';
-        const batteryLevelLabel = this.i18n.BATTERY_CHARGE_LEVEL || 'Charge level';
-        inputs.innerHTML = '<label>' + batteryLevelLabel + '</label>';
-
-        // Create charge level inputs
-        inputs.appendChild(this.createLevelSection());
-
-        // Add charging label
-        const chargingLabel = document.createElement('label');
-        chargingLabel.innerHTML = this.i18n.BATTERY_CHARGE_STATE || 'State of charge';
-        inputs.appendChild(chargingLabel);
-
-        // Add charging section
-        inputs.appendChild(this.createChargingSection());
-
-        // Append inputs to the modal container
-        container.appendChild(inputs);
-    }
-
-    /**
-     * Create and return the widget "charging" section.
-     *
-     * @return {HTMLElement} Charging section.
-     */
-    createChargingSection() {
-        const chargingGroup = document.createElement('div');
-        this.chargingStatus = document.createElement('div');
-        chargingGroup.className = 'gm-charging-group';
-
-        this.chargingImage = document.createElement('div');
-        this.chargingImage.className = 'gm-charging-image';
-        chargingGroup.appendChild(this.chargingImage);
-
-        // Switch button for charging state
-        this.chargingInput = document.createElement('gm-switch');
-        this.chargingInput.addEventListener('gm-change', () => {
-            this.sendDataToInstance();
-            this.updateUIBatteryChargingState();
-        });
-
-        this.chargingStatus.className = 'gm-charging-status';
-        this.chargingStatus.innerHTML = 'Not charging';
-        chargingGroup.appendChild(this.chargingStatus);
-        chargingGroup.appendChild(this.chargingInput);
-
-        return chargingGroup;
-    }
-
-    /**
-     * Create and return the widget "level" section.
-     *
-     * @return {HTMLElement} Level section.
-     */
-    createLevelSection() {
+        // Charge level
         this.chargeGroup = document.createElement('div');
-        this.chargeGroup.className = 'gm-charge-level-group';
+        this.chargeGroup.className = 'gm-battery-charge-group';
 
-        // Charge level image
+        const chargeLabel = document.createElement('label');
+        chargeLabel.innerHTML = this.i18n.BATTERY_CHARGE_LEVEL || 'Charge level';
+        this.chargeGroup.appendChild(chargeLabel);
+
         const chargeImageGroup = document.createElement('div');
         chargeImageGroup.className = 'gm-charge-image-group';
-        const chargeImage = document.createElement('div');
+
         const chargeImageOverlayContainer = document.createElement('div');
         chargeImageOverlayContainer.className = 'gm-charge-image-overlay-container';
+
+        const chargeImage = document.createElement('div');
         this.chargeImageOverlay = document.createElement('div');
         chargeImage.className = 'gm-charge-image';
         this.chargeImageOverlay.className = 'gm-charge-image-overlay';
@@ -150,24 +91,26 @@ export default class Battery extends OverlayPlugin {
         sliderGroup.style.display = 'flex';
 
         // slider range for battery level
-        this.chargeSlider = slider.createSlider({
-            min: 0,
-            max: 100,
-            value: 50,
-            onChange: (value) => {
-                this.chargeInput.setValue(value);
-                this.updateUIBatteryChargingPercent(value);
-                this.sendDataToInstance();
-            },
-            onCursorMove: (value) => {
-                // update UI withous sending data to instance
-                this.chargeInput.setValue(value);
-                this.updateUIBatteryChargingPercent(value);
-            },
+        this.chargeSlider = document.createElement('gm-slider');
+        this.chargeSlider.setAttribute('min', '0');
+        this.chargeSlider.setAttribute('max', '100');
+        this.chargeSlider.setAttribute('value', '50');
+        this.chargeSlider.className = 'battery-slider';
+
+        this.chargeSlider.addEventListener('gm-change', (e) => {
+            const value = e.detail.value;
+            this.chargeInput.setValue(value);
+            this.updateUIBatteryChargingPercent(value);
+            this.sendDataToInstance();
         });
 
-        sliderGroup.appendChild(this.chargeSlider.element);
-        this.chargeGroup.appendChild(sliderGroup);
+        this.chargeSlider.addEventListener('gm-input', (e) => {
+            const value = e.detail.value;
+            this.chargeInput.setValue(value);
+            this.updateUIBatteryChargingPercent(value);
+        });
+
+        sliderGroup.appendChild(this.chargeSlider);
 
         // Charge level input
         this.chargeInput = textInput.createTextInput({
@@ -176,84 +119,103 @@ export default class Battery extends OverlayPlugin {
             regexFilter: /^(0?[0-9]{1,2}|100)$/,
             classes: 'gm-charge-input',
             onChange: (value) => {
-                this.chargeSlider.setValue(value);
+                this.chargeSlider.value = value;
                 this.updateUIBatteryChargingPercent(value);
                 this.sendDataToInstance();
             },
-            onBlur: (v) => {
-                if (v === '') {
-                    this.chargeInput.setValue('0', true);
-                }
-            },
+        });
+        sliderGroup.appendChild(this.chargeInput.element);
+        this.chargeGroup.appendChild(sliderGroup);
+
+        container.appendChild(this.chargeGroup);
+
+        const separator = document.createElement('div');
+        separator.className = 'gm-separator';
+        container.appendChild(separator);
+
+        // Charging state
+        const chargingGroup = document.createElement('div');
+        chargingGroup.className = 'gm-battery-charging-group';
+
+        const chargingLabel = document.createElement('label');
+        chargingLabel.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
+        chargingGroup.appendChild(chargingLabel);
+
+        this.chargingStatus = document.createElement('div');
+        this.chargingStatus.className = 'gm-charging-status';
+        this.chargingStatus.innerHTML = 'Not charging';
+
+        // Switch button for charging state
+        this.chargingInput = document.createElement('gm-switch');
+        this.chargingInput.addEventListener('gm-change', () => {
+            this.sendDataToInstance();
+            this.updateUIBatteryChargingState();
         });
 
-        // bind arrow keys to input, to increase/decrease value with arrow up/down
-        this.instance.addListener(this.chargeInput.element, 'keydown', (e) => {
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                this.chargeInput.setValue(Math.min(100, Number(this.chargeInput.getValue()) + 1), true);
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                this.chargeInput.setValue(Math.max(0, Number(this.chargeInput.getValue()) - 1), true);
-            }
-        });
+        this.chargingStatus.className = 'gm-charging-status';
+        this.chargingStatus.innerHTML = 'Not charging';
 
-        this.chargeGroup.appendChild(this.chargeInput.element);
-
-        return this.chargeGroup;
-    }
-
-    /**
-     * Display or hide the widget.
-     */
-
-    /**
-     * Update widget charging state UI.
-     *
-     * @param {boolean} charging Whether or not the battery is charging.
-     */
-    updateUIBatteryChargingState() {
-        this.chargingImage.classList[this.chargingInput.getState() ? 'add' : 'remove']('charging');
-
-        const chargingLabel = this.i18n.BATTERY_CHARGING || 'Charging';
-        const dischargingLabel = this.i18n.BATTERY_DISCHARGING || 'Not charging';
-
-        this.chargingStatus.innerHTML = this.chargingInput.getState() ? chargingLabel : dischargingLabel;
-    }
-
-    /**
-     * Synchronize widget UI.
-     *
-     * @param  {number}  value Battery level.
-     * @return {boolean}       Whether or not battery level has been applied.
-     */
-    updateUIBatteryChargingPercent(value) {
-        value = Number(value);
-        if (Number.isNaN(value)) {
-            return false;
-        }
-
-        value = Math.min(Math.max(0, value), 100);
-        this.chargeImageOverlay.style.cssText = 'height: calc( ' + value + '% + 1px);';
-        this.chargeGroup.classList.remove('low', 'medium');
-        if (value <= 10) {
-            this.chargeGroup.classList.add('low');
-        } else if (value <= 20) {
-            this.chargeGroup.classList.add('medium');
-        }
-        return true;
+        chargingGroup.appendChild(this.chargingStatus);
+        chargingGroup.appendChild(this.chargingInput);
+        container.appendChild(chargingGroup);
     }
 
     /**
      * Send information to instance.
      */
     sendDataToInstance() {
-        const level = Number(this.chargeInput.getValue());
-        const charging = this.chargingInput.getState() ? 'charging' : 'discharging';
         const json = {
             channel: 'battery',
-            messages: ['set state level ' + level, 'set state status ' + charging],
+            messages: [
+                'set_level ' + this.chargeSlider.value,
+                'set_status ' + (this.chargingInput.checked ? 'charging' : 'discharging'),
+            ],
         };
         this.instance.sendEvent(json);
     }
-};
+
+    /**
+     * Update UI based on battery events.
+     *
+     * @param {string} status Battery status (charging/discharging/full/not-charging).
+     * @param {string} level  Battery level (0-100).
+     * @param {string} mode   Battery mode (ac/usb/wireless).
+     */
+    updateUIBatteryState(status, level, mode) {
+        this.chargeSlider.value = level;
+        this.chargeInput.setValue(level);
+        this.updateUIBatteryChargingPercent(level);
+
+        if (status === 'charging') {
+            this.chargingInput.checked = true;
+            this.chargingStatus.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
+            this.chargingStatus.classList.add('charging');
+        } else {
+            this.chargingInput.checked = false;
+            this.chargingStatus.innerHTML = this.i18n.BATTERY_NOT_CHARGING || 'Not charging';
+            this.chargingStatus.classList.remove('charging');
+        }
+    }
+
+    /**
+     * Update UI battery level.
+     *
+     * @param {string} value Battery level.
+     */
+    updateUIBatteryChargingPercent(value) {
+        this.chargeImageOverlay.style.height = 100 - value + '%';
+    }
+
+    /**
+     * Update UI battery charging state.
+     */
+    updateUIBatteryChargingState() {
+        if (this.chargingInput.checked) {
+            this.chargingStatus.innerHTML = this.i18n.BATTERY_CHARGING || 'Charging';
+            this.chargingStatus.classList.add('charging');
+        } else {
+            this.chargingStatus.innerHTML = this.i18n.BATTERY_NOT_CHARGING || 'Not charging';
+            this.chargingStatus.classList.remove('charging');
+        }
+    }
+}

@@ -1,6 +1,5 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
-import {textInput, chipTag, slider} from './util/components';
+import { textInput, chipTag } from './util/components';
 import log from 'loglevel';
 
 /* global google */
@@ -94,7 +93,7 @@ export default class GPS extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.GPS_TITLE || 'GPS',
             classes: 'gm-gps-plugin',
             width: 498,
@@ -235,24 +234,24 @@ export default class GPS extends OverlayPlugin {
         accuracyWrapper.className = 'gm-gps-accuracy-input-wrapper';
 
         // Create the accuracy slider
-        this.accuracySlider = slider.createSlider({
-            min: 0,
-            max: 200,
-            value: 0,
-            classes: 'gm-gps-accuracy-slider',
-            onChange: (value) => {
-                this.inputComponents.accuracy.setValue(value);
-                this.checkErrors();
-            },
-            onCursorMove: (value) => {
-                // Update UI without sending data to instance
-                this.inputComponents.accuracy.setValue(value);
-                this.checkErrors();
-            },
+        this.accuracySlider = document.createElement('gm-slider');
+        this.accuracySlider.setAttribute('min', '0');
+        this.accuracySlider.setAttribute('max', '200');
+        this.accuracySlider.setAttribute('value', '0');
+        this.accuracySlider.className = 'gm-gps-accuracy-slider';
+
+        this.accuracySlider.addEventListener('gm-change', (e) => {
+            this.inputComponents.accuracy.setValue(e.detail.value);
+            this.checkErrors();
+        });
+
+        this.accuracySlider.addEventListener('gm-input', (e) => {
+            this.inputComponents.accuracy.setValue(e.detail.value);
+            this.checkErrors();
         });
 
         // Add the slider to the wrapper
-        accuracyWrapper.appendChild(this.accuracySlider.element);
+        accuracyWrapper.appendChild(this.accuracySlider);
 
         this.inputComponents.accuracy = textInput.createTextInput({
             classes: 'gm-gps-accuracy-input',
@@ -264,7 +263,7 @@ export default class GPS extends OverlayPlugin {
             onChange: (v) => {
                 // Update slider when input changes
                 const value = parseFloat(v) || 0;
-                this.accuracySlider.setValue(value);
+                this.accuracySlider.value = value;
                 this.checkErrors();
             },
             onBlur: (v) => {
@@ -328,24 +327,24 @@ export default class GPS extends OverlayPlugin {
         bearingWrapper.className = 'gm-gps-bearing-input-wrapper';
 
         // Create the bearing slider
-        this.bearingSlider = slider.createSlider({
-            min: 0,
-            max: 360,
-            value: 0,
-            classes: 'gm-gps-bearing-slider',
-            onChange: (value) => {
-                this.inputComponents.bearing.setValue(value);
-                this.checkErrors();
-            },
-            onCursorMove: (value) => {
-                // Update UI without sending data to instance
-                this.inputComponents.bearing.setValue(value);
-                this.checkErrors();
-            },
+        this.bearingSlider = document.createElement('gm-slider');
+        this.bearingSlider.setAttribute('min', '0');
+        this.bearingSlider.setAttribute('max', '360');
+        this.bearingSlider.setAttribute('value', '0');
+        this.bearingSlider.className = 'gm-gps-bearing-slider';
+
+        this.bearingSlider.addEventListener('gm-change', (e) => {
+            this.inputComponents.bearing.setValue(e.detail.value);
+            this.checkErrors();
+        });
+
+        this.bearingSlider.addEventListener('gm-input', (e) => {
+            this.inputComponents.bearing.setValue(e.detail.value);
+            this.checkErrors();
         });
 
         // Add the slider to the wrapper
-        bearingWrapper.appendChild(this.bearingSlider.element);
+        bearingWrapper.appendChild(this.bearingSlider);
 
         this.inputComponents.bearing = textInput.createTextInput({
             value: '0',
@@ -358,7 +357,7 @@ export default class GPS extends OverlayPlugin {
             onChange: (v) => {
                 // Update slider when input changes
                 const value = parseFloat(v) || 0;
-                this.bearingSlider.setValue(value);
+                this.bearingSlider.value = value;
                 this.checkErrors();
             },
             onBlur: (v) => {
@@ -444,7 +443,7 @@ export default class GPS extends OverlayPlugin {
             return;
         }
 
-        const json = {channel: 'gps', messages: []};
+        const json = { channel: 'gps', messages: [] };
         const info = this.getLocationInfo();
 
         for (const field of Object.keys(this.inputComponents)) {
@@ -466,7 +465,7 @@ export default class GPS extends OverlayPlugin {
      */
     async checkLocationPermission() {
         try {
-            this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
+            this.permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
             if (this.permissionStatus.state === 'denied') {
                 this.setToMyPositionBtn.disabled = true;
             } else {
@@ -564,7 +563,7 @@ export default class GPS extends OverlayPlugin {
             if (this.map) {
                 this.clearMarkers();
                 this.addMapMarker(position.coords.latitude, position.coords.longitude, true);
-                this.map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
+                this.map.setCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
             }
         } catch (error) {
             // if permission was denied, disable the button

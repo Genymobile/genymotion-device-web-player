@@ -1,9 +1,8 @@
-
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 import OverlayPlugin from './util/OverlayPlugin';
-import {switchButton, dropdownSelect} from './util/components';
+import { dropdownSelect } from './util/components';
 
 import MOBILE_PROFILES from './util/network-mobile-profiles';
 import MOBILE_SIGNAL_STRENGTH from './util/mobile-signal-strength';
@@ -172,7 +171,7 @@ export default class Network extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.NETWORK_TITLE || 'Network',
             width: 378,
             height: 610,
@@ -185,12 +184,11 @@ export default class Network extends OverlayPlugin {
         wifiText.innerHTML = this.i18n.WIFI || 'Wifi';
         wifiSection.appendChild(wifiText);
 
-        this.wifiSwitch = switchButton.createSwitch({
-            onChange: (value) => {
-                this.sendWifiStateEvent(value);
-            },
+        this.wifiSwitch = document.createElement('gm-switch');
+        this.wifiSwitch.addEventListener('gm-change', (e) => {
+            this.sendWifiStateEvent(e.detail.checked);
         });
-        wifiSection.appendChild(this.wifiSwitch.element);
+        wifiSection.appendChild(this.wifiSwitch);
 
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
@@ -204,12 +202,11 @@ export default class Network extends OverlayPlugin {
         mobileDataText.innerHTML = this.i18n.MOBILE_DATA || 'Mobile data';
         mobileDataSwitchDiv.appendChild(mobileDataText);
 
-        this.mobileDataSwitch = switchButton.createSwitch({
-            onChange: (value) => {
-                this.sendMobileDataStateEvent(value);
-            },
+        this.mobileDataSwitch = document.createElement('gm-switch');
+        this.mobileDataSwitch.addEventListener('gm-change', (e) => {
+            this.sendMobileDataStateEvent(e.detail.checked);
         });
-        mobileDataSwitchDiv.appendChild(this.mobileDataSwitch.element);
+        mobileDataSwitchDiv.appendChild(this.mobileDataSwitch);
         this.mobileDataSection.appendChild(mobileDataSwitchDiv);
 
         const networkTypeLabel = document.createElement('label');
@@ -223,7 +220,7 @@ export default class Network extends OverlayPlugin {
             onChange: (newValue) => {
                 const msgs = [];
                 msgs.push('setprofile mobile ' + newValue);
-                const json = {channel: 'network_profile', messages: msgs};
+                const json = { channel: 'network_profile', messages: msgs };
                 this.instance.sendEvent(json);
             },
         });
@@ -243,7 +240,7 @@ export default class Network extends OverlayPlugin {
             onChange: (newValue) => {
                 const msgs = [];
                 msgs.push('setsignalstrength mobile ' + newValue);
-                const json = {channel: 'network_profile', messages: msgs};
+                const json = { channel: 'network_profile', messages: msgs };
                 this.instance.sendEvent(json);
             },
         });
@@ -272,7 +269,7 @@ export default class Network extends OverlayPlugin {
             msgs.push('disableif wifi');
         }
 
-        const json = {channel: 'settings', messages: msgs};
+        const json = { channel: 'settings', messages: msgs };
         this.instance.sendEvent(json);
     }
 
@@ -284,10 +281,10 @@ export default class Network extends OverlayPlugin {
             msgs.push('disableif mobile');
         }
 
-        const json1 = {channel: 'settings', messages: msgs};
+        const json1 = { channel: 'settings', messages: msgs };
         this.instance.sendEvent(json1);
 
-        const json2 = {channel: 'network_profile', messages: ['notify phone']};
+        const json2 = { channel: 'network_profile', messages: ['notify phone'] };
         this.instance.sendEvent(json2);
     }
 

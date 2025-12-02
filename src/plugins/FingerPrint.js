@@ -1,6 +1,5 @@
 
 import OverlayPlugin from './util/OverlayPlugin';
-import {switchButton} from './util/components';
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -134,7 +133,7 @@ export default class FingerPrint extends OverlayPlugin {
         if (this.instance.store.state.isWebRTCConnectionReady) {
             this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL);
         } else {
-            const unSubscribe = this.instance.store.subscribe(({isWebRTCConnectionReady}) => {
+            const unSubscribe = this.instance.store.subscribe(({ isWebRTCConnectionReady }) => {
                 if (isWebRTCConnectionReady) {
                     this.sendDataToInstance(FINGERPRINT_MESSAGES.toSend.NOTIFY_ALL);
                     unSubscribe();
@@ -160,7 +159,7 @@ export default class FingerPrint extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.FINGERPRINT_TITLE || 'Biometrics',
             classes: 'gm-fingerprint-plugin',
             width: 378,
@@ -194,15 +193,14 @@ export default class FingerPrint extends OverlayPlugin {
         recognizedFPByDefaultText.innerHTML =
             this.i18n.FINGERPRINT_AUTOMATIC_BIOMETRIC_AUTHENTICATION || 'Automatic biometric authentication';
 
-        this.recognizedFPByDefaultStatus = switchButton.createSwitch({
-            classes: 'autoValidationSwitch',
-            onChange: (value) => {
-                this.state.isRecognizedFPByDefault = value;
-            },
+        this.recognizedFPByDefaultStatus = document.createElement('gm-switch');
+        this.recognizedFPByDefaultStatus.className = 'autoValidationSwitch';
+        this.recognizedFPByDefaultStatus.addEventListener('gm-change', (e) => {
+            this.state.isRecognizedFPByDefault = e.detail.checked;
         });
 
         recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultText);
-        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus.element);
+        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus);
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);
@@ -266,7 +264,7 @@ export default class FingerPrint extends OverlayPlugin {
      * @param {String} button Button name.
      * @param {HTMLElement} buttonsDiv Buttons container.
      */
-    createFingerprintButton({cmd, message, onclick}, buttonsDiv) {
+    createFingerprintButton({ cmd, message, onclick }, buttonsDiv) {
         const buttonDiv = document.createElement('div');
         buttonDiv.classList.add('gm-fingerprint-dialog-button');
 

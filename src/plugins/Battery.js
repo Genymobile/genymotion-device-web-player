@@ -1,6 +1,5 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
-import {slider, switchButton, textInput} from './util/components';
+import { slider, textInput } from './util/components';
 
 /**
  * Instance battery plugin.
@@ -66,7 +65,7 @@ export default class Battery extends OverlayPlugin {
      */
     renderWidget() {
         // Create elements
-        const {container} = this.createTemplateModal({
+        const { container } = this.createTemplateModal({
             title: this.i18n.BATTERY_TITLE || 'Battery',
             classes: 'gm-battery-plugin',
             width: 378,
@@ -109,17 +108,16 @@ export default class Battery extends OverlayPlugin {
         chargingGroup.appendChild(this.chargingImage);
 
         // Switch button for charging state
-        this.chargingInput = switchButton.createSwitch({
-            onChange: () => {
-                this.sendDataToInstance();
-                this.updateUIBatteryChargingState();
-            },
+        this.chargingInput = document.createElement('gm-switch');
+        this.chargingInput.addEventListener('gm-change', () => {
+            this.sendDataToInstance();
+            this.updateUIBatteryChargingState();
         });
 
         this.chargingStatus.className = 'gm-charging-status';
         this.chargingStatus.innerHTML = 'Not charging';
         chargingGroup.appendChild(this.chargingStatus);
-        chargingGroup.appendChild(this.chargingInput.element);
+        chargingGroup.appendChild(this.chargingInput);
 
         return chargingGroup;
     }

@@ -2,9 +2,11 @@ import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import path from 'path';
 
+import basicSsl from '@vitejs/plugin-basic-ssl';
+
 export default defineConfig(({ mode }) => {
     return {
-        // plugins: [viteSingleFile()],
+        plugins: [basicSsl()],
         build: {
             target: 'es2015',
             lib: {

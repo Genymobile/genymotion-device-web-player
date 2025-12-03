@@ -71,7 +71,7 @@ export default class MediaManager {
 
         if (this.instance.options.microphone) {
             try {
-                const permissionObj = await navigator.permissions.query({name: 'microphone'});
+                const permissionObj = await navigator.permissions.query({ name: 'microphone' });
                 log.debug(`microphone ${permissionObj.state}`);
                 this.microphonePermissionObject = permissionObj;
                 this.instance.addListener(permissionObj, 'change', this.onMicrophonePermissionChange.bind(this));
@@ -82,7 +82,7 @@ export default class MediaManager {
         }
 
         try {
-            const permissionObj = await navigator.permissions.query({name: 'camera'});
+            const permissionObj = await navigator.permissions.query({ name: 'camera' });
             log.debug(`camera ${permissionObj.state}`);
             this.cameraPermissionObject = permissionObj;
             this.instance.addListener(permissionObj, 'change', this.onCameraPermissionChange.bind(this));
@@ -99,9 +99,9 @@ export default class MediaManager {
      * Redirect the client webcam video stream to the instance.
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    async toggleVideoStreaming() {
+    async toggleVideoStreaming(deviceIdOrStream) {
         if (!this.videoStreaming) {
-            return this.startVideoStreaming();
+            return this.startVideoStreaming(deviceIdOrStream);
         }
         return this.stopVideoStreaming();
     }
@@ -111,9 +111,9 @@ export default class MediaManager {
      * Redirect the client microphone audio stream to the instance.
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    async toggleAudioStreaming() {
+    async toggleAudioStreaming(deviceId) {
         if (!this.audioStreaming) {
-            return this.startAudioStreaming();
+            return this.startAudioStreaming(deviceId);
         }
         return this.stopAudioStreaming();
     }
@@ -122,19 +122,31 @@ export default class MediaManager {
      * Initialize and start client webcam video stream.
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    async startVideoStreaming() {
+    async startVideoStreaming(deviceIdOrStream) {
         if (!navigator.mediaDevices) {
             return false;
         }
 
+        let mediaStream;
+
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: this.videoWithMicrophone,
-                video: {
-                    width: this.videoWidth,
-                    height: this.videoHeight,
-                },
-            });
+            if (deviceIdOrStream && typeof deviceIdOrStream === 'object' && deviceIdOrStream instanceof MediaStream) {
+                mediaStream = deviceIdOrStream;
+            } else {
+                const constraints = {
+                    audio: this.videoWithMicrophone,
+                    video: {
+                        width: this.videoWidth,
+                        height: this.videoHeight,
+                    },
+                };
+
+                if (deviceIdOrStream) {
+                    constraints.video.deviceId = { exact: deviceIdOrStream };
+                }
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            }
+
             log.debug('Client video stream ready');
             this.videoStreaming = true;
             this.localVideoStream = mediaStream;
@@ -149,16 +161,22 @@ export default class MediaManager {
      * Initialize and start client microphone audio stream.
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
-    async startAudioStreaming() {
+    async startAudioStreaming(deviceId) {
         if (!navigator.mediaDevices) {
             return false;
         }
 
+        const constraints = {
+            audio: true,
+            video: false,
+        };
+
+        if (deviceId) {
+            constraints.audio = { deviceId: { exact: deviceId } };
+        }
+
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: false,
-            });
+            const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             log.debug('Client audio stream ready');
             this.audioStreaming = true;
             this.localAudioStream = mediaStream;

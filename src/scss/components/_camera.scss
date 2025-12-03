@@ -1,0 +1,46 @@
+@use '../base/variables' as *;
+
+.device-renderer-instance .gm-camera-plugin {
+    .gm-modal-body {
+        padding: $spacing-m;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-m;
+    }
+
+    .gm-camera-section {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+
+        label {
+            font-weight: bold;
+            color: var(--gm-on-surface-color);
+        }
+
+        .gm-camera-preview {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background-color: var(--gm-surface-variant-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: none; // Hidden by default
+            }
+
+            .gm-camera-placeholder {
+                color: var(--gm-on-surface-variant-color);
+                text-align: center;
+                padding: $spacing-m;
+            }
+        }
+    }
+}

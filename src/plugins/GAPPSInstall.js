@@ -1,9 +1,8 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const log = require('loglevel');
-const {progressBar} = require('./util/components');
-const fileUploader = require('./util/fileUploader');
+import OverlayPlugin from './util/OverlayPlugin';
+import log from 'loglevel';
+import {progressBar} from './util/components';
+import fileUploader from './util/fileUploader';
 log.setDefaultLevel('debug');
 
 // Views definitions
@@ -161,7 +160,7 @@ class InstallationSuccessView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         const restartBtn = document.createElement('button');
@@ -174,7 +173,7 @@ class InstallationSuccessView {
             };
             this.plugin.instance.sendEvent(json);
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -243,7 +242,7 @@ class InstallationFailedView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -359,7 +358,7 @@ class InitialView {
                     case 'SUCCESS':
                         this.fileUploaderComponent.showUploadSuccess();
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
+                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
                             this.plugin.toolbarBtn.setIndicator('success');
                         }
                         break;
@@ -371,7 +370,7 @@ class InitialView {
                                 Please make sure the file is valid and try again.`,
                         );
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
+                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
                             this.plugin.toolbarBtn.setIndicator('failed');
                         }
                         break;
@@ -486,7 +485,7 @@ class InitialView {
                 this.handleFileUpload(file);
                 this.instance.root.classList.add('gm-uploading-in-progess');
             },
-            onUploadCanceled:() => {
+            onUploadCanceled: () => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {
@@ -579,7 +578,7 @@ class InitialView {
 }
 
 // Plugin main class
-module.exports = class GAPPSInstall extends OverlayPlugin {
+export default class GAPPSInstall extends OverlayPlugin {
     static get name() {
         return 'GAPPSInstall';
     }
@@ -687,7 +686,7 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
             title: this.i18n.GAPPS_TITLE || 'Install APPS',
             onClick: () => {
                 if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
-                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())) {
                     this.toolbarBtn.setIndicator('');
                 };
                 this.toggleWidget();

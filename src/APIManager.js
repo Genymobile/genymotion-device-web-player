@@ -1,6 +1,5 @@
-'use strict';
 
-module.exports = class APIManager {
+export default class APIManager {
     constructor(instance) {
         this.instance = instance;
         this.apiFunctions = {};

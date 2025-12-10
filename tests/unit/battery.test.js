@@ -1,7 +1,6 @@
-'use strict';
-
-const Battery = require('../../src/plugins/Battery');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import Battery from '../../src/plugins/Battery.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let battery;
 let instance;
@@ -56,8 +55,8 @@ describe('Battery Plugin', () => {
         let levelMock;
 
         beforeEach(() => {
-            statusMock = jest.spyOn(battery, 'updateUIBatteryChargingState');
-            levelMock = jest.spyOn(battery, 'updateUIBatteryChargingPercent');
+            statusMock = vi.spyOn(battery, 'updateUIBatteryChargingState');
+            levelMock = vi.spyOn(battery, 'updateUIBatteryChargingPercent');
         });
 
         afterEach(() => {
@@ -105,7 +104,7 @@ describe('Battery Plugin', () => {
         let sendEventSpy;
 
         beforeEach(() => {
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            sendEventSpy = vi.spyOn(instance, 'sendEvent');
         });
 
         afterEach(() => {

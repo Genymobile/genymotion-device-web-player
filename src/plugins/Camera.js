@@ -1,15 +1,14 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
+import OverlayPlugin from './util/OverlayPlugin';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
  * Instance camera plugin.
  * Provides client webcam and camera control.
  */
-module.exports = class Camera extends OverlayPlugin {
+export default class Camera extends OverlayPlugin {
     static get name() {
         return 'Camera';
     }

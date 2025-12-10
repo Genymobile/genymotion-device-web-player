@@ -1,8 +1,7 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
+import OverlayPlugin from './util/OverlayPlugin';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 const MAX_SCREENRECORD_LENGTH_IN_MINUTES = 3;
@@ -12,7 +11,7 @@ const CAPTURE_INTERVAL_MS = 50;
  * Instance screenrecord plugin.
  * Provides screenshot and video capture.
  */
-module.exports = class Screenrecord extends OverlayPlugin {
+export default class Screenrecord extends OverlayPlugin {
     static get name() {
         return 'Screenrecord';
     }

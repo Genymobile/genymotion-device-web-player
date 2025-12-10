@@ -1,6 +1,5 @@
-'use strict';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 const ControllerType = Object.freeze({
@@ -9,7 +8,7 @@ const ControllerType = Object.freeze({
     Dualshock4: Symbol('DualShock4'),
 });
 
-module.exports = class GamepadManager {
+export default class GamepadManager {
     constructor(instance) {
         this.instance = instance;
         this.instance.gamepadManager = this;

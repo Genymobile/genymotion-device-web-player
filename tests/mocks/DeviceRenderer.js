@@ -1,12 +1,11 @@
-'use strict';
+import Original from '../../src/DeviceRenderer.js';
+import DeviceRendererFactory from '../../src/DeviceRendererFactory.js';
+import OriginalToolbarManager from '../../src/plugins/util/ToolBarManager.js';
+import OriginalTooltipManager from '../../src/plugins/util/TooltipManager.js';
+import OriginalApiManager from '../../src/APIManager.js';
+import {vi} from 'vitest';
 
-const Original = require('../../src/DeviceRenderer');
-const DeviceRendererFactory = require('../../src/DeviceRendererFactory');
-const OriginalToolbarManager = require('../../src/plugins/util/ToolBarManager');
-const OriginalTooltipManager = require('../../src/plugins/util/TooltipManager');
-const OriginalApiManager = require('../../src/APIManager');
-
-const store = require('../../src/store/index');
+import store from '../../src/store/index.js';
 
 class ToolBarManager extends OriginalToolbarManager {
     constructor(instance) {
@@ -24,9 +23,9 @@ class ToolBarManager extends OriginalToolbarManager {
         return button;
     }
 }
-module.exports = class DeviceRenderer extends Original {
+export default class DeviceRenderer extends Original {
     constructor(options = {}) {
-        if (!options.i18n){
+        if (!options.i18n) {
             options.i18n = {};
         }
         // we use the factory to load the template, like in production, this way the template generated takes the options
@@ -38,7 +37,7 @@ module.exports = class DeviceRenderer extends Original {
         super(document.body, options);
 
         navigator.mediaDevices = {
-            getUserMedia: jest.fn().mockReturnValue(Promise.resolve(null)),
+            getUserMedia: vi.fn().mockReturnValue(Promise.resolve(null)),
         };
 
         this.outgoingMessages = [];
@@ -73,4 +72,4 @@ module.exports = class DeviceRenderer extends Original {
      * Can be used anytime to renegotiate the SDP if necessary.
      */
     renegotiateWebRTCConnection() {}
-};
+}

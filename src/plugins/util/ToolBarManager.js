@@ -117,7 +117,7 @@ export default class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             title,
-            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left':'right',
+            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
             'toolbarTitleWidget'
         );
     }
@@ -144,7 +144,7 @@ export default class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             this.instance.options.i18n.NOT_SUPPORTED || 'Not currently supported',
-            this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+            this.instance.options.toolbarPosition === 'right' ? 'left' : 'right'
         );
         buttonIcon.classList.add('gm-disabled-icon-button');
 
@@ -303,4 +303,3 @@ export default class ToolbarManager {
     }
 }
 
-module.exports = ToolbarManager;

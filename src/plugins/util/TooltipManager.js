@@ -36,7 +36,7 @@ export default class TooltipManager {
      * @param {string} [position] - 'top'|'bottom'|'left'|'right' - Optional. Preferred position for the element. If not specified, the position will be determined in the following order of preference: 'bottom', 'left', 'right', 'top'.
      *  @param {string} [classes] - Optional. Additional classes to add to the tooltip.
      */
-    setTooltip(element, text, position, classes=null) {
+    setTooltip(element, text, position, classes = null) {
         if (!element) {
             return;
         }

@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import {vi} from 'vitest';
 import Network from '../../src/plugins/Network.js';
 import Instance from '../mocks/DeviceRenderer.js';
 
@@ -102,7 +102,7 @@ describe('Network Plugin', () => {
                 'state phone up_rate:enabled:384 down_rate:enabled:384 up_delay:enabled:75 down_delay:enabled:75 up_pkt_loss:enabled:0.00 down_pkt_loss:enabled:0.00 dns_delay:enabled:200 profile:umts signal_strength:great',
             );
 
-            expect(network.dropdownNetworkType.getValue()).toBe('umts');
+            expect(network.dropdownNetworkType.value).toBe('umts');
 
             expect(document.querySelector('.gm-network-mobile-section > section:nth-of-type(1)').textContent).toContain(
                 'Download speed:',
@@ -133,24 +133,30 @@ describe('Network Plugin', () => {
 
         test('wifi emit status event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.wifiSwitch.checked = true;
-            network.wifiSwitch.dispatchEvent(new CustomEvent('gm-switch-change', { detail: { checked: true } }));
-            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'settings', messages: ['enableif wifi'] });
+            // Simulate gm-switch change to checked
+            network.wifiSwitch.dispatchEvent(
+                new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
+            );
+            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif wifi']});
         });
 
         test('mobile data emit status event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.mobileDataSwitch.checked = true;
-            network.mobileDataSwitch.dispatchEvent(new CustomEvent('gm-switch-change', { detail: { checked: true } }));
-            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'settings', messages: ['enableif mobile'] });
-            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'network_profile', messages: ['notify phone'] });
+            network.mobileDataSwitch.dispatchEvent(
+                new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
+            );
+            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif mobile']});
+            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'network_profile', messages: ['notify phone']});
         });
 
         test('change network_profile emit event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             // change network profile
             const dropDownSelectProfile = network.profilesForDropdownNetworkType.find((p) => p.value === 'lte');
-            network.dropdownNetworkType.setValue(dropDownSelectProfile, true);
+            network.dropdownNetworkType.value = dropDownSelectProfile.value;
+            network.dropdownNetworkType.dispatchEvent(
+                new CustomEvent('gm-dropdown-change', {detail: {value: dropDownSelectProfile.value}, bubbles: true}),
+            );
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setprofile mobile lte'],
@@ -160,7 +166,13 @@ describe('Network Plugin', () => {
             const dropdownSignalStrengthProfile = network.profilesForDropdownSignalStrength.find(
                 (p) => p.value === 'great',
             );
-            network.selectMobileSignalStrength.setValue(dropdownSignalStrengthProfile, true);
+            network.selectMobileSignalStrength.value = dropdownSignalStrengthProfile.value;
+            network.selectMobileSignalStrength.dispatchEvent(
+                new CustomEvent('gm-dropdown-change', {
+                    detail: {value: dropdownSignalStrengthProfile.value},
+                    bubbles: true,
+                }),
+            );
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setsignalstrength mobile great'],

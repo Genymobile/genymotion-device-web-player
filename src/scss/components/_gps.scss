@@ -4,14 +4,6 @@
  * GPS plugin styles
  */
 .device-renderer-instance .gm-gps-plugin {
-    .gm-gps-saved {
-        .gm-actions {
-            .gm-tag-success {
-                visibility: visible;
-            }
-        }
-    }
-
     .gm-mapview {
         height: 222px;
         width: 100%;
@@ -111,8 +103,5 @@
     }
 
     .gm-actions {
-        .gm-tag-success {
-            visibility: hidden;
-        }
     }
 }

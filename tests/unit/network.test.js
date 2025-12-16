@@ -1,4 +1,4 @@
-import {vi} from 'vitest';
+import { vi } from 'vitest';
 import Network from '../../src/plugins/Network.js';
 import Instance from '../mocks/DeviceRenderer.js';
 
@@ -58,21 +58,21 @@ describe('Network Plugin', () => {
 
         test('wifi switch change on incoming event', () => {
             instance.emit('settings', 'if wifi:off mobile:off');
-            expect(network.wifiSwitch.getState()).toBe(false);
+            expect(network.wifiSwitch.checked).toBe(false);
             instance.emit('settings', 'if wifi:on mobile:on');
-            expect(network.wifiSwitch.getState()).toBe(true);
+            expect(network.wifiSwitch.checked).toBe(true);
         });
 
         test('mobile data switch change on incoming event', () => {
             instance.emit('settings', 'if wifi:on mobile:on');
-            expect(network.mobileDataSwitch.getState()).toBe(true);
+            expect(network.mobileDataSwitch.checked).toBe(true);
 
             expect(document.querySelector('.gm-network-mobile-section').classList).not.toContain('disabled');
             expect(document.querySelector('.gm-network-type-dropdown').classList).not.toContain('disabled');
             expect(document.querySelector('.gm-signal-strength-dropdown').classList).not.toContain('disabled');
 
             instance.emit('settings', 'if wifi:off mobile:off');
-            expect(network.mobileDataSwitch.getState()).toBe(false);
+            expect(network.mobileDataSwitch.checked).toBe(false);
 
             expect(document.querySelector('.gm-network-mobile-section').classList).toContain('disabled');
             expect(document.querySelector('.gm-network-type-dropdown').classList).toContain('disabled');
@@ -133,15 +133,17 @@ describe('Network Plugin', () => {
 
         test('wifi emit status event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.wifiSwitch.setState(true, true);
-            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif wifi']});
+            network.wifiSwitch.checked = true;
+            network.wifiSwitch.dispatchEvent(new CustomEvent('gm-switch-change', { detail: { checked: true } }));
+            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'settings', messages: ['enableif wifi'] });
         });
 
         test('mobile data emit status event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.mobileDataSwitch.setState(true, true);
-            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif mobile']});
-            expect(sendEventSpy).toHaveBeenCalledWith({channel: 'network_profile', messages: ['notify phone']});
+            network.mobileDataSwitch.checked = true;
+            network.mobileDataSwitch.dispatchEvent(new CustomEvent('gm-switch-change', { detail: { checked: true } }));
+            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'settings', messages: ['enableif mobile'] });
+            expect(sendEventSpy).toHaveBeenCalledWith({ channel: 'network_profile', messages: ['notify phone'] });
         });
 
         test('change network_profile emit event', () => {

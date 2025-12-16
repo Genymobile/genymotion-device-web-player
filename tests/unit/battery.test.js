@@ -38,9 +38,9 @@ describe('Battery Plugin', () => {
         });
 
         test('has default values', () => {
-            expect(battery.chargingInput.getState()).toBeFalsy();
-            expect(Number(battery.chargeSlider.getValue())).toBe(50);
-            expect(Number(battery.chargeInput.getValue())).toBe(50);
+            expect(battery.chargingInput.checked).toBeFalsy();
+            expect(Number(battery.chargeSlider.value)).toBe(50);
+            expect(Number(battery.chargeInput.value)).toBe(50);
         });
 
         test('has translations', () => {
@@ -72,31 +72,31 @@ describe('Battery Plugin', () => {
             instance.emit('battery', 'state mode badstate badvalue'); // Bad state and value
             expect(levelMock).toHaveBeenLastCalledWith('badvalue');
             expect(statusMock).toHaveBeenLastCalledWith();
-            expect(battery.chargingInput.getState()).toBeTruthy();
-            expect(Number(battery.chargeSlider.getValue())).toBe(50);
-            expect(Number(battery.chargeInput.getValue())).toBe(50);
+            expect(battery.chargingInput.checked).toBeTruthy();
+            expect(Number(battery.chargeSlider.value)).toBe(50);
+            expect(Number(battery.chargeInput.value)).toBe(50);
 
             instance.emit('battery', 'state mode badstate 69'); // Bad state
             expect(levelMock).toHaveBeenLastCalledWith('69');
             expect(statusMock).toHaveBeenLastCalledWith();
-            expect(battery.chargingInput.getState()).toBeTruthy();
-            expect(Number(battery.chargeSlider.getValue())).toBe(69);
-            expect(Number(battery.chargeInput.getValue())).toBe(69);
+            expect(battery.chargingInput.checked).toBeTruthy();
+            expect(Number(battery.chargeSlider.value)).toBe(69);
+            expect(Number(battery.chargeInput.value)).toBe(69);
 
             instance.emit('battery', 'state mode discharging badlevel'); // Bad value
             expect(levelMock).toHaveBeenLastCalledWith('badlevel');
             expect(statusMock).toHaveBeenLastCalledWith();
 
-            expect(battery.chargingInput.getState()).toBeFalsy();
-            expect(Number(battery.chargeSlider.getValue())).toBe(69); // Previous value
-            expect(Number(battery.chargeInput.getValue())).toBe(69); // Previous value
+            expect(battery.chargingInput.checked).toBeFalsy();
+            expect(Number(battery.chargeSlider.value)).toBe(69); // Previous value
+            expect(Number(battery.chargeInput.value)).toBe(69); // Previous value
 
             instance.emit('battery', 'state mode charging 42'); // Good state and value
             expect(levelMock).toHaveBeenLastCalledWith('42');
             expect(statusMock).toHaveBeenLastCalledWith();
-            expect(battery.chargingInput.getState()).toBeTruthy();
-            expect(Number(battery.chargeSlider.getValue())).toBe(42);
-            expect(Number(battery.chargeInput.getValue())).toBe(42);
+            expect(battery.chargingInput.checked).toBeTruthy();
+            expect(Number(battery.chargeSlider.value)).toBe(42);
+            expect(Number(battery.chargeInput.value)).toBe(42);
         });
     });
 
@@ -112,7 +112,7 @@ describe('Battery Plugin', () => {
         });
 
         test('battery level input', () => {
-            const input = battery.chargeInput.element.querySelector('input');
+            const input = battery.chargeInput.querySelector('input');
             input.value = 69;
             input.dispatchEvent(new Event('input', {bubbles: true}));
 
@@ -124,7 +124,7 @@ describe('Battery Plugin', () => {
         });
 
         test('battery level slider', () => {
-            const input = battery.chargeSlider.element.querySelector('input');
+            const input = battery.chargeSlider.querySelector('input');
             input.value = 42;
             input.dispatchEvent(new Event('change', {bubbles: true}));
 
@@ -136,11 +136,13 @@ describe('Battery Plugin', () => {
         });
 
         test('battery state', () => {
-            battery.chargingInput.element.querySelector('input').click();
+            // Simulate user click on gm-switch to toggle and emit event
+            battery.chargingInput.click();
+
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({
                 channel: 'battery',
-                messages: ['set state level 50', 'set state status discharging'],
+                messages: ['set state level 50', 'set state status charging'],
             });
         });
     });

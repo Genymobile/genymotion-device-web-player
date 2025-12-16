@@ -1,5 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import {switchButton} from './util/components';
+import '@/components/GmSwitch';
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -114,7 +114,7 @@ export default class FingerPrint extends OverlayPlugin {
                             }
 
                             // update switch
-                            this.recognizedFPByDefaultStatus.setState(value);
+                            this.recognizedFPByDefaultStatus.checked = value;
                             break;
                         default:
                             break;
@@ -193,15 +193,14 @@ export default class FingerPrint extends OverlayPlugin {
         recognizedFPByDefaultText.innerHTML =
             this.i18n.FINGERPRINT_AUTOMATIC_BIOMETRIC_AUTHENTICATION || 'Automatic biometric authentication';
 
-        this.recognizedFPByDefaultStatus = switchButton.createSwitch({
-            classes: 'autoValidationSwitch',
-            onChange: (value) => {
-                this.state.isRecognizedFPByDefault = value;
-            },
+        this.recognizedFPByDefaultStatus = document.createElement('gm-switch');
+        this.recognizedFPByDefaultStatus.className = 'autoValidationSwitch';
+        this.recognizedFPByDefaultStatus.addEventListener('gm-switch-change', (e) => {
+            this.state.isRecognizedFPByDefault = e.detail.checked;
         });
 
         recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultText);
-        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus.element);
+        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus);
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);

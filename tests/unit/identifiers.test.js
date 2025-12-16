@@ -45,11 +45,28 @@ describe('Identifiers Plugin', () => {
             ['android', 'device'].forEach(() => {
                 test('button disabled', () => {
                     expect(identifiers.submitBtn.disabled).toBeTruthy();
-                    identifiers.androidInput.setValue('jean-michel', true);
-                    identifiers.deviceInput.setValue('jean-michel', true);
+                    identifiers.androidInput.value = 'jean-michel';
+                    identifiers.androidInput.dispatchEvent(
+                        new CustomEvent('gm-text-input-change', {detail: {value: 'jean-michel'}, bubbles: true}),
+                    );
+
+                    identifiers.deviceInput.value = 'jean-michel';
+                    identifiers.deviceInput.dispatchEvent(
+                        new CustomEvent('gm-text-input-change', {detail: {value: 'jean-michel'}, bubbles: true}),
+                    );
+
                     expect(identifiers.submitBtn.disabled).toBeTruthy();
-                    identifiers.androidInput.setValue('0123456789abcdef', true);
-                    identifiers.deviceInput.setValue('0123456789abcde', true);
+
+                    identifiers.androidInput.value = '0123456789abcdef';
+                    identifiers.androidInput.dispatchEvent(
+                        new CustomEvent('gm-text-input-change', {detail: {value: '0123456789abcdef'}, bubbles: true}),
+                    );
+
+                    identifiers.deviceInput.value = '0123456789abcde';
+                    identifiers.deviceInput.dispatchEvent(
+                        new CustomEvent('gm-text-input-change', {detail: {value: '0123456789abcde'}, bubbles: true}),
+                    );
+
                     expect(identifiers.submitBtn.disabled).toBeFalsy();
                 });
             });
@@ -96,13 +113,13 @@ describe('Identifiers Plugin', () => {
     test('outgoing events', () => {
         const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
-        identifiers.androidInput.setValue('jean-michel');
-        identifiers.deviceInput.setValue('jean-michel');
+        identifiers.androidInput.value = 'jean-michel';
+        identifiers.deviceInput.value = 'jean-michel';
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(0);
 
-        identifiers.androidInput.setValue('jean-michel');
-        identifiers.deviceInput.setValue('0123456789abcde');
+        identifiers.androidInput.value = 'jean-michel';
+        identifiers.deviceInput.value = '0123456789abcde';
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(1);
         expect(instance.outgoingMessages[0]).toEqual({
@@ -110,9 +127,9 @@ describe('Identifiers Plugin', () => {
             messages: ['set parameter device_id:0123456789abcde'],
         });
 
-        identifiers.androidInput.setValue('0123456789abcdef');
+        identifiers.androidInput.value = '0123456789abcdef';
         // input jean-michel is invalid so we keep the previous value
-        identifiers.deviceInput.setValue('jean-michel');
+        identifiers.deviceInput.value = 'jean-michel';
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(3);
         expect(instance.outgoingMessages[1]).toEqual({
@@ -124,8 +141,8 @@ describe('Identifiers Plugin', () => {
             messages: ['set parameter device_id:0123456789abcde'],
         });
 
-        identifiers.androidInput.setValue('0123456789abcdef');
-        identifiers.deviceInput.setValue('0123456789abcdb');
+        identifiers.androidInput.value = '0123456789abcdef';
+        identifiers.deviceInput.value = '0123456789abcdb';
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(5);
         expect(instance.outgoingMessages[3]).toEqual({
@@ -137,8 +154,8 @@ describe('Identifiers Plugin', () => {
             messages: ['set parameter device_id:0123456789abcdb'],
         });
 
-        identifiers.androidInput.setValue('1234567891234@é%');
-        identifiers.deviceInput.setValue('0123456789abcde');
+        identifiers.androidInput.value = '1234567891234@é%';
+        identifiers.deviceInput.value = '0123456789abcde';
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(7);
         expect(instance.outgoingMessages[6]).toEqual({

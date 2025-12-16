@@ -1,4 +1,5 @@
 {
+    "parser": "@babel/eslint-parser",
     "extends": [
         "eslint:recommended",
         "plugin:prettier/recommended"
@@ -13,8 +14,9 @@
         "jest": true
     },
     "parserOptions": {
-        "ecmaVersion": 2020,
-        "sourceType": "module"
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "requireConfigFile": false
     },
     "rules": {
         "prettier/prettier": [
@@ -41,6 +43,8 @@
         "no-unreachable-loop": "error",
         "require-atomic-updates": "error",
         "no-useless-backreference": "error",
+        "object-curly-spacing": "off",
+        "space-before-function-paren": "off",
         // Best practices
         "array-callback-return": [
             "error",
@@ -167,10 +171,6 @@
             }
         ],
         "no-trailing-spaces": "error",
-        "object-curly-spacing": [
-            "error",
-            "never"
-        ],
         "padded-blocks": [
             "error",
             "never"
@@ -189,14 +189,6 @@
         "semi-style": [
             "error",
             "last"
-        ],
-        "space-before-function-paren": [
-            "error",
-            {
-                "anonymous": "always",
-                "named": "never",
-                "asyncArrow": "never"
-            }
         ],
         "space-in-parens": [
             "error",

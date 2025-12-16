@@ -195,30 +195,16 @@ export default class Battery extends OverlayPlugin {
             this.sendDataToInstance();
         });
 
-        // Handle blur to reset empty value to 0
-        this.chargeInput.inputElement?.addEventListener('blur', (e) => {
-            if (e.target.value === '') {
-                this.chargeInput.value = '0';
-                // Trigger change manually if needed, or rely on bind
-            }
-        });
-
         // bind arrow keys to input, to increase/decrease value with arrow up/down
         this.instance.addListener(this.chargeInput, 'keydown', (e) => {
             if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                this.chargeInput.value = Math.min(100, Number(this.chargeInput.value) + 1);
-                // Manually trigger updates as setter doesn't emit events
-                this.chargeSlider.value = parseFloat(this.chargeInput.value);
-                this.updateUIBatteryChargingPercent(this.chargeInput.value);
-                this.sendDataToInstance();
+                const newValue = Math.min(100, Number(this.chargeInput.value) + 1);
+                this.chargeInput.setValue(newValue, {emit: true});
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                this.chargeInput.value = Math.max(0, Number(this.chargeInput.value) - 1);
-                // Manually trigger updates
-                this.chargeSlider.value = parseFloat(this.chargeInput.value);
-                this.updateUIBatteryChargingPercent(this.chargeInput.value);
-                this.sendDataToInstance();
+                const newValue = Math.max(0, Number(this.chargeInput.value) - 1);
+                this.chargeInput.setValue(newValue, {emit: true});
             }
         });
 

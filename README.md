@@ -68,12 +68,12 @@ npm install @genymotion/device-web-player
 Package import (commonJS):
 
 ```js
-const {DeviceRendererFactory} = require('genymotion/device-web-player');
+const {DeviceRendererFactory} = require('@genymotion/device-web-player');
 ```
 
 ```html
 <style lang="scss">
-    @import 'genymotion-device-web-renderer/dist/css/device-renderer.min.css';
+    @import '@genymotion/device-web-player/dist/css/device-renderer.min.css';
 </style>
 ```
 
@@ -125,14 +125,129 @@ See the example below or explore our [detailed example](https://github.com/Genym
 
     // Disconnect the device renderer, closing any open data channels.
     window.addEventListener('beforeunload', function () {
-        playerAPI.disconnect();
+        rendererAPI.VM_communication.disconnect();
     });
 </script>
 ```
 
 ### 🔑 A word about the token
 
-To connect a [SaaS](https://docs.genymotion.com/saas/) instance you need to generate and use a specific token. This must be done by using our [endpoint API](https://developer.genymotion.com/saas/#tag/Instances-v1/operation/accessToken). When using this API, don't forget to include the x-api-token HTTP header with a valid [Bearer](https://developer.genymotion.com/saas/#tag/Users-v1/operation/login) or [API Token](https://www.genymotion.com/blog/api-tokens-for-genymotion-saas/)
+For SaaS, the player requires an instance-scoped access token (`access_token`) — not a user JWT. Use exactly one authentication scheme per SaaS API request:
+
+- `Authorization: Bearer <JWT>` after logging in via `POST /v1/users/login`, or
+- `x-api-token: <API_TOKEN>` using an API token from the SaaS portal.
+
+Do not send both headers at once.
+
+Flow to render a SaaS device:
+
+1. Authenticate with one scheme:
+  - JWT: `POST /v1/users/login` → response contains `token` (your JWT).
+  - API token: skip login and use `x-api-token` directly.
+2. Get your instance info (for `webrtcAddress`): `GET /v1/instances/<INSTANCE_UUID>` using your chosen header.
+3. Generate the per-instance access token: `POST /v1/instances/access-token` with body `{"instance_uuid":"<INSTANCE_UUID>"}` using the same header.
+4. Use the returned `access_token` as `options.token` when calling `setupRenderer`.
+
+Notes:
+- SaaS JWTs expire (e.g., ~48h). Regenerate by re-login when needed.
+- The `access_token` is scoped to a single instance and may expire; if you receive a token invalid/expired error, call the access-token endpoint again and reconnect.
+- For PaaS, `options.token` is the instance ID provided by your device provider. No SaaS API calls are required.
+
+Useful references:
+- Login (JWT): https://developer.genymotion.com/saas/#operation/login
+- Get instance: https://developer.genymotion.com/saas/#operation/getInstance
+- Access token: https://developer.genymotion.com/saas/#tag/Instances-v1/operation/accessToken
+- API tokens overview: https://www.genymotion.com/blog/api-tokens-for-genymotion-saas/
+
+### SaaS Token Flow Examples
+
+Here are some practical examples for retrieving an `access_token`.
+
+#### Using `curl`
+
+This is useful for backend scripts or testing.
+
+```bash
+# 1. (Optional) Login to get a JWT if you are not using an API Token
+JWT=$(curl -X POST https://api.geny.io/cloud/v1/users/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com","password":"<your_password>"}' | jq -r .token)
+
+# 2. Get instance details (like webrtcAddress)
+# Using a JWT
+curl https://api.geny.io/cloud/v1/instances/<INSTANCE_UUID> \
+  -H "Authorization: Bearer $JWT"
+
+# Or using an API Token
+curl https://api.geny.io/cloud/v1/instances/<INSTANCE_UUID> \
+  -H "x-api-token: <YOUR_API_TOKEN>"
+
+# 3. Generate the access_token for the player
+# Using a JWT
+ACCESS_TOKEN=$(curl -X POST https://api.geny.io/cloud/v1/instances/access-token \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $JWT" \
+  -d '{"instance_uuid":"<INSTANCE_UUID>"}' | jq -r .access_token)
+
+# Or using an API Token
+ACCESS_TOKEN=$(curl -X POST https://api.geny.io/cloud/v1/instances/access-token \
+  -H 'Content-Type: application/json' \
+  -H "x-api-token: <YOUR_API_TOKEN>" \
+  -d '{"instance_uuid":"<INSTANCE_UUID>"}' | jq -r .access_token)
+
+echo "Your access token is: $ACCESS_TOKEN"
+```
+
+#### Using JavaScript `fetch`
+
+This is how you would implement it in a frontend application.
+
+```javascript
+async function getSaasAccessToken(instanceUuid, apiToken) {
+    try {
+        const response = await fetch('https://api.geny.io/cloud/v1/instances/access-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-token': apiToken, // or 'Authorization': 'Bearer <JWT>'
+            },
+            body: JSON.stringify({ instance_uuid: instanceUuid }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.access_token;
+    } catch (error) {
+        console.error('Failed to get SaaS access token:', error);
+        return null;
+    }
+}
+
+// Usage:
+const instanceUuid = '<YOUR_INSTANCE_UUID>';
+const apiToken = '<YOUR_API_TOKEN>'; // Or use a JWT
+getSaasAccessToken(instanceUuid, apiToken).then(accessToken => {
+    if (accessToken) {
+        // Now use this accessToken in the player options
+        const options = {
+            token: accessToken,
+            // ... other options
+        };
+        // ... setupRenderer ...
+    }
+});
+```
+
+### Token Troubleshooting
+
+If the player fails to connect, check for these common WebSocket close codes:
+-   **4242**: The token is invalid or incorrect. Verify you are using the `access_token` for SaaS, not a JWT.
+-   **4243**: The token has expired. Regenerate a new `access_token` using the `/v1/instances/access-token` endpoint and reconnect.
+-   If you get HTTP 400/401 errors from the SaaS API, ensure you are using exactly one authentication header (`Authorization` or `x-api-token`), not both.
+
 
 ## 🎨 Style and CSS
 
@@ -320,7 +435,7 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Default:** `undefined`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-  Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [login api](https://developer.genymotion.com/saas/#operation/login).
+  Instance access token, the shared secret used to connect to the device. For Genymotion PaaS devices, the token is the instance id (more information can be find [here](https://docs.genymotion.com/paas/02_Getting_Started/)). For SaaS devices, you must generate the access token using the [`/v1/instances/access-token` endpoint](https://developer.genymotion.com/saas/#tag/Instances-v1/operation/accessToken).
 
 #### `toolbarOrder`
 

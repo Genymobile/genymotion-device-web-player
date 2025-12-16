@@ -60,7 +60,7 @@ describe('Camera Plugin', () => {
             mediaManager.removeAudioStream.mockRestore();
         });
 
-        it('video can be toggled on', async() => {
+        it('video can be toggled on', async () => {
             const videoStreamAdded = new Promise((resolve) => {
                 mediaManager.addVideoStream.mockImplementationOnce(() => {
                     // Toutes les assertions et appels de spy se font ici :
@@ -91,7 +91,7 @@ describe('Camera Plugin', () => {
             expect(stopAudioSpy).toHaveBeenCalledTimes(0);
         });
 
-        it('audio can be toggled on', async() => {
+        it('audio can be toggled on', async () => {
             const audioStreamAdded = new Promise((resolve) => {
                 mediaManager.addAudioStream.mockImplementationOnce(() => {
                     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -120,7 +120,7 @@ describe('Camera Plugin', () => {
             expect(stopVideoSpy).toHaveBeenCalledTimes(0);
         });
 
-        it('handles mediaDevices video errors', async() => {
+        it('handles mediaDevices video errors', async () => {
             const videoStreamError = new Promise((resolve) => {
                 mediaManager.onVideoStreamError.mockImplementationOnce(() => {
                     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -141,7 +141,7 @@ describe('Camera Plugin', () => {
             await videoStreamError;
         });
 
-        it('handles mediaDevices audio errors', async() => {
+        it('handles mediaDevices audio errors', async () => {
             const audioStreamError = new Promise((resolve) => {
                 mediaManager.onAudioStreamError.mockImplementationOnce(() => {
                     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -181,7 +181,7 @@ describe('Camera Plugin', () => {
             expect(mediaManager.audioStreaming).toBeFalsy();
         });
 
-        it('handles starting video when audio is streaming', async() => {
+        it('handles starting video when audio is streaming', async () => {
             mediaManager.audioStreaming = true;
 
             const videoStreamAdded = new Promise((resolve) => {
@@ -202,7 +202,7 @@ describe('Camera Plugin', () => {
             await videoStreamAdded;
         });
 
-        it('handles starting audio when video is streaming', async() => {
+        it('handles starting audio when video is streaming', async () => {
             mediaManager.videoStreaming = true;
 
             const audioStreamAdded = new Promise((resolve) => {
@@ -223,7 +223,7 @@ describe('Camera Plugin', () => {
             await audioStreamAdded;
         });
 
-        it('handles stopping video when audio is streaming', async() => {
+        it('handles stopping video when audio is streaming', async () => {
             mediaManager.videoStreaming = true;
             mediaManager.audioStreaming = true;
 
@@ -244,7 +244,7 @@ describe('Camera Plugin', () => {
             await videoStreamRemoved;
         });
 
-        it('handles stopping audio when video is streaming', async() => {
+        it('handles stopping audio when video is streaming', async () => {
             mediaManager.videoStreaming = true;
             mediaManager.audioStreaming = true;
 

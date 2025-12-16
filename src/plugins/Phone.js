@@ -1,5 +1,6 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import {textInput} from './util/components';
+
+import '@/components/GmTextInput.js';
 
 /**
  * Instance phone plugin.
@@ -61,29 +62,29 @@ export default class Phone extends OverlayPlugin {
         // Phone group
         const phoneGroup = document.createElement('div');
 
-        this.phoneInput = textInput.createTextInput({
-            classes: 'gm-phone-number',
-            placeholder: this.i18n.PHONE_CALL_PLACEHOLDER || 'Please enter the phone number',
-            regexFilter: /^[0-9+\-().\s]{1,25}$/,
-            regexValidField: /^[0-9+\-().\s]+$/,
-            messageField: true,
-            onChange: () => {
-                if (this.phoneInput.checkValidity()) {
-                    this.phoneBtn.disabled = false;
-                } else {
-                    this.phoneBtn.disabled = true;
-                }
-                if (this.textInput.value.length > 0 && this.phoneInput.checkValidity()) {
-                    this.textBtn.disabled = false;
-                } else {
-                    this.textBtn.disabled = true;
-                }
-                if (this.phoneInput.checkValidity()) {
-                    this.phoneInput.setErrorMessage('');
-                } else {
-                    this.phoneInput.setErrorMessage('Invalid phone number');
-                }
-            },
+        this.phoneInput = document.createElement('gm-text-input');
+        this.phoneInput.classList.add('gm-phone-number');
+        this.phoneInput.setAttribute(
+            'placeholder',
+            this.i18n.PHONE_CALL_PLACEHOLDER || 'Please enter the phone number',
+        );
+        // Regex source strings
+        this.phoneInput.setAttribute('regex-filter', '^[0-9+\\-().\\s]{1,25}$');
+        this.phoneInput.setAttribute('regex-valid', '^[0-9+\\-().\\s]+$');
+
+        this.phoneInput.addEventListener('gm-text-input-change', () => {
+            if (this.phoneInput.checkValidity()) {
+                this.phoneBtn.disabled = false;
+                this.phoneInput.setErrorMessage('');
+            } else {
+                this.phoneBtn.disabled = true;
+                this.phoneInput.setErrorMessage('Invalid phone number');
+            }
+            if (this.textInput.value.length > 0 && this.phoneInput.checkValidity()) {
+                this.textBtn.disabled = false;
+            } else {
+                this.textBtn.disabled = true;
+            }
         });
 
         this.phoneBtn = document.createElement('button');
@@ -96,7 +97,7 @@ export default class Phone extends OverlayPlugin {
 
         phoneGroup.innerHTML = '<label>' + incomingPhoneLabel + '</label>';
         phoneGroup.className = 'gm-phone-group';
-        phoneGroup.appendChild(this.phoneInput.element);
+        phoneGroup.appendChild(this.phoneInput);
         phoneGroup.appendChild(this.phoneBtn);
         inputs.appendChild(phoneGroup);
 
@@ -140,7 +141,7 @@ export default class Phone extends OverlayPlugin {
             event.preventDefault();
         }
 
-        const json = {channel: 'baseband', messages: ['gsm call ' + this.phoneInput.getValue()]};
+        const json = {channel: 'baseband', messages: ['gsm call ' + this.phoneInput.value]};
         this.instance.sendEvent(json);
     }
 
@@ -156,7 +157,7 @@ export default class Phone extends OverlayPlugin {
 
         const json = {
             channel: 'baseband',
-            messages: ['sms send ' + this.phoneInput.getValue() + ' ' + this.textInput.value],
+            messages: ['sms send ' + this.phoneInput.value + ' ' + this.textInput.value],
         };
         this.instance.sendEvent(json);
     }

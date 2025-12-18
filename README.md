@@ -141,7 +141,7 @@ Do not send both headers at once.
 
 Flow to render a SaaS device:
 
-1. Authenticate with one scheme:
+1. Authenticate with either one of these schemes (not both!):
   - JWT: `POST /v1/users/login` → response contains `token` (your JWT).
   - API token: skip login and use `x-api-token` directly.
 2. Get your instance info (for `webrtcAddress`): `GET /v1/instances/<INSTANCE_UUID>` using your chosen header.
@@ -149,9 +149,9 @@ Flow to render a SaaS device:
 4. Use the returned `access_token` as `options.token` when calling `setupRenderer`.
 
 Notes:
-- SaaS JWTs expire (e.g., ~48h). Regenerate by re-login when needed.
+- SaaS JWTs expire after a while (e.g., ~48h). Regenerate by re-login when needed.
 - The `access_token` is scoped to a single instance and may expire; if you receive a token invalid/expired error, call the access-token endpoint again and reconnect.
-- For PaaS, `options.token` is the instance ID provided by your device provider. No SaaS API calls are required.
+- For Genymotion Device Image, `options.token` is the instance ID provided by your cloud provider. No SaaS API calls are required.
 
 Useful references:
 - Login (JWT): https://developer.genymotion.com/saas/#operation/login

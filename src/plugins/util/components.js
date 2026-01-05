@@ -111,7 +111,7 @@ const slider = (() => {
 
         // Update UI based on the current slider value
         const updateUI = () => {
-            requestAnimationFrame(async () => {
+            requestAnimationFrame(async() => {
                 // if CSS isn't ready cursorWidth & sliderWidth haven't size, so we loop to waiting CSS ready
                 const start = performance.now();
                 while (sliderCursor.offsetWidth === 0 || sliderDiv.offsetWidth === 0) {

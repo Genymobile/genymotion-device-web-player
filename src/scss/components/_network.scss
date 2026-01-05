@@ -78,9 +78,7 @@
 
     .gm-network-mobile-section {
         .gm-signal-strength-dropdown {
-            .dropdown-selected {
-                margin-bottom: $spacing-xl;
-            }
+            margin-bottom: $spacing-xl;
         }
 
         &.disabled {

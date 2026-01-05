@@ -1,5 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import '@/components/GmChip.js';
+import {chipTag} from './util/components';
 
 import log from 'loglevel';
 log.setDefaultLevel('debug');
@@ -45,9 +45,7 @@ export default class Clipboard extends OverlayPlugin {
             try {
                 this.clipboard = decodeURIComponent(escape(window.atob(values[2])));
                 if (this.clipboard !== this.clipboardInput.value) {
-                    if (this.appliedTag) {
-                        this.appliedTag.visible = false;
-                    }
+                    this.container.classList.remove('gm-clipboard-saved');
                 }
                 this.clipboardInput.value = this.clipboard;
             } catch (error) {
@@ -92,7 +90,7 @@ export default class Clipboard extends OverlayPlugin {
         this.clipboardInput.className = 'gm-clipboard-input';
         this.clipboardInput.placeholder = this.i18n.CLIPBOARD_PLACEHOLDER || 'Write your content here';
         this.clipboardInput.oninput = (event) => {
-            this.appliedTag.visible = false;
+            this.container.classList.remove('gm-clipboard-saved');
             if (event.target.value.length > 0) {
                 this.submitBtn.disabled = false;
             } else {
@@ -102,20 +100,19 @@ export default class Clipboard extends OverlayPlugin {
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
-        const appliedTag = document.createElement('gm-chip');
-        appliedTag.value = this.i18n.CLIPBOARD_COPIED || 'Copied';
-        appliedTag.visible = false;
-        this.appliedTag = appliedTag;
+        const appliedTag = chipTag.createChip({
+            text: this.i18n.CLIPBOARD_COPIED || 'Copied',
+        });
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.CLIPBOARD_COPY || 'Copy to device';
         this.submitBtn.className = 'gm-btn gm-clipboard-apply';
         this.submitBtn.onclick = () => {
-            this.appliedTag.visible = true;
+            this.container.classList.add('gm-clipboard-saved');
             this.sendDataToInstance();
         };
 
-        actionsDiv.appendChild(appliedTag);
+        actionsDiv.appendChild(appliedTag.element);
         actionsDiv.appendChild(this.submitBtn);
 
         // Setup

@@ -9,6 +9,14 @@
         flex-direction: column;
     }
 
+    .gm-identifiers-saved {
+        .gm-actions {
+            .gm-tag-success {
+                visibility: visible;
+            }
+        }
+    }
+
     .gm-inputs {
         flex: 1;
 
@@ -37,5 +45,8 @@
     }
 
     .gm-actions {
+        .gm-tag-success {
+            visibility: hidden;
+        }
     }
 }

@@ -1,6 +1,6 @@
 import OverlayPlugin from './util/OverlayPlugin';
 import log from 'loglevel';
-import '@/components/GmProgressBar.js';
+import {progressBar} from './util/components';
 import fileUploader from './util/fileUploader';
 log.setDefaultLevel('debug');
 
@@ -50,11 +50,14 @@ class InstallingGAPPSView {
         progressTextContainer.appendChild(this.progressText);
         progressTextContainer.appendChild(this.progressPercentage);
 
-        this.progressBar = document.createElement('gm-progress-bar');
+        this.progressBar = progressBar.createProgressBar({
+            value: 0,
+            max: 100,
+        });
 
         progressSection.appendChild(androidIcon);
         progressSection.appendChild(progressTextContainer);
-        progressSection.appendChild(this.progressBar);
+        progressSection.appendChild(this.progressBar.element);
 
         const separator2 = document.createElement('div');
         separator2.className = 'gm-separator';
@@ -96,7 +99,7 @@ class InstallingGAPPSView {
     updateProgress(percentage, text) {
         this.progressPercentage.innerHTML = `${percentage}%`;
         this.progressText.innerHTML = text;
-        this.progressBar.value = percentage;
+        this.progressBar.setValue(percentage);
     }
 }
 
@@ -392,8 +395,6 @@ class InitialView {
                 log.error(error);
                 this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
             }
-        } else {
-            this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
         }
     }
 

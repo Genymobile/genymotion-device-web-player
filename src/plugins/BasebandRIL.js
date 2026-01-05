@@ -1,6 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import '@/components/GmChip.js';
-import '@/components/GmTextInput.js';
+import {textInput, chipTag} from './util/components';
 
 /**
  * Instance Baseband/RIL plugin.
@@ -49,25 +48,25 @@ export default class BasebandRIL extends OverlayPlugin {
         }
 
         if (values[0] === 'network' && values[1] === 'operator') {
-            this.networkOperatorMMC.value = values[2];
+            this.networkOperatorMMC.setValue(values[2]);
         }
         if (values[0] === 'network' && values[1] === 'operator_name') {
-            this.networkOperatorName.value = values.slice(2).join(' ');
+            this.networkOperatorName.setValue(values.slice(2).join(' '));
         }
         if (values[0] === 'sim' && values[1] === 'operator') {
-            this.simOperatorMMC.value = values[2];
+            this.simOperatorMMC.setValue(values[2]);
         }
         if (values[0] === 'sim' && values[1] === 'operator_name') {
-            this.simOperatorName.value = values.slice(2).join(' ');
+            this.simOperatorName.setValue(values.slice(2).join(' '));
         }
         if (values[0] === 'sim' && values[1] === 'imsi_id') {
-            this.simMSIN.value = values[2];
+            this.simMSIN.setValue(values[2]);
         }
         if (values[0] === 'sim' && values[1] === 'phone_number') {
-            this.simOperatorPhoneNumber.value = values[2];
+            this.simOperatorPhoneNumber.setValue(values[2]);
         }
         this.checkIfFormIsValid();
-        this.appliedTag.visible = true;
+        this.container.classList.add('gm-baseband-saved');
     }
 
     /**
@@ -110,32 +109,34 @@ export default class BasebandRIL extends OverlayPlugin {
         const networkOperatorMMCDiv = document.createElement('div');
         const networkOperatorMMCLabel = document.createElement('label');
         networkOperatorMMCLabel.innerHTML = 'MCC/MNC';
-        this.networkOperatorMMC = document.createElement('gm-text-input');
-        this.networkOperatorMMC.classList.add('gm-network-mmc');
-        this.networkOperatorMMC.setAttribute('placeholder', 'eg: 20814');
-        this.networkOperatorMMC.setAttribute('regex-filter', '^[0-9]{0,6}$');
-        this.networkOperatorMMC.setAttribute('regex-valid', '^[0-9]{5,6}$');
-
-        this.networkOperatorMMC.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.networkOperatorMMC = textInput.createTextInput({
+            classes: 'gm-network-mmc',
+            regexFilter: /^[0-9]{0,6}$/,
+            regexValidField: /^[0-9]{5,6}$/,
+            placeholder: 'eg: 20814',
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
         });
         networkOperatorMMCDiv.appendChild(networkOperatorMMCLabel);
-        networkOperatorMMCDiv.appendChild(this.networkOperatorMMC);
+        networkOperatorMMCDiv.appendChild(this.networkOperatorMMC.element);
 
         const networkOperatorNameDiv = document.createElement('div');
         const networkOperatorNameLabel = document.createElement('label');
         networkOperatorNameLabel.innerHTML = 'Name';
-        this.networkOperatorName = document.createElement('gm-text-input');
-        this.networkOperatorName.classList.add('gm-network-name');
-        this.networkOperatorName.setAttribute('placeholder', 'eg: Verizon');
-
-        this.networkOperatorName.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.networkOperatorName = textInput.createTextInput({
+            classes: 'gm-network-name',
+            placeholder: 'eg: Verizon',
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
         });
         networkOperatorNameDiv.appendChild(networkOperatorNameLabel);
-        networkOperatorNameDiv.appendChild(this.networkOperatorName);
+        networkOperatorNameDiv.appendChild(this.networkOperatorName.element);
 
         networkOperatorFirstLineDiv.appendChild(networkOperatorMMCDiv);
         networkOperatorFirstLineDiv.appendChild(networkOperatorNameDiv);
@@ -157,32 +158,34 @@ export default class BasebandRIL extends OverlayPlugin {
         const simOperatorMMCDiv = document.createElement('div');
         const simOperatorMMCLabel = document.createElement('label');
         simOperatorMMCLabel.innerHTML = 'MCC/MNC';
-        this.simOperatorMMC = document.createElement('gm-text-input');
-        this.simOperatorMMC.classList.add('gm-sim-mmc');
-        this.simOperatorMMC.setAttribute('placeholder', 'eg: 20814');
-        this.simOperatorMMC.setAttribute('regex-filter', '^[0-9]{0,6}$');
-        this.simOperatorMMC.setAttribute('regex-valid', '^[0-9]{5,6}$');
-
-        this.simOperatorMMC.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.simOperatorMMC = textInput.createTextInput({
+            classes: 'gm-sim-mmc',
+            placeholder: 'eg: 20814',
+            regexFilter: /^[0-9]{0,6}$/,
+            regexValidField: /^[0-9]{5,6}$/,
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
         });
         simOperatorMMCDiv.appendChild(simOperatorMMCLabel);
-        simOperatorMMCDiv.appendChild(this.simOperatorMMC);
+        simOperatorMMCDiv.appendChild(this.simOperatorMMC.element);
 
         const simOperatorNameDiv = document.createElement('div');
         const simOperatorNameLabel = document.createElement('label');
         simOperatorNameLabel.innerHTML = 'Name';
-        this.simOperatorName = document.createElement('gm-text-input');
-        this.simOperatorName.classList.add('gm-sim-name');
-        this.simOperatorName.setAttribute('placeholder', 'eg: AT&T');
-
-        this.simOperatorName.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.simOperatorName = textInput.createTextInput({
+            classes: 'gm-sim-name',
+            placeholder: 'eg: AT&T',
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
         });
         simOperatorNameDiv.appendChild(simOperatorNameLabel);
-        simOperatorNameDiv.appendChild(this.simOperatorName);
+        simOperatorNameDiv.appendChild(this.simOperatorName.element);
 
         simOperatorFirstLineDiv.appendChild(simOperatorMMCDiv);
         simOperatorFirstLineDiv.appendChild(simOperatorNameDiv);
@@ -191,34 +194,36 @@ export default class BasebandRIL extends OverlayPlugin {
         const simMSINDiv = document.createElement('div');
         const simMSINLabel = document.createElement('label');
         simMSINLabel.innerHTML = 'MSIN';
-        this.simMSIN = document.createElement('gm-text-input');
-        this.simMSIN.classList.add('gm-sim-msin');
-        this.simMSIN.setAttribute('placeholder', 'eg: 2176510739');
-        this.simMSIN.setAttribute('regex-filter', '^[0-9]{0,10}$');
-        this.simMSIN.setAttribute('regex-valid', '^[0-9]{9,10}$');
-
-        this.simMSIN.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.simMSIN = textInput.createTextInput({
+            classes: 'gm-sim-msin',
+            placeholder: 'eg: 2176510739',
+            regexFilter: /^[0-9]{0,10}$/,
+            regexValidField: /^[0-9]{9,10}$/,
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('f');
+            },
         });
         simMSINDiv.appendChild(simMSINLabel);
-        simMSINDiv.appendChild(this.simMSIN);
+        simMSINDiv.appendChild(this.simMSIN.element);
 
         const simOperatorPhoneDiv = document.createElement('div');
         const simOperatorPhoneLabel = document.createElement('label');
         simOperatorPhoneLabel.innerHTML = 'Phone Number';
-        this.simOperatorPhoneNumber = document.createElement('gm-text-input');
-        this.simOperatorPhoneNumber.classList.add('gm-sim-phone');
-        this.simOperatorPhoneNumber.setAttribute('placeholder', 'eg: 8004337300');
-        this.simOperatorPhoneNumber.setAttribute('regex-filter', '^[0-9+\\-().\\s]{0,25}$');
-        this.simOperatorPhoneNumber.setAttribute('regex-valid', '^[0-9+\\-().\\s]+$');
-
-        this.simOperatorPhoneNumber.addEventListener('gm-text-input-change', () => {
-            this.checkIfFormIsValid();
-            this.appliedTag.visible = false;
+        this.simOperatorPhoneNumber = textInput.createTextInput({
+            classes: 'gm-sim-phone',
+            placeholder: 'eg: 8004337300',
+            regexFilter: /^[0-9+\-().\s]{0,25}$/,
+            regexValidField: /^[0-9+\-().\s]+$/,
+            messageField: true,
+            onChange: () => {
+                this.checkIfFormIsValid();
+                this.container.classList.remove('gm-baseband-saved');
+            },
         });
         simOperatorPhoneDiv.appendChild(simOperatorPhoneLabel);
-        simOperatorPhoneDiv.appendChild(this.simOperatorPhoneNumber);
+        simOperatorPhoneDiv.appendChild(this.simOperatorPhoneNumber.element);
 
         simOperatorSecondLineDiv.appendChild(simMSINDiv);
         simOperatorSecondLineDiv.appendChild(simOperatorPhoneDiv);
@@ -230,10 +235,8 @@ export default class BasebandRIL extends OverlayPlugin {
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
 
-        const appliedTag = document.createElement('gm-chip');
-        appliedTag.visible = false;
-        this.appliedTag = appliedTag;
-        actionsDiv.appendChild(appliedTag);
+        const appliedTag = chipTag.createChip();
+        actionsDiv.appendChild(appliedTag.element);
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.BASEBAND_APPLY || 'Apply';
@@ -270,18 +273,18 @@ export default class BasebandRIL extends OverlayPlugin {
      */
     checkSimImsiErrors() {
         let isError = false;
-        if (!this.simOperatorMMC.value.length) {
+        if (!this.simOperatorMMC.getValue().length) {
             this.simMSIN.setErrorMessage('');
             return isError;
         }
-        if (!this.simMSIN.value.length) {
+        if (!this.simMSIN.getValue().length) {
             this.simOperatorMMC.setErrorMessage('');
             return isError;
         }
-        if (this.simOperatorMMC.value.length === 6 && this.simMSIN.value.length !== 9) {
+        if (this.simOperatorMMC.getValue().length === 6 && this.simMSIN.getValue().length !== 9) {
             this.simMSIN.setErrorMessage('9 digits required');
             isError = true;
-        } else if (this.simOperatorMMC.value.length === 5 && this.simMSIN.value.length !== 10) {
+        } else if (this.simOperatorMMC.getValue().length === 5 && this.simMSIN.getValue().length !== 10) {
             this.simMSIN.setErrorMessage('10 digits required');
             isError = true;
         }
@@ -313,28 +316,28 @@ export default class BasebandRIL extends OverlayPlugin {
 
         isValid = !this.checkSimImsiErrors();
 
-        if (!this.networkOperatorMMC.value.length || !this.networkOperatorMMC.checkValidity()) {
+        if (!this.networkOperatorMMC.getValue().length || !this.networkOperatorMMC.checkValidity()) {
             this.networkOperatorMMC.setErrorMessage('5-6 digits');
             isValid = false;
         }
-        if (!this.simOperatorMMC.value.length || !this.simOperatorMMC.checkValidity()) {
+        if (!this.simOperatorMMC.getValue().length || !this.simOperatorMMC.checkValidity()) {
             this.simOperatorMMC.setErrorMessage('5-6 digits');
             isValid = false;
         }
-        if (!this.simMSIN.value.length || !this.simMSIN.checkValidity()) {
+        if (!this.simMSIN.getValue().length || !this.simMSIN.checkValidity()) {
             this.simMSIN.setErrorMessage('9-10 digits');
             isValid = false;
         }
-        if (!this.simOperatorPhoneNumber.value.length || !this.simOperatorPhoneNumber.checkValidity()) {
+        if (!this.simOperatorPhoneNumber.getValue().length || !this.simOperatorPhoneNumber.checkValidity()) {
             this.simOperatorPhoneNumber.setErrorMessage('Invalid phone');
             isValid = false;
         }
 
-        if (!this.networkOperatorName.value.length) {
+        if (!this.networkOperatorName.getValue().length) {
             this.networkOperatorName.setErrorMessage('Required');
             isValid = false;
         }
-        if (!this.simOperatorName.value.length) {
+        if (!this.simOperatorName.getValue().length) {
             this.simOperatorName.setErrorMessage('Required');
             isValid = false;
         }
@@ -355,27 +358,27 @@ export default class BasebandRIL extends OverlayPlugin {
         }
 
         const msgs = [];
-        if (this.networkOperatorMMC.value.length) {
-            msgs.push('network operator ' + this.networkOperatorMMC.value);
+        if (this.networkOperatorMMC.getValue().length) {
+            msgs.push('network operator ' + this.networkOperatorMMC.getValue());
         }
-        if (this.networkOperatorName.value.length) {
-            msgs.push('network operator_name ' + this.networkOperatorName.value);
-        }
-
-        if (this.simOperatorMMC.value.length) {
-            msgs.push('sim operator ' + this.simOperatorMMC.value);
+        if (this.networkOperatorName.getValue().length) {
+            msgs.push('network operator_name ' + this.networkOperatorName.getValue());
         }
 
-        if (this.simOperatorName.value.length) {
-            msgs.push('sim operator_name ' + this.simOperatorName.value);
+        if (this.simOperatorMMC.getValue().length) {
+            msgs.push('sim operator ' + this.simOperatorMMC.getValue());
         }
 
-        if (this.simMSIN.value.length) {
-            msgs.push('sim imsi_id ' + this.simMSIN.value);
+        if (this.simOperatorName.getValue().length) {
+            msgs.push('sim operator_name ' + this.simOperatorName.getValue());
         }
 
-        if (this.simOperatorPhoneNumber.value.length) {
-            msgs.push('sim phone_number ' + this.simOperatorPhoneNumber.value);
+        if (this.simMSIN.getValue().length) {
+            msgs.push('sim imsi_id ' + this.simMSIN.getValue());
+        }
+
+        if (this.simOperatorPhoneNumber.getValue().length) {
+            msgs.push('sim phone_number ' + this.simOperatorPhoneNumber.getValue());
         }
 
         if (msgs.length > 0) {
@@ -383,6 +386,6 @@ export default class BasebandRIL extends OverlayPlugin {
             this.instance.sendEvent(json);
         }
 
-        this.appliedTag.visible = true;
+        this.container.classList.add('gm-baseband-saved');
     }
 }

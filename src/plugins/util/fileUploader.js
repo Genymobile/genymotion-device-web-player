@@ -1,4 +1,4 @@
-import '@/components/GmProgressBar.js';
+import {progressBar} from './components';
 
 /**
  * Module for creating custom file uploader components with drag & drop functionality.
@@ -131,13 +131,16 @@ const fileUploader = (() => {
         uploadProgressTextContainer.appendChild(uploadFileName);
         uploadProgressTextContainer.appendChild(uploadCancelButton);
 
-        const progressBarUpload = document.createElement('gm-progress-bar');
+        const progressBarUpload = progressBar.createProgressBar({
+            value: 0,
+            max: 100,
+        });
 
         const uploadSizeText = document.createElement('div');
         uploadSizeText.className = 'gm-size-text';
 
         wrapperUploadingTextAndProgress.appendChild(uploadProgressTextContainer);
-        wrapperUploadingTextAndProgress.appendChild(progressBarUpload);
+        wrapperUploadingTextAndProgress.appendChild(progressBarUpload.element);
         wrapperUploadingTextAndProgress.appendChild(uploadSizeText);
 
         uploadProgressInfoDiv.appendChild(uploadProgressIcon);
@@ -263,7 +266,7 @@ const fileUploader = (() => {
         };
 
         const resetProgressBar = () => {
-            progressBarUpload.value = 0;
+            progressBarUpload.setValue(0);
             uploadSizeText.innerHTML = '';
         };
 
@@ -325,7 +328,7 @@ const fileUploader = (() => {
         };
 
         const updateProgress = (percentage, uploadedSize, fileSize) => {
-            progressBarUpload.value = percentage;
+            progressBarUpload.setValue(percentage);
             uploadSizeText.innerHTML = `(${uploadedSize} ${i18n.OF || 'of'} ${fileSize}Mo)`;
             if (onUploadProgress) {
                 onUploadProgress(percentage, uploadedSize, fileSize);

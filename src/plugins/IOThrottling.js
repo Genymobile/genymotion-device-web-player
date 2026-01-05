@@ -1,7 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
-import '@/components/GmChip.js';
-import '@/components/GmTextInput.js';
-import '@/components/GmDropdown.js';
+import {dropdownSelect, textInput, chipTag} from './util/components';
 
 import PROFILES from './util/iothrottling-profiles';
 const PROFILE_CUSTOM_NAME = 'Custom';
@@ -101,16 +99,16 @@ export default class IOThrottling extends OverlayPlugin {
         const IOThrottlingLabel = this.i18n.IOTHROTTLING_PROFILE || 'Profile';
         inputs.innerHTML = '<label>' + IOThrottlingLabel + '</label>';
 
-        this.dropdownProfile = document.createElement('gm-dropdown');
-        this.dropdownProfile.items = this.profilesForDropdown;
-        this.dropdownProfile.value = 0;
-        this.dropdownProfile.dropdownMaxHeight = 205;
-        this.dropdownProfile.hasCheckmark = true;
-        this.dropdownProfile.addEventListener('gm-dropdown-change', (e) => {
-            this.updateDiskIOValues(e.detail.value);
+        this.dropdownProfile = dropdownSelect.createDropdown({
+            items: this.profilesForDropdown,
+            value: 0,
+            dropdownMaxHeight: 205,
+            hasCheckmark: true,
+            onChange: (newValue) => {
+                this.updateDiskIOValues(newValue);
+            },
         });
-
-        inputs.appendChild(this.dropdownProfile);
+        inputs.appendChild(this.dropdownProfile.element);
 
         const readByteRateDiv = document.createElement('div');
         readByteRateDiv.classList.add('gm-fields');
@@ -121,22 +119,21 @@ export default class IOThrottling extends OverlayPlugin {
         const readByteRateText = document.createElement('div');
         readByteRateText.innerHTML = this.i18n.IOTHROTTLING_READ_BYTERATE || 'Read speed limit:';
 
-        this.readByteRate = document.createElement('gm-text-input');
-        this.readByteRate.setAttribute('value', '50');
-        this.readByteRate.classList.add('gm-iothrottling-readbyterate');
-        // regexFilter: /^[0-9]*$/ -> regex-filter: ^[0-9]*$
-        this.readByteRate.setAttribute('regex-filter', '^[0-9]*$');
-
-        this.readByteRate.addEventListener('gm-text-input-change', (e) => {
-            const value = e.detail.value;
-            const num = Number(value);
-            if (isNaN(num) || num < 0 || num > 4095) {
-                this.readByteRate.setErrorMessage('0 to 4095');
-                this.applyBtn.disabled = true;
-            } else {
-                this.readByteRate.setErrorMessage('');
-                this.applyBtn.disabled = false;
-            }
+        this.readByteRate = textInput.createTextInput({
+            value: '50',
+            classes: 'gm-iothrottling-readbyterate',
+            regexFilter: /^[0-9]*$/,
+            messageField: true,
+            onChange: (value) => {
+                const num = Number(value);
+                if (isNaN(num) || num < 0 || num > 4095) {
+                    this.readByteRate.setErrorMessage('0 to 4095');
+                    this.applyBtn.disabled = true;
+                } else {
+                    this.readByteRate.setErrorMessage('');
+                    this.applyBtn.disabled = false;
+                }
+            },
         });
 
         const readByteRateSpeedText = document.createElement('div');
@@ -147,7 +144,7 @@ export default class IOThrottling extends OverlayPlugin {
         readByteRateSpeedNoneText.classList.add('gm-noThrottling');
 
         readByteRateContainer.appendChild(readByteRateText);
-        readByteRateContainer.appendChild(this.readByteRate);
+        readByteRateContainer.appendChild(this.readByteRate.element);
         readByteRateContainer.appendChild(readByteRateSpeedText);
         readByteRateContainer.appendChild(readByteRateSpeedNoneText);
 
@@ -159,11 +156,9 @@ export default class IOThrottling extends OverlayPlugin {
         applyBtnDiv.className = 'gm-iothrottling-apply gm-actions';
         const statusDiv = document.createElement('div');
         statusDiv.className = 'gm-iothrottling-status';
-        const appliedTag = document.createElement('gm-chip');
-        appliedTag.visible = false;
-        this.appliedTag = appliedTag;
+        const appliedTag = chipTag.createChip();
 
-        statusDiv.appendChild(appliedTag);
+        statusDiv.appendChild(appliedTag.element);
 
         this.applyBtn = document.createElement('button');
         this.applyBtn.className = 'gm-btn';
@@ -203,7 +198,7 @@ export default class IOThrottling extends OverlayPlugin {
 
         const json = {
             channel: 'diskio',
-            messages: ['set readbyterate ' + this.readByteRate.value * BYTES_PER_MEGABYTE, 'clearcache'],
+            messages: ['set readbyterate ' + this.readByteRate.getValue() * BYTES_PER_MEGABYTE, 'clearcache'],
         };
         this.instance.sendEvent(json);
     }
@@ -240,21 +235,17 @@ export default class IOThrottling extends OverlayPlugin {
             const profile = this.profilesForDropdown.find((p) => p.value === this.lastReadByteRateReceived);
 
             if (!profile) {
-                this.appliedTag.visible = true;
-            } else {
-                this.appliedTag.visible = false;
+                this.container.classList.add('gm-iothrottling-saved');
             }
         } else if (readSpeed === this.lastReadByteRateReceived) {
             // if readSpeed isn't custom and is equal to the lastReadByteRateReceived then the active profil is dropdown profil
-            this.appliedTag.visible = true;
-        } else {
-            this.appliedTag.visible = false;
+            this.container.classList.add('gm-iothrottling-saved');
         }
 
         // if readspeed is not a number or is less than 0 then set select "none" profile
         if (!readSpeedIsCustom && (Number.isNaN(readSpeed) || readSpeed <= 0)) {
-            this.readByteRate.value = 0;
-            this.dropdownProfile.value = this.profilesForDropdown.find((profile) => profile.value === 0)?.value;
+            this.readByteRate.setValue(0);
+            this.dropdownProfile.setValue(this.profilesForDropdown.find((profile) => profile.value === 0));
             // Display Read speed limit: No disk performance alteration
             this.container.classList.add('gm-iothrottling-none');
             return;
@@ -263,15 +254,15 @@ export default class IOThrottling extends OverlayPlugin {
         const profile = this.profilesForDropdown.find((prof) => prof.value === readSpeed);
 
         if (!readSpeedIsCustom && profile) {
-            this.readByteRate.setAttribute('readonly', '');
-            this.dropdownProfile.value = profile?.value;
-            this.readByteRate.value = readSpeed;
+            this.readByteRate.setReadOnly(true);
+            this.dropdownProfile.setValue(profile);
+            this.readByteRate.setValue(readSpeed);
         } else {
             // custom
-            this.readByteRate.removeAttribute('readonly');
+            this.readByteRate.setReadOnly(false);
             const custom = this.profilesForDropdown.find((prof) => prof.value === PROFILE_CUSTOM_NAME);
-            this.dropdownProfile.value = custom?.value;
-            this.readByteRate.value = this.lastReadByteRateReceived;
+            this.dropdownProfile.setValue(custom);
+            this.readByteRate.setValue(this.lastReadByteRateReceived);
         }
     }
 }

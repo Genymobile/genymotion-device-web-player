@@ -4,6 +4,14 @@
  * Baseband plugin styles
  */
 .device-renderer-instance .gm-baseband-plugin {
+    .gm-baseband-saved {
+        .gm-actions {
+            .gm-tag-success {
+                visibility: visible;
+            }
+        }
+    }
+
     .gm-network-operator-section-line,
     .gm-sim-operator-section-line {
         display: flex;
@@ -54,6 +62,12 @@
             mask-position: center;
             mask-image: url('../../assets/images/ic_baseband.svg');
             -webkit-mask-image: url('../../assets/images/ic_baseband.svg');
+        }
+    }
+
+    .gm-actions {
+        .gm-tag-success {
+            visibility: hidden;
         }
     }
 }

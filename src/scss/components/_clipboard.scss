@@ -10,6 +10,14 @@
             flex-direction: column;
         }
 
+        &-clipboard-saved {
+            .gm-actions {
+                .gm-tag-success {
+                    visibility: visible;
+                }
+            }
+        }
+
         &-clipboard-text {
             margin: $spacing-s 0;
         }
@@ -43,6 +51,10 @@
                 background: currentColor;
                 width: 32px;
                 height: 32px;
+            }
+
+            .gm-tag-success {
+                visibility: hidden;
             }
         }
     }

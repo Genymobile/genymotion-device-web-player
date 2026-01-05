@@ -349,50 +349,52 @@ class InitialView {
         this.removeListenerDragAndDropLeave = null;
         this.removeListenerDragAndDropDrop = null;
 
-        try {
-            this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
-            this.fileUploadWorker.onmessage = (event) => {
-                const msg = event.data;
-                switch (msg.code) {
-                    case 'SUCCESS':
-                        this.fileUploaderComponent.showUploadSuccess();
-                        // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
-                            this.plugin.toolbarBtn.setIndicator('success');
-                        }
-                        break;
-                    case 'FAIL':
-                        this.fileUploaderComponent.uploadingStop();
-                        this.fileUploaderComponent.showUploadError(
-                            this.i18n.FILE_SEND_APK_FAILED ||
-                                `Something went wrong while processing the APK file. 
-                                Please make sure the file is valid and try again.`,
-                        );
-                        // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
-                            this.plugin.toolbarBtn.setIndicator('failed');
-                        }
-                        break;
-                    case 'PROGRESS':
-                        this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
-                        break;
-                    case 'SOCKET_FAIL':
-                        this.fileUploaderComponent.showUploadError(
-                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
-                                'Something went wrong while connecting to the server.',
-                        );
-                        this.fileUploaderComponent.setEnabled(false);
-                        break;
-                    case 'SOCKET_SUCCESS':
-                        this.fileUploaderComponent.reset();
-                        break;
-                    default:
-                        break;
-                }
-            };
-        } catch (error) {
-            log.error(error);
-            this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+        if (this.plugin.instance.options.fileUploadUrl) {
+            try {
+                this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
+                this.fileUploadWorker.onmessage = (event) => {
+                    const msg = event.data;
+                    switch (msg.code) {
+                        case 'SUCCESS':
+                            this.fileUploaderComponent.showUploadSuccess();
+                            // Show the indicator in the toolbar if the widget is closed.
+                            if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
+                                this.plugin.toolbarBtn.setIndicator('success');
+                            }
+                            break;
+                        case 'FAIL':
+                            this.fileUploaderComponent.uploadingStop();
+                            this.fileUploaderComponent.showUploadError(
+                                this.i18n.FILE_SEND_APK_FAILED ||
+                                    `Something went wrong while processing the APK file. 
+                                    Please make sure the file is valid and try again.`,
+                            );
+                            // Show the indicator in the toolbar if the widget is closed.
+                            if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
+                                this.plugin.toolbarBtn.setIndicator('failed');
+                            }
+                            break;
+                        case 'PROGRESS':
+                            this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
+                            break;
+                        case 'SOCKET_FAIL':
+                            this.fileUploaderComponent.showUploadError(
+                                this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                                    'Something went wrong while connecting to the server.',
+                            );
+                            this.fileUploaderComponent.setEnabled(false);
+                            break;
+                        case 'SOCKET_SUCCESS':
+                            this.fileUploaderComponent.reset();
+                            break;
+                        default:
+                            break;
+                    }
+                };
+            } catch (error) {
+                log.error(error);
+                this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+            }
         }
     }
 

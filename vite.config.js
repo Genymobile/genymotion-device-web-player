@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
             },
             outDir: 'dist',
             emptyOutDir: true,
-            minify: mode === 'production' ? 'terser' : false,
+            minify: mode === 'production' ? 'esbuild' : false,
             cssCodeSplit: false,
             rollupOptions: {
                 output: {

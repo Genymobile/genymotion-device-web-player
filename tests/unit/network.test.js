@@ -1,7 +1,6 @@
-'use strict';
-
-const Network = require('../../src/plugins/Network');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import Network from '../../src/plugins/Network.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let network;
 let instance;
@@ -87,7 +86,7 @@ describe('Network Plugin', () => {
         });
 
         test('network_profile with invalid value', () => {
-            const updateDetail = jest.spyOn(network, 'updateDetail');
+            const updateDetail = vi.spyOn(network, 'updateDetail');
             ['jean-michel', 'state wifi -123', '', 'state wifi missing:additional:values'].forEach((invalidValue) => {
                 instance.emit('network_profile', invalidValue);
                 expect(updateDetail).not.toHaveBeenCalled();
@@ -133,20 +132,20 @@ describe('Network Plugin', () => {
         });
 
         test('wifi emit status event', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             network.wifiSwitch.setState(true, true);
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif wifi']});
         });
 
         test('mobile data emit status event', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             network.mobileDataSwitch.setState(true, true);
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif mobile']});
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'network_profile', messages: ['notify phone']});
         });
 
         test('change network_profile emit event', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             // change network profile
             const dropDownSelectProfile = network.profilesForDropdownNetworkType.find((p) => p.value === 'lte');
             network.dropdownNetworkType.setValue(dropDownSelectProfile, true);

@@ -1,15 +1,14 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
+import OverlayPlugin from './util/OverlayPlugin';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
  * Instance screenshot plugin.
  * Provides screenshot and video capture.
  */
-module.exports = class Screenshot extends OverlayPlugin {
+export default class Screenshot extends OverlayPlugin {
     static get name() {
         return 'Screenshot';
     }

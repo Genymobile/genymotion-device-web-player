@@ -1,9 +1,7 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {textInput, chipTag} = require('./util/components');
-const {slider} = require('./util/components');
-const log = require('loglevel');
+import OverlayPlugin from './util/OverlayPlugin';
+import {textInput, chipTag, slider} from './util/components';
+import log from 'loglevel';
 
 /* global google */
 
@@ -11,7 +9,7 @@ const log = require('loglevel');
  * Instance GPS plugin.
  * Provides GPS control.
  */
-module.exports = class GPS extends OverlayPlugin {
+export default class GPS extends OverlayPlugin {
     static get name() {
         return 'GPS';
     }
@@ -620,7 +618,7 @@ module.exports = class GPS extends OverlayPlugin {
      * @param {number} lng Longitude of the marker.
      * @param {boolean} setAltitudeAuto Retrieve and set altitude from gmaps.
      */
-    addMapMarker(lat, lng, setAltitudeAuto=false) {
+    addMapMarker(lat, lng, setAltitudeAuto = false) {
         if (typeof google === 'undefined') {
             return;
         }

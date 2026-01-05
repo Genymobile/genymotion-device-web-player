@@ -1,43 +1,42 @@
-'use strict';
+import MultiTouchEvents from './plugins/MultiTouchEvents';
+import ButtonsEvents from './plugins/ButtonsEvents';
+import Fullscreen from './plugins/Fullscreen';
+import Clipboard from './plugins/Clipboard';
+import StreamBitrate from './plugins/StreamBitrate';
+import Screenrecord from './plugins/Screenrecord';
+import Screenshot from './plugins/Screenshot';
+import StreamResolution from './plugins/StreamResolution';
+import CoordinateUtils from './plugins/CoordinateUtils';
+import KeyboardEvents from './plugins/KeyboardEvents';
+import KeyboardMapping from './plugins/KeyboardMapping';
+import MouseEvents from './plugins/MouseEvents';
+import PeerConnectionStats from './plugins/PeerConnectionStats';
+import Gamepad from './plugins/Gamepad';
+import Camera from './plugins/Camera';
+import GPS from './plugins/GPS';
+import FileUpload from './plugins/FileUpload';
+import GAPPSInstall from './plugins/GAPPSInstall';
+import Battery from './plugins/Battery';
+import Identifiers from './plugins/Identifiers';
+import Network from './plugins/Network';
+import Phone from './plugins/Phone';
+import BasebandRIL from './plugins/BasebandRIL';
+import IOThrottling from './plugins/IOThrottling';
+import GamepadManager from './plugins/GamepadManager';
+import FingerPrint from './plugins/FingerPrint';
+import MediaManager from './plugins/MediaManager';
 
-// Plugins
-const MultiTouchEvents = require('./plugins/MultiTouchEvents');
-const ButtonsEvents = require('./plugins/ButtonsEvents');
-const Fullscreen = require('./plugins/Fullscreen');
-const Clipboard = require('./plugins/Clipboard');
-const StreamBitrate = require('./plugins/StreamBitrate');
-const Screenrecord = require('./plugins/Screenrecord');
-const Screenshot = require('./plugins/Screenshot');
-const StreamResolution = require('./plugins/StreamResolution');
-const CoordinateUtils = require('./plugins/CoordinateUtils');
-const KeyboardEvents = require('./plugins/KeyboardEvents');
-const KeyboardMapping = require('./plugins/KeyboardMapping');
-const MouseEvents = require('./plugins/MouseEvents');
-const PeerConnectionStats = require('./plugins/PeerConnectionStats');
-const Gamepad = require('./plugins/Gamepad');
-const Camera = require('./plugins/Camera');
-const GPS = require('./plugins/GPS');
-const FileUpload = require('./plugins/FileUpload');
-const GAPPSInstall = require('./plugins/GAPPSInstall');
-const Battery = require('./plugins/Battery');
-const Identifiers = require('./plugins/Identifiers');
-const Network = require('./plugins/Network');
-const Phone = require('./plugins/Phone');
-const BasebandRIL = require('./plugins/BasebandRIL');
-const IOThrottling = require('./plugins/IOThrottling');
-const GamepadManager = require('./plugins/GamepadManager');
-const FingerPrint = require('./plugins/FingerPrint');
-const MediaManager = require('./plugins/MediaManager');
+import { generateUID } from './utils/helpers';
+import log from 'loglevel';
+import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
-const {generateUID} = require('./utils/helpers');
-const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
  * Device renderer instance.
  * Initialize a renderer for a specific VM instance
  */
-module.exports = class DeviceRenderer {
+export default class DeviceRenderer {
     /**
      * Renderer instance initialization.
      *

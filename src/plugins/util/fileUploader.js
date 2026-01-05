@@ -1,6 +1,5 @@
-'use strict';
 
-const {progressBar} = require('./components');
+import {progressBar} from './components';
 
 /**
  * Module for creating custom file uploader components with drag & drop functionality.

@@ -1,7 +1,8 @@
-'use strict';
-jest.mock('loglevel');
-const FileUpload = require('../../src/plugins/FileUpload');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+
+vi.mock('loglevel');
+import FileUpload from '../../src/plugins/FileUpload.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let instance;
 
@@ -20,19 +21,16 @@ describe('FileUpload Plugin', () => {
         });
 
         it('should attach ondragover, ondragenter, and ondragleave to root', () => {
-            const addEventListenerSpy = jest.spyOn(instance.root, 'addEventListener');
+            const addEventListenerSpy = vi.spyOn(instance.root, 'addEventListener');
             instance = new Instance();
 
             new FileUpload(instance, {
                 UPLOADER_INSTALLING: 'TEST UPLOADER PLUGIN INSTALLING...',
             });
 
-            expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, 'dragover', expect.any(Function),
-                {});
-            expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, 'dragleave', expect.any(Function),
-                {});
-            expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, 'drop', expect.any(Function),
-                {});
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, 'dragover', expect.any(Function), {});
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, 'dragleave', expect.any(Function), {});
+            expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, 'drop', expect.any(Function), {});
         });
     });
 

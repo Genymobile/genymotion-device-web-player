@@ -1,11 +1,10 @@
-'use strict';
 
 /**
  * TooltipManager
  * Allows you to dynamically add tooltips to any HTML element.
  * Usage: tooltipManager.setTooltip(element, 'Tooltip text', 'top');
  */
-class TooltipManager {
+export default class TooltipManager {
     constructor(instance) {
         this.instance = instance;
         this.tooltipElement = null;
@@ -168,4 +167,3 @@ class TooltipManager {
     }
 }
 
-module.exports = TooltipManager;

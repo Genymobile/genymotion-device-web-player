@@ -1,12 +1,11 @@
-'use strict';
-
-const StreamBitrate = require('../../src/plugins/StreamBitrate');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import StreamBitrate from '../../src/plugins/StreamBitrate.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let chooser;
 let instance;
 
-describe.only('StreamBitrate Plugin', () => {
+describe('StreamBitrate Plugin', () => {
     beforeEach(() => {
         instance = new Instance();
         chooser = new StreamBitrate(instance, {});
@@ -35,7 +34,7 @@ describe.only('StreamBitrate Plugin', () => {
 
     describe('outgoing events', () => {
         test('hq', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             chooser.highQuality = false;
             document.querySelector('.gm-streamrate-chooser').click();
@@ -48,7 +47,7 @@ describe.only('StreamBitrate Plugin', () => {
         });
 
         test('default', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             chooser.highQuality = true;
             document.querySelector('.gm-streamrate-chooser').click();

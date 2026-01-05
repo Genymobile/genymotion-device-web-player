@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * List of available network profiles to send to the VM
  * for android versions greater or equal to 8
  */
-module.exports = [
+export default [
     {
         id: 7,
         name: '5g',

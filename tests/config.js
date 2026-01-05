@@ -1,7 +1,10 @@
-'use strict';
+import {defineConfig} from 'vitest/config';
 
-module.exports = {
-    clearMocks: true,
-    reporters: ['default', 'jest-junit'],
-    testMatch: ['**/?(*.)+(test).js'],
-};
+export default defineConfig({
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: [],
+        include: ['tests/unit/**/*.test.js'],
+    },
+});

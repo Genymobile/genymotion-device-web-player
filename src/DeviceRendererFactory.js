@@ -1,15 +1,14 @@
 /* eslint-disable indent */
-'use strict';
 
-const DeviceRenderer = require('./DeviceRenderer');
-const defaultsDeep = require('lodash/defaultsDeep');
+import DeviceRenderer from './DeviceRenderer';
+import {defaultsDeep} from 'lodash';
 
-const store = require('./store');
-const APIManager = require('./APIManager');
-const ToolbarManager = require('./plugins/util/ToolBarManager');
-const TooltipManager = require('./plugins/util/TooltipManager');
+import store from './store';
+import APIManager from './APIManager';
+import ToolbarManager from './plugins/util/ToolBarManager';
+import TooltipManager from './plugins/util/TooltipManager';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 // Default options
@@ -78,7 +77,7 @@ const defaultOptions = {
 /**
  * Setup & create instances of the device renderer
  */
-module.exports = class DeviceRendererFactory {
+export default class DeviceRendererFactory {
     constructor() {
         this.instances = [];
     }

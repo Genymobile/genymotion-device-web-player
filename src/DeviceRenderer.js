@@ -115,8 +115,9 @@ export default class DeviceRenderer {
         // Prepare source for the upload worker
         if (window.Worker) {
             /*
-             *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
-             * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
+             * Inline worker hack: import a function, stringify its body, and
+             * build a Blob URL to create a Web Worker without a separate file.
+             * Useful to avoid file‑path issues at runtime and keep a single bundle.
              */
             const workerFn = fileUploaderWorkerBlob.toString();
             const workerBody = workerFn.substring(workerFn.indexOf('{') + 1, workerFn.lastIndexOf('}'));

@@ -106,7 +106,8 @@
             gap: $spacing-s;
         }
 
-        .gm-wrapper-uploading-text-and-progress {
+        .gm-wrapper-uploading-text-and-progress,
+        .gm-selected-file-info {
             flex: 1;
 
             .gm-progress-text-container {
@@ -125,6 +126,8 @@
                 cursor: pointer;
                 mask-image: url('../../assets/images/ic_cross.svg');
                 -webkit-mask-image: url('../../assets/images/ic_cross.svg');
+                width: 24px;
+                height: 24px;
             }
 
             .gm-size-text {

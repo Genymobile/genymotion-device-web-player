@@ -25,7 +25,7 @@ let mockSocket;
 
 global.Worker = vi.fn().mockImplementation(() => mockWorker);
 // eslint-disable-next-line space-before-function-paren
-global.WebSocket = vi.fn(function() {
+global.WebSocket = vi.fn(function () {
     mockSocket = new MockWebSocket();
     return mockSocket;
 });

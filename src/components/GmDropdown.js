@@ -97,8 +97,9 @@ export class GmDropdown extends HTMLElement {
      * Supported formats:
      * - String: 'Item Label'
      * - Object (Rich HTML): { element: HTMLElement, value: 'val' }
+     * - Object (Plain): { value: 'val', valueToDisplay: 'Display Text' }
      * Re-renders the options and clears the value if it's no longer present.
-     * @param {Array<string|{element: HTMLElement, value: any}>} newItems - List of items.
+     * @param {Array<string|{element: HTMLElement, value: any}|{value: any, valueToDisplay: string}>} newItems - List of items.
      */
     set items(newItems) {
         this.#items = newItems;
@@ -224,6 +225,8 @@ export class GmDropdown extends HTMLElement {
                 optionDiv.innerHTML = item;
             } else if (item.element instanceof HTMLElement) {
                 optionDiv.appendChild(item.element);
+            } else if (item.valueToDisplay) {
+                optionDiv.textContent = item.valueToDisplay;
             } else {
                 return;
             }

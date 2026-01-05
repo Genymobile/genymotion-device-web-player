@@ -1,7 +1,5 @@
-'use strict';
-
-const FullScreen = require('../../src/plugins/Fullscreen');
-const Instance = require('../mocks/DeviceRenderer');
+import FullScreen from '../../src/plugins/Fullscreen.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 describe('FullScreen Plugin', () => {
     beforeEach(() => {

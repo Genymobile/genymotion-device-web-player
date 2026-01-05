@@ -1,9 +1,9 @@
-'use strict';
+import {vi} from 'vitest';
 
-jest.mock('loglevel');
+vi.mock('loglevel');
 
-const GPS = require('../../src/plugins/GPS');
-const Instance = require('../mocks/DeviceRenderer');
+import GPS from '../../src/plugins/GPS.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let gps;
 let instance;
@@ -86,7 +86,7 @@ describe('GPS Plugin', () => {
     describe('incoming events', () => {
         describe('gps', () => {
             test('invalid messages', () => {
-                const setFieldValue = jest.spyOn(gps, 'setFieldValue');
+                const setFieldValue = vi.spyOn(gps, 'setFieldValue');
 
                 instance.emit('gps', 'status');
                 expect(setFieldValue).toHaveBeenCalledTimes(0);
@@ -101,7 +101,7 @@ describe('GPS Plugin', () => {
         let sendEventSpy;
 
         beforeEach(() => {
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            sendEventSpy = vi.spyOn(instance, 'sendEvent');
         });
 
         afterEach(() => {

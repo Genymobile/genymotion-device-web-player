@@ -1,16 +1,14 @@
-'use strict';
+import OverlayPlugin from './util/OverlayPlugin';
+import {chipTag} from './util/components';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {chipTag} = require('./util/components');
-
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
  * Instance clipboard plugin.
  * Provides clipboard data exchange capability between client and instance.
  */
-module.exports = class Clipboard extends OverlayPlugin {
+export default class Clipboard extends OverlayPlugin {
     static get name() {
         return 'Clipboard';
     }
@@ -145,4 +143,4 @@ module.exports = class Clipboard extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

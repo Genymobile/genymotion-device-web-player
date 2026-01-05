@@ -1,9 +1,7 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const log = require('loglevel');
-const {progressBar} = require('./util/components');
-const fileUploader = require('./util/fileUploader');
+import OverlayPlugin from './util/OverlayPlugin';
+import log from 'loglevel';
+import {progressBar} from './util/components';
+import fileUploader from './util/fileUploader';
 log.setDefaultLevel('debug');
 
 // Views definitions
@@ -161,7 +159,7 @@ class InstallationSuccessView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         const restartBtn = document.createElement('button');
@@ -174,7 +172,7 @@ class InstallationSuccessView {
             };
             this.plugin.instance.sendEvent(json);
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -243,7 +241,7 @@ class InstallationFailedView {
         closeBtn.className = 'gm-btn';
         closeBtn.onclick = () => {
             this.plugin.closeWidget();
-            this.plugin.viewAtNextopening='InitialView';
+            this.plugin.viewAtNextopening = 'InitialView';
         };
 
         actionsSection.appendChild(closeBtn);
@@ -351,50 +349,52 @@ class InitialView {
         this.removeListenerDragAndDropLeave = null;
         this.removeListenerDragAndDropDrop = null;
 
-        try {
-            this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
-            this.fileUploadWorker.onmessage = (event) => {
-                const msg = event.data;
-                switch (msg.code) {
-                    case 'SUCCESS':
-                        this.fileUploaderComponent.showUploadSuccess();
-                        // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
-                            this.plugin.toolbarBtn.setIndicator('success');
-                        }
-                        break;
-                    case 'FAIL':
-                        this.fileUploaderComponent.uploadingStop();
-                        this.fileUploaderComponent.showUploadError(
-                            this.i18n.FILE_SEND_APK_FAILED ||
-                            `Something went wrong while processing the APK file. 
-                                Please make sure the file is valid and try again.`,
-                        );
-                        // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)){
-                            this.plugin.toolbarBtn.setIndicator('failed');
-                        }
-                        break;
-                    case 'PROGRESS':
-                        this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
-                        break;
-                    case 'SOCKET_FAIL':
-                        this.fileUploaderComponent.showUploadError(
-                            this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
-                            'Something went wrong while connecting to the server.'
-                        );
-                        this.fileUploaderComponent.setEnabled(false);
-                        break;
-                    case 'SOCKET_SUCCESS':
-                        this.fileUploaderComponent.reset();
-                        break;
-                    default:
-                        break;
-                }
-            };
-        } catch (error) {
-            log.error(error);
-            this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+        if (this.plugin.instance.options.fileUploadUrl) {
+            try {
+                this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
+                this.fileUploadWorker.onmessage = (event) => {
+                    const msg = event.data;
+                    switch (msg.code) {
+                        case 'SUCCESS':
+                            this.fileUploaderComponent.showUploadSuccess();
+                            // Show the indicator in the toolbar if the widget is closed.
+                            if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
+                                this.plugin.toolbarBtn.setIndicator('success');
+                            }
+                            break;
+                        case 'FAIL':
+                            this.fileUploaderComponent.uploadingStop();
+                            this.fileUploaderComponent.showUploadError(
+                                this.i18n.FILE_SEND_APK_FAILED ||
+                                    `Something went wrong while processing the APK file. 
+                                    Please make sure the file is valid and try again.`,
+                            );
+                            // Show the indicator in the toolbar if the widget is closed.
+                            if (!this.plugin.instance.store.getters.isWidgetOpened(this.plugin.overlayID)) {
+                                this.plugin.toolbarBtn.setIndicator('failed');
+                            }
+                            break;
+                        case 'PROGRESS':
+                            this.fileUploaderComponent.updateProgress(msg.value * 100, msg.uploadedSize, msg.fileSize);
+                            break;
+                        case 'SOCKET_FAIL':
+                            this.fileUploaderComponent.showUploadError(
+                                this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
+                                    'Something went wrong while connecting to the server.',
+                            );
+                            this.fileUploaderComponent.setEnabled(false);
+                            break;
+                        case 'SOCKET_SUCCESS':
+                            this.fileUploaderComponent.reset();
+                            break;
+                        default:
+                            break;
+                    }
+                };
+            } catch (error) {
+                log.error(error);
+                this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
+            }
         }
     }
 
@@ -410,7 +410,7 @@ class InitialView {
         text.innerHTML =
             this.i18n.GAPPS_TEXT ||
             'You can install <b>Open GApps</b> to access <b>Google Play Store</b> ' +
-            'services, or <b>APK files</b> on your virtual device.';
+                'services, or <b>APK files</b> on your virtual device.';
         introSection.appendChild(text);
 
         const separator1 = document.createElement('div');
@@ -486,7 +486,7 @@ class InitialView {
                 this.handleFileUpload(file);
                 this.instance.root.classList.add('gm-uploading-in-progess');
             },
-            onUploadCanceled:() => {
+            onUploadCanceled: () => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {
@@ -553,22 +553,20 @@ class InitialView {
             event.stopPropagation();
         });
 
-        this.removeListenerDragAndDropLeave =
-            this.instance.addListener(this.instance.root, 'dragleave', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-            });
+        this.removeListenerDragAndDropLeave = this.instance.addListener(this.instance.root, 'dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
 
-        this.removeListenerDragAndDropDrop =
-            this.instance.addListener(this.instance.root, 'drop', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
+        this.removeListenerDragAndDropDrop = this.instance.addListener(this.instance.root, 'drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
 
-                const file = event.dataTransfer.files[0];
-                if (file && file.name && file.name.toLowerCase().endsWith('.apk')) {
-                    this.fileUploaderComponent.startUpload(file);
-                }
-            });
+            const file = event.dataTransfer.files[0];
+            if (file && file.name && file.name.toLowerCase().endsWith('.apk')) {
+                this.fileUploaderComponent.startUpload(file);
+            }
+        });
     }
 
     removeListenerOnRoot() {
@@ -579,7 +577,7 @@ class InitialView {
 }
 
 // Plugin main class
-module.exports = class GAPPSInstall extends OverlayPlugin {
+export default class GAPPSInstall extends OverlayPlugin {
     static get name() {
         return 'GAPPSInstall';
     }
@@ -686,12 +684,14 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
             iconClass: 'gm-gapps-button',
             title: this.i18n.GAPPS_TITLE || 'Install APPS',
             onClick: () => {
-                if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
-                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                if (
+                    !this.instance.store.getters.isWidgetOpened(this.overlayID) &&
+                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())
+                ) {
                     this.toolbarBtn.setIndicator('');
-                };
+                }
                 this.toggleWidget();
-            }
+            },
         });
     }
 
@@ -756,4 +756,4 @@ module.exports = class GAPPSInstall extends OverlayPlugin {
         }
         super.toggleWidget();
     }
-};
+}

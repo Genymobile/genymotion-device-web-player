@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = class APIManager {
+export default class APIManager {
     constructor(instance) {
         this.instance = instance;
         this.apiFunctions = {};
@@ -81,8 +79,8 @@ module.exports = class APIManager {
                 );
             },
             description:
-            // eslint-disable-next-line max-len
-            'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
+                // eslint-disable-next-line max-len
+                'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
         });
         // Register open a widget
         this.registerFunction({
@@ -185,4 +183,4 @@ module.exports = class APIManager {
         }, {});
         return exposedFunctions;
     }
-};
+}

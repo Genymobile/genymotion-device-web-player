@@ -1,10 +1,8 @@
-'use strict';
+import OverlayPlugin from './util/OverlayPlugin';
+import log from 'loglevel';
+import fileUploader from './util/fileUploader';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const log = require('loglevel');
-const fileUploader = require('./util/fileUploader');
-
-module.exports = class FileUpload extends OverlayPlugin {
+export default class FileUpload extends OverlayPlugin {
     static get name() {
         return 'FileUpload';
     }
@@ -31,7 +29,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                     case 'SUCCESS':
                         this.fileUploader.showUploadSuccess();
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                             this.toolbarBtn.setIndicator('success');
                         }
                         break;
@@ -43,7 +41,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                                 Please make sure the file is valid and try again.`,
                         );
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                             this.toolbarBtn.setIndicator('failed');
                         }
                         break;
@@ -53,7 +51,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                     case 'SOCKET_FAIL':
                         this.fileUploader.showUploadError(
                             this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
-                            'Something went wrong while connecting to the server.'
+                                'Something went wrong while connecting to the server.',
                         );
                         this.fileUploader.setEnabled(false);
                         break;
@@ -70,7 +68,7 @@ module.exports = class FileUpload extends OverlayPlugin {
             this.instance.tooltipManager.setTooltip(
                 this.toolbarBtn.htmlElement,
                 i18n.ERROR_ON_LOAD_FILE_UPLOAD || "Upload worker can't be load, check the fileUploadUrl option",
-                this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+                this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
             );
         }
     }
@@ -84,12 +82,14 @@ module.exports = class FileUpload extends OverlayPlugin {
             iconClass: 'gm-uploader-button',
             title: this.i18n.UPLOADER_TITLE || 'File upload',
             onClick: () => {
-                if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
-                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                if (
+                    !this.instance.store.getters.isWidgetOpened(this.overlayID) &&
+                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())
+                ) {
                     this.toolbarBtn.setIndicator('');
-                };
+                }
                 this.toggleWidget();
-            }
+            },
         });
     }
 
@@ -109,7 +109,8 @@ module.exports = class FileUpload extends OverlayPlugin {
         introSection.className = 'gm-section';
         const text = document.createElement('div');
         text.className = 'gm-text';
-        text.innerHTML = this.i18n.FILE_UPLOAD_TEXT ||
+        text.innerHTML =
+            this.i18n.FILE_UPLOAD_TEXT ||
             `You can upload files from here.
              Application (APK) files and flashable ZIP archives will be installed;
              other file types will be copied to the Download folder (/sdcard/Download) on the device.`;
@@ -129,7 +130,7 @@ module.exports = class FileUpload extends OverlayPlugin {
                 const msg = {type: 'upload', file};
                 this.fileUploadWorker.postMessage(msg);
             },
-            onUploadCanceled:() => {
+            onUploadCanceled: () => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {
@@ -180,21 +181,19 @@ module.exports = class FileUpload extends OverlayPlugin {
             event.stopPropagation();
         });
 
-        this.removeListenerDragAndDropLeave =
-            this.instance.addListener(this.instance.root, 'dragleave', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-            });
+        this.removeListenerDragAndDropLeave = this.instance.addListener(this.instance.root, 'dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
 
-        this.removeListenerDragAndDropDrop =
-            this.instance.addListener(this.instance.root, 'drop', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
+        this.removeListenerDragAndDropDrop = this.instance.addListener(this.instance.root, 'drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
 
-                if (!event.dataTransfer.files[0].name.toLowerCase().endsWith('.apk')) {
-                    this.fileUploader.startUpload(event.dataTransfer.files[0]);
-                }
-            });
+            if (!event.dataTransfer.files[0].name.toLowerCase().endsWith('.apk')) {
+                this.fileUploader.startUpload(event.dataTransfer.files[0]);
+            }
+        });
     }
 
     removeListenerOnRoot() {
@@ -202,4 +201,4 @@ module.exports = class FileUpload extends OverlayPlugin {
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
     }
-};
+}

@@ -1,5 +1,3 @@
-'use strict';
-
 const RESOLUTIONS = [
     {text: '-', value: '0'},
     {text: '240p', value: '240'},
@@ -13,7 +11,7 @@ const RESOLUTIONS = [
  * Stream resolution plugin.
  * Provides video stream resolution control.
  */
-module.exports = class StreamResolution {
+export default class StreamResolution {
     static get name() {
         return 'StreamResolution';
     }
@@ -67,4 +65,4 @@ module.exports = class StreamResolution {
             },
         });
     }
-};
+}

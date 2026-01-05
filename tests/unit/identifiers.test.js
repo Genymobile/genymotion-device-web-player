@@ -1,7 +1,6 @@
-'use strict';
-
-const Identifiers = require('../../src/plugins/Identifiers');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import Identifiers from '../../src/plugins/Identifiers.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let identifiers;
 let instance;
@@ -95,7 +94,7 @@ describe('Identifiers Plugin', () => {
     });
 
     test('outgoing events', () => {
-        const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+        const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
         identifiers.androidInput.setValue('jean-michel');
         identifiers.deviceInput.setValue('jean-michel');
@@ -126,7 +125,7 @@ describe('Identifiers Plugin', () => {
         });
 
         identifiers.androidInput.setValue('0123456789abcdef');
-        identifiers.deviceInput.setValue('0123456789abcdb');;
+        identifiers.deviceInput.setValue('0123456789abcdb');
         identifiers.sendDataToInstance(new Event(''));
         expect(sendEventSpy).toHaveBeenCalledTimes(5);
         expect(instance.outgoingMessages[3]).toEqual({

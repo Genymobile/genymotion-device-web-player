@@ -1,7 +1,5 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {textInput, chipTag} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {textInput, chipTag} from './util/components';
 
 const HEX = '0123456789abcdef';
 const DIGITS = '0123456789';
@@ -10,7 +8,7 @@ const DIGITS = '0123456789';
  * Instance identifiers plugin.
  * Provides device ID (IMEI) and Android ID control.
  */
-module.exports = class Identifiers extends OverlayPlugin {
+export default class Identifiers extends OverlayPlugin {
     static get name() {
         return 'Identifiers';
     }
@@ -250,4 +248,4 @@ module.exports = class Identifiers extends OverlayPlugin {
 
         return hash;
     }
-};
+}

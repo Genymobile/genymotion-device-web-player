@@ -1,13 +1,11 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {slider, switchButton, textInput} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {slider, switchButton, textInput} from './util/components';
 
 /**
  * Instance battery plugin.
  * Provides battery level and state control.
  */
-module.exports = class Battery extends OverlayPlugin {
+export default class Battery extends OverlayPlugin {
     static get name() {
         return 'Battery';
     }
@@ -259,4 +257,4 @@ module.exports = class Battery extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

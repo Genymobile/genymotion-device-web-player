@@ -1,19 +1,18 @@
-'use strict';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {switchButton, dropdownSelect} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {switchButton, dropdownSelect} from './util/components';
 
-const MOBILE_PROFILES = require('./util/network-mobile-profiles');
-const MOBILE_SIGNAL_STRENGTH = require('./util/mobile-signal-strength');
+import MOBILE_PROFILES from './util/network-mobile-profiles';
+import MOBILE_SIGNAL_STRENGTH from './util/mobile-signal-strength';
 
 /**
  * Instance network plugin.
  * Provides network I/O control.
  */
-module.exports = class Network extends OverlayPlugin {
+export default class Network extends OverlayPlugin {
     static get name() {
         return 'Network';
     }

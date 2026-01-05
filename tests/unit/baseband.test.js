@@ -1,7 +1,6 @@
-'use strict';
-
-const BasebandRIL = require('../../src/plugins/BasebandRIL');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import BasebandRIL from '../../src/plugins/BasebandRIL.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let instance;
 let baseband;
@@ -112,7 +111,7 @@ describe('BasebandRIL Plugin', () => {
             instance = new Instance();
             baseband = new BasebandRIL(instance, {}, true);
             instance.emit('baseband', 'network operator 123456');
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             baseband.networkOperatorMMC.setValue('123456', true);
             baseband.networkOperatorName.setValue('value', true);

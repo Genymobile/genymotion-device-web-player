@@ -1,6 +1,6 @@
-'use strict';
-const log = require('loglevel');
-class ToolbarManager {
+
+import log from 'loglevel';
+export default class ToolbarManager {
     /**
      * Initialize ToolbarManager
      * @param {Object} instance - The instance to be managed.

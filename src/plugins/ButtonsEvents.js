@@ -1,4 +1,3 @@
-'use strict';
 
 const META_KEYCODE = '0x01000022';
 const ENTER_KEYCODE = '0x01000005';
@@ -14,7 +13,7 @@ const ROTATE_KEYCODE = 'gm-rotation';
  * Instance physical buttons plugin.
  * Provides physical buttons (power, volume, ...) control.
  */
-module.exports = class ButtonsEvents {
+export default class ButtonsEvents {
     static get name() {
         return 'ButtonsEvents';
     }

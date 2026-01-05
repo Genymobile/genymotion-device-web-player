@@ -1,11 +1,10 @@
-'use strict';
 
 /**
  * Screen coordinates utility plugin.
  * Provides utility functions related to mouse inputs & the instance video stream.
  * Used by MouseEvents and MultiTouchEvents plugins.
  */
-module.exports = class CoordinateUtils {
+export default class CoordinateUtils {
     /**
      * Plugin initialization.
      *

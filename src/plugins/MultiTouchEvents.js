@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * Instance multi touch plugin.
  * Forward multi touch events to instance.
  */
-module.exports = class MultiTouchEvents {
+export default class MultiTouchEvents {
     static get name() {
         return 'MultiTouchEvents';
     }

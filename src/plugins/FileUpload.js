@@ -1,10 +1,9 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const log = require('loglevel');
-const fileUploader = require('./util/fileUploader');
+import OverlayPlugin from './util/OverlayPlugin';
+import log from 'loglevel';
+import fileUploader from './util/fileUploader';
 
-module.exports = class FileUpload extends OverlayPlugin {
+export default class FileUpload extends OverlayPlugin {
     static get name() {
         return 'FileUpload';
     }

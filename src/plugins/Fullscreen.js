@@ -1,10 +1,9 @@
-'use strict';
 
 /**
  * Display fullscreen plugin.
  * Gives the ability to display the renderer on the whole screen.
  */
-module.exports = class Fullscreen {
+export default class Fullscreen {
     static get name() {
         return 'Fullscreen';
     }

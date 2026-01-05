@@ -1,9 +1,9 @@
-'use strict';
+import {vi} from 'vitest';
 
-jest.mock('loglevel');
+vi.mock('loglevel');
 
-const FingerPrint = require('../../src/plugins/FingerPrint');
-const Instance = require('../mocks/DeviceRenderer');
+import FingerPrint from '../../src/plugins/FingerPrint.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let instance;
 
@@ -62,7 +62,7 @@ describe('FingerPrint Plugin', () => {
                 expect(button.classList.contains('disabled')).toBe(false);
             });
 
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
             buttons[0].click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -78,7 +78,7 @@ describe('FingerPrint Plugin', () => {
         });
 
         test("Auto validate fingerprint's request when auto validation is enabled", () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
             const autoValidation = document.querySelector('.autoValidationSwitch span');
             autoValidation.click();

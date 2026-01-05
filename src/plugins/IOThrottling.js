@@ -1,9 +1,8 @@
-'use strict';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {dropdownSelect, textInput, chipTag} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {dropdownSelect, textInput, chipTag} from './util/components';
 
-const PROFILES = require('./util/iothrottling-profiles');
+import PROFILES from './util/iothrottling-profiles';
 const PROFILE_CUSTOM_NAME = 'Custom';
 const BYTES_PER_KILOBYTE = 1024;
 const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE << 10;
@@ -12,7 +11,7 @@ const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE << 10;
  * Instance IO throttling plugin.
  * Provides disk I/O control.
  */
-module.exports = class IOThrottling extends OverlayPlugin {
+export default class IOThrottling extends OverlayPlugin {
     static get name() {
         return 'IOThrottling';
     }

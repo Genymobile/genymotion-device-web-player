@@ -1,6 +1,6 @@
-'use strict';
-const {generateUID} = require('../utils/helpers');
-const log = require('loglevel');
+
+import {generateUID} from '../utils/helpers';
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 const initialState = {
@@ -174,4 +174,4 @@ const store = (instance) => {
     createStore(instance, reducer);
 };
 
-module.exports = store;
+export default store;

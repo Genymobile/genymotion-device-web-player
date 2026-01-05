@@ -77,10 +77,6 @@ export default class DeviceRenderer {
         this.signalingDataChannel = null;
         this.cameraSender = null;
         this.microphoneSender = null;
-        this.sdpConstraints = {
-            offerToReceiveAudio: true,
-            offerToReceiveVideo: true,
-        };
 
         // last accessed x/y position
         this.x = 0;
@@ -435,7 +431,8 @@ export default class DeviceRenderer {
         }
         // creating SDP offer
         try {
-            const description = await this.peerConnection.createOffer(this.sdpConstraints);
+            const description = await this.peerConnection.createOffer();
+            log.debug('Generated SDP Offer:', description.sdp);
             this.setLocalDescription(description);
         } catch (error) {
             this.onWebRTCConnectionError(error);
@@ -470,6 +467,7 @@ export default class DeviceRenderer {
 
         const config = {
             iceServers: iceServers,
+            bundlePolicy: 'max-compat',
         };
 
         if (!this.peerConnection) {
@@ -487,6 +485,13 @@ export default class DeviceRenderer {
         } else {
             this.useWebsocketAsDataChannel = true;
         }
+
+        /*
+         * Add transceivers to receive audio and video (VM screen/audio)
+         * This replaces the legacy offerToReceiveAudio/Video constraints
+         */
+        this.peerConnection.addTransceiver('audio', {direction: 'recvonly'});
+        this.peerConnection.addTransceiver('video', {direction: 'recvonly'});
 
         this.peerConnection.onicecandidate = (event) => {
             if (typeof event.candidate === 'undefined') {

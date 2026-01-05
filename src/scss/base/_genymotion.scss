@@ -89,10 +89,11 @@
                 mask-repeat: no-repeat;
                 -webkit-mask-position: center;
                 mask-position: center;
-                mask-image: url('../assets/images/ic_spinner-material.svg');
-                -webkit-mask-image: url('../assets/images/ic_spinner-material.svg');
+                mask-image: url('../../assets/images/ic_spinner-material.svg');
+                -webkit-mask-image: url('../../assets/images/ic_spinner-material.svg');
                 width: 20px;
                 height: 20px;
+                display: block;
             }
         }
 

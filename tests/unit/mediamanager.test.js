@@ -60,38 +60,7 @@ describe('Camera Plugin', () => {
             mediaManager.removeAudioStream.mockRestore();
         });
 
-        it('video can be toggled on', async () => {
-            const videoStreamAdded = new Promise((resolve) => {
-                mediaManager.addVideoStream.mockImplementationOnce(() => {
-                    // Toutes les assertions et appels de spy se font ici :
-                    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
-                    expect(startVideoSpy).toHaveBeenCalledTimes(1);
-                    expect(stopVideoSpy).toHaveBeenCalledTimes(0);
-                    expect(startAudioSpy).toHaveBeenCalledTimes(0);
-                    expect(stopAudioSpy).toHaveBeenCalledTimes(0);
-                    expect(mediaManager.videoStreaming).toBeTruthy();
-                    expect(mediaManager.audioStreaming).toBeFalsy();
-                    expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
-
-                    resolve();
-                });
-            });
-
-            mediaManager.toggleVideoStreaming();
-
-            await videoStreamAdded;
-        });
-
-        it('video can be toggled off', () => {
-            mediaManager.videoStreaming = true;
-            mediaManager.toggleVideoStreaming();
-            expect(startVideoSpy).toHaveBeenCalledTimes(0);
-            expect(stopVideoSpy).toHaveBeenCalledTimes(1);
-            expect(startAudioSpy).toHaveBeenCalledTimes(0);
-            expect(stopAudioSpy).toHaveBeenCalledTimes(0);
-        });
-
-        it('audio can be toggled on', async () => {
+        it('audio can be started', async () => {
             const audioStreamAdded = new Promise((resolve) => {
                 mediaManager.addAudioStream.mockImplementationOnce(() => {
                     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -99,21 +68,19 @@ describe('Camera Plugin', () => {
                     expect(stopAudioSpy).toHaveBeenCalledTimes(0);
                     expect(startVideoSpy).toHaveBeenCalledTimes(0);
                     expect(stopVideoSpy).toHaveBeenCalledTimes(0);
-                    expect(mediaManager.audioStreaming).toBeTruthy();
-                    expect(mediaManager.videoStreaming).toBeFalsy();
                     expect(mediaManager.onAudioStreamError).toHaveBeenCalledTimes(0);
                     resolve();
                 });
             });
 
-            mediaManager.toggleAudioStreaming();
+            mediaManager.startAudioStreaming();
 
             await audioStreamAdded;
         });
 
-        it('audio can be toggled off', () => {
-            mediaManager.audioStreaming = true;
-            mediaManager.toggleAudioStreaming();
+        it('audio can be stopped', () => {
+            mediaManager.localAudioStream = {};
+            mediaManager.stopAudioStreaming();
             expect(startAudioSpy).toHaveBeenCalledTimes(0);
             expect(stopAudioSpy).toHaveBeenCalledTimes(1);
             expect(startVideoSpy).toHaveBeenCalledTimes(0);
@@ -136,7 +103,7 @@ describe('Camera Plugin', () => {
                 });
             });
             navigator.mediaDevices.getUserMedia.mockReturnValueOnce(Promise.reject(null));
-            mediaManager.toggleVideoStreaming();
+            mediaManager.startVideoStreaming();
 
             await videoStreamError;
         });
@@ -157,14 +124,13 @@ describe('Camera Plugin', () => {
                 });
             });
             navigator.mediaDevices.getUserMedia.mockReturnValueOnce(Promise.reject(null));
-            mediaManager.toggleAudioStreaming();
+            mediaManager.startAudioStreaming();
 
             await audioStreamError;
         });
 
         it('handles stopping when not started', () => {
-            mediaManager.videoStreaming = false;
-            mediaManager.audioStreaming = false;
+            mediaManager.localAudioStream = null;
             mediaManager.stopVideoStreaming();
             mediaManager.stopAudioStreaming();
 
@@ -177,12 +143,10 @@ describe('Camera Plugin', () => {
             expect(mediaManager.addVideoStream).toHaveBeenCalledTimes(0);
             expect(mediaManager.removeAudioStream).toHaveBeenCalledTimes(0);
             expect(mediaManager.removeVideoStream).toHaveBeenCalledTimes(0);
-            expect(mediaManager.videoStreaming).toBeFalsy();
-            expect(mediaManager.audioStreaming).toBeFalsy();
         });
 
         it('handles starting video when audio is streaming', async () => {
-            mediaManager.audioStreaming = true;
+            mediaManager.localAudioStream = {};
 
             const videoStreamAdded = new Promise((resolve) => {
                 mediaManager.addVideoStream.mockImplementationOnce(() => {
@@ -192,19 +156,16 @@ describe('Camera Plugin', () => {
                     expect(startAudioSpy).toHaveBeenCalledTimes(0);
                     expect(stopAudioSpy).toHaveBeenCalledTimes(0);
                     expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
-                    expect(mediaManager.videoStreaming).toBeTruthy();
                     resolve();
                 });
             });
 
-            mediaManager.toggleVideoStreaming();
+            mediaManager.startVideoStreaming();
 
             await videoStreamAdded;
         });
 
         it('handles starting audio when video is streaming', async () => {
-            mediaManager.videoStreaming = true;
-
             const audioStreamAdded = new Promise((resolve) => {
                 mediaManager.addAudioStream.mockImplementationOnce(() => {
                     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -213,40 +174,17 @@ describe('Camera Plugin', () => {
                     expect(startVideoSpy).toHaveBeenCalledTimes(0);
                     expect(stopVideoSpy).toHaveBeenCalledTimes(0);
                     expect(mediaManager.onAudioStreamError).toHaveBeenCalledTimes(0);
-                    expect(mediaManager.audioStreaming).toBeTruthy();
                     resolve();
                 });
             });
 
-            mediaManager.toggleAudioStreaming();
+            mediaManager.startAudioStreaming();
 
             await audioStreamAdded;
         });
 
-        it('handles stopping video when audio is streaming', async () => {
-            mediaManager.videoStreaming = true;
-            mediaManager.audioStreaming = true;
-
-            const videoStreamRemoved = new Promise((resolve) => {
-                mediaManager.removeVideoStream.mockImplementationOnce(() => {
-                    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(0);
-                    expect(startVideoSpy).toHaveBeenCalledTimes(0);
-                    expect(stopVideoSpy).toHaveBeenCalledTimes(1);
-                    expect(startAudioSpy).toHaveBeenCalledTimes(0);
-                    expect(stopAudioSpy).toHaveBeenCalledTimes(0);
-                    expect(mediaManager.onVideoStreamError).toHaveBeenCalledTimes(0);
-                    resolve();
-                });
-            });
-
-            mediaManager.toggleVideoStreaming();
-
-            await videoStreamRemoved;
-        });
-
         it('handles stopping audio when video is streaming', async () => {
-            mediaManager.videoStreaming = true;
-            mediaManager.audioStreaming = true;
+            mediaManager.localAudioStream = {};
 
             const audioStreamRemoved = new Promise((resolve) => {
                 mediaManager.removeAudioStream.mockImplementationOnce(() => {
@@ -260,7 +198,7 @@ describe('Camera Plugin', () => {
                 });
             });
 
-            mediaManager.toggleAudioStreaming();
+            mediaManager.stopAudioStreaming();
 
             await audioStreamRemoved;
         });

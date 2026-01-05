@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -369,4 +368,4 @@ export default class MediaManager {
         this.cameraSender = null;
         this.microphoneSender = null;
     }
-};
+}

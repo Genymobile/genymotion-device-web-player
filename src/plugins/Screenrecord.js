@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 
 import log from 'loglevel';
@@ -228,4 +227,4 @@ export default class Screenrecord extends OverlayPlugin {
             this.stopRecording();
         }
     }
-};
+}

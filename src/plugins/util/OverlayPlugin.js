@@ -1,4 +1,3 @@
-
 import {generateUID} from '../../utils/helpers';
 
 /**
@@ -328,10 +327,7 @@ export default class OverlayPlugin {
         }
 
         // Check if modal is outside video wrapper bounds
-        if (
-            calcModalRect.right > videoWrapperRect.width ||
-            calcModalRect.bottom > videoWrapperRect.height
-        ) {
+        if (calcModalRect.right > videoWrapperRect.width || calcModalRect.bottom > videoWrapperRect.height) {
             return true;
         }
         return false;
@@ -368,10 +364,10 @@ export default class OverlayPlugin {
                         0,
                         Math.min(
                             wrapperVideoRect.bottom -
-                            modalHeight -
-                            wrapperVideoRect.top +
-                            marginTopAndBottom -
-                            OVERLAY_BORDER_MARGIN,
+                                modalHeight -
+                                wrapperVideoRect.top +
+                                marginTopAndBottom -
+                                OVERLAY_BORDER_MARGIN,
                             y,
                         ),
                     );
@@ -388,10 +384,10 @@ export default class OverlayPlugin {
                         0,
                         Math.min(
                             wrapperVideoRect.bottom -
-                            modalHeight -
-                            wrapperVideoRect.top +
-                            marginTopAndBottom -
-                            OVERLAY_BORDER_MARGIN,
+                                modalHeight -
+                                wrapperVideoRect.top +
+                                marginTopAndBottom -
+                                OVERLAY_BORDER_MARGIN,
                             y,
                         ),
                     );
@@ -567,4 +563,3 @@ export default class OverlayPlugin {
 // Static properties for shared state management
 OverlayPlugin.hasBeenCalled = false; // Singleton check for global listeners
 OverlayPlugin.modalZIndex = 100; // Z-index management for modal stacking
-

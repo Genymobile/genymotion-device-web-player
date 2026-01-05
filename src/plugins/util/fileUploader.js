@@ -1,4 +1,3 @@
-
 import {progressBar} from './components';
 
 /**
@@ -34,7 +33,7 @@ const fileUploader = (() => {
         browseButtonText = 'BROWSE',
         accept = null,
         classes = '',
-        i18n = {}
+        i18n = {},
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -291,8 +290,9 @@ const fileUploader = (() => {
                         onFileSelect(file);
                     }
                 } else {
-                    showUploadError(i18n.FILE_TYPE_NOT_APK ||
-                        `Invalid file type. Only ${accept} files are supported.
+                    showUploadError(
+                        i18n.FILE_TYPE_NOT_APK ||
+                            `Invalid file type. Only ${accept} files are supported.
                         Please select a file with the correct extension.`,
                     );
                 }
@@ -372,7 +372,7 @@ const fileUploader = (() => {
             uploadingStop,
             showUploadError,
             showUploadSuccess,
-            startUpload: checkFileBeforeUpload
+            startUpload: checkFileBeforeUpload,
         };
     };
 

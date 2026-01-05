@@ -1,4 +1,3 @@
-
 export function generateUID() {
     const date = Date.now().toString(36);
     const part1 = date.substring(date.length - 5);

@@ -19,4 +19,3 @@ const genyDeviceWebPlayer = {
 };
 
 export default genyDeviceWebPlayer;
-

@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -161,4 +160,4 @@ export default class Gamepad extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

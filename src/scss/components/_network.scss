@@ -82,7 +82,6 @@
         }
 
         &.disabled {
-
             label,
             section {
                 color: var(--gm-tertiary-color);
@@ -90,7 +89,6 @@
         }
 
         &.disabledDetails {
-
             section,
             .gm-signal-strength-label {
                 color: var(--gm-tertiary-color);

@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import log from 'loglevel';
 import fileUploader from './util/fileUploader';
@@ -38,7 +37,7 @@ export default class FileUpload extends OverlayPlugin {
                         this.fileUploader.uploadingStop();
                         this.fileUploader.showUploadError(
                             this.i18n.FILE_SEND_FAILED ||
-                            `Something went wrong while processing the file. 
+                                `Something went wrong while processing the file. 
                                 Please make sure the file is valid and try again.`,
                         );
                         // Show the indicator in the toolbar if the widget is closed.
@@ -52,7 +51,7 @@ export default class FileUpload extends OverlayPlugin {
                     case 'SOCKET_FAIL':
                         this.fileUploader.showUploadError(
                             this.i18n.FILE_UPLOAD_CONNECTION_FAILED ||
-                            'Something went wrong while connecting to the server.'
+                                'Something went wrong while connecting to the server.',
                         );
                         this.fileUploader.setEnabled(false);
                         break;
@@ -69,7 +68,7 @@ export default class FileUpload extends OverlayPlugin {
             this.instance.tooltipManager.setTooltip(
                 this.toolbarBtn.htmlElement,
                 i18n.ERROR_ON_LOAD_FILE_UPLOAD || "Upload worker can't be load, check the fileUploadUrl option",
-                this.instance.options.toolbarPosition === 'right' ? 'left' : 'right'
+                this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
             );
         }
     }
@@ -83,12 +82,14 @@ export default class FileUpload extends OverlayPlugin {
             iconClass: 'gm-uploader-button',
             title: this.i18n.UPLOADER_TITLE || 'File upload',
             onClick: () => {
-                if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
-                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())) {
+                if (
+                    !this.instance.store.getters.isWidgetOpened(this.overlayID) &&
+                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())
+                ) {
                     this.toolbarBtn.setIndicator('');
-                };
+                }
                 this.toggleWidget();
-            }
+            },
         });
     }
 
@@ -108,7 +109,8 @@ export default class FileUpload extends OverlayPlugin {
         introSection.className = 'gm-section';
         const text = document.createElement('div');
         text.className = 'gm-text';
-        text.innerHTML = this.i18n.FILE_UPLOAD_TEXT ||
+        text.innerHTML =
+            this.i18n.FILE_UPLOAD_TEXT ||
             `You can upload files from here.
              Application (APK) files and flashable ZIP archives will be installed;
              other file types will be copied to the Download folder (/sdcard/Download) on the device.`;
@@ -179,21 +181,19 @@ export default class FileUpload extends OverlayPlugin {
             event.stopPropagation();
         });
 
-        this.removeListenerDragAndDropLeave =
-            this.instance.addListener(this.instance.root, 'dragleave', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-            });
+        this.removeListenerDragAndDropLeave = this.instance.addListener(this.instance.root, 'dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
 
-        this.removeListenerDragAndDropDrop =
-            this.instance.addListener(this.instance.root, 'drop', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
+        this.removeListenerDragAndDropDrop = this.instance.addListener(this.instance.root, 'drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
 
-                if (!event.dataTransfer.files[0].name.toLowerCase().endsWith('.apk')) {
-                    this.fileUploader.startUpload(event.dataTransfer.files[0]);
-                }
-            });
+            if (!event.dataTransfer.files[0].name.toLowerCase().endsWith('.apk')) {
+                this.fileUploader.startUpload(event.dataTransfer.files[0]);
+            }
+        });
     }
 
     removeListenerOnRoot() {
@@ -201,4 +201,4 @@ export default class FileUpload extends OverlayPlugin {
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
     }
-};
+}

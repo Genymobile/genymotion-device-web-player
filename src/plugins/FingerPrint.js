@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {switchButton} from './util/components';
 import log from 'loglevel';
@@ -349,4 +348,4 @@ export default class FingerPrint extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

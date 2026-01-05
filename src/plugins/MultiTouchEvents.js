@@ -1,4 +1,3 @@
-
 /**
  * Instance multi touch plugin.
  * Forward multi touch events to instance.
@@ -92,4 +91,4 @@ export default class MultiTouchEvents {
         this.instance.addListener(this.instance.video, 'touchend', this.onScreenTouchEnd.bind(this), false);
         this.instance.addListener(this.instance.video, 'touchmove', this.onScreenTouchMove.bind(this), false);
     }
-};
+}

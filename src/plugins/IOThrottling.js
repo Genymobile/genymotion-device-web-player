@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {dropdownSelect, textInput, chipTag} from './util/components';
 
@@ -134,7 +133,7 @@ export default class IOThrottling extends OverlayPlugin {
                     this.readByteRate.setErrorMessage('');
                     this.applyBtn.disabled = false;
                 }
-            }
+            },
         });
 
         const readByteRateSpeedText = document.createElement('div');
@@ -266,4 +265,4 @@ export default class IOThrottling extends OverlayPlugin {
             this.readByteRate.setValue(this.lastReadByteRateReceived);
         }
     }
-};
+}

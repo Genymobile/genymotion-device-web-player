@@ -1,4 +1,3 @@
-
 /**
  * Screen coordinates utility plugin.
  * Provides utility functions related to mouse inputs & the instance video stream.
@@ -222,4 +221,4 @@ export default class CoordinateUtils {
                 y);
         return {x: Math.round(xPercent), y: Math.round(yPercent)};
     }
-};
+}

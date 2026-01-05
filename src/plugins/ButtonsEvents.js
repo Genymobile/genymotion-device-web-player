@@ -1,4 +1,3 @@
-
 const META_KEYCODE = '0x01000022';
 const ENTER_KEYCODE = '0x01000005';
 const VOLUME_DOWN_KEYCODE = '0x01000070';
@@ -186,4 +185,4 @@ export default class ButtonsEvents {
             onMouseup: this.mouseButtonReleaseEvent.bind(this),
         });
     }
-};
+}

@@ -1,4 +1,3 @@
-
 const RESOLUTIONS = [
     {text: '-', value: '0'},
     {text: '240p', value: '240'},
@@ -66,4 +65,4 @@ export default class StreamResolution {
             },
         });
     }
-};
+}

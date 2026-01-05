@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {textInput} from './util/components';
 
@@ -161,4 +160,4 @@ export default class Phone extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

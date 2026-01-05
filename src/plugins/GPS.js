@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {textInput, chipTag, slider} from './util/components';
 import log from 'loglevel';
@@ -684,4 +683,4 @@ export default class GPS extends OverlayPlugin {
         });
         this.markers = [];
     }
-};
+}

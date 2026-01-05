@@ -1,4 +1,3 @@
-
 /**
  * List of invisible key that can be pressed.
  * For values, see http://doc.qt.io/qt-4.8/qt.html & https://github.com/ccampbell/mousetrap/blob/master/mousetrap.js
@@ -254,4 +253,4 @@ export default class KeyboardEvents {
         });
         this.isListenerAdded = false;
     }
-};
+}

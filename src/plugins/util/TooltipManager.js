@@ -1,4 +1,3 @@
-
 /**
  * TooltipManager
  * Allows you to dynamically add tooltips to any HTML element.
@@ -166,4 +165,3 @@ export default class TooltipManager {
         return {left: Math.max(8, left), top, position: 'bottom'};
     }
 }
-

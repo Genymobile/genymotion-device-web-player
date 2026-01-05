@@ -549,7 +549,7 @@ export default class DeviceRenderer {
                             popup.innerHTML =
                                 this.options.i18n.UNMUTE_INVITE ||
                                 'By default, the sound has been turned off, ' +
-                                'please click anywhere to re-enable audio';
+                                    'please click anywhere to re-enable audio';
                             this.videoWrapper.prepend(popup);
                             const addSound = () => {
                                 this.video.muted = false;
@@ -1064,4 +1064,4 @@ export default class DeviceRenderer {
         // Ensure 'right' style from CSS is overridden/removed
         buttonDiv.style.right = '';
     }
-};
+}

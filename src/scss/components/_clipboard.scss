@@ -27,18 +27,21 @@
             margin-bottom: $spacing-s;
             flex: 1;
         }
+
         &-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             .gm-clipboard-apply {
                 display: flex;
                 align-items: center;
             }
+
             .gm-clipboard-apply::before {
                 content: '';
-                mask-image: url('../assets/images/ic_copy.svg');
-                -webkit-mask-image: url('../assets/images/ic_copy.svg');
+                mask-image: url('../../assets/images/ic_copy.svg');
+                -webkit-mask-image: url('../../assets/images/ic_copy.svg');
                 -webkit-mask-size: contain;
                 mask-size: contain;
                 -webkit-mask-repeat: no-repeat;
@@ -49,6 +52,7 @@
                 width: 32px;
                 height: 32px;
             }
+
             .gm-tag-success {
                 visibility: hidden;
             }

@@ -1,9 +1,9 @@
-'use strict';
+import {vi} from 'vitest';
 
-jest.mock('loglevel');
+vi.mock('loglevel');
 
-const Clipboard = require('../../src/plugins/Clipboard');
-const Instance = require('../mocks/DeviceRenderer');
+import Clipboard from '../../src/plugins/Clipboard.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let clipboard;
 let instance;
@@ -78,7 +78,7 @@ describe('Clipboard Plugin', () => {
         let sendEventSpy;
 
         beforeEach(() => {
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            sendEventSpy = vi.spyOn(instance, 'sendEvent');
         });
 
         afterEach(() => {

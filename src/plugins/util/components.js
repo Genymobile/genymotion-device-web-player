@@ -1,5 +1,4 @@
-'use strict';
-const log = require('loglevel');
+import log from 'loglevel';
 /**
  * Module for creating custom switch button components.
  * @module switchButton
@@ -135,7 +134,7 @@ const slider = (() => {
                 progressBar.style.width = `${percentage}%`;
                 sliderCursor.style.left = adjustedPercentage;
 
-                const calc = ((percentage / 100) * sliderCursor.offsetWidth - (sliderCursor.offsetWidth / 2)) * -1;
+                const calc = ((percentage / 100) * sliderCursor.offsetWidth - sliderCursor.offsetWidth / 2) * -1;
                 sliderCursor.style.transform = `translate(${calc}px, -50%)`;
             });
         };
@@ -658,4 +657,4 @@ const progressBar = (() => {
     return {createProgressBar};
 })();
 
-module.exports = {switchButton, slider, textInput, dropdownSelect, chipTag, progressBar};
+export {switchButton, slider, textInput, dropdownSelect, chipTag, progressBar};

@@ -1,13 +1,11 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {textInput} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {textInput} from './util/components';
 
 /**
  * Instance phone plugin.
  * Provides phone call and SMS support.
  */
-module.exports = class Phone extends OverlayPlugin {
+export default class Phone extends OverlayPlugin {
     static get name() {
         return 'Phone';
     }
@@ -162,4 +160,4 @@ module.exports = class Phone extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

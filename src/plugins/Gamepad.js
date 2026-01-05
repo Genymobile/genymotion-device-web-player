@@ -1,14 +1,12 @@
-'use strict';
-
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
-const OverlayPlugin = require('./util/OverlayPlugin');
+import OverlayPlugin from './util/OverlayPlugin';
 
 /**
  * Instance gamepad plugin.
  */
-module.exports = class Gamepad extends OverlayPlugin {
+export default class Gamepad extends OverlayPlugin {
     static get name() {
         return 'Gamepad';
     }
@@ -162,4 +160,4 @@ module.exports = class Gamepad extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

@@ -1,20 +1,21 @@
-'use strict';
-jest.mock('loglevel');
+import {vi} from 'vitest';
+
+vi.mock('loglevel');
 
 // window.Worker mock
 const mockWorker = {
-    postMessage: jest.fn(),
+    postMessage: vi.fn(),
     onmessage: null,
 };
 
 const mockBlobUrl = 'blob:mock-url-123';
-global.URL.createObjectURL = jest.fn().mockReturnValue(mockBlobUrl);
-global.URL.revokeObjectURL = jest.fn();
+global.URL.createObjectURL = vi.fn().mockReturnValue(mockBlobUrl);
+global.URL.revokeObjectURL = vi.fn();
 
-global.Worker = jest.fn().mockImplementation(() => mockWorker);
+global.Worker = vi.fn().mockImplementation(() => mockWorker);
 
-const GAPPSInstall = require('../../src/plugins/GAPPSInstall');
-const Instance = require('../mocks/DeviceRenderer');
+import GAPPSInstall from '../../src/plugins/GAPPSInstall.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let instance;
 let plugin;
@@ -29,8 +30,12 @@ describe('GAPPSInstall Plugin', () => {
         global.URL.revokeObjectURL.mockClear();
 
         instance = new Instance({
-            fileUploadUrl: 'mocked'
+            fileUploadUrl: 'mocked',
         });
+
+        // Mock the createFileUploadWorker method to return our mock worker
+        instance.createFileUploadWorker = vi.fn().mockReturnValue(mockWorker);
+
         plugin = new GAPPSInstall(instance, {
             GAPPS_TITLE: 'TEST GAPPS TITLE',
             DRAG_DROP_TEXT: 'TEST DRAG DROP TEXT',
@@ -43,7 +48,7 @@ describe('GAPPSInstall Plugin', () => {
 
     afterEach(() => {
         // clean all mocks after each test
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('api', () => {
@@ -122,10 +127,10 @@ describe('GAPPSInstall Plugin', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
 
-            expect(initialView.fileUploaderComponent.element.
-                querySelector('.gm-btn.gm-gradient-button').disabled).toBe(true);
-            expect(initialView.fileUploaderComponent.element.
-                querySelector('.gm-drag-drop-area.disabled')).toBeTruthy();
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-btn.gm-gradient-button').disabled).toBe(
+                true,
+            );
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-drag-drop-area.disabled')).toBeTruthy();
         });
 
         test('re-enables drag and drop after upload completion', () => {
@@ -134,17 +139,17 @@ describe('GAPPSInstall Plugin', () => {
 
             document.querySelector('.gm-cancel-update-icon').click();
 
-            expect(initialView.fileUploaderComponent.element.
-                querySelector('.gm-btn.gm-gradient-button').disabled).toBe(false);
-            expect(initialView.fileUploaderComponent.element.
-                querySelector('.gm-drag-drop-area.disabled')).toBeFalsy();
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-btn.gm-gradient-button').disabled).toBe(
+                false,
+            );
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-drag-drop-area.disabled')).toBeFalsy();
         });
     });
 
     describe('file validation', () => {
         test('accepts valid APK file', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
-            const showUploadError = jest.spyOn(initialView.fileUploaderComponent, 'showUploadError');
+            const showUploadError = vi.spyOn(initialView.fileUploaderComponent, 'showUploadError');
 
             initialView.fileUploaderComponent.startUpload(file);
 
@@ -153,13 +158,14 @@ describe('GAPPSInstall Plugin', () => {
 
         test('rejects non-APK file', () => {
             const file = new File(['test'], 'test.txt', {type: 'text/plain'});
-            const startUpload = jest.spyOn(initialView.fileUploaderComponent, 'startUpload');
+            const startUpload = vi.spyOn(initialView.fileUploaderComponent, 'startUpload');
 
             initialView.fileUploaderComponent.startUpload(file);
             expect(startUpload).toHaveBeenCalled();
 
-            expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML)
-                .toEqual(expect.stringContaining('TEST FILE TYPE NOT APK'));
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-error-text').innerHTML).toEqual(
+                expect.stringContaining('TEST FILE TYPE NOT APK'),
+            );
         });
     });
 
@@ -185,7 +191,7 @@ describe('GAPPSInstall Plugin', () => {
             const file = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
             initialView.handleFileUpload(file);
 
-            expect(global.Worker).toHaveBeenCalledWith(expect.any(String));
+            expect(instance.createFileUploadWorker).toHaveBeenCalled();
             expect(mockWorker.postMessage).toHaveBeenCalledWith({
                 type: 'upload',
                 file: file,
@@ -200,8 +206,9 @@ describe('GAPPSInstall Plugin', () => {
             mockWorker.onmessage(event);
 
             expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
-            expect(document.getElementsByClassName('gm-error-text')[0].innerHTML)
-                .toEqual(expect.stringContaining('TEST FILE APK SEND FAILED'));
+            expect(document.getElementsByClassName('gm-error-text')[0].innerHTML).toEqual(
+                expect.stringContaining('TEST FILE APK SEND FAILED'),
+            );
         });
 
         test('handles worker progress message', () => {
@@ -214,13 +221,14 @@ describe('GAPPSInstall Plugin', () => {
                     code: 'PROGRESS',
                     value: 0.5,
                     uploadedSize: '450.00',
-                    fileSize: '900.00'
-                }
+                    fileSize: '900.00',
+                },
             };
             mockWorker.onmessage(event);
             expect(initialView.fileUploaderComponent.element.querySelector('.gm-progress-bar').style.width).toBe('50%');
-            expect(initialView.fileUploaderComponent.element.querySelector('.gm-size-text').innerHTML)
-                .toBe('(450.00 of 900.00Mo)');
+            expect(initialView.fileUploaderComponent.element.querySelector('.gm-size-text').innerHTML).toBe(
+                '(450.00 of 900.00Mo)',
+            );
         });
 
         test('handles worker cancellation', () => {
@@ -229,12 +237,10 @@ describe('GAPPSInstall Plugin', () => {
 
             document.querySelector('.gm-cancel-update-icon').click();
 
-            mockWorker.postMessage(
-                {type: 'cancel'}
-            );
+            mockWorker.postMessage({type: 'cancel'});
 
             expect(mockWorker.postMessage).toHaveBeenCalledWith({
-                type: 'cancel'
+                type: 'cancel',
             });
 
             expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);

@@ -18,12 +18,14 @@
         gap: $spacing-xl;
         /*margin-bottom: $spacing-m;*/
     }
+
     .gm-network-operator-section-title {
         color: var(--gm-on-secondary-color);
         display: flex;
         align-items: center;
         font-weight: bolder;
         margin-bottom: $spacing-m;
+
         &::before {
             content: ' ';
             width: 30px;
@@ -35,8 +37,8 @@
             mask-repeat: no-repeat;
             -webkit-mask-position: center;
             mask-position: center;
-            mask-image: url('../assets/images/ic_world.svg');
-            -webkit-mask-image: url('../assets/images/ic_world.svg');
+            mask-image: url('../../assets/images/ic_world.svg');
+            -webkit-mask-image: url('../../assets/images/ic_world.svg');
         }
     }
 
@@ -58,10 +60,11 @@
             mask-repeat: no-repeat;
             -webkit-mask-position: center;
             mask-position: center;
-            mask-image: url('../assets/images/ic_baseband.svg');
-            -webkit-mask-image: url('../assets/images/ic_baseband.svg');
+            mask-image: url('../../assets/images/ic_baseband.svg');
+            -webkit-mask-image: url('../../assets/images/ic_baseband.svg');
         }
     }
+
     .gm-actions {
         .gm-tag-success {
             visibility: hidden;

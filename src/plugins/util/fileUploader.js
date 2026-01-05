@@ -1,6 +1,4 @@
-'use strict';
-
-const {progressBar} = require('./components');
+import {progressBar} from './components';
 
 /**
  * Module for creating custom file uploader components with drag & drop functionality.
@@ -35,7 +33,7 @@ const fileUploader = (() => {
         browseButtonText = 'BROWSE',
         accept = null,
         classes = '',
-        i18n= {}
+        i18n = {},
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -121,7 +119,7 @@ const fileUploader = (() => {
 
         uploadCancelButton.className = 'gm-cancel-update-icon';
         uploadCancelButton.onclick = () => {
-            fileInput.value= '';
+            fileInput.value = '';
             if (onUploadCanceled) {
                 onUploadCanceled();
             }
@@ -292,8 +290,9 @@ const fileUploader = (() => {
                         onFileSelect(file);
                     }
                 } else {
-                    showUploadError(i18n.FILE_TYPE_NOT_APK ||
-                        `Invalid file type. Only ${accept} files are supported.
+                    showUploadError(
+                        i18n.FILE_TYPE_NOT_APK ||
+                            `Invalid file type. Only ${accept} files are supported.
                         Please select a file with the correct extension.`,
                     );
                 }
@@ -373,11 +372,11 @@ const fileUploader = (() => {
             uploadingStop,
             showUploadError,
             showUploadSuccess,
-            startUpload: checkFileBeforeUpload
+            startUpload: checkFileBeforeUpload,
         };
     };
 
     return {createFileUploader};
 })();
 
-module.exports = fileUploader;
+export default fileUploader;

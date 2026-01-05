@@ -1,8 +1,7 @@
-'use strict';
-
-const IOThrottling = require('../../src/plugins/IOThrottling');
-const IOThrottlingProfiles = require('../../src/plugins/util/iothrottling-profiles');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import IOThrottling from '../../src/plugins/IOThrottling.js';
+import IOThrottlingProfiles from '../../src/plugins/util/iothrottling-profiles.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let diskio;
 let instance;
@@ -82,7 +81,7 @@ describe('IOThrottling Plugin', () => {
 
     describe('outgoing events', () => {
         test('readbyterate', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             IOThrottlingProfiles.forEach((profile) => {
                 if (!profile.readByteRate) {
@@ -115,7 +114,7 @@ describe('IOThrottling Plugin', () => {
         });
 
         test('readbyterate', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             diskio.clearCacheBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);

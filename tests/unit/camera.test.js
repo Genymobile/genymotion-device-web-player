@@ -1,10 +1,10 @@
-'use strict';
+import {vi} from 'vitest';
 
-jest.mock('loglevel');
+vi.mock('loglevel');
 
-const MediaManager = require('../../src/plugins/MediaManager');
-const Camera = require('../../src/plugins/Camera');
-const Instance = require('../mocks/DeviceRenderer');
+import MediaManager from '../../src/plugins/MediaManager.js';
+import Camera from '../../src/plugins/Camera.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 // eslint-disable-next-line no-unused-vars
 let mediaManager;

@@ -1,13 +1,11 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {textInput, chipTag} = require('./util/components');
+import OverlayPlugin from './util/OverlayPlugin';
+import {textInput, chipTag} from './util/components';
 
 /**
  * Instance Baseband/RIL plugin.
  * Provides Baseband and RIL informations control.
  */
-module.exports = class BasebandRIL extends OverlayPlugin {
+export default class BasebandRIL extends OverlayPlugin {
     static get name() {
         return 'BasebandRIL';
     }
@@ -390,4 +388,4 @@ module.exports = class BasebandRIL extends OverlayPlugin {
 
         this.container.classList.add('gm-baseband-saved');
     }
-};
+}

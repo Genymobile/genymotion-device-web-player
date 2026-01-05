@@ -30,7 +30,7 @@ export default class FileUpload extends OverlayPlugin {
                     case 'SUCCESS':
                         this.fileUploader.showUploadSuccess();
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                             this.toolbarBtn.setIndicator('success');
                         }
                         break;
@@ -38,11 +38,11 @@ export default class FileUpload extends OverlayPlugin {
                         this.fileUploader.uploadingStop();
                         this.fileUploader.showUploadError(
                             this.i18n.FILE_SEND_FAILED ||
-                                `Something went wrong while processing the file. 
+                            `Something went wrong while processing the file. 
                                 Please make sure the file is valid and try again.`,
                         );
                         // Show the indicator in the toolbar if the widget is closed.
-                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)){
+                        if (!this.instance.store.getters.isWidgetOpened(this.overlayID)) {
                             this.toolbarBtn.setIndicator('failed');
                         }
                         break;
@@ -69,7 +69,7 @@ export default class FileUpload extends OverlayPlugin {
             this.instance.tooltipManager.setTooltip(
                 this.toolbarBtn.htmlElement,
                 i18n.ERROR_ON_LOAD_FILE_UPLOAD || "Upload worker can't be load, check the fileUploadUrl option",
-                this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+                this.instance.options.toolbarPosition === 'right' ? 'left' : 'right'
             );
         }
     }
@@ -84,7 +84,7 @@ export default class FileUpload extends OverlayPlugin {
             title: this.i18n.UPLOADER_TITLE || 'File upload',
             onClick: () => {
                 if (!this.instance.store.getters.isWidgetOpened(this.overlayID) &&
-                ['success', 'failed'].includes(this.toolbarBtn.getIndicator())){
+                    ['success', 'failed'].includes(this.toolbarBtn.getIndicator())) {
                     this.toolbarBtn.setIndicator('');
                 };
                 this.toggleWidget();
@@ -128,7 +128,7 @@ export default class FileUpload extends OverlayPlugin {
                 const msg = {type: 'upload', file};
                 this.fileUploadWorker.postMessage(msg);
             },
-            onUploadCanceled:() => {
+            onUploadCanceled: () => {
                 this.fileUploadWorker.postMessage({type: 'cancel'});
             },
             onUploadComplete: () => {

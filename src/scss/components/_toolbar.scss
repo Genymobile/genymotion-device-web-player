@@ -8,6 +8,7 @@
         &.toolbarPosition-left {
             flex-direction: row-reverse;
         }
+
         /*
         * &.toolbarPosition-right {} is the default, so no need to add it
         */
@@ -17,6 +18,7 @@
             min-width: $toolbar-width;
             max-height: 100%;
             position: relative;
+
             &::-webkit-scrollbar {
                 display: none;
             }
@@ -33,14 +35,17 @@
 
             .gm-floating-toolbar {
                 height: 100%;
+
                 ul {
                     display: flex;
                     flex-direction: row;
                     height: 100%;
                     gap: 0px;
+
                     li {
                         height: 100%;
                         width: 68px;
+
                         &.gm-v-separator {
                             height: 75%;
                             width: 1px;
@@ -51,7 +56,7 @@
                         }
 
                         .gm-screenrecord-button {
-                            + .gm-screenrecord-timer {
+                            +.gm-screenrecord-timer {
                                 bottom: 6px;
                             }
                         }
@@ -69,6 +74,7 @@
             max-height: 100%;
             flex-direction: column;
             align-items: center;
+
             &::-webkit-scrollbar {
                 display: none;
             }
@@ -78,6 +84,7 @@
                 flex-direction: column;
                 gap: 10px;
                 width: 100%;
+
                 li {
                     width: 100%;
                     transition: background-color 0.3s;
@@ -86,25 +93,31 @@
                     display: flex;
                     justify-content: center;
                     align-items: center;
+
                     &:hover {
                         cursor: pointer;
+
                         .gm-icon-button {
                             background-color: var(--gm-primary-color);
                         }
                     }
+
                     &.gm-separator {
                         width: 75%;
                         height: 1px;
                         margin-left: auto;
                         margin-right: auto;
                     }
+
                     &:not(.gm-separator):hover {
                         background-color: var(--gm-secondary-variant-color);
                     }
+
                     &:has(.gm-disabled-icon-button):hover {
                         cursor: auto;
                         background-color: transparent;
                     }
+
                     &.gm-toolbar-dot {
                         &-active {
                             &::before {
@@ -118,6 +131,7 @@
                                 left: 7px;
                             }
                         }
+
                         &-notification {
                             &::before {
                                 content: ' ';
@@ -130,6 +144,7 @@
                                 left: 7px;
                                 z-index: 2;
                             }
+
                             &::after {
                                 content: ' ';
                                 position: absolute;
@@ -144,6 +159,7 @@
                                 left: 2px;
                             }
                         }
+
                         &-success {
                             &::before {
                                 content: ' ';
@@ -156,6 +172,7 @@
                                 left: 7px;
                             }
                         }
+
                         &-failed {
                             &::before {
                                 content: ' ';
@@ -169,14 +186,17 @@
                             }
                         }
                     }
+
                     .gm {
                         &-icon-button {
                             background-color: var(--gm-on-secondary-color);
+
                             &:hover,
                             &.gm-active {
                                 cursor: pointer;
                                 background-color: var(--gm-primary-color);
                             }
+
                             &.gm-disabled-icon-button {
                                 background-color: var(--gm-tertiary-color);
                                 pointer-events: none;
@@ -184,63 +204,63 @@
                         }
 
                         &-rotation {
-                            mask-image: url('../assets/images/ic_rotation.svg');
-                            -webkit-mask-image: url('../assets/images/ic_rotation.svg');
+                            mask-image: url('../../assets/images/ic_rotation.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_rotation.svg');
                         }
 
                         &-sound-up {
-                            mask-image: url('../assets/images/ic_sound_up.svg');
-                            -webkit-mask-image: url('../assets/images/ic_sound_up.svg');
+                            mask-image: url('../../assets/images/ic_sound_up.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_sound_up.svg');
                         }
 
                         &-sound-down {
-                            mask-image: url('../assets/images/ic_sound_down.svg');
-                            -webkit-mask-image: url('../assets/images/ic_sound_down.svg');
+                            mask-image: url('../../assets/images/ic_sound_down.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_sound_down.svg');
                         }
 
                         &-recent {
-                            mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
-                            -webkit-mask-image: url('../assets/images/ic_nav_android_multiapp.svg');
+                            mask-image: url('../../assets/images/ic_nav_android_multiapp.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_nav_android_multiapp.svg');
                         }
 
                         &-home {
-                            mask-image: url('../assets/images/ic_nav_android_home.svg');
-                            -webkit-mask-image: url('../assets/images/ic_nav_android_home.svg');
+                            mask-image: url('../../assets/images/ic_nav_android_home.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_nav_android_home.svg');
                         }
 
                         &-back {
-                            mask-image: url('../assets/images/ic_nav_android_back.svg');
-                            -webkit-mask-image: url('../assets/images/ic_nav_android_back.svg');
+                            mask-image: url('../../assets/images/ic_nav_android_back.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_nav_android_back.svg');
                         }
 
                         &-battery-button {
-                            mask-image: url('../assets/images/ic_battery.svg');
-                            -webkit-mask-image: url('../assets/images/ic_battery.svg');
+                            mask-image: url('../../assets/images/ic_battery.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_battery.svg');
                         }
 
                         &-gamepad-button {
-                            mask-image: url('../assets/images/ic_gamepad.svg');
-                            -webkit-mask-image: url('../assets/images/ic_gamepad.svg');
+                            mask-image: url('../../assets/images/ic_gamepad.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_gamepad.svg');
                         }
 
                         &-power {
-                            mask-image: url('../assets/images/ic_power.svg');
-                            -webkit-mask-image: url('../assets/images/ic_power.svg');
+                            mask-image: url('../../assets/images/ic_power.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_power.svg');
                         }
 
                         &-camera-button {
-                            mask-image: url('../assets/images/ic_camera.svg');
-                            -webkit-mask-image: url('../assets/images/ic_camera.svg');
+                            mask-image: url('../../assets/images/ic_camera.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_camera.svg');
                         }
 
                         &-camera-mic-button {
-                            mask-image: url('../assets/images/ic_camera_mic.svg');
-                            -webkit-mask-image: url('../assets/images/ic_camera_mic.svg');
+                            mask-image: url('../../assets/images/ic_camera_mic.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_camera_mic.svg');
                         }
 
                         &-streamres-button {
-                            mask-image: url('../assets/images/ic_resolution.svg');
-                            -webkit-mask-image: url('../assets/images/ic_resolution.svg');
+                            mask-image: url('../../assets/images/ic_resolution.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_resolution.svg');
                             outline: none;
                             border: none;
                             color: transparent;
@@ -258,27 +278,28 @@
                         }
 
                         &-gps-button {
-                            mask-image: url('../assets/images/ic_location.svg');
-                            -webkit-mask-image: url('../assets/images/ic_location.svg');
+                            mask-image: url('../../assets/images/ic_location.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_location.svg');
                         }
 
                         &-fullscreen-button {
-                            mask-image: url('../assets/images/ic_fullscreen.svg');
-                            -webkit-mask-image: url('../assets/images/ic_fullscreen.svg');
+                            mask-image: url('../../assets/images/ic_fullscreen.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_fullscreen.svg');
 
                             &.gm-active,
                             &.gm-active:hover {
-                                mask-image: url('../assets/images/ic_fullscreen_active.svg');
-                                -webkit-mask-image: url('../assets/images/ic_fullscreen_active.svg');
+                                mask-image: url('../../assets/images/ic_fullscreen_active.svg');
+                                -webkit-mask-image: url('../../assets/images/ic_fullscreen_active.svg');
                                 background-color: var(--gm-primary-color);
                             }
                         }
 
                         &-screenrecord-button {
-                            mask-image: url('../assets/images/ic_screenrecord.svg');
-                            -webkit-mask-image: url('../assets/images/ic_screenrecord.svg');
+                            mask-image: url('../../assets/images/ic_screenrecord.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_screenrecord.svg');
                             position: relative;
-                            + .gm-screenrecord-timer {
+
+                            +.gm-screenrecord-timer {
                                 position: absolute;
                                 left: 50%;
                                 transform: translateX(-50%);
@@ -289,54 +310,55 @@
                                 font-weight: bold;
                             }
                         }
+
                         &-screenshot-button {
-                            mask-image: url('../assets/images/ic_screenshot.svg');
-                            -webkit-mask-image: url('../assets/images/ic_screenshot.svg');
+                            mask-image: url('../../assets/images/ic_screenshot.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_screenshot.svg');
                         }
 
                         &-identifiers-button {
-                            mask-image: url('../assets/images/ic_id.svg');
-                            -webkit-mask-image: url('../assets/images/ic_id.svg');
+                            mask-image: url('../../assets/images/ic_id.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_id.svg');
                         }
 
                         &-network-button {
-                            mask-image: url('../assets/images/ic_network.svg');
-                            -webkit-mask-image: url('../assets/images/ic_network.svg');
+                            mask-image: url('../../assets/images/ic_network.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_network.svg');
                         }
 
                         &-iothrottling-button {
-                            mask-image: url('../assets/images/ic_disk_IO.svg');
-                            -webkit-mask-image: url('../assets/images/ic_disk_IO.svg');
+                            mask-image: url('../../assets/images/ic_disk_IO.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_disk_IO.svg');
                         }
 
                         &-phone-button {
-                            mask-image: url('../assets/images/ic_text_and_call.svg');
-                            -webkit-mask-image: url('../assets/images/ic_text_and_call.svg');
+                            mask-image: url('../../assets/images/ic_text_and_call.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_text_and_call.svg');
                         }
 
                         &-sim-button {
-                            mask-image: url('../assets/images/ic_baseband.svg');
-                            -webkit-mask-image: url('../assets/images/ic_baseband.svg');
+                            mask-image: url('../../assets/images/ic_baseband.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_baseband.svg');
                         }
 
                         &-uploader-button {
-                            mask-image: url('../assets/images/ic_installation.svg');
-                            -webkit-mask-image: url('../assets/images/ic_installation.svg');
+                            mask-image: url('../../assets/images/ic_installation.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_installation.svg');
                         }
 
                         &-streamrate-chooser {
-                            mask-image: url('../assets/images/ic_hq.svg');
-                            -webkit-mask-image: url('../assets/images/ic_hq.svg');
+                            mask-image: url('../../assets/images/ic_hq.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_hq.svg');
                         }
 
                         &-clipboard-button {
-                            mask-image: url('../assets/images/ic_clipboard.svg');
-                            -webkit-mask-image: url('../assets/images/ic_clipboard.svg');
+                            mask-image: url('../../assets/images/ic_clipboard.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_clipboard.svg');
                         }
 
                         &-fingerprint-button {
-                            mask-image: url('../assets/images/ic_biometrics.svg');
-                            -webkit-mask-image: url('../assets/images/ic_biometrics.svg');
+                            mask-image: url('../../assets/images/ic_biometrics.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_biometrics.svg');
 
                             &.fingerprint-require {
                                 background-color: var(--gm-primary-color);
@@ -345,60 +367,66 @@
                             }
 
                             &.fingerprint-autoValidation {
-                                mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
-                                -webkit-mask-image: url('../assets/images/ic_biometrics_auto_validation.svg');
+                                mask-image: url('../../assets/images/ic_biometrics_auto_validation.svg');
+                                -webkit-mask-image: url('../../assets/images/ic_biometrics_auto_validation.svg');
                                 background-color: var(--gm-primary-color);
                             }
                         }
 
                         &-keymapping-button {
-                            mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
-                            -webkit-mask-image: url('../assets/images/ic_keymapping_desactivate.svg');
+                            mask-image: url('../../assets/images/ic_keymapping_desactivate.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_keymapping_desactivate.svg');
 
                             &.gm-active {
-                                mask-image: url('../assets/images/ic_keymapping.svg');
-                                -webkit-mask-image: url('../assets/images/ic_keymapping.svg');
+                                mask-image: url('../../assets/images/ic_keymapping.svg');
+                                -webkit-mask-image: url('../../assets/images/ic_keymapping.svg');
                             }
+
                             &.keymapping-paused {
                                 background-color: var(--gm-tertiary-color);
                             }
                         }
 
                         &-gapps-button {
-                            mask-image: url('../assets/images/ic_gapps.svg');
-                            -webkit-mask-image: url('../assets/images/ic_gapps.svg');
+                            mask-image: url('../../assets/images/ic_gapps.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_gapps.svg');
                         }
 
                         &-default-turn-button {
-                            mask-image: url('../assets/images/ic_warning.svg');
-                            -webkit-mask-image: url('../assets/images/ic_warning.svg');
+                            mask-image: url('../../assets/images/ic_warning.svg');
+                            -webkit-mask-image: url('../../assets/images/ic_warning.svg');
                         }
                     }
                 }
             }
         }
-        .gm-toolbar{
-            ul{
-                li{
+
+        .gm-toolbar {
+            ul {
+                li {
                     &.gm-toolbar-dot {
                         &-active {
                             &::before {
                                 left: 12px;
                             }
                         }
+
                         &-notification {
                             &::before {
                                 left: 12px;
                             }
+
                             &::after {
                                 left: 7px;
                             }
                         }
+
                         &-success {
                             &::before {
                                 left: 12px;
                             }
                         }
+
                         &-failed {
                             &::before {
                                 left: 12px;

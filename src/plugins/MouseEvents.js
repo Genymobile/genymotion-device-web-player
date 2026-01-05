@@ -23,7 +23,7 @@ export default class MouseEvents {
 
         this.leftButtonPressed = false;
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
-        this.removeMouseUpListener = () => {};
+        this.removeMouseUpListener = () => { };
 
         this.instance.store.subscribe(
             ({isMouseEventsEnabled}) => {

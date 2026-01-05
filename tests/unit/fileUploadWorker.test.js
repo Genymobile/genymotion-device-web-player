@@ -21,10 +21,14 @@ class MockWebSocket {
     }
 }
 
-const mockSocket = new MockWebSocket();
+let mockSocket;
 
 global.Worker = vi.fn().mockImplementation(() => mockWorker);
-global.WebSocket = vi.fn().mockImplementation(() => new MockWebSocket());
+// eslint-disable-next-line space-before-function-paren
+global.WebSocket = vi.fn(function() {
+    mockSocket = new MockWebSocket();
+    return mockSocket;
+});
 global.self.postMessage = vi.fn();
 const mockBlobUrl = 'blob:mock-url-123';
 global.URL.createObjectURL = vi.fn().mockReturnValue(mockBlobUrl);
@@ -37,9 +41,18 @@ describe('FileUploaderWorker', () => {
         // Reset mocks before each test
         mockWorker.postMessage.mockClear();
         global.Worker.mockClear();
-        mockSocket.send.mockClear();
-        mockSocket.close.mockClear();
         global.WebSocket.mockClear();
+
+        // Initialize or reset mockSocket
+        if (mockSocket) {
+            mockSocket.send.mockClear();
+            mockSocket.close.mockClear();
+            mockSocket.onopen = null;
+            mockSocket.onclose = null;
+            mockSocket.onerror = null;
+            mockSocket.onmessage = null;
+            mockSocket.binaryType = null;
+        }
 
         // Mock File
         mockFile = new File(['test'], 'test.apk', {type: 'application/vnd.android.package-archive'});
@@ -49,7 +62,6 @@ describe('FileUploaderWorker', () => {
         });
 
         worker = new FileUploaderWorker();
-        worker.socket = mockSocket;
     });
 
     describe('initialization', () => {
@@ -65,7 +77,7 @@ describe('FileUploaderWorker', () => {
     });
 
     describe('message handling', () => {
-        test.skip('handles address message and connects to WebSocket', () => {
+        test('handles address message and connects to WebSocket', () => {
             const msg = {
                 type: 'address',
                 token: 'test-token',
@@ -77,24 +89,26 @@ describe('FileUploaderWorker', () => {
             expect(worker.token).toBe('test-token');
             expect(worker.address).toBe('ws://test.com');
             expect(global.WebSocket).toHaveBeenCalledWith('ws://test.com');
-            expect(mockSocket.binaryType).toBe('arraybuffer');
-            expect(mockSocket.onopen).toBe(worker.onOpen);
-            expect(mockSocket.onerror).toBe(worker.onSocketFailure);
-            expect(mockSocket.onmessage).toBe(worker.onSocketMsg);
-            expect(mockSocket.onclose).toBe(worker.onClose);
+            expect(worker.socket.binaryType).toBe('arraybuffer');
+            expect(worker.socket.onopen).toBe(worker.onOpen);
+            expect(worker.socket.onerror).toBe(worker.onSocketFailure);
+            expect(worker.socket.onmessage).toBe(worker.onSocketMsg);
+            expect(worker.socket.onclose).toBe(worker.onClose);
         });
 
         test('handles close message', () => {
             worker.isUploading = true;
+            worker.socket = mockSocket;
 
             worker.onmessage({data: {type: 'close'}});
 
             expect(worker.isUploading).toBe(false);
-            expect(mockSocket.onclose).toBeNull();
-            expect(mockSocket.close).toHaveBeenCalled();
+            expect(worker.socket.onclose).toBeNull();
+            expect(worker.socket.close).toHaveBeenCalled();
         });
 
         test('handles upload message', () => {
+            worker.socket = mockSocket;
             worker.onmessage({data: {type: 'upload', file: mockFile}});
 
             expect(worker.file).toBe(mockFile);
@@ -102,7 +116,7 @@ describe('FileUploaderWorker', () => {
             expect(worker.hasError).toBe(false);
             expect(worker.uploadedSize).toBe(0);
 
-            expect(mockSocket.send).toHaveBeenCalledWith(
+            expect(worker.socket.send).toHaveBeenCalledWith(
                 JSON.stringify({
                     type: 'FILE_UPLOAD',
                     name: 'test.apk',
@@ -113,6 +127,7 @@ describe('FileUploaderWorker', () => {
 
         test('handles cancel message', () => {
             worker.isUploading = true;
+            worker.socket = mockSocket;
             worker.onmessage({data: {type: 'cancel'}});
 
             expect(worker.isUploading).toBe(false);
@@ -121,16 +136,17 @@ describe('FileUploaderWorker', () => {
                 type: 'FILE_UPLOAD',
                 code: 'CANCELED',
             });
-            expect(mockSocket.close).toHaveBeenCalled();
+            expect(worker.socket.close).toHaveBeenCalled();
         });
     });
 
     describe('WebSocket connection', () => {
         test('sends token on connection open', () => {
             worker.token = 'test-token';
+            worker.socket = mockSocket;
             worker.onOpen();
 
-            expect(mockSocket.send).toHaveBeenCalledWith(
+            expect(worker.socket.send).toHaveBeenCalledWith(
                 JSON.stringify({
                     type: 'token',
                     token: 'test-token',
@@ -138,7 +154,7 @@ describe('FileUploaderWorker', () => {
             );
         });
 
-        test.skip('reconnects on connection close', () => {
+        test('reconnects on connection close', () => {
             vi.useFakeTimers();
             worker.address = 'ws://test.com';
 

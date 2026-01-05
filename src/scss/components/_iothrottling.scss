@@ -7,13 +7,11 @@
     .gm-noThrottling {
         display: none;
     }
-
     .gm-iothrottling-none {
         .gm-units,
         .gm-iothrottling-readbyterate {
             display: none;
         }
-
         .gm-noThrottling {
             display: block;
         }
@@ -24,6 +22,16 @@
             label {
                 animation: blink-alert 1.5s ease-in-out;
             }
+        }
+    }
+
+    .gm-tag-success {
+        display: none;
+    }
+
+    .gm-iothrottling-saved {
+        .gm-tag-success {
+            display: block;
         }
     }
 
@@ -44,21 +52,17 @@
             display: flex;
             align-items: center;
             gap: 10px;
-
             /* override the input error component css to keep the vertical align */
             .text-input-bottom {
                 position: absolute;
                 width: 96px;
             }
-
             .gm-iothrottling-readbyterate {
                 width: 96px;
-
                 input {
                     text-align: center;
                 }
             }
-
             .gm-units {
                 margin-left: 8px;
             }
@@ -68,7 +72,6 @@
     .gm-iothrottling-apply {
         margin-bottom: $spacing-s;
     }
-
     .gm-iothrottling-clearcache {
         label {
             padding-bottom: 0;

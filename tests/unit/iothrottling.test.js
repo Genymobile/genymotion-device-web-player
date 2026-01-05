@@ -58,13 +58,13 @@ describe('IOThrottling Plugin', () => {
         test('diskio', () => {
             ['jean-michel', 'readbyterate -123', '', 'readbyterate invalid'].forEach((invalidValue) => {
                 instance.emit('diskio', invalidValue);
-                expect(diskio.dropdownProfile.value).toBe(0);
+                expect(diskio.dropdownProfile.getValue()).toBe(0);
             });
 
             [69, 420].forEach((customValue) => {
                 instance.emit('diskio', `readbyterate ${customValue * 1024 * 1024}`);
-                expect(diskio.dropdownProfile.value).toBe('Custom');
-                expect(Number(diskio.readByteRate.value)).toBe(customValue);
+                expect(diskio.dropdownProfile.getValue()).toBe('Custom');
+                expect(Number(diskio.readByteRate.getValue())).toBe(customValue);
             });
 
             IOThrottlingProfiles.forEach((profile) => {
@@ -73,8 +73,8 @@ describe('IOThrottling Plugin', () => {
                 }
 
                 instance.emit('diskio', `readbyterate ${profile.readByteRate * 1024 * 1024}`);
-                expect(diskio.dropdownProfile.value).toBe(profile.readByteRate);
-                expect(Number(diskio.readByteRate.value)).toBe(profile.readByteRate);
+                expect(diskio.dropdownProfile.getValue()).toBe(profile.readByteRate);
+                expect(Number(diskio.readByteRate.getValue())).toBe(profile.readByteRate);
             });
         });
     });
@@ -91,10 +91,7 @@ describe('IOThrottling Plugin', () => {
                 sendEventSpy.mockClear();
                 instance.outgoingMessages = [];
                 const dropDownProfile = diskio.profilesForDropdown.find((p) => p.value === profile.readByteRate);
-                diskio.dropdownProfile.value = dropDownProfile.value;
-                diskio.dropdownProfile.dispatchEvent(
-                    new CustomEvent('gm-dropdown-change', {detail: {value: dropDownProfile.value}, bubbles: true}),
-                );
+                diskio.dropdownProfile.setValue(dropDownProfile, true);
                 diskio.widget.querySelector('.gm-btn').click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(1);
                 expect(instance.outgoingMessages[0]).toEqual({
@@ -105,15 +102,9 @@ describe('IOThrottling Plugin', () => {
 
             sendEventSpy.mockClear();
             instance.outgoingMessages = [];
-            const dropDownProfile = diskio.profilesForDropdown.find((p) => p.value === 'Custom');
-            diskio.dropdownProfile.value = dropDownProfile.value;
-            diskio.dropdownProfile.dispatchEvent(
-                new CustomEvent('gm-dropdown-change', {detail: {value: dropDownProfile.value}, bubbles: true}),
-            );
-            diskio.readByteRate.value = 69;
-            diskio.readByteRate.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: 69}, bubbles: true}),
-            );
+            const dropDownProfile = diskio.profilesForDropdown.find((p) => p.name === 'Custom');
+            diskio.dropdownProfile.setValue(dropDownProfile, true);
+            diskio.readByteRate.setValue(69);
             diskio.widget.querySelector('.gm-btn').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({

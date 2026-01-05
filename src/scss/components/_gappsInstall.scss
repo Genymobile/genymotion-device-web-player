@@ -8,29 +8,29 @@
 
         .initial-view-container {
             height: 100%;
-    
+
             .gm-gapps-text {
                 padding-bottom: $spacing-s;
             }
-    
+
             .gm-gapps-status {
                 font-weight: 900;
             }
-    
+
             .gm-actions {
                 padding-bottom: $spacing-s;
             }
-    
+
             .gm-gapps-icon {
                 margin-right: $spacing-s;
-                mask-image: url('../assets/images/ic_gapps.svg');
-                -webkit-mask-image: url('../assets/images/ic_gapps.svg');
+                mask-image: url('../../assets/images/ic_gapps.svg');
+                -webkit-mask-image: url('../../assets/images/ic_gapps.svg');
             }
-    
+
             .gm-downloadFile-icon {
                 margin-right: $spacing-s;
             }
-    
+
             .gm-gapps-installed-status {
                 display: flex;
                 align-items: center;
@@ -38,7 +38,7 @@
                 font-weight: 900;
 
             }
-    
+
             .gm-apk-title {
                 display: flex;
                 align-items: center;
@@ -46,7 +46,7 @@
                 font-weight: 900;
             }
         }
-    
+
         .disclaimer-view-container {
             height: 100%;
             display: flex;
@@ -57,20 +57,22 @@
                 align-items: center;
                 margin-bottom: $spacing-m;
             }
+
             .gm-disclaimer-text {
                 flex: 1;
             }
-    
+
             .gm-disclaimer-actions {
                 justify-content: flex-end;
                 gap: $spacing-s;
             }
         }
-    
+
         .installing-gapps-view-container {
             height: 100%;
             display: flex;
             flex-direction: column;
+
             .gm-progress-section {
                 flex: 1;
                 display: flex;
@@ -78,15 +80,15 @@
                 justify-content: center;
                 align-items: center;
                 padding: 0 $spacing-xl;
-    
+
                 .gm-droid-icon {
                     width: 48px;
                     height: 48px;
-                    mask-image: url('../assets/images/ic_droid.svg');
-                    -webkit-mask-image: url('../assets/images/ic_droid.svg');
+                    mask-image: url('../../assets/images/ic_droid.svg');
+                    -webkit-mask-image: url('../../assets/images/ic_droid.svg');
                     background-color: var(--gm-tertiary-color);
                 }
-    
+
                 .gm-progress-text-container {
                     display: flex;
                     align-items: center;
@@ -95,34 +97,39 @@
                     margin: $spacing-m 0;
                 }
             }
+
             .gm-progress-actions {
                 justify-content: flex-end;
                 gap: $spacing-s;
             }
         }
-    
+
         .installation-success-view-container {
             height: 100%;
             display: flex;
             flex-direction: column;
+
             .gm-success-message-section {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-    
+
                 .gm-check-icon {
                     margin-bottom: $spacing-m;
                 }
+
                 .gm-success-text {
                     font-weight: bold;
                     margin-bottom: $spacing-m;
                 }
+
                 .gm-success-description {
                     text-align: center;
                 }
             }
+
             .gm-success-actions {
                 justify-content: flex-end;
                 gap: $spacing-s;
@@ -133,25 +140,28 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+
             .gm-failed-message-section {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-    
+
                 .gm-failed-icon {
                     margin-bottom: $spacing-m;
                 }
-    
+
                 .gm-failed-text {
                     font-weight: bold;
                     margin-bottom: $spacing-m;
                 }
+
                 .gm-failed-description {
                     text-align: center;
                 }
             }
+
             .gm-failed-actions {
                 justify-content: flex-end;
                 gap: $spacing-s;
@@ -159,4 +169,3 @@
         }
     }
 }
-

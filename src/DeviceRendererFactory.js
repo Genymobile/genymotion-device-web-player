@@ -193,18 +193,16 @@ export default class DeviceRendererFactory {
             <div class="player-screen-wrapper">
                 <div class="gm-video-wrapper">
                     <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
-                    ${
-                        options.showPhoneBorder
-                            ? '<div class="gm-phone-button"></div><div class="gm-phone-border"></div>'
-                            : ''
-                    }
+                    ${options.showPhoneBorder
+                ? '<div class="gm-phone-button"></div><div class="gm-phone-border"></div>'
+                : ''
+            }
                 </div>
-                ${
-                    options.floatingToolbar
-                        ? // eslint-disable-next-line max-len
-                          '<div class="gm-floating-toolbar-wrapper"><div class="gm-floating-toolbar"><ul></ul></div></div>'
-                        : ''
-                }
+                ${options.floatingToolbar
+                ? // eslint-disable-next-line max-len
+                '<div class="gm-floating-toolbar-wrapper"><div class="gm-floating-toolbar"><ul></ul></div></div>'
+                : ''
+            }
             </div>
             <div class="gm-toolbar-wrapper">
                 <div class="gm-toolbar">

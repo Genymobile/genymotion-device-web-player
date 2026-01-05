@@ -26,7 +26,7 @@ import GamepadManager from './plugins/GamepadManager';
 import FingerPrint from './plugins/FingerPrint';
 import MediaManager from './plugins/MediaManager';
 
-import { generateUID } from './utils/helpers';
+import {generateUID} from './utils/helpers';
 import log from 'loglevel';
 import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
@@ -118,11 +118,9 @@ export default class DeviceRenderer {
              *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
              * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
              */
-            let fileUploaderWorkerBlob = require('./worker/FileUploaderWorker');
-            fileUploaderWorkerBlob = fileUploaderWorkerBlob
-                .toString()
-                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
-            const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
+            const workerFn = fileUploaderWorkerBlob.toString();
+            const workerBody = workerFn.substring(workerFn.indexOf('{') + 1, workerFn.lastIndexOf('}'));
+            const src = new Blob([workerBody], {type: 'application/javascript'});
             this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
         }
 
@@ -551,7 +549,7 @@ export default class DeviceRenderer {
                             popup.innerHTML =
                                 this.options.i18n.UNMUTE_INVITE ||
                                 'By default, the sound has been turned off, ' +
-                                    'please click anywhere to re-enable audio';
+                                'please click anywhere to re-enable audio';
                             this.videoWrapper.prepend(popup);
                             const addSound = () => {
                                 this.video.muted = false;

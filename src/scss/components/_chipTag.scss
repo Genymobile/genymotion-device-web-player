@@ -12,8 +12,8 @@
                 &::after {
                     content: ' ';
                     background-color: var(--gm-success-color);
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
+                    mask-image: url('../../assets/images/ic_check.svg');
+                    -webkit-mask-image: url('../../assets/images/ic_check.svg');
                     -webkit-mask-size: contain;
                     mask-size: contain;
                     -webkit-mask-repeat: no-repeat;

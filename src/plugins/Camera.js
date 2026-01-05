@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 
 import log from 'loglevel';
@@ -42,7 +41,7 @@ export default class Camera extends OverlayPlugin {
             title: this.instance.options.microphone
                 ? this.i18n.CAMERA_MIC_TITLE || 'Camera and microphone injection'
                 : this.i18n.CAMERA_TITLE || 'Camera injection',
-            onClick: async() => {
+            onClick: async () => {
                 await this.instance.mediaManager.toggleVideoStreaming();
                 if (this.instance.mediaManager.videoStreaming) {
                     this.toolbarBtn.setIndicator('active');
@@ -61,4 +60,4 @@ export default class Camera extends OverlayPlugin {
             this.toolbarBtn.disable();
         }
     }
-};
+}

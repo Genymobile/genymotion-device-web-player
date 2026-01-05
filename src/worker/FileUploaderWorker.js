@@ -1,4 +1,3 @@
-
 export default function () {
     const self = this;
     this.socket = null;
@@ -177,4 +176,4 @@ export default function () {
                 break;
         }
     };
-};
+}

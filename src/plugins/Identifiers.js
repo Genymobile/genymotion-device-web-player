@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {textInput, chipTag} from './util/components';
 
@@ -249,4 +248,4 @@ export default class Identifiers extends OverlayPlugin {
 
         return hash;
     }
-};
+}

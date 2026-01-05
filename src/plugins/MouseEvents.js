@@ -1,4 +1,3 @@
-
 /**
  * Instance mouse plugin.
  * Forward touch events to instance.
@@ -23,7 +22,7 @@ export default class MouseEvents {
 
         this.leftButtonPressed = false;
         this.boundEventListener = this.releaseAtPreviousPositionEvent.bind(this);
-        this.removeMouseUpListener = () => { };
+        this.removeMouseUpListener = () => {};
 
         this.instance.store.subscribe(
             ({isMouseEventsEnabled}) => {
@@ -239,4 +238,4 @@ export default class MouseEvents {
 
         return pixels;
     }
-};
+}

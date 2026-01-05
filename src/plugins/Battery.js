@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {slider, switchButton, textInput} from './util/components';
 
@@ -258,4 +257,4 @@ export default class Battery extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

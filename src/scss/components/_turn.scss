@@ -2,9 +2,8 @@
  * Turn server plugin styles
  */
 
-.device-renderer-instance { 
+.device-renderer-instance {
     .gm-default-turn-used {
-        
         position: absolute;
         left: -305px;
         color: var(--gm-text-color);
@@ -27,7 +26,7 @@
             content: ' ';
             position: absolute;
             bottom: 0;
-            right: -17px; 
+            right: -17px;
             margin-top: -10px;
             border-width: 10px;
             border-style: solid;

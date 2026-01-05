@@ -1,4 +1,3 @@
-
 /**
  * Display fullscreen plugin.
  * Gives the ability to display the renderer on the whole screen.
@@ -107,4 +106,4 @@ export default class Fullscreen {
             this.exitFullscreen();
         }
     }
-};
+}

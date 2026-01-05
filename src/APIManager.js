@@ -1,4 +1,3 @@
-
 export default class APIManager {
     constructor(instance) {
         this.instance = instance;
@@ -80,8 +79,8 @@ export default class APIManager {
                 );
             },
             description:
-            // eslint-disable-next-line max-len
-            'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
+                // eslint-disable-next-line max-len
+                'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
         });
         // Register open a widget
         this.registerFunction({
@@ -184,4 +183,4 @@ export default class APIManager {
         }, {});
         return exposedFunctions;
     }
-};
+}

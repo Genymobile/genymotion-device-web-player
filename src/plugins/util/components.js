@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 /**
  * Module for creating custom switch button components.
@@ -112,7 +111,7 @@ const slider = (() => {
 
         // Update UI based on the current slider value
         const updateUI = () => {
-            requestAnimationFrame(async() => {
+            requestAnimationFrame(async () => {
                 // if CSS isn't ready cursorWidth & sliderWidth haven't size, so we loop to waiting CSS ready
                 const start = performance.now();
                 while (sliderCursor.offsetWidth === 0 || sliderDiv.offsetWidth === 0) {
@@ -135,7 +134,7 @@ const slider = (() => {
                 progressBar.style.width = `${percentage}%`;
                 sliderCursor.style.left = adjustedPercentage;
 
-                const calc = ((percentage / 100) * sliderCursor.offsetWidth - (sliderCursor.offsetWidth / 2)) * -1;
+                const calc = ((percentage / 100) * sliderCursor.offsetWidth - sliderCursor.offsetWidth / 2) * -1;
                 sliderCursor.style.transform = `translate(${calc}px, -50%)`;
             });
         };

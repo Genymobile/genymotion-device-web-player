@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {textInput, chipTag} from './util/components';
 
@@ -389,4 +388,4 @@ export default class BasebandRIL extends OverlayPlugin {
 
         this.container.classList.add('gm-baseband-saved');
     }
-};
+}

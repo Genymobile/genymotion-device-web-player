@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -372,4 +371,4 @@ export default class Network extends OverlayPlugin {
                 };
             });
     }
-};
+}

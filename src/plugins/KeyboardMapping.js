@@ -1,4 +1,3 @@
-
 import {generateUID} from '../utils/helpers';
 
 /**
@@ -762,4 +761,4 @@ export default class KeyboardMapping {
             });
         }
     }
-};
+}

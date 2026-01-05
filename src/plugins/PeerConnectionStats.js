@@ -1,4 +1,3 @@
-
 /**
  * Instance peer connections plugin.
  * Provides peer connections statistics.
@@ -122,4 +121,4 @@ export default class PeerConnectionStats {
         delete this.connection;
         delete this.instance;
     }
-};
+}

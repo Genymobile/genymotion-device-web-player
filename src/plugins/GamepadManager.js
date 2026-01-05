@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
@@ -524,4 +523,4 @@ export default class GamepadManager {
             log.error(`no vibration actuator for controller ${guestIndex}`);
         }
     }
-};
+}

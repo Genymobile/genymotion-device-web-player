@@ -1,4 +1,3 @@
-
 /**
  * Stream bitrate plugin.
  * Provides video stream quality (audio and video bitrates) control.
@@ -54,4 +53,4 @@ export default class StreamBitrate {
             },
         });
     }
-};
+}

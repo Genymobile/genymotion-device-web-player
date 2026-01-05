@@ -56,7 +56,7 @@
                         }
 
                         .gm-screenrecord-button {
-                            +.gm-screenrecord-timer {
+                            + .gm-screenrecord-timer {
                                 bottom: 6px;
                             }
                         }
@@ -299,7 +299,7 @@
                             -webkit-mask-image: url('../../assets/images/ic_screenrecord.svg');
                             position: relative;
 
-                            +.gm-screenrecord-timer {
+                            + .gm-screenrecord-timer {
                                 position: absolute;
                                 left: 50%;
                                 transform: translateX(-50%);

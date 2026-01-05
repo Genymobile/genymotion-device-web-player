@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 
 import log from 'loglevel';
@@ -89,4 +88,4 @@ export default class Screenshot extends OverlayPlugin {
             document.body.removeChild(downloadLink);
         }, 100);
     }
-};
+}

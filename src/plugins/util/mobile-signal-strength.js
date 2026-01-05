@@ -1,4 +1,3 @@
-
 /**
  * List of possible network signal strengths to send to the VM.
  * Used only for android versions greater or equal to 8.

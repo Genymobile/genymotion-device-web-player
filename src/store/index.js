@@ -1,4 +1,3 @@
-
 import {generateUID} from '../utils/helpers';
 import log from 'loglevel';
 log.setDefaultLevel('debug');

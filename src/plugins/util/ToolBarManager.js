@@ -1,4 +1,3 @@
-
 import log from 'loglevel';
 export default class ToolbarManager {
     /**
@@ -71,7 +70,7 @@ export default class ToolbarManager {
             dataAttributes,
             isDisabled,
             button,
-            buttonIcon
+            buttonIcon,
         });
 
         // Return control functions for future manipulation
@@ -83,7 +82,7 @@ export default class ToolbarManager {
             setActive: (isActive = true) => this.setButtonActive(id, isActive),
             setIndicator: (typeOfIndicator) => this.setButtonIndicator(id, typeOfIndicator),
             getIndicator: () => this.getButtonIndicator(id),
-            htmlElement: button
+            htmlElement: button,
         };
     }
 
@@ -118,7 +117,7 @@ export default class ToolbarManager {
             button,
             title,
             isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
-            'toolbarTitleWidget'
+            'toolbarTitleWidget',
         );
     }
 
@@ -144,7 +143,7 @@ export default class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             this.instance.options.i18n.NOT_SUPPORTED || 'Not currently supported',
-            this.instance.options.toolbarPosition === 'right' ? 'left' : 'right'
+            this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
         );
         buttonIcon.classList.add('gm-disabled-icon-button');
 
@@ -302,4 +301,3 @@ export default class ToolbarManager {
         }
     }
 }
-

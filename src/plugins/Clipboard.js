@@ -1,4 +1,3 @@
-
 import OverlayPlugin from './util/OverlayPlugin';
 import {chipTag} from './util/components';
 
@@ -144,4 +143,4 @@ export default class Clipboard extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

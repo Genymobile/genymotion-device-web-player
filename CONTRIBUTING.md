@@ -24,6 +24,9 @@ request. It's not mandatory at all, but feel free to open an issue to present yo
 
 To start working on the Genymotion device web player, all you need if an HTML page to instanciate a player from your
 local copy of this repository.
+
+> **Note:** This project requires Node.js 20 or higher for development. You can use `nvm use` to automatically switch to the correct version defined in `.nvmrc`.
+
 Build the player in dev mode:
 
 ```sh

@@ -409,7 +409,7 @@ The Player API provides functionality for managing plugin options and websocket 
 
 **Description**: Enables fullscreen mode, but must be called from a user action in compliance with browser security rules.
 
-### 🖼 `utils`
+### 🧩 `widget`
 
 #### `openWidget`
 

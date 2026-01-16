@@ -30,6 +30,12 @@ export class GmChip extends HTMLElement {
      * @param {string} oldValue - Old attribute value.
      * @param {string} newValue - New attribute value.
      */
+    /**
+     * Called when an observed attribute changes.
+     * @param {string} name - Attribute name.
+     * @param {string} oldValue - Old attribute value.
+     * @param {string} newValue - New attribute value.
+     */
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue === newValue) {
             return;
@@ -60,18 +66,13 @@ export class GmChip extends HTMLElement {
             return;
         }
 
-        // Remove old class
+        this.#type = newType;
         if (this.#type) {
-            this.classList.remove('gm-tag-' + this.#type);
-        }
-
-        this.#type = newType || 'success';
-        this.classList.add('gm-tag-' + this.#type);
-
-        // Reflect to attribute
-        if (this.getAttribute('type') !== this.#type) {
             this.setAttribute('type', this.#type);
+        } else {
+            this.removeAttribute('type');
         }
+        this.#updateUI();
     }
 
     /**
@@ -94,14 +95,12 @@ export class GmChip extends HTMLElement {
         }
 
         this.#value = val;
-        const container = this.querySelector('.gm-tag-container');
-        if (container) {
-            container.textContent = this.#value;
-        }
-
-        if (this.getAttribute('value') !== this.#value) {
+        if (this.#value) {
             this.setAttribute('value', this.#value);
+        } else {
+            this.removeAttribute('value');
         }
+        this.#updateUI();
     }
 
     /**
@@ -124,20 +123,32 @@ export class GmChip extends HTMLElement {
      * Renders the component HTML.
      */
     #render() {
-        this.#updateTypeClass();
-
+        // Initial render structure
         const container = document.createElement('div');
         container.className = 'gm-tag-container';
-        container.textContent = this.#value;
         this.appendChild(container);
+
+        this.#updateUI();
     }
 
     /**
-     * Updates the CSS class based on type.
+     * Updates the UI (classes and text) based on internal state.
      */
-    #updateTypeClass() {
+    #updateUI() {
+        this.classList.forEach((cls) => {
+            if (cls.startsWith('gm-tag-')) {
+                this.classList.remove(cls);
+            }
+        });
+
         if (this.#type) {
             this.classList.add('gm-tag-' + this.#type);
+        }
+
+        // Update Text
+        const container = this.querySelector('.gm-tag-container');
+        if (container) {
+            container.textContent = this.#value;
         }
     }
 }

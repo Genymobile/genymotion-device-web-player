@@ -124,7 +124,6 @@ export default class IOThrottling extends OverlayPlugin {
         this.readByteRate = document.createElement('gm-text-input');
         this.readByteRate.setAttribute('value', '50');
         this.readByteRate.classList.add('gm-iothrottling-readbyterate');
-        // regexFilter: /^[0-9]*$/ -> regex-filter: ^[0-9]*$
         this.readByteRate.setAttribute('regex-filter', '^[0-9]*$');
 
         this.readByteRate.addEventListener('gm-text-input-change', (e) => {

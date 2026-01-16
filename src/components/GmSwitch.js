@@ -19,7 +19,7 @@ export class GmSwitch extends HTMLElement {
      * Called when custom element is appended to the DOM.
      */
     connectedCallback() {
-        // Render if not already rendered (e.g., after a disconnect/reconnect)
+        // Make sure the component is rendered only once
         if (!this.querySelector('input')) {
             this.#render();
         }
@@ -40,8 +40,18 @@ export class GmSwitch extends HTMLElement {
      * @param {string} newValue - New attribute value.
      */
     attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) {
+            return;
+        }
+
         if (name === 'checked') {
-            this.checked = newValue !== null;
+            const isChecked = newValue !== null;
+            if (this.#checked !== isChecked) {
+                this.#checked = isChecked;
+                this.#updateUI();
+            }
+        } else if (name === 'disabled') {
+            this.#updateUI();
         }
     }
 
@@ -59,21 +69,19 @@ export class GmSwitch extends HTMLElement {
      * @param {boolean} value - New checked state.
      */
     set checked(value) {
-        if (this.#checked === value) {
+        const isChecked = !!value;
+        if (this.#checked === isChecked) {
             return;
         }
 
-        this.#checked = !!value;
-        const input = this.querySelector('input');
-        if (input) {
-            input.checked = this.#checked;
-        }
-
-        if (this.#checked) {
+        this.#checked = isChecked;
+        // Reflect to attribute
+        if (isChecked) {
             this.setAttribute('checked', '');
         } else {
             this.removeAttribute('checked');
         }
+        this.#updateUI();
     }
 
     /**
@@ -84,13 +92,26 @@ export class GmSwitch extends HTMLElement {
 
         const input = document.createElement('input');
         input.type = 'checkbox';
-        input.checked = this.#checked;
 
         const slider = document.createElement('span');
         slider.className = 'switch-slider';
 
         this.appendChild(input);
         this.appendChild(slider);
+
+        // Initial UI update
+        this.#updateUI();
+    }
+
+    /**
+     * Updates the UI based on internal state.
+     */
+    #updateUI() {
+        const input = this.querySelector('input');
+        if (input) {
+            input.checked = this.#checked;
+            input.disabled = this.hasAttribute('disabled');
+        }
     }
 
     /**

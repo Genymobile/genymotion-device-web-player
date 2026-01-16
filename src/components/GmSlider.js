@@ -6,7 +6,6 @@ export class GmSlider extends HTMLElement {
     #min = 0;
     #max = 100;
     #value = 50;
-    #onCursorMove = null;
 
     static get observedAttributes() {
         return ['min', 'max', 'value', 'disabled'];
@@ -17,6 +16,7 @@ export class GmSlider extends HTMLElement {
     }
 
     connectedCallback() {
+        // Make sure the component is rendered only once
         if (!this.querySelector('.slider-input')) {
             this.render();
         }
@@ -36,28 +36,31 @@ export class GmSlider extends HTMLElement {
 
         switch (name) {
             case 'min':
+                if (val >= this.#max) {
+                    return;
+                }
                 this.#min = val;
+
+                if (this.#value < this.#min) {
+                    this.setAttribute('value', this.#min);
+                }
+
                 if (this.input) {
                     this.input.min = this.#min;
-                    // Validate value against new min
-                    if (this.#value < this.#min) {
-                        this.setAttribute('value', this.#min);
-                    }
                 }
                 break;
             case 'max':
-                // Validation for max: ensure it's not less than or equal to min
                 if (val <= this.#min) {
-                    // If invalid, revert the attribute to the old value or ignore.
                     return;
                 }
                 this.#max = val;
+
+                if (this.#value > this.#max) {
+                    this.setAttribute('value', this.#max);
+                }
+
                 if (this.input) {
                     this.input.max = this.#max;
-                    // Validate value against new max
-                    if (this.#value > this.#max) {
-                        this.setAttribute('value', this.#max);
-                    }
                 }
                 break;
             case 'value':
@@ -111,10 +114,6 @@ export class GmSlider extends HTMLElement {
         this.input.addEventListener('input', (event) => {
             const newVal = parseFloat(event.target.value);
             this.setAttribute('value', newVal);
-
-            if (this.#onCursorMove) {
-                this.#onCursorMove(newVal);
-            }
 
             // Dispatch input event for real-time updates
             this.dispatchEvent(
@@ -211,10 +210,6 @@ export class GmSlider extends HTMLElement {
 
     set value(newValue) {
         this.setAttribute('value', newValue);
-    }
-
-    set onCursorMove(callback) {
-        this.#onCursorMove = callback;
     }
 }
 

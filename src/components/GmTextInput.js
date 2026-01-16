@@ -35,6 +35,7 @@ export class GmTextInput extends HTMLElement {
      * Called when custom element is appended to the DOM.
      */
     connectedCallback() {
+        // Make sure the component is rendered only once
         if (!this.querySelector('.text-input-container')) {
             this.#render();
         }
@@ -74,9 +75,14 @@ export class GmTextInput extends HTMLElement {
             case 'error-message':
                 this.#updateErrorMessage(newValue);
                 break;
+            case 'append-text':
+                this.#updateAppendText(newValue);
+                break;
+            case 'unit-text':
+                this.#updateUnitText(newValue);
+                break;
             default:
                 this.#updateInputAttribute(name, newValue);
-                this.#updateUI(name, newValue);
                 break;
         }
     }
@@ -110,7 +116,6 @@ export class GmTextInput extends HTMLElement {
             return;
         }
 
-        // Respect regex-filter on programmatic set (restore legacy behavior)
         if (this.#regexFilter && !this.#regexFilter.test(strValue) && strValue !== '') {
             log.warn('GmTextInput: Ignored invalid value set programmatically:', strValue);
             return;
@@ -128,9 +133,9 @@ export class GmTextInput extends HTMLElement {
                 return;
             }
 
-            // Block negative input if min is non-negative
-            if (!isNaN(min) && min >= 0 && val < 0) {
-                log.warn('GmTextInput: Ignored negative value set programmatically (strict-range):', strValue);
+            // Block values less than min
+            if (!isNaN(min) && val < min) {
+                log.warn('GmTextInput: Ignored value < min set programmatically (strict-range):', strValue);
                 return;
             }
             // Block values greater than max
@@ -243,8 +248,8 @@ export class GmTextInput extends HTMLElement {
         });
 
         // Initial UI updates
-        this.#updateUI('append-text', this.getAttribute('append-text'));
-        this.#updateUI('unit-text', this.getAttribute('unit-text'));
+        this.#updateAppendText(this.getAttribute('append-text'));
+        this.#updateUnitText(this.getAttribute('unit-text'));
         this.#updateErrorMessage(this.getAttribute('error-message'));
     }
 
@@ -273,34 +278,37 @@ export class GmTextInput extends HTMLElement {
     }
 
     /**
-     * Updates specific UI elements based on attributes.
-     * @param {string} name - Attribute name.
-     * @param {string} value - Attribute value.
+     * Updates the append text.
+     * @param {string} value - The text to append.
      */
-    #updateUI(name, value) {
-        // Guard against DOM not being ready (e.g. before connectedCallback)
+    #updateAppendText(value) {
+        // Guard against DOM not being ready
         if (!this.querySelector('.text-input-container')) {
             return;
         }
 
-        if (name === 'append-text') {
-            const container = this.querySelector('.text-input-container');
-            let appendSpan = container.querySelector('.append-text');
-            if (value) {
-                if (!appendSpan) {
-                    appendSpan = document.createElement('span');
-                    appendSpan.classList.add('append-text');
-                    container.appendChild(appendSpan);
-                }
-                appendSpan.textContent = value;
-            } else if (appendSpan) {
-                appendSpan.remove();
+        const container = this.querySelector('.text-input-container');
+        let appendSpan = container.querySelector('.append-text');
+        if (value) {
+            if (!appendSpan) {
+                appendSpan = document.createElement('span');
+                appendSpan.classList.add('append-text');
+                container.appendChild(appendSpan);
             }
-        } else if (name === 'unit-text') {
-            if (this.unitTextEl) {
-                this.unitTextEl.textContent = value || '';
-                this.#updateBottomVisibility();
-            }
+            appendSpan.textContent = value;
+        } else if (appendSpan) {
+            appendSpan.remove();
+        }
+    }
+
+    /**
+     * Updates the unit text.
+     * @param {string} value - The unit text.
+     */
+    #updateUnitText(value) {
+        if (this.unitTextEl) {
+            this.unitTextEl.textContent = value || '';
+            this.#updateBottomVisibility();
         }
     }
 
@@ -377,8 +385,8 @@ export class GmTextInput extends HTMLElement {
             const max = parseFloat(this.getAttribute('max'));
             const val = parseFloat(newValue);
 
-            // Block negative input if min is non-negative
-            if (!isNaN(min) && min >= 0 && val < 0) {
+            // Block values less than min
+            if (!isNaN(min) && val < min) {
                 e.target.value = this.#value;
                 return;
             }
@@ -413,11 +421,10 @@ export class GmTextInput extends HTMLElement {
      */
     #handleChange(e) {
         /*
-         * We already dispatched change on input, but to be safe for non-input changes (paste? though paste triggers input)
-         * or just blur events.
-         * Avoid duplicate events if possible, but duplicate change is usually harmless for validation.
+         * Stop native change bubbling to avoid exposing the internal input's change event directly.
+         * We dispatch our own 'gm-text-input-change' instead.
          */
-        e.stopPropagation(); // Stop native change bubbling
+        e.stopPropagation();
         this.dispatchEvent(
             new CustomEvent('gm-text-input-change', {
                 detail: {value: this.#value},

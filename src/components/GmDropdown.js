@@ -19,6 +19,13 @@ export class GmDropdown extends HTMLElement {
             return;
         }
 
+        this.#render();
+    }
+
+    /**
+     * Renders the component structure.
+     */
+    #render() {
         this.classList.add('dropdown');
         if (this.#disabled) {
             this.classList.add('disabled');
@@ -47,6 +54,7 @@ export class GmDropdown extends HTMLElement {
             this.#toggleMenu();
         });
 
+        // Close the dropdown if the user clicks outside of it
         document.addEventListener('click', (e) => {
             if (!this.contains(e.target)) {
                 this.#closeMenu();
@@ -86,15 +94,18 @@ export class GmDropdown extends HTMLElement {
 
     /**
      * Set the list of items.
+     * Supported formats:
+     * - String: 'Item Label'
+     * - Object (Rich HTML): { element: HTMLElement, value: 'val' }
      * Re-renders the options and clears the value if it's no longer present.
-     * @param {Array} newItems - List of items.
+     * @param {Array<string|{element: HTMLElement, value: any}>} newItems - List of items.
      */
     set items(newItems) {
         this.#items = newItems;
         if (this.dropdownMenuDiv) {
             this.#renderOptions();
             const found = this.#items.some((i) => (i.value ?? i) === this.#value);
-            if (!found && this.#items.length > 0) {
+            if (!found) {
                 this.#value = '';
                 this.selectedValueDiv.textContent = 'Select...';
             }
@@ -142,7 +153,7 @@ export class GmDropdown extends HTMLElement {
 
     /**
      * Helper to retrieve the display label for a given value.
-     * @param {string|number} val - The value to look for.
+     * @param {string} val - The value to look for.
      * @returns {string} The display text.
      */
     #getDisplayValue(val) {
@@ -248,10 +259,6 @@ export class GmDropdown extends HTMLElement {
                  * Fallback: childNodes array.
                  */
                 parent = this.dropdownMenuDiv.children[index];
-            }
-
-            if (!parent) {
-                return;
             }
 
             // Remove existing check

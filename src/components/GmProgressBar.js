@@ -19,6 +19,7 @@ export class GmProgressBar extends HTMLElement {
      * Called when custom element is appended to the DOM.
      */
     connectedCallback() {
+        // Make sure the component is rendered only once
         if (!this.querySelector('.gm-progress-container')) {
             this.#render();
         }

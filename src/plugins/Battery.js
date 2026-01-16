@@ -45,10 +45,8 @@ export default class Battery extends OverlayPlugin {
             this.updateUIBatteryChargingState();
 
             const numValue = parseFloat(values[1]);
-            // Only update slider if value is valid number, otherwise keep current value
-            if (!Number.isNaN(numValue)) {
-                this.chargeSlider.value = numValue;
-            }
+            this.chargeSlider.value = numValue;
+
             this.chargeInput.value = values[1];
             this.updateUIBatteryChargingPercent(values[1]);
         });
@@ -199,11 +197,11 @@ export default class Battery extends OverlayPlugin {
         this.instance.addListener(this.chargeInput, 'keydown', (e) => {
             if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                const newValue = Math.min(100, Number(this.chargeInput.value) + 1);
+                const newValue = Number(this.chargeInput.value) + 1;
                 this.chargeInput.setValue(newValue, {emit: true});
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                const newValue = Math.max(0, Number(this.chargeInput.value) - 1);
+                const newValue = Number(this.chargeInput.value) - 1;
                 this.chargeInput.setValue(newValue, {emit: true});
             }
         });

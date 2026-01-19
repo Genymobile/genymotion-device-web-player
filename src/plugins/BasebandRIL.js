@@ -116,7 +116,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.networkOperatorMMC.setAttribute('regex-filter', '^[0-9]{0,6}$');
         this.networkOperatorMMC.setAttribute('regex-valid', '^[0-9]{5,6}$');
 
-        this.networkOperatorMMC.addEventListener('gm-text-input-change', () => {
+        this.networkOperatorMMC.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });
@@ -130,7 +130,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.networkOperatorName.classList.add('gm-network-name');
         this.networkOperatorName.setAttribute('placeholder', 'eg: Verizon');
 
-        this.networkOperatorName.addEventListener('gm-text-input-change', () => {
+        this.networkOperatorName.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });
@@ -163,7 +163,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.simOperatorMMC.setAttribute('regex-filter', '^[0-9]{0,6}$');
         this.simOperatorMMC.setAttribute('regex-valid', '^[0-9]{5,6}$');
 
-        this.simOperatorMMC.addEventListener('gm-text-input-change', () => {
+        this.simOperatorMMC.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });
@@ -177,7 +177,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.simOperatorName.classList.add('gm-sim-name');
         this.simOperatorName.setAttribute('placeholder', 'eg: AT&T');
 
-        this.simOperatorName.addEventListener('gm-text-input-change', () => {
+        this.simOperatorName.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });
@@ -197,7 +197,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.simMSIN.setAttribute('regex-filter', '^[0-9]{0,10}$');
         this.simMSIN.setAttribute('regex-valid', '^[0-9]{9,10}$');
 
-        this.simMSIN.addEventListener('gm-text-input-change', () => {
+        this.simMSIN.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });
@@ -213,7 +213,7 @@ export default class BasebandRIL extends OverlayPlugin {
         this.simOperatorPhoneNumber.setAttribute('regex-filter', '^[0-9+\\-().\\s]{0,25}$');
         this.simOperatorPhoneNumber.setAttribute('regex-valid', '^[0-9+\\-().\\s]+$');
 
-        this.simOperatorPhoneNumber.addEventListener('gm-text-input-change', () => {
+        this.simOperatorPhoneNumber.addEventListener('gm-text-input-input', () => {
             this.checkIfFormIsValid();
             this.appliedTag.visible = false;
         });

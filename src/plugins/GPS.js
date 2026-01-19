@@ -155,7 +155,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.latitude.setAttribute('max', '90');
         this.inputComponents.latitude.setAttribute('step', 'any');
 
-        this.inputComponents.latitude.addEventListener('gm-text-input-change', () => {
+        this.inputComponents.latitude.addEventListener('gm-text-input-input', () => {
             if (!this.inputComponents.latitude.checkValidity()) {
                 this.inputComponents.latitude.setErrorMessage('Between -90 and 90');
             } else {
@@ -182,7 +182,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.longitude.setAttribute('max', '180');
         this.inputComponents.longitude.setAttribute('step', 'any');
 
-        this.inputComponents.longitude.addEventListener('gm-text-input-change', () => {
+        this.inputComponents.longitude.addEventListener('gm-text-input-input', () => {
             if (!this.inputComponents.longitude.checkValidity()) {
                 this.inputComponents.longitude.setErrorMessage('Between -180 and 180');
             } else {
@@ -217,7 +217,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.altitude.setAttribute('max', '10000');
         this.inputComponents.altitude.setAttribute('step', 'any');
 
-        this.inputComponents.altitude.addEventListener('gm-text-input-change', () => {
+        this.inputComponents.altitude.addEventListener('gm-text-input-input', () => {
             if (!this.inputComponents.altitude.checkValidity()) {
                 this.inputComponents.altitude.setErrorMessage('Between -10,000 and 10,000');
             } else {
@@ -267,7 +267,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.accuracy.setAttribute('max', '200');
         this.inputComponents.accuracy.setAttribute('strict-range', '');
 
-        this.inputComponents.accuracy.addEventListener('gm-text-input-change', (e) => {
+        this.inputComponents.accuracy.addEventListener('gm-text-input-input', (e) => {
             const value = parseFloat(e.detail.value) || 0;
             this.accuracySlider.value = value;
             this.checkErrors();
@@ -310,7 +310,7 @@ export default class GPS extends OverlayPlugin {
             this.inputComponents.speed.setAttribute('max', '399.99');
             this.inputComponents.speed.setAttribute('step', '0.01');
 
-            this.inputComponents.speed.addEventListener('gm-text-input-change', () => {
+            this.inputComponents.speed.addEventListener('gm-text-input-input', () => {
                 if (!this.inputComponents.speed.checkValidity()) {
                     this.inputComponents.speed.setErrorMessage('Between 0 and 399.99');
                 } else {
@@ -362,7 +362,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.bearing.setAttribute('max', '360');
         this.inputComponents.bearing.setAttribute('strict-range', '');
 
-        this.inputComponents.bearing.addEventListener('gm-text-input-change', (e) => {
+        this.inputComponents.bearing.addEventListener('gm-text-input-input', (e) => {
             const value = parseFloat(e.detail.value) || 0;
             this.bearingSlider.value = value;
             this.checkErrors();

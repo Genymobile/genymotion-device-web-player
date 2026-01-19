@@ -186,7 +186,7 @@ export default class Battery extends OverlayPlugin {
         this.chargeInput.setAttribute('strict-range', '');
         this.chargeInput.classList.add('gm-charge-input', 'gm-no-error-space');
 
-        this.chargeInput.addEventListener('gm-text-input-change', (e) => {
+        this.chargeInput.addEventListener('gm-text-input-input', (e) => {
             const value = e.detail.value;
             this.chargeSlider.value = parseFloat(value) || 0;
             this.updateUIBatteryChargingPercent(value);

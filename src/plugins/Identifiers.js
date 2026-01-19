@@ -95,7 +95,7 @@ export default class Identifiers extends OverlayPlugin {
         this.androidInput.setAttribute('regex-filter', `^[${HEX}]{0,16}$`);
         this.androidInput.setAttribute('regex-valid', `^[${HEX}]{16}$`);
 
-        this.androidInput.addEventListener('gm-text-input-change', () => {
+        this.androidInput.addEventListener('gm-text-input-input', () => {
             this.appliedTag.visible = false;
             this.checkIDsValidity();
             if (!this.androidInput.checkValidity()) {
@@ -128,7 +128,7 @@ export default class Identifiers extends OverlayPlugin {
         this.deviceInput.setAttribute('regex-filter', `^[${HEX}]{0,15}$`);
         this.deviceInput.setAttribute('regex-valid', `^[${HEX}]{14,15}$`);
 
-        this.deviceInput.addEventListener('gm-text-input-change', () => {
+        this.deviceInput.addEventListener('gm-text-input-input', () => {
             this.appliedTag.visible = false;
             this.checkIDsValidity();
             if (!this.deviceInput.checkValidity()) {

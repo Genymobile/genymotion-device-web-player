@@ -69,6 +69,9 @@ export default class DeviceRenderer {
         // Event callbacks
         this.callbacks = {};
 
+        // Plugins/Widgets registry
+        this.widgets = [];
+
         // Event listeners
         this.allListeners = [];
 
@@ -975,6 +978,24 @@ export default class DeviceRenderer {
         if (this.webRTCWebsocket.readyState === 0) {
             return;
         }
+
+        // Cleanup specific widget resources dynamically
+        this.widgets.forEach((widget) => {
+            if (widget && typeof widget.destroy === 'function') {
+                widget.destroy();
+            }
+        });
+
+        if (this.store && this.store.destroy) {
+            this.store.destroy();
+        }
+
+        if (this.fileUploaderWorkerBlobSRC) {
+            URL.revokeObjectURL(this.fileUploaderWorkerBlobSRC);
+            this.fileUploaderWorkerBlobSRC = null;
+        }
+
+        this.emit('destroyed');
 
         this.removeAllListeners();
         this.disconnect();

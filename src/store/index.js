@@ -103,7 +103,11 @@ const createStore = (instance, reducer) => {
         return unsubscribe;
     };
 
-    instance.store = {state: initialState, dispatch, subscribe, getters};
+    const destroy = () => {
+        listeners.length = 0;
+    };
+
+    instance.store = {state: initialState, dispatch, subscribe, getters, destroy};
 };
 
 const reducer = (state, action) => {

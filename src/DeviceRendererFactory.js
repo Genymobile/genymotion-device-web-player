@@ -78,9 +78,7 @@ const defaultOptions = {
  * Setup & create instances of the device renderer
  */
 export default class DeviceRendererFactory {
-    constructor() {
-        this.instances = [];
-    }
+    constructor() {}
 
     /**
      * Setup a device renderer instance in the given dom element, for the device instance identified by its instanceWebRTCUrl.
@@ -170,8 +168,6 @@ export default class DeviceRendererFactory {
         instance.toolbarManager = new ToolbarManager(instance);
         instance.tooltipManager = new TooltipManager(instance);
 
-        this.instances.push(instance);
-
         this.loadPlugins(instance);
         this.loadToolbar(instance);
         instance.onWebRTCReady();
@@ -253,7 +249,8 @@ export default class DeviceRendererFactory {
                 }
                 // eslint-disable-next-line no-unused-expressions
                 if (plugin.class) {
-                    new plugin.class(instance, ...args);
+                    const widget = new plugin.class(instance, ...args);
+                    instance.widgets.push(widget);
                 }
             }
         });

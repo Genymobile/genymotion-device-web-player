@@ -38,7 +38,8 @@ export default class Camera extends OverlayPlugin {
         this.renderWidget();
 
         // Listen for permission changes
-        window.addEventListener('gm-cameraPermissionChange', () => this.enumerateDevices());
+        this.onCameraPermissionChange = () => this.enumerateDevices();
+        window.addEventListener('gm-cameraPermissionChange', this.onCameraPermissionChange);
     }
 
     /**
@@ -646,6 +647,11 @@ export default class Camera extends OverlayPlugin {
                 }
                 return true;
             });
+
+            if (this.audioNodes.length === 0 && this.audioContext) {
+                this.audioContext.close();
+                this.audioContext = null;
+            }
         }
 
         const mediaElement = type === 'front' ? this.frontMediaElement : this.backMediaElement;
@@ -774,6 +780,22 @@ export default class Camera extends OverlayPlugin {
         } catch (error) {
             log.error(`Error starting ${type} video:`, error);
             placeholder.classList.remove('hidden');
+        }
+    }
+
+    destroy() {
+        window.removeEventListener('gm-cameraPermissionChange', this.onCameraPermissionChange);
+
+        this.stopFileStream('front');
+        this.stopFileStream('back');
+
+        if (this.audioContext) {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
+
+        if (this.audioNodes) {
+            this.audioNodes = [];
         }
     }
 }

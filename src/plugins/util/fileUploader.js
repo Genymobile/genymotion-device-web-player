@@ -19,6 +19,7 @@ const fileUploader = (() => {
      * @param {string} [options.classes=''] - Additional CSS classes to apply
      * @param {string} [options.invalidFileTypeMessage=''] - Custom error message for invalid file types
      * @param {Object} i18n - i18n object translation
+     * @param {string} mode - 'upload' or 'select', this plugin is used for both upload and select file (same ui, minor difference in functionnalities)
      * @returns {Object} Object containing the file uploader element and control methods
      * @property {HTMLElement} element - The file uploader DOM element
      * @property {Function} setEnabled - Method to enable/disable the file uploader
@@ -288,12 +289,15 @@ const fileUploader = (() => {
                     const acceptedTypes = accept.split(',').map((t) => t.trim().toLowerCase());
                     isValid = acceptedTypes.some((type) => {
                         if (type.endsWith('/*')) {
+                            // e.g. "image/*, vidoe/* => it's a generic mime type which accept all images format"
                             const mainType = type.split('/')[0];
                             return file.type.startsWith(`${mainType}/`);
                         }
                         if (type.startsWith('.')) {
+                            // e.g. ".jpg"
                             return file.name.toLowerCase().endsWith(type);
                         }
+                        // e.g. "image/jpeg"
                         return file.type === type;
                     });
                 }

@@ -405,14 +405,6 @@ export class GmTextInput extends HTMLElement {
                 bubbles: true,
             }),
         );
-
-        // Dispatch change event immediately for validation on input
-        this.dispatchEvent(
-            new CustomEvent('gm-text-input-change', {
-                detail: {value: this.#value},
-                bubbles: true,
-            }),
-        );
     }
 
     /**

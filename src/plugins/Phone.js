@@ -72,7 +72,7 @@ export default class Phone extends OverlayPlugin {
         this.phoneInput.setAttribute('regex-filter', '^[0-9+\\-().\\s]{1,25}$');
         this.phoneInput.setAttribute('regex-valid', '^[0-9+\\-().\\s]+$');
 
-        this.phoneInput.addEventListener('gm-text-input-change', () => {
+        this.phoneInput.addEventListener('gm-text-input-input', () => {
             if (this.phoneInput.checkValidity()) {
                 this.phoneBtn.disabled = false;
                 this.phoneInput.setErrorMessage('');

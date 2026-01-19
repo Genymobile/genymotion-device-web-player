@@ -90,11 +90,9 @@ describe('IOThrottling Plugin', () => {
 
                 sendEventSpy.mockClear();
                 instance.outgoingMessages = [];
-                const dropDownProfile = diskio.profilesForDropdown.find((p) => p.value === profile.readByteRate);
-                diskio.dropdownProfile.value = dropDownProfile.value;
-                diskio.dropdownProfile.dispatchEvent(
-                    new CustomEvent('gm-dropdown-change', {detail: {value: dropDownProfile.value}, bubbles: true}),
-                );
+                const dropDownProfileIndex = diskio.profilesForDropdown
+                    .findIndex((p) => p.value === profile.readByteRate);
+                diskio.dropdownProfile.dropdownMenuDiv.children[dropDownProfileIndex].click();
                 diskio.widget.querySelector('.gm-btn').click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(1);
                 expect(instance.outgoingMessages[0]).toEqual({
@@ -105,15 +103,12 @@ describe('IOThrottling Plugin', () => {
 
             sendEventSpy.mockClear();
             instance.outgoingMessages = [];
-            const dropDownProfile = diskio.profilesForDropdown.find((p) => p.value === 'Custom');
-            diskio.dropdownProfile.value = dropDownProfile.value;
-            diskio.dropdownProfile.dispatchEvent(
-                new CustomEvent('gm-dropdown-change', {detail: {value: dropDownProfile.value}, bubbles: true}),
-            );
-            diskio.readByteRate.value = 69;
-            diskio.readByteRate.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: 69}, bubbles: true}),
-            );
+            const dropDownProfileIndex = diskio.profilesForDropdown.findIndex((p) => p.value === 'Custom');
+            diskio.dropdownProfile.dropdownMenuDiv.children[dropDownProfileIndex].click();
+
+            const input = diskio.readByteRate.querySelector('input');
+            input.value = 69;
+            input.dispatchEvent(new Event('input', {bubbles: true}));
             diskio.widget.querySelector('.gm-btn').click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
             expect(instance.outgoingMessages[0]).toEqual({

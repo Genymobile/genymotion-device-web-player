@@ -37,7 +37,7 @@ describe('FingerPrint Plugin', () => {
             const switchEl = document.querySelector('.autoValidationSwitch');
             expect(switchEl).toBeTruthy();
             expect(switchEl.checked).toBe(false);
-            switchEl.dispatchEvent(new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}));
+            switchEl.click();
             expect(switchEl.checked).toBe(true);
 
             // body
@@ -79,9 +79,7 @@ describe('FingerPrint Plugin', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
             const autoValidationSwitch = document.querySelector('.autoValidationSwitch');
-            autoValidationSwitch.dispatchEvent(
-                new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
-            );
+            autoValidationSwitch.click();
 
             instance.emit('fingerprint', 'current_status scanning');
             instance.emit('fingerprint', 'scan start');
@@ -106,9 +104,7 @@ describe('FingerPrint Plugin', () => {
                         .querySelector('.gm-fingerprint-button')
                         .parentElement.classList.contains('gm-toolbar-dot-active'),
                 ).toBe(false);
-                autoValidation.dispatchEvent(
-                    new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
-                );
+                autoValidation.click();
                 expect(
                     document
                         .querySelector('.gm-fingerprint-button')

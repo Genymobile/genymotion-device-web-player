@@ -131,20 +131,17 @@ describe('Network Plugin', () => {
             network = new Network(instance, {});
         });
 
-        test('wifi emit status event', () => {
+        test('wifi state', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            // Simulate gm-switch change to checked
-            network.wifiSwitch.dispatchEvent(
-                new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
-            );
+            const wifiSwitch = network.wifiSwitch;
+            wifiSwitch.click();
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif wifi']});
         });
 
-        test('mobile data emit status event', () => {
+        test('mobile data state', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.mobileDataSwitch.dispatchEvent(
-                new CustomEvent('gm-switch-change', {detail: {checked: true}, bubbles: true}),
-            );
+            const mobileDataSwitch = network.mobileDataSwitch;
+            mobileDataSwitch.click();
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif mobile']});
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'network_profile', messages: ['notify phone']});
         });
@@ -152,27 +149,19 @@ describe('Network Plugin', () => {
         test('change network_profile emit event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             // change network profile
-            const dropDownSelectProfile = network.profilesForDropdownNetworkType.find((p) => p.value === 'lte');
-            network.dropdownNetworkType.value = dropDownSelectProfile.value;
-            network.dropdownNetworkType.dispatchEvent(
-                new CustomEvent('gm-dropdown-change', {detail: {value: dropDownSelectProfile.value}, bubbles: true}),
-            );
+            const dropDownSelectProfileIndex = network.profilesForDropdownNetworkType
+                .findIndex((p) => p.value === 'lte');
+            network.dropdownNetworkType.dropdownMenuDiv.children[dropDownSelectProfileIndex].click();
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setprofile mobile lte'],
             });
 
             // change signal strength
-            const dropdownSignalStrengthProfile = network.profilesForDropdownSignalStrength.find(
+            const dropdownSignalStrengthProfileIndex = network.profilesForDropdownSignalStrength.findIndex(
                 (p) => p.value === 'great',
             );
-            network.selectMobileSignalStrength.value = dropdownSignalStrengthProfile.value;
-            network.selectMobileSignalStrength.dispatchEvent(
-                new CustomEvent('gm-dropdown-change', {
-                    detail: {value: dropdownSignalStrengthProfile.value},
-                    bubbles: true,
-                }),
-            );
+            network.selectMobileSignalStrength.dropdownMenuDiv.children[dropdownSignalStrengthProfileIndex].click();
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setsignalstrength mobile great'],

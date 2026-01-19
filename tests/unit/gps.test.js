@@ -69,10 +69,10 @@ describe('GPS Plugin', () => {
                 test(`button disabled when ${field} is invalid`, () => {
                     const fieldInput = gps.inputComponents[field];
                     const submitButton = document.querySelector('.gm-gps-update');
-                    fieldInput.value = value;
-                    fieldInput.dispatchEvent(
-                        new CustomEvent('gm-text-input-change', {detail: {value: value}, bubbles: true}),
-                    );
+
+                    const input = fieldInput.querySelector('input');
+                    input.value = value;
+                    input.dispatchEvent(new Event('input', {bubbles: true}));
                     if (field !== 'accuracy' && field !== 'bearing') {
                         expect(
                             fieldInput.querySelector('.text-input-message').classList.contains('hidden'),
@@ -109,63 +109,13 @@ describe('GPS Plugin', () => {
             sendEventSpy.mockRestore();
         });
 
-        /*
-         *test('invalid input value', () => {
-         *    gps.inputComponents.altitude.value = 'jean-michel';
-         *    gps.inputComponents.altitude.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *
-         *    gps.inputComponents.latitude.value = 'jean-michel';
-         *    gps.inputComponents.latitude.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *
-         *    gps.inputComponents.longitude.value = 'jean-michel';
-         *    gps.inputComponents.longitude.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *
-         *    gps.inputComponents.accuracy.value = 'jean-michel';
-         *    gps.inputComponents.accuracy.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *
-         *    gps.inputComponents.bearing.value = 'jean-michel';
-         *    gps.inputComponents.bearing.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *
-         *    gps.inputComponents.speed.value = 'jean-michel';
-         *    gps.inputComponents.speed.dispatchEvent(new CustomEvent('gm-text-input-change', { detail: { value: 'jean-michel' }, bubbles: true }));
-         *    expect(document.querySelector('.gm-gps-update').disabled).toBeTruthy();
-         *
-         *    document.querySelector('.gm-gps-update').click();
-         *
-         *    expect(sendEventSpy).toHaveBeenCalledTimes(0);
-         *});
-         */
-
         test('min value', () => {
-            gps.inputComponents.altitude.value = '-10000';
-            gps.inputComponents.altitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '-10000'}, bubbles: true}),
-            );
-
-            gps.inputComponents.latitude.value = '-90';
-            gps.inputComponents.latitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '-90'}, bubbles: true}),
-            );
-
-            gps.inputComponents.longitude.value = '-180';
-            gps.inputComponents.longitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '-180'}, bubbles: true}),
-            );
-
-            gps.inputComponents.accuracy.value = '0';
-            gps.inputComponents.accuracy.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '0'}, bubbles: true}),
-            );
-
-            gps.inputComponents.bearing.value = '0';
-            gps.inputComponents.bearing.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '0'}, bubbles: true}),
-            );
-
-            gps.inputComponents.speed.value = '0';
-            gps.inputComponents.speed.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '0'}, bubbles: true}),
-            );
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['-10000', '-90', '-180', '0', '0', '0'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -184,35 +134,12 @@ describe('GPS Plugin', () => {
         });
 
         test('max value', () => {
-            gps.inputComponents.altitude.value = '10000';
-            gps.inputComponents.altitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '10000'}, bubbles: true}),
-            );
-
-            gps.inputComponents.latitude.value = '90';
-            gps.inputComponents.latitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '90'}, bubbles: true}),
-            );
-
-            gps.inputComponents.longitude.value = '180';
-            gps.inputComponents.longitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '180'}, bubbles: true}),
-            );
-
-            gps.inputComponents.accuracy.value = '200';
-            gps.inputComponents.accuracy.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '200'}, bubbles: true}),
-            );
-
-            gps.inputComponents.bearing.value = '360';
-            gps.inputComponents.bearing.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '360'}, bubbles: true}),
-            );
-
-            gps.inputComponents.speed.value = '399.99';
-            gps.inputComponents.speed.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '399.99'}, bubbles: true}),
-            );
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['10000', '90', '180', '200', '360', '399.99'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -231,35 +158,12 @@ describe('GPS Plugin', () => {
         });
 
         test('nominal value', () => {
-            gps.inputComponents.altitude.value = '420';
-            gps.inputComponents.altitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '420'}, bubbles: true}),
-            );
-
-            gps.inputComponents.latitude.value = '69'; // Nice
-            gps.inputComponents.latitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '69'}, bubbles: true}),
-            );
-
-            gps.inputComponents.longitude.value = '3.14';
-            gps.inputComponents.longitude.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '3.14'}, bubbles: true}),
-            );
-
-            gps.inputComponents.accuracy.value = '42';
-            gps.inputComponents.accuracy.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '42'}, bubbles: true}),
-            );
-
-            gps.inputComponents.bearing.value = '13';
-            gps.inputComponents.bearing.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '13'}, bubbles: true}),
-            );
-
-            gps.inputComponents.speed.value = '399';
-            gps.inputComponents.speed.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '399'}, bubbles: true}),
-            );
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['420', '69', '3.14', '42', '13', '399'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);

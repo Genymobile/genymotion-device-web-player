@@ -113,35 +113,18 @@ describe('BasebandRIL Plugin', () => {
             instance.emit('baseband', 'network operator 123456');
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
-            baseband.networkOperatorMMC.value = '123456';
-            baseband.networkOperatorMMC.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '123456'}, bubbles: true}),
-            );
+            const setInput = (component, value) => {
+                const input = component.querySelector('input');
+                input.value = value;
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            };
 
-            baseband.networkOperatorName.value = 'value';
-            baseband.networkOperatorName.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: 'value'}, bubbles: true}),
-            );
-
-            baseband.simOperatorMMC.value = '123456';
-            baseband.simOperatorMMC.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '123456'}, bubbles: true}),
-            );
-
-            baseband.simOperatorName.value = 'value';
-            baseband.simOperatorName.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: 'value'}, bubbles: true}),
-            );
-
-            baseband.simMSIN.value = '012345678';
-            baseband.simMSIN.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '012345678'}, bubbles: true}),
-            );
-
-            baseband.simOperatorPhoneNumber.value = '0011223344';
-            baseband.simOperatorPhoneNumber.dispatchEvent(
-                new CustomEvent('gm-text-input-change', {detail: {value: '0011223344'}, bubbles: true}),
-            );
+            setInput(baseband.networkOperatorMMC, '123456');
+            setInput(baseband.networkOperatorName, 'value');
+            setInput(baseband.simOperatorMMC, '123456');
+            setInput(baseband.simOperatorName, 'value');
+            setInput(baseband.simMSIN, '012345678');
+            setInput(baseband.simOperatorPhoneNumber, '0011223344');
             baseband.submitBtn.click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -157,9 +140,9 @@ describe('BasebandRIL Plugin', () => {
                 ],
             });
 
-            baseband.simOperatorName.value = 'value';
-            baseband.simMSIN.value = '012345678';
-            baseband.simOperatorPhoneNumber.value = '0011223344';
+            setInput(baseband.simOperatorName, 'value');
+            setInput(baseband.simMSIN, '012345678');
+            setInput(baseband.simOperatorPhoneNumber, '0011223344');
             baseband.submitBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(2);
             expect(instance.outgoingMessages[1]).toEqual({

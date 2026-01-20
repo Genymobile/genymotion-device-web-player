@@ -502,12 +502,6 @@ export default class Camera extends OverlayPlugin {
             canvas.height = sourceHeight || 720;
             const ctx = canvas.getContext('2d');
 
-            const drawFrame = () => {
-                if (sourceWidth && sourceHeight) {
-                    ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
-                }
-            };
-
             let audioTrack = null;
             /*
              * If the instance supports microphone and we are playing a video,
@@ -576,7 +570,7 @@ export default class Camera extends OverlayPlugin {
                  * We destroyed the locally created `mediaElement` because it won't be used.
                  * IMPORTANT: Do NOT call `stopFileStream` here, as it would incorrectly reset the global state
                  * of the *new* currently active request (if any).
-                */
+                 */
                 if (mediaElement) {
                     mediaElement.src = '';
                     if (mediaElement.parentNode) {
@@ -586,13 +580,48 @@ export default class Camera extends OverlayPlugin {
                 return;
             }
 
-            const drawLoop = () => {
-                if (finalStream.active) {
-                    drawFrame();
-                    requestAnimationFrame(drawLoop);
+            if (isImage) {
+                // Optimization: Draw image once, no loop needed
+                if (sourceWidth && sourceHeight) {
+                    ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
                 }
-            };
-            drawLoop();
+            } else {
+                // Optimization: Video draw loop, use requestVideoFrameCallback if available for efficient sync, otherwise fallback to throttled rAF
+                this[type + 'UseVideoFrameCallback'] = 'requestVideoFrameCallback' in mediaElement;
+                let lastTime = 0;
+                // Target 30fps for the fallback throttle
+                const throttleInterval = 1000 / 30;
+
+                const drawLoop = (now) => {
+                    // Stop if the stream has been cancelled (ID check)
+                    if (!this[type + 'LoadingId']) {
+                        return;
+                    }
+
+                    if (this[type + 'UseVideoFrameCallback']) {
+                        if (sourceWidth && sourceHeight) {
+                            ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
+                        }
+                        this[type + 'AnimationId'] = mediaElement.requestVideoFrameCallback(drawLoop);
+                    } else {
+                        // Throttling logic for rAF
+                        if (!lastTime || now - lastTime >= throttleInterval) {
+                            lastTime = now;
+                            if (sourceWidth && sourceHeight) {
+                                ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
+                            }
+                        }
+                        this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
+                    }
+                };
+
+                // Start the loop
+                if (this[type + 'UseVideoFrameCallback']) {
+                    this[type + 'AnimationId'] = mediaElement.requestVideoFrameCallback(drawLoop);
+                } else {
+                    this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
+                }
+            }
 
             // Hide loader
             loader.classList.add('hidden');
@@ -629,6 +658,20 @@ export default class Camera extends OverlayPlugin {
 
         // Invalidate any pending loading request
         this[type + 'LoadingId'] = null;
+
+        // Cancel any running animation
+        if (this[type + 'AnimationId']) {
+            if (this[type + 'UseVideoFrameCallback']) {
+                const mediaElement = type === 'front' ? this.frontMediaElement : this.backMediaElement;
+                if (mediaElement && typeof mediaElement.cancelVideoFrameCallback === 'function') {
+                    mediaElement.cancelVideoFrameCallback(this[type + 'AnimationId']);
+                }
+            } else {
+                cancelAnimationFrame(this[type + 'AnimationId']);
+            }
+            this[type + 'AnimationId'] = null;
+            this[type + 'UseVideoFrameCallback'] = false;
+        }
 
         const loader = type === 'front' ? this.frontLoader : this.backLoader;
         if (loader) {

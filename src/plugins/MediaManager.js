@@ -281,7 +281,16 @@ export default class MediaManager {
             if (sender) {
                 log.debug(`Replacing ${type} video track on sender`);
                 await sender.replaceTrack(stream.getVideoTracks()[0]);
+                sender.setStreams(stream);
                 this.setTransceiverDirection(sender, 'sendrecv');
+
+                // Limit bitrate to avoid congestion (1.5 Mbps)
+                const parameters = sender.getParameters();
+                if (!parameters.encodings) {
+                    parameters.encodings = [{}];
+                }
+                parameters.encodings[0].maxBitrate = 1500000;
+                await sender.setParameters(parameters).catch(e => log.warn('Failed to set sender parameters', e));
             } else {
                 // Try to find an existing video transceiver that is recvonly (reusable)
                 const transceivers = this.instance.peerConnection.getTransceivers();
@@ -312,6 +321,15 @@ export default class MediaManager {
                     } else {
                         this.backCameraSender = transceiver.sender;
                     }
+
+                    const newSender = transceiver.sender;
+                    const parameters = newSender.getParameters();
+                    if (!parameters.encodings) {
+                        parameters.encodings = [{}];
+                    }
+                    parameters.encodings[0].maxBitrate = 1500000;
+                    await newSender.setParameters(parameters)
+                        .catch((e) => log.warn('Failed to set new sender parameters', e));
                 }
             }
         } else {

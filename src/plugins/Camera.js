@@ -497,10 +497,26 @@ export default class Camera extends OverlayPlugin {
             const sourceWidth = isImage ? mediaElement.width : mediaElement.videoWidth;
             const sourceHeight = isImage ? mediaElement.height : mediaElement.videoHeight;
 
+            // Fixed target resolution (16:9) to ensure stability and standard aspect ratio
+            const targetWidth = 1280;
+            const targetHeight = 720;
+
             const canvas = document.createElement('canvas');
-            canvas.width = sourceWidth || 1280;
-            canvas.height = sourceHeight || 720;
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
+
+            // Fill black background for letterboxing
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+            // Calculate scaling to fit (contain) while preserving aspect ratio
+            const ratio = Math.min(targetWidth / sourceWidth, targetHeight / sourceHeight);
+            const drawWidth = Math.floor(sourceWidth * ratio);
+            const drawHeight = Math.floor(sourceHeight * ratio);
+
+            // Center the video in the canvas
+            const startX = (targetWidth - drawWidth) / 2;
+            const startY = (targetHeight - drawHeight) / 2;
 
             let audioTrack = null;
             /*
@@ -582,13 +598,14 @@ export default class Camera extends OverlayPlugin {
 
             if (isImage) {
                 // Optimization: Draw image once, no loop needed
-                if (sourceWidth && sourceHeight) {
-                    ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
+                if (drawWidth && drawHeight) {
+                    ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
                 }
             } else {
                 // Optimization: Video draw loop, use requestVideoFrameCallback if available for efficient sync, otherwise fallback to throttled rAF
                 this[type + 'UseVideoFrameCallback'] = 'requestVideoFrameCallback' in mediaElement;
                 let lastTime = 0;
+
                 // Target 30fps for the fallback throttle
                 const throttleInterval = 1000 / 30;
 
@@ -599,16 +616,16 @@ export default class Camera extends OverlayPlugin {
                     }
 
                     if (this[type + 'UseVideoFrameCallback']) {
-                        if (sourceWidth && sourceHeight) {
-                            ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
+                        if (drawWidth && drawHeight) {
+                            ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
                         }
                         this[type + 'AnimationId'] = mediaElement.requestVideoFrameCallback(drawLoop);
                     } else {
                         // Throttling logic for rAF
                         if (!lastTime || now - lastTime >= throttleInterval) {
                             lastTime = now;
-                            if (sourceWidth && sourceHeight) {
-                                ctx.drawImage(mediaElement, 0, 0, sourceWidth, sourceHeight);
+                            if (drawWidth && drawHeight) {
+                                ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
                             }
                         }
                         this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
@@ -702,11 +719,11 @@ export default class Camera extends OverlayPlugin {
             if (typeof mediaElement.pause === 'function') {
                 mediaElement.pause();
             }
+
+            mediaElement.removeAttribute('src');
+
             if (typeof mediaElement.load === 'function') {
-                mediaElement.src = '';
                 mediaElement.load();
-            } else {
-                mediaElement.src = '';
             }
 
             if (mediaElement.parentNode) {

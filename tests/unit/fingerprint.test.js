@@ -34,13 +34,11 @@ describe('FingerPrint Plugin', () => {
                 'Automatic biometric authentication',
             );
 
-            const checkbox = document.querySelector('.autoValidationSwitch input[type="checkbox"]');
-            const firstSpan = document.querySelector('.autoValidationSwitch span');
-
-            expect(checkbox).toBeTruthy();
-            expect(checkbox.checked).toBe(false);
-            firstSpan.click();
-            expect(checkbox.checked).toBe(true);
+            const switchEl = document.querySelector('.autoValidationSwitch');
+            expect(switchEl).toBeTruthy();
+            expect(switchEl.checked).toBe(false);
+            switchEl.click();
+            expect(switchEl.checked).toBe(true);
 
             // body
             document.querySelector('.gm-fingerprint-dialog-button').click();
@@ -80,8 +78,8 @@ describe('FingerPrint Plugin', () => {
         test("Auto validate fingerprint's request when auto validation is enabled", () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             expect(sendEventSpy).toHaveBeenCalledTimes(0);
-            const autoValidation = document.querySelector('.autoValidationSwitch span');
-            autoValidation.click();
+            const autoValidationSwitch = document.querySelector('.autoValidationSwitch');
+            autoValidationSwitch.click();
 
             instance.emit('fingerprint', 'current_status scanning');
             instance.emit('fingerprint', 'scan start');
@@ -100,7 +98,7 @@ describe('FingerPrint Plugin', () => {
 
         describe('toolbar icons', () => {
             test('has right icon when auto validation is disabled / enabled', () => {
-                const autoValidation = document.querySelector('.autoValidationSwitch span');
+                const autoValidation = document.querySelector('.autoValidationSwitch');
                 expect(
                     document
                         .querySelector('.gm-fingerprint-button')

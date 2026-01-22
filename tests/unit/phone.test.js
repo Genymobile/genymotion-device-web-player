@@ -57,12 +57,16 @@ describe('Phone Plugin', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             ['jean-michel', ''].forEach((invalidValue) => {
-                phone.phoneInput.setValue(invalidValue, true);
+                const input = phone.phoneInput.querySelector('input');
+                input.value = invalidValue;
+                input.dispatchEvent(new Event('input', {bubbles: true}));
                 phone.phoneBtn.click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(0);
             });
 
-            phone.phoneInput.setValue('0123456789', true);
+            const input = phone.phoneInput.querySelector('input');
+            input.value = '0123456789';
+            input.dispatchEvent(new Event('input', {bubbles: true}));
             phone.phoneBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
@@ -71,7 +75,9 @@ describe('Phone Plugin', () => {
 
         test('sms send', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            phone.phoneInput.setValue('0123456789', true);
+            const input = phone.phoneInput.querySelector('input');
+            input.value = '0123456789';
+            input.dispatchEvent(new Event('input', {bubbles: true}));
 
             const event = new KeyboardEvent('keyup', {key: ''});
             phone.textInput.dispatchEvent(event);

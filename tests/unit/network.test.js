@@ -58,21 +58,21 @@ describe('Network Plugin', () => {
 
         test('wifi switch change on incoming event', () => {
             instance.emit('settings', 'if wifi:off mobile:off');
-            expect(network.wifiSwitch.getState()).toBe(false);
+            expect(network.wifiSwitch.checked).toBe(false);
             instance.emit('settings', 'if wifi:on mobile:on');
-            expect(network.wifiSwitch.getState()).toBe(true);
+            expect(network.wifiSwitch.checked).toBe(true);
         });
 
         test('mobile data switch change on incoming event', () => {
             instance.emit('settings', 'if wifi:on mobile:on');
-            expect(network.mobileDataSwitch.getState()).toBe(true);
+            expect(network.mobileDataSwitch.checked).toBe(true);
 
             expect(document.querySelector('.gm-network-mobile-section').classList).not.toContain('disabled');
             expect(document.querySelector('.gm-network-type-dropdown').classList).not.toContain('disabled');
             expect(document.querySelector('.gm-signal-strength-dropdown').classList).not.toContain('disabled');
 
             instance.emit('settings', 'if wifi:off mobile:off');
-            expect(network.mobileDataSwitch.getState()).toBe(false);
+            expect(network.mobileDataSwitch.checked).toBe(false);
 
             expect(document.querySelector('.gm-network-mobile-section').classList).toContain('disabled');
             expect(document.querySelector('.gm-network-type-dropdown').classList).toContain('disabled');
@@ -102,7 +102,7 @@ describe('Network Plugin', () => {
                 'state phone up_rate:enabled:384 down_rate:enabled:384 up_delay:enabled:75 down_delay:enabled:75 up_pkt_loss:enabled:0.00 down_pkt_loss:enabled:0.00 dns_delay:enabled:200 profile:umts signal_strength:great',
             );
 
-            expect(network.dropdownNetworkType.getValue()).toBe('umts');
+            expect(network.dropdownNetworkType.value).toBe('umts');
 
             expect(document.querySelector('.gm-network-mobile-section > section:nth-of-type(1)').textContent).toContain(
                 'Download speed:',
@@ -131,15 +131,17 @@ describe('Network Plugin', () => {
             network = new Network(instance, {});
         });
 
-        test('wifi emit status event', () => {
+        test('wifi state', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.wifiSwitch.setState(true, true);
+            const wifiSwitch = network.wifiSwitch;
+            wifiSwitch.click();
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif wifi']});
         });
 
-        test('mobile data emit status event', () => {
+        test('mobile data state', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
-            network.mobileDataSwitch.setState(true, true);
+            const mobileDataSwitch = network.mobileDataSwitch;
+            mobileDataSwitch.click();
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'settings', messages: ['enableif mobile']});
             expect(sendEventSpy).toHaveBeenCalledWith({channel: 'network_profile', messages: ['notify phone']});
         });
@@ -147,18 +149,19 @@ describe('Network Plugin', () => {
         test('change network_profile emit event', () => {
             const sendEventSpy = vi.spyOn(instance, 'sendEvent');
             // change network profile
-            const dropDownSelectProfile = network.profilesForDropdownNetworkType.find((p) => p.value === 'lte');
-            network.dropdownNetworkType.setValue(dropDownSelectProfile, true);
+            const dropDownSelectProfileIndex = network.profilesForDropdownNetworkType
+                .findIndex((p) => p.value === 'lte');
+            network.dropdownNetworkType.dropdownMenuDiv.children[dropDownSelectProfileIndex].click();
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setprofile mobile lte'],
             });
 
             // change signal strength
-            const dropdownSignalStrengthProfile = network.profilesForDropdownSignalStrength.find(
+            const dropdownSignalStrengthProfileIndex = network.profilesForDropdownSignalStrength.findIndex(
                 (p) => p.value === 'great',
             );
-            network.selectMobileSignalStrength.setValue(dropdownSignalStrengthProfile, true);
+            network.selectMobileSignalStrength.dropdownMenuDiv.children[dropdownSignalStrengthProfileIndex].click();
             expect(sendEventSpy).toHaveBeenCalledWith({
                 channel: 'network_profile',
                 messages: ['setsignalstrength mobile great'],

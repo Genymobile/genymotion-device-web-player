@@ -15,6 +15,11 @@
 
             .input {
                 text-align: left;
+
+                &[type='number'] {
+                    text-align: right;
+                }
+
                 padding-left: 0;
                 padding-right: 0;
                 border: none;
@@ -37,6 +42,15 @@
                     border: none;
                     color: var(--gm-tertiary-variant-color);
                 }
+
+                /* Hide spin buttons */
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+
+                -moz-appearance: textfield;
             }
         }
 
@@ -61,6 +75,11 @@
             &.hidden {
                 display: none;
             }
+        }
+
+        /* Modifier to remove bottom space if not needed (e.g. Battery) */
+        &.gm-no-error-space .text-input-bottom {
+            display: none !important;
         }
 
         .text-input-unit {

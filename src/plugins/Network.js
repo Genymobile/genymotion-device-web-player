@@ -2,7 +2,8 @@ import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 import OverlayPlugin from './util/OverlayPlugin';
-import {switchButton, dropdownSelect} from './util/components';
+import '@/components/GmSwitch';
+import '@/components/GmDropdown.js';
 
 import MOBILE_PROFILES from './util/network-mobile-profiles';
 import MOBILE_SIGNAL_STRENGTH from './util/mobile-signal-strength';
@@ -70,8 +71,8 @@ export default class Network extends OverlayPlugin {
         const values = message.split(' ');
 
         if (values[0] === 'if') {
-            this.wifiSwitch.setState(false);
-            this.mobileDataSwitch.setState(false);
+            this.wifiSwitch.checked = false;
+            this.mobileDataSwitch.checked = false;
 
             if (values.length !== 3) {
                 return;
@@ -79,16 +80,16 @@ export default class Network extends OverlayPlugin {
 
             const wifiOn = values[1].match(/(wifi:)(\w+)/);
             if (wifiOn) {
-                this.wifiSwitch.setState(wifiOn[2] === 'on');
+                this.wifiSwitch.checked = wifiOn[2] === 'on';
             }
 
             const mobileOn = values[2].match(/(mobile:)(\w+)/);
             if (mobileOn) {
                 if (mobileOn[2] === 'on') {
-                    this.mobileDataSwitch.setState(true);
+                    this.mobileDataSwitch.checked = true;
                     this.disableMobileData(false);
                 } else {
-                    this.mobileDataSwitch.setState(false);
+                    this.mobileDataSwitch.checked = false;
                     this.disableMobileData(true);
                 }
             }
@@ -113,17 +114,17 @@ export default class Network extends OverlayPlugin {
         const signalStrength = values[10].split(':');
 
         // Update the dropdowns network type and signal strength
-        this.dropdownNetworkType.setValue(
-            this.profilesForDropdownNetworkType.find((mp) => mp.value === mobileProfile[1]),
-        );
-        this.selectMobileSignalStrength.setValue(
-            this.profilesForDropdownSignalStrength.find((ms) => ms.value === signalStrength[1]),
-        );
+        this.dropdownNetworkType.value = this.profilesForDropdownNetworkType.find(
+            (mp) => mp.value === mobileProfile[1],
+        )?.value;
+        this.selectMobileSignalStrength.value = this.profilesForDropdownSignalStrength.find(
+            (ms) => ms.value === signalStrength[1],
+        )?.value;
 
         // Disable signal strength dropdown and details if network type is none
         this.hasTodisableSignalStrengthDropdownAndDetails();
         // reset details if mobile data is off or if network type is none
-        const hasDetailsToBeReset = !this.mobileDataSwitch.getState() || mobileProfile[1] === 'none';
+        const hasDetailsToBeReset = !this.mobileDataSwitch.checked || mobileProfile[1] === 'none';
 
         // Update details
         this.updateDetail('downSpeed', downSpeed[2] + ' b/s', downSpeed[1] === 'disabled' || hasDetailsToBeReset);
@@ -146,12 +147,12 @@ export default class Network extends OverlayPlugin {
     enable5G() {
         // Enable the 5G of the plugin (i.e. adding the 5G option to the mobile profile)
         this.prepareArrayForDropdownNetworkType(MOBILE_PROFILES);
-        this.dropdownNetworkType.updateOptions(this.profilesForDropdownNetworkType);
+        this.dropdownNetworkType.items = this.profilesForDropdownNetworkType;
     }
 
     disable5G() {
         this.prepareArrayForDropdownNetworkType(MOBILE_PROFILES.filter((item) => item.name !== '5g'));
-        this.dropdownNetworkType.updateOptions(this.profilesForDropdownNetworkType);
+        this.dropdownNetworkType.items = this.profilesForDropdownNetworkType;
     }
 
     /**
@@ -184,12 +185,11 @@ export default class Network extends OverlayPlugin {
         wifiText.innerHTML = this.i18n.WIFI || 'Wifi';
         wifiSection.appendChild(wifiText);
 
-        this.wifiSwitch = switchButton.createSwitch({
-            onChange: (value) => {
-                this.sendWifiStateEvent(value);
-            },
+        this.wifiSwitch = document.createElement('gm-switch');
+        this.wifiSwitch.addEventListener('gm-switch-change', (e) => {
+            this.sendWifiStateEvent(e.detail.checked);
         });
-        wifiSection.appendChild(this.wifiSwitch.element);
+        wifiSection.appendChild(this.wifiSwitch);
 
         const separator = document.createElement('div');
         separator.className = 'gm-separator';
@@ -203,51 +203,52 @@ export default class Network extends OverlayPlugin {
         mobileDataText.innerHTML = this.i18n.MOBILE_DATA || 'Mobile data';
         mobileDataSwitchDiv.appendChild(mobileDataText);
 
-        this.mobileDataSwitch = switchButton.createSwitch({
-            onChange: (value) => {
-                this.sendMobileDataStateEvent(value);
-            },
+        this.mobileDataSwitch = document.createElement('gm-switch');
+        this.mobileDataSwitch.addEventListener('gm-switch-change', (e) => {
+            this.sendMobileDataStateEvent(e.detail.checked);
         });
-        mobileDataSwitchDiv.appendChild(this.mobileDataSwitch.element);
+        mobileDataSwitchDiv.appendChild(this.mobileDataSwitch);
         this.mobileDataSection.appendChild(mobileDataSwitchDiv);
 
         const networkTypeLabel = document.createElement('label');
         networkTypeLabel.innerHTML = this.i18n.NETWORK_TYPE || 'Network type';
 
-        this.dropdownNetworkType = dropdownSelect.createDropdown({
-            items: this.profilesForDropdownNetworkType,
-            hasCheckmark: true,
-            dropdownMaxHeight: 245,
-            classes: 'gm-network-type-dropdown',
-            onChange: (newValue) => {
-                const msgs = [];
-                msgs.push('setprofile mobile ' + newValue);
-                const json = {channel: 'network_profile', messages: msgs};
-                this.instance.sendEvent(json);
-            },
+        this.dropdownNetworkType = document.createElement('gm-dropdown');
+        this.dropdownNetworkType.items = this.profilesForDropdownNetworkType;
+        this.dropdownNetworkType.hasCheckmark = true;
+        this.dropdownNetworkType.dropdownMaxHeight = 245;
+        this.dropdownNetworkType.classList.add('gm-network-type-dropdown');
+        this.dropdownNetworkType.addEventListener('gm-dropdown-change', (e) => {
+            const newValue = e.detail.value;
+            const msgs = [];
+            msgs.push('setprofile mobile ' + newValue);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         });
+
         this.mobileDataSection.appendChild(networkTypeLabel);
-        this.mobileDataSection.appendChild(this.dropdownNetworkType.element);
+        this.mobileDataSection.appendChild(this.dropdownNetworkType);
 
         const signalStrengthLabel = document.createElement('label');
         signalStrengthLabel.className = 'gm-signal-strength-label';
         signalStrengthLabel.innerHTML = this.i18n.SIGNAL_STRENGTH || 'Signal strength';
         this.mobileDataSection.appendChild(signalStrengthLabel);
 
-        this.selectMobileSignalStrength = dropdownSelect.createDropdown({
-            items: this.profilesForDropdownSignalStrength,
-            hasCheckmark: true,
-            dropdownMaxHeight: 155,
-            classes: 'gm-signal-strength-dropdown',
-            onChange: (newValue) => {
-                const msgs = [];
-                msgs.push('setsignalstrength mobile ' + newValue);
-                const json = {channel: 'network_profile', messages: msgs};
-                this.instance.sendEvent(json);
-            },
+        this.selectMobileSignalStrength = document.createElement('gm-dropdown');
+        this.selectMobileSignalStrength.items = this.profilesForDropdownSignalStrength;
+        this.selectMobileSignalStrength.hasCheckmark = true;
+        this.selectMobileSignalStrength.dropdownMaxHeight = 155;
+        this.selectMobileSignalStrength.classList.add('gm-signal-strength-dropdown');
+        this.selectMobileSignalStrength.addEventListener('gm-dropdown-change', (e) => {
+            const newValue = e.detail.value;
+            const msgs = [];
+            msgs.push('setsignalstrength mobile ' + newValue);
+            const json = {channel: 'network_profile', messages: msgs};
+            this.instance.sendEvent(json);
         });
+
         this.mobileDataSection.appendChild(signalStrengthLabel);
-        this.mobileDataSection.appendChild(this.selectMobileSignalStrength.element);
+        this.mobileDataSection.appendChild(this.selectMobileSignalStrength);
 
         // Add detail fields
         this.mobileDataSection.appendChild(this.createDetailsSection('Download speed', 'downSpeed'));
@@ -298,24 +299,24 @@ export default class Network extends OverlayPlugin {
     disableMobileData(isDisabled) {
         if (isDisabled) {
             this.mobileDataSection.classList.add('disabled');
-            this.dropdownNetworkType.setDisabled(true);
-            this.selectMobileSignalStrength.setDisabled(true);
+            this.dropdownNetworkType.disabled = true;
+            this.selectMobileSignalStrength.disabled = true;
         } else {
             this.mobileDataSection.classList.remove('disabled');
-            this.dropdownNetworkType.setDisabled(false);
-            this.selectMobileSignalStrength.setDisabled(false);
+            this.dropdownNetworkType.disabled = false;
+            this.selectMobileSignalStrength.disabled = false;
         }
         this.hasTodisableSignalStrengthDropdownAndDetails();
     }
 
     hasTodisableSignalStrengthDropdownAndDetails() {
-        const isDisabled = !this.mobileDataSwitch.getState() || this.dropdownNetworkType.getValue() === 'none';
+        const isDisabled = !this.mobileDataSwitch.checked || this.dropdownNetworkType.value === 'none';
         if (isDisabled) {
             this.mobileDataSection.classList.add('disabledDetails');
-            this.selectMobileSignalStrength.setDisabled(isDisabled);
+            this.selectMobileSignalStrength.disabled = isDisabled;
         } else {
             this.mobileDataSection.classList.remove('disabledDetails');
-            this.selectMobileSignalStrength.setDisabled(false);
+            this.selectMobileSignalStrength.disabled = false;
         }
     }
 

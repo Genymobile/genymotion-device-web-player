@@ -454,7 +454,7 @@ export default class Camera extends OverlayPlugin {
                 mediaElement.src = url;
                 mediaElement.loop = true;
                 mediaElement.muted = false;
-                mediaElement.volume = 0;
+                mediaElement.volume = 1;
                 mediaElement.playsInline = true;
                 mediaElement.crossOrigin = 'anonymous';
 
@@ -696,17 +696,16 @@ export default class Camera extends OverlayPlugin {
         }
 
         if (this.audioNodes) {
-            this.audioNodes = this.audioNodes.filter((node) => {
+            this.audioNodes.forEach((node) => {
                 if (node.type === type) {
                     try {
                         node.source.disconnect();
                     } catch (e) {
                         log.warn('Error disconnecting audio node:', e);
                     }
-                    return false;
                 }
-                return true;
             });
+            this.audioNodes = this.audioNodes.filter((node) => node.type !== type);
 
             if (this.audioNodes.length === 0 && this.audioContext) {
                 this.audioContext.close();
@@ -714,14 +713,14 @@ export default class Camera extends OverlayPlugin {
             }
         }
 
+        // Cleanup media element
         const mediaElement = type === 'front' ? this.frontMediaElement : this.backMediaElement;
         if (mediaElement) {
             if (typeof mediaElement.pause === 'function') {
                 mediaElement.pause();
             }
 
-            mediaElement.removeAttribute('src');
-
+            mediaElement.src = '';
             if (typeof mediaElement.load === 'function') {
                 mediaElement.load();
             }
@@ -737,33 +736,29 @@ export default class Camera extends OverlayPlugin {
             }
         }
 
-        if (type === 'front') {
-            if (this.frontStream) {
-                this.frontStream.getTracks().forEach((t) => {
-                    t.stop();
-                });
+        // Cleanup stream and UI
+        const stream = type === 'front' ? this.frontStream : this.backStream;
+        if (stream) {
+            stream.getTracks().forEach((t) => {
+                t.stop();
+            });
+            if (type === 'front') {
                 this.frontStream = null;
-            }
-            this.frontVideo.classList.add('hidden');
-            this.frontVideo.srcObject = null;
-            this.frontFileInfo.classList.add('hidden');
-            this.frontUploader.classList.remove('hidden');
-
-            this.instance.mediaManager.stopVideoStreaming('front');
-        } else if (type === 'back') {
-            if (this.backStream) {
-                this.backStream.getTracks().forEach((t) => {
-                    t.stop();
-                });
+            } else {
                 this.backStream = null;
             }
-            this.backVideo.classList.add('hidden');
-            this.backVideo.srcObject = null;
-            this.backFileInfo.classList.add('hidden');
-            this.backUploader.classList.remove('hidden');
-
-            this.instance.mediaManager.stopVideoStreaming('back');
         }
+
+        const video = type === 'front' ? this.frontVideo : this.backVideo;
+        const fileInfo = type === 'front' ? this.frontFileInfo : this.backFileInfo;
+        const uploader = type === 'front' ? this.frontUploader : this.backUploader;
+
+        video.classList.add('hidden');
+        video.srcObject = null;
+        fileInfo.classList.add('hidden');
+        uploader.classList.remove('hidden');
+
+        this.instance.mediaManager.stopVideoStreaming(type);
 
         if (!this.frontStream && !this.backStream) {
             this.toolbarBtn.setIndicator('');
@@ -801,18 +796,10 @@ export default class Camera extends OverlayPlugin {
             fileInfo.classList.add('hidden');
         }
 
-        if (deviceId === 'none') {
-            placeholder.classList.remove('hidden');
-            await this.instance.mediaManager.stopVideoStreaming(type);
+        if (deviceId === 'none' || deviceId === 'file') {
+            const element = deviceId === 'none' ? placeholder : uploader;
+            element.classList.remove('hidden');
 
-            if (!this.frontStream && !this.backStream) {
-                this.toolbarBtn.setIndicator('');
-            }
-            return;
-        }
-
-        if (deviceId === 'file') {
-            uploader.classList.remove('hidden');
             await this.instance.mediaManager.stopVideoStreaming(type);
 
             if (!this.frontStream && !this.backStream) {

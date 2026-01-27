@@ -53,13 +53,6 @@ describe('Camera Plugin', () => {
         test('widget is rendered with correct elements', () => {
             // Check for dropdowns
             expect(document.getElementsByClassName('gm-camera-dropdown-front')).toHaveLength(1);
-            /*
-             * expect(document.getElementsByClassName('gm-camera-dropdown-back')).toHaveLength(1); // Back camera removed in recent user edit if logic changed, but structurally it might still be there if not fully removed from JS.
-             * Checking the code, the user added CSS to hide it, but didn't remove JS completely yet?
-             * Wait, looking at user diff: "this.renderCameraSection(container, 'Video', 'front');" and back camera section is technically still there in constructor but user hid it via CSS?
-             * "sep2.className = 'gm-separator';" ... "this.renderCameraSection(container, 'Back camera', 'back');" is still in constructor in original file content I have.
-             * The user only modified "Front camera" string to "Video".
-             */
 
             // Check for placeholder
             const placeholders = document.getElementsByClassName('gm-camera-placeholder');

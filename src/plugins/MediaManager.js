@@ -290,7 +290,7 @@ export default class MediaManager {
                     parameters.encodings = [{}];
                 }
                 parameters.encodings[0].maxBitrate = 1500000;
-                await sender.setParameters(parameters).catch(e => log.warn('Failed to set sender parameters', e));
+                await sender.setParameters(parameters).catch((e) => log.warn('Failed to set sender parameters', e));
             } else {
                 // Try to find an existing video transceiver that is recvonly (reusable)
                 const transceivers = this.instance.peerConnection.getTransceivers();
@@ -422,7 +422,7 @@ export default class MediaManager {
                 }
             }
             /*
-             * if the if the flag for bundled audio&video stream is set, we'll remove the audio track too
+             * if the flag for bundled audio&video stream is set, we'll remove the audio track too
              * Note: Only if we are closing the stream that owns the audio?
              * Current simplified logic: if generic videoWithMicrophone is on, we remove mic sender.
              */

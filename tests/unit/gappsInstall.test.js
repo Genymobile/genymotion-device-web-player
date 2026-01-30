@@ -40,7 +40,7 @@ describe('GAPPSInstall Plugin', () => {
             GAPPS_TITLE: 'TEST GAPPS TITLE',
             DRAG_DROP_TEXT: 'TEST DRAG DROP TEXT',
             BROWSE_BUTTON_TEXT: 'TEST BROWSE',
-            FILE_TYPE_NOT_APK: 'TEST FILE TYPE NOT APK',
+            FILE_TYPE_INVALID: 'TEST FILE TYPE NOT APK',
             FILE_SEND_APK_FAILED: 'TEST FILE APK SEND FAILED',
         });
         initialView = plugin.instanciatedViews.get('InitialView');

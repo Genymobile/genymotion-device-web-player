@@ -24,6 +24,7 @@ request. It's not mandatory at all, but feel free to open an issue to present yo
 
 To start working on the Genymotion device web player, all you need if an HTML page to instanciate a player from your
 local copy of this repository.
+
 Build the player in dev mode:
 
 ```sh

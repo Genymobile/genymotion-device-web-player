@@ -8,8 +8,9 @@
     ],
     "types": "dist/index.d.ts",
     "engines": {
-        "node": ">=16"
+        "node": ">=20"
     },
+
     "scripts": {
         "test": "vitest run",
         "test:ui": "vitest --ui",
@@ -43,6 +44,7 @@
         "@babel/preset-env": "^7.18.6",
         "@fullhuman/postcss-purgecss": "5.0.0",
         "@vitest/ui": "^4.0.15",
+        "@vitejs/plugin-basic-ssl": "^2.1.0",
         "autoprefixer": "10.4.14",
         "babel-eslint": "^10.1.0",
         "eslint": "^7.32.0",

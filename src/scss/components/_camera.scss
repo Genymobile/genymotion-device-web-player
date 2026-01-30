@@ -1,0 +1,180 @@
+@use '../base/variables' as *;
+
+.device-renderer-instance .gm-camera-plugin {
+    .gm-modal-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    // TODO delete this css section when back could handle 2 camera
+    // ------------------------
+    .gm-camera-section:nth-child(4),
+    .gm-separator:nth-child(3) {
+        display: none;
+    }
+    // ------------------------
+
+    .gm-camera-section {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+
+        &.gm-camera-permission {
+            display: flex;
+            align-items: center;
+
+            .gm-separator {
+                margin-left: 0;
+            }
+
+            .gm-permission-request-view,
+            .gm-permission-denied-view,
+            .gm-permission-no-device-view,
+            .gm-permission-granted-view {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                align-content: center;
+                justify-content: center;
+                min-height: 38px;
+            }
+
+            .gm-permission-request-view {
+                justify-content: space-between;
+
+                .gm-permission-text {
+                    font-size: 12px;
+                    color: #ccc;
+                    margin-right: $spacing-s;
+                    flex: 1;
+                }
+
+                .gm-btn {
+                    white-space: nowrap;
+                }
+            }
+
+            .gm-permission-denied-view,
+            .gm-permission-no-device-view,
+            .gm-permission-granted-view {
+                color: #ccc;
+                font-size: 12px;
+            }
+        }
+
+        .gm-camera-preview {
+            position: relative;
+            width: 100%;
+            margin-top: $spacing-l;
+            background-color: var(--gm-surface-variant-color);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+
+            .gm-camera-placeholder,
+            .gm-drag-drop-area,
+            .gm-loader-container,
+            .gm-camera-video-front,
+            .gm-camera-video-back {
+                height: 196px !important;
+            }
+
+            video {
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+                background: var(--gm-background-color);
+            }
+
+            .gm-camera-placeholder {
+                background-color: var(--gm-on-tertiary-variant-color);
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .gm-camera-placeholder-icon {
+                    position: relative;
+                    width: 48px;
+                    height: 48px;
+                    background-color: transparent;
+
+                    &::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: var(--gm-tertiary-color);
+                        mask-image: url('../../assets/images/ic_camera_disabled.svg');
+                        -webkit-mask-image: url('../../assets/images/ic_camera_disabled.svg');
+                        mask-size: contain;
+                        -webkit-mask-size: contain;
+                        mask-repeat: no-repeat;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-position: center;
+                        -webkit-mask-position: center;
+                    }
+                }
+            }
+
+            .gm-camera-file-info {
+                padding: $spacing-s 0;
+                background-color: var(--gm-surface-variant-color);
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .gm-file-name {
+                    font-size: 12px;
+                    color: var(--gm-on-secondary-color);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 400px;
+                }
+            }
+
+            .gm-cancel-update-icon {
+                cursor: pointer;
+                mask-image: url('../../assets/images/ic_cross.svg');
+                -webkit-mask-image: url('../../assets/images/ic_cross.svg');
+                width: 24px;
+                height: 24px;
+            }
+
+            .gm-file-uploader {
+                height: 100%;
+                width: 100%;
+
+                .gm-drag-drop-area {
+                    //height: 100%;
+                    margin-top: 0;
+                    justify-content: center;
+
+                    .drop-text {
+                        margin-top: $spacing-m;
+                    }
+                }
+            }
+
+            .gm-loader-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+
+                .gm-loader-text {
+                    margin-top: 10px;
+                    color: var(--gm-on-secondary-color);
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}

@@ -17,7 +17,9 @@ const fileUploader = (() => {
      * @param {string} [options.browseButtonText='BROWSE'] - Text to display on the browse button
      * @param {string} [options.accept=''] - File types to accept (e.g. '.apk' or not set for accept all files)
      * @param {string} [options.classes=''] - Additional CSS classes to apply
+     * @param {string} [options.invalidFileTypeMessage=''] - Custom error message for invalid file types
      * @param {Object} i18n - i18n object translation
+     * @param {string} mode - 'upload' or 'select', this plugin is used for both upload and select file (same ui, minor difference in functionnalities)
      * @returns {Object} Object containing the file uploader element and control methods
      * @property {HTMLElement} element - The file uploader DOM element
      * @property {Function} setEnabled - Method to enable/disable the file uploader
@@ -34,6 +36,8 @@ const fileUploader = (() => {
         accept = null,
         classes = '',
         i18n = {},
+        mode = 'upload',
+        invalidFileTypeMessage = null,
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -278,17 +282,41 @@ const fileUploader = (() => {
 
         const checkFileBeforeUpload = (file) => {
             if (file) {
-                if (!accept || (accept && file.name.toLowerCase().endsWith(accept.toLowerCase()))) {
+                let isValid = false;
+                if (!accept) {
+                    isValid = true;
+                } else {
+                    const acceptedTypes = accept.split(',').map((t) => t.trim().toLowerCase());
+                    isValid = acceptedTypes.some((type) => {
+                        if (type.endsWith('/*')) {
+                            // e.g. "image/*, vidoe/* => it's a generic mime type which accept all images format"
+                            const mainType = type.split('/')[0];
+                            return file.type.startsWith(`${mainType}/`);
+                        }
+                        if (type.startsWith('.')) {
+                            // e.g. ".jpg"
+                            return file.name.toLowerCase().endsWith(type);
+                        }
+                        // e.g. "image/jpeg"
+                        return file.type === type;
+                    });
+                }
+
+                if (isValid) {
                     // If file is valid, hide error and show upload progress
                     hideUploadError();
                     hideUploadSuccess();
-                    showUploadProgress(file);
+                    if (mode === 'upload') {
+                        showUploadProgress(file);
+                    }
                     if (onFileSelect) {
                         onFileSelect(file);
                     }
+                    fileInput.value = '';
                 } else {
                     showUploadError(
-                        i18n.FILE_TYPE_NOT_APK ||
+                        invalidFileTypeMessage ||
+                            i18n.FILE_TYPE_INVALID ||
                             `Invalid file type. Only ${accept} files are supported.
                         Please select a file with the correct extension.`,
                     );

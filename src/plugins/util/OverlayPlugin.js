@@ -75,14 +75,14 @@ export default class OverlayPlugin {
      * Sets up global click handler for overlay dismissal
      */
     setupGlobalClickHandler() {
-        if (!OverlayPlugin.hasBeenCalled) {
+        if (!this.instance.hasOverlayGlobalListener) {
             this.instance.addListener(document, 'click', this.handleClickOutsideOverlay.bind(this));
             this.instance.addListener(window, 'resize', () => {
                 if (this.instance.store.state.overlay.isOpen) {
                     this.closeAllOverlays();
                 }
             });
-            OverlayPlugin.hasBeenCalled = true;
+            this.instance.hasOverlayGlobalListener = true;
         }
     }
 
@@ -561,5 +561,4 @@ export default class OverlayPlugin {
 }
 
 // Static properties for shared state management
-OverlayPlugin.hasBeenCalled = false; // Singleton check for global listeners
 OverlayPlugin.modalZIndex = 100; // Z-index management for modal stacking

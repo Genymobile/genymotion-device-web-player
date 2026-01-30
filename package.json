@@ -7,9 +7,11 @@
         "dist"
     ],
     "types": "dist/index.d.ts",
+    "engines": {
+        "node": ">=20"
+    },
 
     "scripts": {
-        "prepare": "node tools/check-node-version.js",
         "test": "vitest run",
         "test:ui": "vitest --ui",
         "test:watch": "vitest",

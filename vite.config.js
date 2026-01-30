@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { viteSingleFile } from 'vite-plugin-singlefile';
 import path from 'path';
 
 import basicSsl from '@vitejs/plugin-basic-ssl';
@@ -12,6 +11,7 @@ export default defineConfig(({ mode }) => {
                 name: 'html-transform',
                 transformIndexHtml(html) {
                     if (mode === 'development') {
+                        // For development, instead of using the built dist, hot reload the files from src with auto-reconnect
                         let newHtml = html.replace(
                             /<script src="\.\.\/dist\/js\/device-renderer\.min\.js" data-player-url><\/script>/,
                             `

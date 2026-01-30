@@ -453,7 +453,11 @@ export default class Camera extends OverlayPlugin {
                 mediaElement = document.createElement('video');
                 mediaElement.src = url;
                 mediaElement.loop = true;
-                mediaElement.muted = false;
+                /*
+                 * If microphone is enabled, keep audio unmuted for Web Audio API capture (inject to the VM).
+                 * Otherwise, mute explicitly to prevent sound from playing in the browser.
+                 */
+                mediaElement.muted = !this.instance.options.microphone;
                 mediaElement.volume = 1;
                 mediaElement.playsInline = true;
                 mediaElement.crossOrigin = 'anonymous';

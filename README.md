@@ -51,7 +51,9 @@ A Modern, WebRTC compatible, Web browser:
 
 ## 📦 Installation
 
-### 📥 Install via NPM / Yarn
+### 📥 Install via NPM / Yarn 
+
+**Node.js 20 or later is required.**
 
 Using yarn:
 

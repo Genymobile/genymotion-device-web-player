@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import fs from 'fs';
 
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
@@ -54,6 +55,7 @@ export default defineConfig(({ mode }) => {
                         );
                         // Remove dist CSS to rely on HMR from src/index.js import
                         newHtml = newHtml.replace(
+                            // eslint-disable-next-line max-len
                             /<link rel="stylesheet" href="\.\.\/dist\/css\/device-renderer\.min\.css" data-player-url \/>/,
                             '<!-- dist css removed for dev HMR -->',
                         );
@@ -62,13 +64,29 @@ export default defineConfig(({ mode }) => {
                     return html;
                 },
             },
+            {
+                name: 'copy-assets',
+                closeBundle() {
+                    if (mode === 'production') {
+                        fs.copyFileSync('index.d.ts', 'dist/index.d.ts');
+                        fs.cpSync('example', 'dist/example', { recursive: true });
+
+                        const htmlPath = path.resolve(__dirname, 'dist/example/geny-window.html');
+                        if (fs.existsSync(htmlPath)) {
+                            let content = fs.readFileSync(htmlPath, 'utf-8');
+                            content = content.replace(/\.\.\/dist\//g, '../');
+                            fs.writeFileSync(htmlPath, content);
+                        }
+                    }
+                },
+            },
         ],
         build: {
             target: 'es2015',
             lib: {
                 entry: path.resolve(__dirname, 'src/index.js'),
                 name: 'genyDeviceWebPlayer',
-                fileName: (format) => `js/device-renderer.min.js`,
+                fileName: () => 'js/device-renderer.min.js',
                 formats: ['umd'],
             },
             outDir: 'dist',
@@ -80,7 +98,9 @@ export default defineConfig(({ mode }) => {
                     name: 'genyDeviceWebPlayer',
                     globals: {},
                     assetFileNames: (assetInfo) => {
-                        if (assetInfo.name.endsWith('.css')) return 'css/device-renderer.min.css';
+                        if (assetInfo.name.endsWith('.css')) {
+                            return 'css/device-renderer.min.css';
+                        }
                         return assetInfo.name;
                     },
                 },

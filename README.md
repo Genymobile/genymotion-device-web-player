@@ -515,7 +515,7 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Default:** `undefined`
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
-  Set the file upload URL, required if `fileUpload` is set to `true`.
+  Set the file upload URL, required if `fileUpload` is set to `true`. Example for a PaaS instance: `wss://***.***.***.***/fileupload/`
 
 #### fullscreen <img align="right" src="./doc/assets/ic_fullscreen.svg">
 

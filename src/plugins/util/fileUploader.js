@@ -1,6 +1,4 @@
-'use strict';
-
-const {progressBar} = require('./components');
+import '@/components/GmProgressBar.js';
 
 /**
  * Module for creating custom file uploader components with drag & drop functionality.
@@ -19,7 +17,9 @@ const fileUploader = (() => {
      * @param {string} [options.browseButtonText='BROWSE'] - Text to display on the browse button
      * @param {string} [options.accept=''] - File types to accept (e.g. '.apk' or not set for accept all files)
      * @param {string} [options.classes=''] - Additional CSS classes to apply
+     * @param {string} [options.invalidFileTypeMessage=''] - Custom error message for invalid file types
      * @param {Object} i18n - i18n object translation
+     * @param {string} mode - 'upload' or 'select', this plugin is used for both upload and select file (same ui, minor difference in functionnalities)
      * @returns {Object} Object containing the file uploader element and control methods
      * @property {HTMLElement} element - The file uploader DOM element
      * @property {Function} setEnabled - Method to enable/disable the file uploader
@@ -35,7 +35,9 @@ const fileUploader = (() => {
         browseButtonText = 'BROWSE',
         accept = null,
         classes = '',
-        i18n= {}
+        i18n = {},
+        mode = 'upload',
+        invalidFileTypeMessage = null,
     }) => {
         let handleDragOver = null;
         let handleDragLeave = null;
@@ -121,7 +123,7 @@ const fileUploader = (() => {
 
         uploadCancelButton.className = 'gm-cancel-update-icon';
         uploadCancelButton.onclick = () => {
-            fileInput.value= '';
+            fileInput.value = '';
             if (onUploadCanceled) {
                 onUploadCanceled();
             }
@@ -133,16 +135,13 @@ const fileUploader = (() => {
         uploadProgressTextContainer.appendChild(uploadFileName);
         uploadProgressTextContainer.appendChild(uploadCancelButton);
 
-        const progressBarUpload = progressBar.createProgressBar({
-            value: 0,
-            max: 100,
-        });
+        const progressBarUpload = document.createElement('gm-progress-bar');
 
         const uploadSizeText = document.createElement('div');
         uploadSizeText.className = 'gm-size-text';
 
         wrapperUploadingTextAndProgress.appendChild(uploadProgressTextContainer);
-        wrapperUploadingTextAndProgress.appendChild(progressBarUpload.element);
+        wrapperUploadingTextAndProgress.appendChild(progressBarUpload);
         wrapperUploadingTextAndProgress.appendChild(uploadSizeText);
 
         uploadProgressInfoDiv.appendChild(uploadProgressIcon);
@@ -268,7 +267,7 @@ const fileUploader = (() => {
         };
 
         const resetProgressBar = () => {
-            progressBarUpload.setValue(0);
+            progressBarUpload.value = 0;
             uploadSizeText.innerHTML = '';
         };
 
@@ -283,17 +282,42 @@ const fileUploader = (() => {
 
         const checkFileBeforeUpload = (file) => {
             if (file) {
-                if (!accept || (accept && file.name.toLowerCase().endsWith(accept.toLowerCase()))) {
+                let isValid = false;
+                if (!accept) {
+                    isValid = true;
+                } else {
+                    const acceptedTypes = accept.split(',').map((t) => t.trim().toLowerCase());
+                    isValid = acceptedTypes.some((type) => {
+                        if (type.endsWith('/*')) {
+                            // e.g. "image/*, vidoe/* => it's a generic mime type which accept all images format"
+                            const mainType = type.split('/')[0];
+                            return file.type.startsWith(`${mainType}/`);
+                        }
+                        if (type.startsWith('.')) {
+                            // e.g. ".jpg"
+                            return file.name.toLowerCase().endsWith(type);
+                        }
+                        // e.g. "image/jpeg"
+                        return file.type === type;
+                    });
+                }
+
+                if (isValid) {
                     // If file is valid, hide error and show upload progress
                     hideUploadError();
                     hideUploadSuccess();
-                    showUploadProgress(file);
+                    if (mode === 'upload') {
+                        showUploadProgress(file);
+                    }
                     if (onFileSelect) {
                         onFileSelect(file);
                     }
+                    fileInput.value = '';
                 } else {
-                    showUploadError(i18n.FILE_TYPE_NOT_APK ||
-                        `Invalid file type. Only ${accept} files are supported.
+                    showUploadError(
+                        invalidFileTypeMessage ||
+                            i18n.FILE_TYPE_INVALID ||
+                            `Invalid file type. Only ${accept} files are supported.
                         Please select a file with the correct extension.`,
                     );
                 }
@@ -329,7 +353,7 @@ const fileUploader = (() => {
         };
 
         const updateProgress = (percentage, uploadedSize, fileSize) => {
-            progressBarUpload.setValue(percentage);
+            progressBarUpload.value = percentage;
             uploadSizeText.innerHTML = `(${uploadedSize} ${i18n.OF || 'of'} ${fileSize}Mo)`;
             if (onUploadProgress) {
                 onUploadProgress(percentage, uploadedSize, fileSize);
@@ -373,11 +397,11 @@ const fileUploader = (() => {
             uploadingStop,
             showUploadError,
             showUploadSuccess,
-            startUpload: checkFileBeforeUpload
+            startUpload: checkFileBeforeUpload,
         };
     };
 
     return {createFileUploader};
 })();
 
-module.exports = fileUploader;
+export default fileUploader;

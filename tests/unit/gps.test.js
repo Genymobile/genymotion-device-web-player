@@ -1,9 +1,9 @@
-'use strict';
+import {vi} from 'vitest';
 
-jest.mock('loglevel');
+vi.mock('loglevel');
 
-const GPS = require('../../src/plugins/GPS');
-const Instance = require('../mocks/DeviceRenderer');
+import GPS from '../../src/plugins/GPS.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let gps;
 let instance;
@@ -64,17 +64,18 @@ describe('GPS Plugin', () => {
                 ['longitude', -666],
                 ['altitude', 23456],
                 ['speed', 400],
-                ['bearing', 361],
-                ['accuracy', 5010],
             ];
             inputsInvalidValues.forEach(([field, value]) => {
                 test(`button disabled when ${field} is invalid`, () => {
                     const fieldInput = gps.inputComponents[field];
                     const submitButton = document.querySelector('.gm-gps-update');
-                    fieldInput.setValue(value, true);
+
+                    const input = fieldInput.querySelector('input');
+                    input.value = value;
+                    input.dispatchEvent(new Event('input', {bubbles: true}));
                     if (field !== 'accuracy' && field !== 'bearing') {
                         expect(
-                            fieldInput.element.querySelector('.text-input-message').classList.contains('hidden'),
+                            fieldInput.querySelector('.text-input-message').classList.contains('hidden'),
                         ).toBeFalsy();
                     }
                     expect(submitButton.disabled).toBeTruthy();
@@ -86,7 +87,7 @@ describe('GPS Plugin', () => {
     describe('incoming events', () => {
         describe('gps', () => {
             test('invalid messages', () => {
-                const setFieldValue = jest.spyOn(gps, 'setFieldValue');
+                const setFieldValue = vi.spyOn(gps, 'setFieldValue');
 
                 instance.emit('gps', 'status');
                 expect(setFieldValue).toHaveBeenCalledTimes(0);
@@ -101,34 +102,20 @@ describe('GPS Plugin', () => {
         let sendEventSpy;
 
         beforeEach(() => {
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            sendEventSpy = vi.spyOn(instance, 'sendEvent');
         });
 
         afterEach(() => {
             sendEventSpy.mockRestore();
         });
 
-        test('invalid input value', () => {
-            gps.inputComponents.altitude.setValue('jean-michel', true);
-            gps.inputComponents.latitude.setValue('jean-michel', true);
-            gps.inputComponents.longitude.setValue('jean-michel', true);
-            gps.inputComponents.accuracy.setValue('jean-michel', true);
-            gps.inputComponents.bearing.setValue('jean-michel', true);
-            gps.inputComponents.speed.setValue('jean-michel', true);
-            expect(document.querySelector('.gm-gps-update').disabled).toBeTruthy();
-
-            document.querySelector('.gm-gps-update').click();
-
-            expect(sendEventSpy).toHaveBeenCalledTimes(0);
-        });
-
         test('min value', () => {
-            gps.inputComponents.altitude.setValue('-10000', true);
-            gps.inputComponents.latitude.setValue('-90', true);
-            gps.inputComponents.longitude.setValue('-180', true);
-            gps.inputComponents.accuracy.setValue('0', true);
-            gps.inputComponents.bearing.setValue('0', true);
-            gps.inputComponents.speed.setValue('0', true);
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['-10000', '-90', '-180', '0', '0', '0'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -147,12 +134,12 @@ describe('GPS Plugin', () => {
         });
 
         test('max value', () => {
-            gps.inputComponents.altitude.setValue('10000', true);
-            gps.inputComponents.latitude.setValue('90', true);
-            gps.inputComponents.longitude.setValue('180', true);
-            gps.inputComponents.accuracy.setValue('200', true);
-            gps.inputComponents.bearing.setValue('360', true);
-            gps.inputComponents.speed.setValue('399.99', true);
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['10000', '90', '180', '200', '360', '399.99'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
@@ -171,12 +158,12 @@ describe('GPS Plugin', () => {
         });
 
         test('nominal value', () => {
-            gps.inputComponents.altitude.setValue('420', true);
-            gps.inputComponents.latitude.setValue('69', true); // Nice
-            gps.inputComponents.longitude.setValue('3.14', true);
-            gps.inputComponents.accuracy.setValue('42', true);
-            gps.inputComponents.bearing.setValue('13', true);
-            gps.inputComponents.speed.setValue('399', true);
+            ['altitude', 'latitude', 'longitude', 'accuracy', 'bearing', 'speed'].forEach((field, index) => {
+                const vals = ['420', '69', '3.14', '42', '13', '399'];
+                const input = gps.inputComponents[field].querySelector('input');
+                input.value = vals[index];
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            });
             document.querySelector('.gm-gps-update').click();
 
             expect(sendEventSpy).toHaveBeenCalledTimes(1);

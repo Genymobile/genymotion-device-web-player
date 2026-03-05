@@ -1,7 +1,6 @@
-'use strict';
-
-const Identifiers = require('../../src/plugins/Identifiers');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import Identifiers from '../../src/plugins/Identifiers.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let identifiers;
 let instance;
@@ -46,11 +45,24 @@ describe('Identifiers Plugin', () => {
             ['android', 'device'].forEach(() => {
                 test('button disabled', () => {
                     expect(identifiers.submitBtn.disabled).toBeTruthy();
-                    identifiers.androidInput.setValue('jean-michel', true);
-                    identifiers.deviceInput.setValue('jean-michel', true);
+                    const androidInput = identifiers.androidInput.querySelector('input');
+                    androidInput.value = 'jean-michel';
+                    androidInput.dispatchEvent(new Event('input', {bubbles: true}));
+
+                    const deviceInput = identifiers.deviceInput.querySelector('input');
+                    deviceInput.value = 'jean-michel';
+                    deviceInput.dispatchEvent(new Event('input', {bubbles: true}));
+
                     expect(identifiers.submitBtn.disabled).toBeTruthy();
-                    identifiers.androidInput.setValue('0123456789abcdef', true);
-                    identifiers.deviceInput.setValue('0123456789abcde', true);
+
+                    const androidInput2 = identifiers.androidInput.querySelector('input');
+                    androidInput2.value = '0123456789abcdef';
+                    androidInput2.dispatchEvent(new Event('input', {bubbles: true}));
+
+                    const deviceInput2 = identifiers.deviceInput.querySelector('input');
+                    deviceInput2.value = '0123456789abcde';
+                    deviceInput2.dispatchEvent(new Event('input', {bubbles: true}));
+
                     expect(identifiers.submitBtn.disabled).toBeFalsy();
                 });
             });
@@ -95,56 +107,67 @@ describe('Identifiers Plugin', () => {
     });
 
     test('outgoing events', () => {
-        const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+        const sendEventSpy = vi.spyOn(instance, 'sendEvent');
+        const submitBtn = identifiers.submitBtn;
 
-        identifiers.androidInput.setValue('jean-michel');
-        identifiers.deviceInput.setValue('jean-michel');
-        identifiers.sendDataToInstance(new Event(''));
+        // Helper to simulate user input
+        const setInput = (component, value) => {
+            const input = component.querySelector('input');
+            input.value = value;
+            input.dispatchEvent(new Event('input', {bubbles: true}));
+        };
+
+        setInput(identifiers.androidInput, 'jean-michel');
+        setInput(identifiers.deviceInput, 'jean-michel');
+        submitBtn.click();
         expect(sendEventSpy).toHaveBeenCalledTimes(0);
 
-        identifiers.androidInput.setValue('jean-michel');
-        identifiers.deviceInput.setValue('0123456789abcde');
-        identifiers.sendDataToInstance(new Event(''));
-        expect(sendEventSpy).toHaveBeenCalledTimes(1);
+        setInput(identifiers.androidInput, 'jean-michel');
+        setInput(identifiers.androidInput, '0123456789abcdef');
+        setInput(identifiers.deviceInput, '0123456789abcde');
+        submitBtn.click();
+        expect(sendEventSpy).toHaveBeenCalledTimes(2);
         expect(instance.outgoingMessages[0]).toEqual({
-            channel: 'settings',
-            messages: ['set parameter device_id:0123456789abcde'],
+            channel: 'framework',
+            messages: ['set parameter android_id:0123456789abcdef'],
         });
-
-        identifiers.androidInput.setValue('0123456789abcdef');
-        // input jean-michel is invalid so we keep the previous value
-        identifiers.deviceInput.setValue('jean-michel');
-        identifiers.sendDataToInstance(new Event(''));
-        expect(sendEventSpy).toHaveBeenCalledTimes(3);
         expect(instance.outgoingMessages[1]).toEqual({
-            channel: 'framework',
-            messages: ['set parameter android_id:0123456789abcdef'],
-        });
-        expect(instance.outgoingMessages[2]).toEqual({
             channel: 'settings',
             messages: ['set parameter device_id:0123456789abcde'],
         });
 
-        identifiers.androidInput.setValue('0123456789abcdef');
-        identifiers.deviceInput.setValue('0123456789abcdb');;
-        identifiers.sendDataToInstance(new Event(''));
-        expect(sendEventSpy).toHaveBeenCalledTimes(5);
-        expect(instance.outgoingMessages[3]).toEqual({
+        setInput(identifiers.androidInput, '0123456789abcdef');
+
+        setInput(identifiers.deviceInput, 'jean-michel'); // Attempt invalid
+        submitBtn.click();
+        expect(sendEventSpy).toHaveBeenCalledTimes(4); // +2 messages (android + device old value)
+        expect(instance.outgoingMessages[2]).toEqual({
             channel: 'framework',
             messages: ['set parameter android_id:0123456789abcdef'],
         });
+        expect(instance.outgoingMessages[3]).toEqual({
+            channel: 'settings',
+            messages: ['set parameter device_id:0123456789abcde'],
+        });
+
+        setInput(identifiers.deviceInput, '0123456789abcdb'); // Valid change
+        submitBtn.click();
+        expect(sendEventSpy).toHaveBeenCalledTimes(6); // +2 messages
         expect(instance.outgoingMessages[4]).toEqual({
+            channel: 'framework',
+            messages: ['set parameter android_id:0123456789abcdef'],
+        });
+        expect(instance.outgoingMessages[5]).toEqual({
             channel: 'settings',
             messages: ['set parameter device_id:0123456789abcdb'],
         });
 
-        identifiers.androidInput.setValue('1234567891234@é%');
-        identifiers.deviceInput.setValue('0123456789abcde');
-        identifiers.sendDataToInstance(new Event(''));
-        expect(sendEventSpy).toHaveBeenCalledTimes(7);
-        expect(instance.outgoingMessages[6]).toEqual({
+        setInput(identifiers.androidInput, '1234567891234@é%'); // Invalid
+        submitBtn.click();
+        expect(sendEventSpy).toHaveBeenCalledTimes(8); // +2 messages (android old + device)
+        expect(instance.outgoingMessages[7]).toEqual({
             channel: 'settings',
-            messages: ['set parameter device_id:0123456789abcde'],
+            messages: ['set parameter device_id:0123456789abcdb'],
         });
     });
 });

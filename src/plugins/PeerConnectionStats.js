@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Instance peer connections plugin.
  * Provides peer connections statistics.
  */
-module.exports = class PeerConnectionStats {
+export default class PeerConnectionStats {
     /**
      * Plugin initialization.
      *
@@ -123,4 +121,4 @@ module.exports = class PeerConnectionStats {
         delete this.connection;
         delete this.instance;
     }
-};
+}

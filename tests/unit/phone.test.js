@@ -1,7 +1,6 @@
-'use strict';
-
-const Phone = require('../../src/plugins/Phone');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import Phone from '../../src/plugins/Phone.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let phone;
 let instance;
@@ -55,15 +54,19 @@ describe('Phone Plugin', () => {
 
     describe('outgoing events', () => {
         test('gsm call', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
 
             ['jean-michel', ''].forEach((invalidValue) => {
-                phone.phoneInput.setValue(invalidValue, true);
+                const input = phone.phoneInput.querySelector('input');
+                input.value = invalidValue;
+                input.dispatchEvent(new Event('input', {bubbles: true}));
                 phone.phoneBtn.click();
                 expect(sendEventSpy).toHaveBeenCalledTimes(0);
             });
 
-            phone.phoneInput.setValue('0123456789', true);
+            const input = phone.phoneInput.querySelector('input');
+            input.value = '0123456789';
+            input.dispatchEvent(new Event('input', {bubbles: true}));
             phone.phoneBtn.click();
             expect(sendEventSpy).toHaveBeenCalledTimes(1);
 
@@ -71,8 +74,10 @@ describe('Phone Plugin', () => {
         });
 
         test('sms send', () => {
-            const sendEventSpy = jest.spyOn(instance, 'sendEvent');
-            phone.phoneInput.setValue('0123456789', true);
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
+            const input = phone.phoneInput.querySelector('input');
+            input.value = '0123456789';
+            input.dispatchEvent(new Event('input', {bubbles: true}));
 
             const event = new KeyboardEvent('keyup', {key: ''});
             phone.textInput.dispatchEvent(event);

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * List of invisible key that can be pressed.
  * For values, see http://doc.qt.io/qt-4.8/qt.html & https://github.com/ccampbell/mousetrap/blob/master/mousetrap.js
@@ -42,7 +40,7 @@ const CTRL_SHORTCUT_KEYS = {
  * Instance keyboard plugin.
  * Translate and forward keyboard events to instance.
  */
-module.exports = class KeyboardEvents {
+export default class KeyboardEvents {
     static get name() {
         return 'KeyboardEvents';
     }
@@ -255,4 +253,4 @@ module.exports = class KeyboardEvents {
         });
         this.isListenerAdded = false;
     }
-};
+}

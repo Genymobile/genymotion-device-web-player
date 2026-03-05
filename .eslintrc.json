@@ -1,6 +1,12 @@
 {
-    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-    "plugins": ["prettier"],
+    "parser": "@babel/eslint-parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:prettier/recommended"
+    ],
+    "plugins": [
+        "prettier"
+    ],
     "env": {
         "browser": true,
         "es6": true,
@@ -8,7 +14,9 @@
         "jest": true
     },
     "parserOptions": {
-        "ecmaVersion": 2020
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "requireConfigFile": false
     },
     "rules": {
         "prettier/prettier": [
@@ -20,7 +28,13 @@
                 "enforceForArrowConditionals": false
             }
         ],
-        "comma-spacing": ["error", {"before": false, "after": true}],
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
         "no-console": "warn",
         "no-extra-parens": "off",
         "no-loss-of-precision": "error",
@@ -29,8 +43,15 @@
         "no-unreachable-loop": "error",
         "require-atomic-updates": "error",
         "no-useless-backreference": "error",
+        "object-curly-spacing": "off",
+        "space-before-function-paren": "off",
         // Best practices
-        "array-callback-return": ["error", {"checkForEach": true}],
+        "array-callback-return": [
+            "error",
+            {
+                "checkForEach": true
+            }
+        ],
         "block-scoped-var": "error",
         "consistent-return": "error",
         "curly": "error",
@@ -47,7 +68,12 @@
         "no-sequences": "error",
         "no-unused-expressions": "warn",
         "prefer-regex-literals": "warn",
-        "valid-jsdoc": ["error", {"requireReturn": false}],
+        "valid-jsdoc": [
+            "error",
+            {
+                "requireReturn": false
+            }
+        ],
         // Strict mode
         "strict": "error",
         // Variables
@@ -55,46 +81,128 @@
         "no-undefined": "error",
         "no-use-before-define": "error",
         // Stylistic issues
-        "array-bracket-newline": ["error", "consistent"],
-        "array-bracket-spacing": ["error", "never"],
-        "array-element-newline": ["error", "consistent"],
+        "array-bracket-newline": [
+            "error",
+            "consistent"
+        ],
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        "array-element-newline": [
+            "error",
+            "consistent"
+        ],
         "block-spacing": "error",
         "brace-style": "error",
-        "camelcase": ["error", {"ignoreDestructuring": true, "ignoreGlobals": true}],
-        "comma-dangle": ["error", "only-multiline"],
-        "computed-property-spacing": ["error", "never", {"enforceForClassMembers": true}],
-        "consistent-this": ["error", "self"],
-        "eol-last": ["error", "always"],
-        "func-call-spacing": ["error", "never"],
-        "func-style": ["error", "declaration", {"allowArrowFunctions": true}],
-        "indent": ["error", 4, {"SwitchCase": 1}],
+        "camelcase": [
+            "error",
+            {
+                "ignoreDestructuring": true,
+                "ignoreGlobals": true
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            "only-multiline"
+        ],
+        "computed-property-spacing": [
+            "error",
+            "never",
+            {
+                "enforceForClassMembers": true
+            }
+        ],
+        "consistent-this": [
+            "error",
+            "self"
+        ],
+        "eol-last": [
+            "error",
+            "always"
+        ],
+        "func-call-spacing": [
+            "error",
+            "never"
+        ],
+        "func-style": [
+            "error",
+            "declaration",
+            {
+                "allowArrowFunctions": true
+            }
+        ],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
         "keyword-spacing": "error",
-        "linebreak-style": ["error", "unix"],
-        "max-len": ["error", 120, {"ignoreComments": true}],
-        "multiline-comment-style": ["error", "starred-block"],
-        "new-cap": ["error", {"properties": false}],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "max-len": [
+            "error",
+            120,
+            {
+                "ignoreComments": true
+            }
+        ],
+        "multiline-comment-style": [
+            "error",
+            "starred-block"
+        ],
+        "new-cap": [
+            "error",
+            {
+                "properties": false
+            }
+        ],
         "new-parens": "error",
         "newline-per-chained-call": "off",
         "no-multi-assign": "error",
-        "no-multiple-empty-lines": ["error", {"max": 1}],
-        "no-trailing-spaces": "error",
-        "object-curly-spacing": ["error", "never"],
-        "padded-blocks": ["error", "never"],
-        "quotes": ["error", "single", {"avoidEscape": true}],
-        "semi": ["error", "always"],
-        "semi-style": ["error", "last"],
-        "space-before-function-paren": [
+        "no-multiple-empty-lines": [
             "error",
             {
-                "anonymous": "always",
-                "named": "never",
-                "asyncArrow": "never"
+                "max": 1
             }
         ],
-        "space-in-parens": ["error", "never"],
-        "spaced-comment": ["error", "always"],
+        "no-trailing-spaces": "error",
+        "padded-blocks": [
+            "error",
+            "never"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "semi-style": [
+            "error",
+            "last"
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
+        "spaced-comment": [
+            "error",
+            "always"
+        ],
         // ECMAScript 6
-        "arrow-parens": ["error", "always"],
+        "arrow-parens": [
+            "error",
+            "always"
+        ],
         "arrow-spacing": "error",
         "no-confusing-arrow": "error",
         "no-var": "error",

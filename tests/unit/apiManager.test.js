@@ -1,7 +1,5 @@
-'use strict';
-
-const Instance = require('../mocks/DeviceRenderer');
-const Clipboard = require('../../src/plugins/Clipboard');
+import Instance from '../mocks/DeviceRenderer.js';
+import Clipboard from '../../src/plugins/Clipboard.js';
 
 let instance;
 let exposedApiFunctions;

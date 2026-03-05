@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = class APIManager {
+export default class APIManager {
     constructor(instance) {
         this.instance = instance;
         this.apiFunctions = {};
@@ -63,6 +61,27 @@ module.exports = class APIManager {
                 'Enable or disable the tracking of analytic events. If disabled, all tracked events will be cleared.',
         });
 
+        // Register a function to process tracked events
+        this.registerFunction({
+            name: 'trackEvents',
+            category: 'analytics',
+            fn: (cb) => {
+                // Subscribe to store's TRACKEVENT changes
+                this.instance.store.subscribe(
+                    ({trackedEvents}) => {
+                        if (this.instance.store.state.trackedEvents.events.length) {
+                            cb([...trackedEvents.events]);
+                            // Flush the tracked events
+                            this.instance.store.dispatch({type: 'FLUSH_TRACKED_EVENTS'});
+                        }
+                    },
+                    ['trackedEvents.events'],
+                );
+            },
+            description:
+                // eslint-disable-next-line max-len
+                'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
+        });
         // Register open a widget
         this.registerFunction({
             name: 'openWidget',
@@ -94,27 +113,32 @@ module.exports = class APIManager {
             },
             description: 'Close the modal of a widget by specifying its constructor name.',
         });
-
-        // Register a function to process tracked events
+        // Register a function to mute the video in the exposed API
         this.registerFunction({
-            name: 'trackEvents',
-            category: 'analytics',
-            fn: (cb) => {
-                // Subscribe to store's TRACKEVENT changes
-                this.instance.store.subscribe(
-                    ({trackedEvents}) => {
-                        if (this.instance.store.state.trackedEvents.events.length) {
-                            cb([...trackedEvents.events]);
-                            // Flush the tracked events
-                            this.instance.store.dispatch({type: 'FLUSH_TRACKED_EVENTS'});
-                        }
-                    },
-                    ['trackedEvents.events'],
-                );
+            name: 'mute',
+            category: 'media',
+            fn: () => {
+                // Set the video to muted state
+                this.instance.video.isForceMuted = true; // Custom flag for muted status
+                this.instance.video.muted = true; // HTMLMediaElement property to mute audio
             },
             description:
                 // eslint-disable-next-line max-len
-                'Invoke a callback function with an array of tracked events. This function is called whenever a new event is recorded.',
+                'Mute the video by setting the muted property to true. This function silences the audio of the current video instance.',
+        });
+
+        // Register a function to unmute the video in the exposed API
+        this.registerFunction({
+            name: 'unmute',
+            category: 'media',
+            fn: () => {
+                // Set the video to unmuted state
+                this.instance.video.isForceMuted = false; // Custom flag for muted status
+                this.instance.video.muted = false; // HTMLMediaElement property to unmute audio
+            },
+            description:
+                // eslint-disable-next-line max-len
+                'Unmute the video by setting the muted property to false. This function restores the audio of the current video instance.',
         });
     }
 
@@ -159,4 +183,4 @@ module.exports = class APIManager {
         }, {});
         return exposedFunctions;
     }
-};
+}

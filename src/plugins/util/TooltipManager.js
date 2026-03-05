@@ -1,11 +1,9 @@
-'use strict';
-
 /**
  * TooltipManager
  * Allows you to dynamically add tooltips to any HTML element.
  * Usage: tooltipManager.setTooltip(element, 'Tooltip text', 'top');
  */
-class TooltipManager {
+export default class TooltipManager {
     constructor(instance) {
         this.instance = instance;
         this.tooltipElement = null;
@@ -37,7 +35,7 @@ class TooltipManager {
      * @param {string} [position] - 'top'|'bottom'|'left'|'right' - Optional. Preferred position for the element. If not specified, the position will be determined in the following order of preference: 'bottom', 'left', 'right', 'top'.
      *  @param {string} [classes] - Optional. Additional classes to add to the tooltip.
      */
-    setTooltip(element, text, position, classes=null) {
+    setTooltip(element, text, position, classes = null) {
         if (!element) {
             return;
         }
@@ -167,5 +165,3 @@ class TooltipManager {
         return {left: Math.max(8, left), top, position: 'bottom'};
     }
 }
-
-module.exports = TooltipManager;

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * List of available IO throttling profiles to send to VM
  *
@@ -9,7 +7,7 @@
  * writeIoRate: The number of write operation allowed per second
  *
  */
-module.exports = [
+export default [
     {
         name: 'None',
         label: '(No disk performance alteration)',

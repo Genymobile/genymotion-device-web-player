@@ -1,43 +1,42 @@
-'use strict';
+import MultiTouchEvents from './plugins/MultiTouchEvents';
+import ButtonsEvents from './plugins/ButtonsEvents';
+import Fullscreen from './plugins/Fullscreen';
+import Clipboard from './plugins/Clipboard';
+import StreamBitrate from './plugins/StreamBitrate';
+import Screenrecord from './plugins/Screenrecord';
+import Screenshot from './plugins/Screenshot';
+import StreamResolution from './plugins/StreamResolution';
+import CoordinateUtils from './plugins/CoordinateUtils';
+import KeyboardEvents from './plugins/KeyboardEvents';
+import KeyboardMapping from './plugins/KeyboardMapping';
+import MouseEvents from './plugins/MouseEvents';
+import PeerConnectionStats from './plugins/PeerConnectionStats';
+import Gamepad from './plugins/Gamepad';
+import Camera from './plugins/Camera';
+import GPS from './plugins/GPS';
+import FileUpload from './plugins/FileUpload';
+import GAPPSInstall from './plugins/GAPPSInstall';
+import Battery from './plugins/Battery';
+import Identifiers from './plugins/Identifiers';
+import Network from './plugins/Network';
+import Phone from './plugins/Phone';
+import BasebandRIL from './plugins/BasebandRIL';
+import IOThrottling from './plugins/IOThrottling';
+import GamepadManager from './plugins/GamepadManager';
+import FingerPrint from './plugins/FingerPrint';
+import MediaManager from './plugins/MediaManager';
 
-// Plugins
-const MultiTouchEvents = require('./plugins/MultiTouchEvents');
-const ButtonsEvents = require('./plugins/ButtonsEvents');
-const Fullscreen = require('./plugins/Fullscreen');
-const Clipboard = require('./plugins/Clipboard');
-const StreamBitrate = require('./plugins/StreamBitrate');
-const Screenrecord = require('./plugins/Screenrecord');
-const Screenshot = require('./plugins/Screenshot');
-const StreamResolution = require('./plugins/StreamResolution');
-const CoordinateUtils = require('./plugins/CoordinateUtils');
-const KeyboardEvents = require('./plugins/KeyboardEvents');
-const KeyboardMapping = require('./plugins/KeyboardMapping');
-const MouseEvents = require('./plugins/MouseEvents');
-const PeerConnectionStats = require('./plugins/PeerConnectionStats');
-const Gamepad = require('./plugins/Gamepad');
-const Camera = require('./plugins/Camera');
-const GPS = require('./plugins/GPS');
-const FileUpload = require('./plugins/FileUpload');
-const GAPPSInstall = require('./plugins/GAPPSInstall');
-const Battery = require('./plugins/Battery');
-const Identifiers = require('./plugins/Identifiers');
-const Network = require('./plugins/Network');
-const Phone = require('./plugins/Phone');
-const BasebandRIL = require('./plugins/BasebandRIL');
-const IOThrottling = require('./plugins/IOThrottling');
-const GamepadManager = require('./plugins/GamepadManager');
-const FingerPrint = require('./plugins/FingerPrint');
-const MediaManager = require('./plugins/MediaManager');
+import {generateUID} from './utils/helpers';
+import log from 'loglevel';
+import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
-const {generateUID} = require('./utils/helpers');
-const log = require('loglevel');
 log.setDefaultLevel('debug');
 
 /**
  * Device renderer instance.
  * Initialize a renderer for a specific VM instance
  */
-module.exports = class DeviceRenderer {
+export default class DeviceRenderer {
     /**
      * Renderer instance initialization.
      *
@@ -70,6 +69,9 @@ module.exports = class DeviceRenderer {
         // Event callbacks
         this.callbacks = {};
 
+        // Plugins/Widgets registry
+        this.widgets = [];
+
         // Event listeners
         this.allListeners = [];
 
@@ -78,10 +80,6 @@ module.exports = class DeviceRenderer {
         this.signalingDataChannel = null;
         this.cameraSender = null;
         this.microphoneSender = null;
-        this.sdpConstraints = {
-            offerToReceiveAudio: true,
-            offerToReceiveVideo: true,
-        };
 
         // last accessed x/y position
         this.x = 0;
@@ -116,14 +114,13 @@ module.exports = class DeviceRenderer {
         // Prepare source for the upload worker
         if (window.Worker) {
             /*
-             *Inline worker hack: require a function, extract its body as a string, and inject it into a Blob.
-             * Allows using a Web Worker without a separate JS file, useful when bundling everything into one file.
+             * Inline worker hack: import a function, stringify its body, and
+             * build a Blob URL to create a Web Worker without a separate file.
+             * Useful to avoid file‑path issues at runtime and keep a single bundle.
              */
-            let fileUploaderWorkerBlob = require('./worker/FileUploaderWorker');
-            fileUploaderWorkerBlob = fileUploaderWorkerBlob
-                .toString()
-                .match(/^\s*function\s*\(\s*\)\s*\{(([\s\S](?!\}$))*[\s\S])/)[1];
-            const src = new Blob([fileUploaderWorkerBlob], {type: 'application/javascript'});
+            const workerFn = fileUploaderWorkerBlob.toString();
+            const workerBody = workerFn.substring(workerFn.indexOf('{') + 1, workerFn.lastIndexOf('}'));
+            const src = new Blob([workerBody], {type: 'application/javascript'});
             this.fileUploaderWorkerBlobSRC = URL.createObjectURL(src);
         }
 
@@ -437,7 +434,8 @@ module.exports = class DeviceRenderer {
         }
         // creating SDP offer
         try {
-            const description = await this.peerConnection.createOffer(this.sdpConstraints);
+            const description = await this.peerConnection.createOffer();
+            log.debug('Generated SDP Offer:', description.sdp);
             this.setLocalDescription(description);
         } catch (error) {
             this.onWebRTCConnectionError(error);
@@ -472,6 +470,7 @@ module.exports = class DeviceRenderer {
 
         const config = {
             iceServers: iceServers,
+            bundlePolicy: 'max-compat',
         };
 
         if (!this.peerConnection) {
@@ -489,6 +488,13 @@ module.exports = class DeviceRenderer {
         } else {
             this.useWebsocketAsDataChannel = true;
         }
+
+        /*
+         * Add transceivers to receive audio and video (VM screen/audio)
+         * This replaces the legacy offerToReceiveAudio/Video constraints
+         */
+        this.peerConnection.addTransceiver('audio', {direction: 'recvonly'});
+        this.peerConnection.addTransceiver('video', {direction: 'recvonly'});
 
         this.peerConnection.onicecandidate = (event) => {
             if (typeof event.candidate === 'undefined') {
@@ -973,6 +979,24 @@ module.exports = class DeviceRenderer {
             return;
         }
 
+        // Cleanup specific widget resources dynamically
+        this.widgets.forEach((widget) => {
+            if (widget && typeof widget.destroy === 'function') {
+                widget.destroy();
+            }
+        });
+
+        if (this.store && this.store.destroy) {
+            this.store.destroy();
+        }
+
+        if (this.fileUploaderWorkerBlobSRC) {
+            URL.revokeObjectURL(this.fileUploaderWorkerBlobSRC);
+            this.fileUploaderWorkerBlobSRC = null;
+        }
+
+        this.emit('destroyed');
+
         this.removeAllListeners();
         this.disconnect();
         this.peerConnectionStats?.destroy();
@@ -1067,4 +1091,4 @@ module.exports = class DeviceRenderer {
         // Ensure 'right' style from CSS is overridden/removed
         buttonDiv.style.right = '';
     }
-};
+}

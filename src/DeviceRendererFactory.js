@@ -1,15 +1,14 @@
 /* eslint-disable indent */
-'use strict';
 
-const DeviceRenderer = require('./DeviceRenderer');
-const defaultsDeep = require('lodash/defaultsDeep');
+import DeviceRenderer from './DeviceRenderer';
+import {defaultsDeep} from 'lodash';
 
-const store = require('./store');
-const APIManager = require('./APIManager');
-const ToolbarManager = require('./plugins/util/ToolBarManager');
-const TooltipManager = require('./plugins/util/TooltipManager');
+import store from './store';
+import APIManager from './APIManager';
+import ToolbarManager from './plugins/util/ToolBarManager';
+import TooltipManager from './plugins/util/TooltipManager';
 
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 // Default options
@@ -78,10 +77,8 @@ const defaultOptions = {
 /**
  * Setup & create instances of the device renderer
  */
-module.exports = class DeviceRendererFactory {
-    constructor() {
-        this.instances = [];
-    }
+export default class DeviceRendererFactory {
+    constructor() {}
 
     /**
      * Setup a device renderer instance in the given dom element, for the device instance identified by its instanceWebRTCUrl.
@@ -171,8 +168,6 @@ module.exports = class DeviceRendererFactory {
         instance.toolbarManager = new ToolbarManager(instance);
         instance.tooltipManager = new TooltipManager(instance);
 
-        this.instances.push(instance);
-
         this.loadPlugins(instance);
         this.loadToolbar(instance);
         instance.onWebRTCReady();
@@ -254,7 +249,8 @@ module.exports = class DeviceRendererFactory {
                 }
                 // eslint-disable-next-line no-unused-expressions
                 if (plugin.class) {
-                    new plugin.class(instance, ...args);
+                    const widget = new plugin.class(instance, ...args);
+                    instance.widgets.push(widget);
                 }
             }
         });
@@ -340,4 +336,4 @@ module.exports = class DeviceRendererFactory {
             }
         });
     }
-};
+}

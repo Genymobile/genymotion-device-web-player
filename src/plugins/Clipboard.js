@@ -1,16 +1,14 @@
-'use strict';
+import OverlayPlugin from './util/OverlayPlugin';
+import '@/components/GmChip.js';
 
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {chipTag} = require('./util/components');
-
-const log = require('loglevel');
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
  * Instance clipboard plugin.
  * Provides clipboard data exchange capability between client and instance.
  */
-module.exports = class Clipboard extends OverlayPlugin {
+export default class Clipboard extends OverlayPlugin {
     static get name() {
         return 'Clipboard';
     }
@@ -47,7 +45,9 @@ module.exports = class Clipboard extends OverlayPlugin {
             try {
                 this.clipboard = decodeURIComponent(escape(window.atob(values[2])));
                 if (this.clipboard !== this.clipboardInput.value) {
-                    this.container.classList.remove('gm-clipboard-saved');
+                    if (this.appliedTag) {
+                        this.appliedTag.visible = false;
+                    }
                 }
                 this.clipboardInput.value = this.clipboard;
             } catch (error) {
@@ -92,7 +92,7 @@ module.exports = class Clipboard extends OverlayPlugin {
         this.clipboardInput.className = 'gm-clipboard-input';
         this.clipboardInput.placeholder = this.i18n.CLIPBOARD_PLACEHOLDER || 'Write your content here';
         this.clipboardInput.oninput = (event) => {
-            this.container.classList.remove('gm-clipboard-saved');
+            this.appliedTag.visible = false;
             if (event.target.value.length > 0) {
                 this.submitBtn.disabled = false;
             } else {
@@ -102,19 +102,20 @@ module.exports = class Clipboard extends OverlayPlugin {
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gm-actions';
-        const appliedTag = chipTag.createChip({
-            text: this.i18n.CLIPBOARD_COPIED || 'Copied',
-        });
+        const appliedTag = document.createElement('gm-chip');
+        appliedTag.value = this.i18n.CLIPBOARD_COPIED || 'Copied';
+        appliedTag.visible = false;
+        this.appliedTag = appliedTag;
 
         this.submitBtn = document.createElement('button');
         this.submitBtn.innerHTML = this.i18n.CLIPBOARD_COPY || 'Copy to device';
         this.submitBtn.className = 'gm-btn gm-clipboard-apply';
         this.submitBtn.onclick = () => {
-            this.container.classList.add('gm-clipboard-saved');
+            this.appliedTag.visible = true;
             this.sendDataToInstance();
         };
 
-        actionsDiv.appendChild(appliedTag.element);
+        actionsDiv.appendChild(appliedTag);
         actionsDiv.appendChild(this.submitBtn);
 
         // Setup
@@ -145,4 +146,4 @@ module.exports = class Clipboard extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

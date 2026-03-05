@@ -125,7 +125,7 @@ See the example below or explore our [detailed example](https://github.com/Genym
 
     // Disconnect the device renderer, closing any open data channels.
     window.addEventListener('beforeunload', function () {
-        playerAPI.disconnect();
+        rendererAPI.VM_communication.disconnect();
     });
 </script>
 ```

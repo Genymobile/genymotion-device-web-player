@@ -96,6 +96,8 @@ or check the [PaaS documentation](https://docs.genymotion.com/paas/01_Requiremen
 
 See the example below or explore our [detailed example](https://github.com/Genymobile/genymotion-device-web-player/tree/main/example)
 
+**Note:** The device screen might not show up if the container element height is not defined. Use CSS to set a meaningful height (e.g., `height: 100vh`).
+
 ```html
 <!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature
 <script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>

@@ -104,7 +104,17 @@ const createStore = (instance, reducer) => {
         return unsubscribe;
     };
 
-    instance.store = {state: initialState, dispatch, subscribe, getters};
+    /**
+     * This function is used when the connection to the device is lost and restored.
+     * It will re-emit the current state to all listeners.
+     */
+    const reconnect = () => {
+        listeners.forEach(({cb}) => {
+            cb({...instance.store.state});
+        });
+    };
+
+    instance.store = {state: initialState, dispatch, subscribe, reconnect, getters};
 };
 
 const reducer = (state, action) => {

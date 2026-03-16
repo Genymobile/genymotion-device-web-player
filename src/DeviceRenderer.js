@@ -403,6 +403,19 @@ module.exports = class DeviceRenderer {
     }
 
     /**
+     * Reconnect the instance. Disconnect the current instance, and then
+     * attempt to reconnect.
+     *
+     * When reconnecting, it will attempt to add the previous keyboard and mouse
+     * callbacks. (including keyboard mapping if applicable)
+     */
+    reconnect() {
+        this.disconnect();
+        this.onWebRTCReady();
+        this.store.reconnect();
+    }
+
+    /**
      * Send event to the instance through the Websocket connection.
      *
      * @param {Object} event Event to send.
@@ -622,7 +635,7 @@ module.exports = class DeviceRenderer {
         this.onConnectionStateChange = () => {
             log.debug('ConnectionState changed:', this.peerConnection.iceConnectionState);
             if (this.peerConnection.iceConnectionState === 'disconnected') {
-                this.onWebRTCReady();
+                this.reconnect();
             }
         };
         this.addListener(this.peerConnection, 'connectionstatechange', this.onConnectionStateChange);

@@ -12,6 +12,7 @@ class InstallingGAPPSView {
         this.progressBar = null;
         this.progressPercentage = null;
         this.progressText = null;
+        this.cancelBtn = null;
     }
 
     render() {
@@ -63,10 +64,10 @@ class InstallingGAPPSView {
         const actionsSection = document.createElement('div');
         actionsSection.className = 'gm-section gm-actions gm-progress-actions'; // Add a class for styling
 
-        const cancelBtn = document.createElement('button');
-        cancelBtn.innerText = this.i18n.CANCEL_BUTTON_TEXT || 'CANCEL';
-        cancelBtn.className = 'gm-btn gm-dont-close';
-        cancelBtn.onclick = () => {
+        this.cancelBtn = document.createElement('button');
+        this.cancelBtn.innerText = this.i18n.CANCEL_BUTTON_TEXT || 'CANCEL';
+        this.cancelBtn.className = 'gm-btn gm-dont-close';
+        this.cancelBtn.onclick = () => {
             this.plugin.instance.sendEvent({
                 channel: 'systempatcher',
                 messages: ['cancel'],
@@ -74,7 +75,7 @@ class InstallingGAPPSView {
             this.plugin.setView('InitialView');
         };
 
-        actionsSection.appendChild(cancelBtn);
+        actionsSection.appendChild(this.cancelBtn);
 
         // Append all sections to the main container
         container.appendChild(introSection);
@@ -97,6 +98,12 @@ class InstallingGAPPSView {
         this.progressPercentage.innerHTML = `${percentage}%`;
         this.progressText.innerHTML = text;
         this.progressBar.value = percentage;
+    }
+
+    setCancelButtonEnabled(enabled) {
+        if (this.cancelBtn) {
+            this.cancelBtn.disabled = !enabled;
+        }
     }
 }
 
@@ -621,6 +628,7 @@ export default class GAPPSInstall extends OverlayPlugin {
                     this.toolbarBtn.setIndicator('notification');
                     if (installingGAPPSView) {
                         installingGAPPSView.updateProgress(100, this.i18n.UPLOADER_INSTALLING || 'Installing');
+                        installingGAPPSView.setCancelButtonEnabled(false);
                     }
                 } else if (msg[0] === 'ready' && msg.length >= 2) {
                     if (msg[1].includes('opengapps')) {
@@ -631,6 +639,7 @@ export default class GAPPSInstall extends OverlayPlugin {
 
                     if (installingGAPPSView) {
                         installingGAPPSView.updateProgress(100, this.i18n.UPLOADER_INSTALLED || 'Installed');
+                        installingGAPPSView.setCancelButtonEnabled(true);
                     }
                     const json = {
                         channel: 'systempatcher',

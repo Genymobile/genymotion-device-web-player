@@ -482,7 +482,7 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Type:** `Boolean`
 - **Default:** `true`
 - **Details:**
-  When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display.
+  When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display, the toolbar is visible only if it contains at least one item.
 
 #### `connectionFailedURL`
 
@@ -609,6 +609,14 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
   Enable or disable the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
+
+#### displayToolbar
+
+- **Type:** `Boolean`
+- **Default:** `true`
+- **Compatibility:** `PaaS`, `SaaS`
+- **Details:**
+  Enable or disable the side toolbar visibility. If set to `true`, the toolbar is visible only if it contains at least one item.
 
 #### fileUpload <img align="right" src="./doc/assets/ic_installation.svg">
 

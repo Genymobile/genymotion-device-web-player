@@ -383,18 +383,16 @@
             }
         }
 
-        &:not(.floatingBarDisplayed) {
-            .player-screen-wrapper {
-                padding-bottom: 25px;
-            }
-        }
-
         .player-screen-wrapper {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             flex: 1;
             padding-top: 25px;
+
+            &:not(:has(.floatingBarDisplayed)) {
+                padding-bottom: 25px;
+            }
 
             .gm-video-wrapper {
                 display: flex;

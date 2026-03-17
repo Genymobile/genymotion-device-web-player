@@ -33,6 +33,8 @@ describe('GAPPSInstall Plugin', () => {
             fileUploadUrl: 'mocked',
         });
 
+        instance.registerEventCallback = vi.fn();
+
         // Mock the createFileUploadWorker method to return our mock worker
         instance.createFileUploadWorker = vi.fn().mockReturnValue(mockWorker);
 
@@ -244,6 +246,35 @@ describe('GAPPSInstall Plugin', () => {
             });
 
             expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
+        });
+    });
+
+    describe('installation process', () => {
+        test('disables cancel button during installation phase', () => {
+            // Get the systempatcher callback
+            const systemPatcherCallback = instance.registerEventCallback.mock.calls.find(
+                (call) => call[0] === 'systempatcher',
+            )[1];
+
+            // Navigate to installing view
+            plugin.setView('InstallingGAPPSView');
+            const installingView = plugin.instanciatedViews.get('InstallingGAPPSView');
+
+            // Find cancel button
+            const cancelBtn = installingView.cancelBtn;
+            expect(cancelBtn.disabled).toBe(false);
+
+            // Simulate downloading
+            systemPatcherCallback('status downloading 0 100');
+            expect(cancelBtn.disabled).toBe(false);
+
+            // Simulate installing
+            systemPatcherCallback('status installing');
+            expect(cancelBtn.disabled).toBe(true);
+
+            // Simulate ready
+            systemPatcherCallback('status ready opengapps');
+            expect(cancelBtn.disabled).toBe(false);
         });
     });
 });

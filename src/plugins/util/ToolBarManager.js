@@ -6,8 +6,15 @@ export default class ToolbarManager {
      */
     constructor(instance) {
         this.instance = instance;
-        this.toolbar = document.querySelector('.gm-toolbar ul');
-        this.floatingToolbar = document.querySelector('.gm-floating-toolbar ul');
+        this.toolbarWrapper = document.querySelector('.gm-toolbar-wrapper');
+        if (this.toolbarWrapper) {
+            this.toolbar = this.toolbarWrapper.querySelector('.gm-toolbar ul');
+        }
+
+        this.floatingToolbarWrapper = document.querySelector('.gm-floating-toolbar-wrapper');
+        if (this.floatingToolbarWrapper) {
+            this.floatingToolbar = this.floatingToolbarWrapper.querySelector('.gm-floating-toolbar ul');
+        }
 
         if (!this.toolbar) {
             log.error('Toolbar container not found.');
@@ -103,6 +110,7 @@ export default class ToolbarManager {
         // Adding HTML element to the DOM
         if (isInfloatingBar) {
             this.floatingToolbar.appendChild(button);
+            this.renderSeparator(true);
         } else {
             this.toolbar.appendChild(button);
         }
@@ -284,6 +292,48 @@ export default class ToolbarManager {
      */
     getButtonById(id) {
         return this.buttonRegistry.get(id);
+    }
+
+    /**
+     * Get the number of buttons in the toolbar (excluding separators).
+     * @param {boolean} isInfloatingBar - Whether to check the floating toolbar.
+     * @returns {number} The number of buttons.
+     */
+    getButtonCount(isInfloatingBar = false) {
+        let count = 0;
+        for (const buttonData of this.buttonRegistry.values()) {
+            if (buttonData.isInfloatingBar === isInfloatingBar) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Update visibility of toolbars based on configuration and content.
+     * @param {boolean} displayToolbar - Whether the main toolbar should be displayed.
+     * @param {boolean} displayFloatingToolbar - Whether the floating toolbar should be displayed.
+     */
+    updateToolbarVisibility(displayToolbar, displayFloatingToolbar) {
+        if (this.toolbarWrapper) {
+            const count = this.getButtonCount(false);
+            if (!displayToolbar || count === 0) {
+                this.toolbarWrapper.classList.add('hidden');
+            } else {
+                this.toolbarWrapper.classList.remove('hidden');
+            }
+        }
+
+        if (this.floatingToolbarWrapper) {
+            const count = this.getButtonCount(true);
+            if (!displayFloatingToolbar || count === 0) {
+                this.floatingToolbarWrapper.classList.add('hidden');
+                this.floatingToolbarWrapper.classList.remove('floatingBarDisplayed');
+            } else {
+                this.floatingToolbarWrapper.classList.remove('hidden');
+                this.floatingToolbarWrapper.classList.add('floatingBarDisplayed');
+            }
+        }
     }
 
     /**

@@ -91,6 +91,7 @@ interface RendererSetupOptions {
     clipboard?: boolean; // Default: true
     connectionFailedURL?: string;
     diskIO?: boolean; // Default: true
+    displayToolbar?: boolean; // Default: true
     fileUpload?: boolean; // Default: true
     gappsInstall?: boolean; // Default: true
     fileUploadUrl?: string;

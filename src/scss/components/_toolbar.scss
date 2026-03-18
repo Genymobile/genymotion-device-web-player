@@ -53,6 +53,9 @@
                             margin-right: 0;
                             margin-top: auto;
                             margin-bottom: auto;
+                            &:last-child {
+                                display: none;
+                            }
                         }
 
                         .gm-screenrecord-button {
@@ -107,6 +110,10 @@
                         height: 1px;
                         margin-left: auto;
                         margin-right: auto;
+                        &+.gm-separator {
+                            // Don't display consecutive separators
+                            display: none;
+                        }
                     }
 
                     &:not(.gm-separator):hover {

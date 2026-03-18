@@ -4,6 +4,21 @@ import '@/components/GmChip.js';
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
+// This is the moderne way (baseline 2020) to handle utf8 base64 conversion.
+const b64ToUtf8 = (str) => {
+    return new TextDecoder('utf-8', { fatal: true }).decode(
+        Uint8Array.from(window.atob(str), (c) => c.charCodeAt(0)),
+    );
+};
+
+const utf8ToB64 = (str) => {
+    return window.btoa(
+        Array.from(new TextEncoder().encode(str), (c) =>
+            String.fromCharCode(c),
+        ).join(''),
+    );
+};
+
 /**
  * Instance clipboard plugin.
  * Provides clipboard data exchange capability between client and instance.
@@ -43,17 +58,21 @@ export default class Clipboard extends OverlayPlugin {
             }
 
             try {
-                this.clipboard = decodeURIComponent(escape(window.atob(values[2])));
+                this.clipboard = b64ToUtf8(values[2]);
                 if (this.clipboard !== this.clipboardInput.value) {
                     if (this.appliedTag) {
                         this.appliedTag.visible = false;
                     }
                 }
                 this.clipboardInput.value = this.clipboard;
+                // Write to system clipboard if the message is from the instance
+                navigator.clipboard.writeText(this.clipboard);
             } catch (error) {
                 log.warn('Malformed clipboard content');
             }
         });
+
+        this.activeAutoClipboard();
     }
 
     /**
@@ -142,8 +161,38 @@ export default class Clipboard extends OverlayPlugin {
     sendDataToInstance() {
         const json = {
             channel: 'framework',
-            messages: ['set_device_clipboard ' + window.btoa(unescape(encodeURIComponent(this.clipboardInput.value)))],
+            messages: ['set_device_clipboard ' + utf8ToB64(this.clipboardInput.value)],
         };
         this.instance.sendEvent(json);
+    }
+
+    activeAutoClipboard() {
+        if (!this.instance.video) {
+            return;
+        }
+
+        this.removeKeyboardListener = this.instance.addListener(this.instance.video, 'keydown', async (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+                try {
+                    const text = await navigator.clipboard.readText();
+
+                    if (text) {
+                        const json = {
+                            channel: 'framework',
+                            messages: ['set_device_clipboard ' + utf8ToB64(text)],
+                        };
+                        this.instance.sendEvent(json);
+                    }
+                } catch (error) {
+                    log.warn('Failed to read clipboard:', error);
+                }
+            }
+        });
+    }
+
+    destroy() {
+        if (this.removeKeyboardListener) {
+            this.removeKeyboardListener();
+        }
     }
 }

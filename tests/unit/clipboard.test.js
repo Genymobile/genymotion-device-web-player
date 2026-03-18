@@ -1,4 +1,8 @@
 import {vi} from 'vitest';
+import {TextEncoder, TextDecoder} from 'util';
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 vi.mock('loglevel');
 
@@ -9,11 +13,32 @@ let clipboard;
 let instance;
 let plugin;
 
+// Mock navigator.clipboard
+Object.assign(navigator, {
+    clipboard: {
+        writeText: vi.fn(),
+        readText: vi.fn(),
+    },
+});
+
 describe('Clipboard Plugin', () => {
     beforeEach(() => {
+        // Mock instance video element
+        const mockVideo = document.createElement('video');
+        mockVideo.className = 'gm-video';
+        document.body.appendChild(mockVideo);
+
         instance = new Instance();
+        instance.video = mockVideo;
+        instance.addListener = vi.fn().mockReturnValue(vi.fn());
+
         clipboard = new Clipboard(instance, {});
         plugin = document.getElementsByClassName('gm-clipboard-plugin')[0];
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
     });
 
     describe('api', () => {
@@ -25,6 +50,8 @@ describe('Clipboard Plugin', () => {
     describe('UI', () => {
         beforeEach(() => {
             instance = new Instance();
+            instance.video = document.createElement('video');
+            instance.addListener = vi.fn().mockReturnValue(vi.fn());
             clipboard = new Clipboard(instance, {
                 CLIPBOARD_TITLE: 'TEST CLIPBOARD PLUGIN TITLE',
             });
@@ -63,7 +90,7 @@ describe('Clipboard Plugin', () => {
             instance.emit('framework', 'clipboard missingparam');
             expect(clipboard.clipboard).toBe('');
 
-            instance.emit('framework', 'unrelevant channel');
+            instance.emit('framework', 'unrelevant channel 3param');
             expect(clipboard.clipboard).toBe('');
 
             instance.emit('framework', 'clipboard from_android badvalue'); // Bad value
@@ -103,6 +130,76 @@ describe('Clipboard Plugin', () => {
                 messages: ['set_device_clipboard dGVzdCB2YWx1ZQ=='],
             });
             expect(clipboard.clipboard).toBe('test value');
+        });
+    });
+
+    describe('auto clipboard', () => {
+        test('activates auto clipboard listener on init', () => {
+            expect(instance.addListener).toHaveBeenCalledWith(instance.video, 'keydown', expect.any(Function));
+        });
+
+        test('sends clipboard content on Ctrl+V', async () => {
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
+            const readTextSpy = vi.spyOn(navigator.clipboard, 'readText').mockResolvedValue('copied text');
+
+            // Get the keydown listener
+            const keydownListener = instance.addListener.mock.calls.find(
+                (call) => call[0] === instance.video && call[1] === 'keydown',
+            )[2];
+
+            // Trigger Ctrl+V
+            const event = {ctrlKey: true, key: 'v'};
+            await keydownListener(event);
+
+            expect(readTextSpy).toHaveBeenCalled();
+            expect(sendEventSpy).toHaveBeenCalledWith({
+                channel: 'framework',
+                messages: ['set_device_clipboard ' + window.btoa('copied text')],
+            });
+        });
+
+        test('sends clipboard content on Meta+V (Mac)', async () => {
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
+            const readTextSpy = vi.spyOn(navigator.clipboard, 'readText').mockResolvedValue('mac copied text');
+
+            // Get the keydown listener
+            const keydownListener = instance.addListener.mock.calls.find(
+                (call) => call[0] === instance.video && call[1] === 'keydown',
+            )[2];
+
+            // Trigger Meta+V
+            const event = {metaKey: true, key: 'v'};
+            await keydownListener(event);
+
+            expect(readTextSpy).toHaveBeenCalled();
+            expect(sendEventSpy).toHaveBeenCalledWith({
+                channel: 'framework',
+                messages: ['set_device_clipboard ' + window.btoa('mac copied text')],
+            });
+        });
+
+        test('does not send if clipboard is empty', async () => {
+            const sendEventSpy = vi.spyOn(instance, 'sendEvent');
+            vi.spyOn(navigator.clipboard, 'readText').mockResolvedValue('');
+
+            const keydownListener = instance.addListener.mock.calls.find(
+                (call) => call[0] === instance.video && call[1] === 'keydown',
+            )[2];
+
+            await keydownListener({ctrlKey: true, key: 'v'});
+
+            expect(sendEventSpy).not.toHaveBeenCalled();
+        });
+
+        test('removes listener on destroy', () => {
+            const removeListenerSpy = vi.fn();
+            instance.addListener.mockReturnValue(removeListenerSpy);
+
+            // Re-init to capture the spy
+            clipboard = new Clipboard(instance, {});
+
+            clipboard.destroy();
+            expect(removeListenerSpy).toHaveBeenCalled();
         });
     });
 });

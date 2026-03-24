@@ -169,6 +169,11 @@ export default class Camera extends OverlayPlugin {
         video.className = `gm-camera-video-${type} hidden`;
         previewContainer.appendChild(video);
 
+        const imagePreview = document.createElement('img');
+        imagePreview.className = `gm-camera-image-${type} hidden`;
+        imagePreview.alt = '';
+        previewContainer.appendChild(imagePreview);
+
         // Placeholder/Grant Access UI
         const placeholder = document.createElement('div');
         placeholder.className = 'gm-camera-placeholder';
@@ -228,6 +233,7 @@ export default class Camera extends OverlayPlugin {
         if (type === 'front') {
             this.frontDropdown = dropdown;
             this.frontVideo = video;
+            this.frontImagePreview = imagePreview;
             this.frontPlaceholder = placeholder;
             this.frontUploader = uploaderElement;
             this.frontFileInfo = fileInfo;
@@ -236,6 +242,7 @@ export default class Camera extends OverlayPlugin {
         } else {
             this.backDropdown = dropdown;
             this.backVideo = video;
+            this.backImagePreview = imagePreview;
             this.backPlaceholder = placeholder;
             this.backUploader = uploaderElement;
             this.backFileInfo = fileInfo;
@@ -344,6 +351,12 @@ export default class Camera extends OverlayPlugin {
                 // Handle case where no device is found even if permission might be granted
                 log.warn('No camera device found during permission request.');
                 this.permissionNoDeviceView.classList.remove('hidden');
+            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                log.warn('Camera is in use by another application.');
+                this.permissionDeniedView.innerHTML =
+                    this.i18n.CAMERA_IN_USE_TEXT ||
+                    '⚠️ Camera is in use by another application. Please close other apps using the camera.';
+                this.permissionDeniedView.classList.remove('hidden');
             } else {
                 log.error('Permission request failed:', error);
                 this.permissionDeniedView.classList.remove('hidden');
@@ -372,29 +385,148 @@ export default class Camera extends OverlayPlugin {
 
         if (this.frontDropdown) {
             this.frontDropdown.items = videoOptions;
-            if (!this.selectedVideoDevice) {
-                this.frontDropdown.value = 'none';
-                this.onDeviceSelected('front', 'none');
-            } else {
-                // Try to preserve selection if it still exists or default to none
+
+            if (this.frontSourceType === 'file') {
+                this.frontDropdown.value = 'file';
+            } else if (this.selectedVideoDevice) {
                 const exists = videoOptions.some((o) => o.value === this.selectedVideoDevice);
-                if (!exists) {
+                if (exists) {
+                    this.frontDropdown.value = this.selectedVideoDevice;
+                } else {
                     this.frontDropdown.value = 'none';
                     this.onDeviceSelected('front', 'none');
                 }
+            } else {
+                this.frontDropdown.value = 'none';
+                this.onDeviceSelected('front', 'none');
             }
         }
 
         if (this.backDropdown) {
             this.backDropdown.items = videoOptions;
-            if (!this.selectedVideoDevice) {
+
+            if (this.backSourceType === 'file') {
+                this.backDropdown.value = 'file';
+            } else if (this.selectedVideoDevice) {
+                const exists = videoOptions.some((o) => o.value === this.selectedVideoDevice);
+                if (exists) {
+                    this.backDropdown.value = this.selectedVideoDevice;
+                } else {
+                    this.backDropdown.value = 'none';
+                    this.onDeviceSelected('back', 'none');
+                }
+            } else {
                 this.backDropdown.value = 'none';
                 this.onDeviceSelected('back', 'none');
             }
         }
     }
 
-    onFileSelected(file, type) {
+    parseAspectRatioValue(aspectRatioValue) {
+        if (!aspectRatioValue || typeof aspectRatioValue !== 'string') {
+            return null;
+        }
+
+        const sanitized = aspectRatioValue.replace('auto', '').trim();
+        if (!sanitized) {
+            return null;
+        }
+
+        if (sanitized.includes('/')) {
+            const [rawWidth, rawHeight] = sanitized.split('/').map((value) => Number(value.trim()));
+            if (rawWidth > 0 && rawHeight > 0) {
+                return rawWidth / rawHeight;
+            }
+        }
+
+        const numericRatio = Number(sanitized);
+        if (numericRatio > 0) {
+            return numericRatio;
+        }
+
+        return null;
+    }
+
+    getRendererAspectRatio() {
+        const wrapper = this.instance.videoWrapper;
+        if (!wrapper) {
+            return 16 / 9;
+        }
+
+        const inlineRatio = this.parseAspectRatioValue(wrapper.style?.aspectRatio);
+        if (inlineRatio) {
+            return inlineRatio;
+        }
+
+        const computedRatio = this.parseAspectRatioValue(window.getComputedStyle(wrapper).aspectRatio);
+        if (computedRatio) {
+            return computedRatio;
+        }
+
+        if (this.instance.video && this.instance.video.videoWidth && this.instance.video.videoHeight) {
+            return this.instance.video.videoWidth / this.instance.video.videoHeight;
+        }
+
+        const bounds = wrapper.getBoundingClientRect();
+        if (bounds.width > 0 && bounds.height > 0) {
+            return bounds.width / bounds.height;
+        }
+
+        return 16 / 9;
+    }
+
+    toEvenDimension(value) {
+        const floored = Math.max(2, Math.floor(value));
+        return floored % 2 === 0 ? floored : floored - 1;
+    }
+
+    getTargetStreamSize() {
+        const maxPixels = 1280 * 720;
+        const maxWidth = 1280;
+        const maxHeight = 1280;
+
+        const rawRatio = this.getRendererAspectRatio();
+        const ratio = Math.min(Math.max(rawRatio, 0.25), 4);
+
+        let width = Math.sqrt(maxPixels * ratio);
+        let height = width / ratio;
+
+        const scale = Math.min(1, maxWidth / width, maxHeight / height);
+        width *= scale;
+        height *= scale;
+
+        const finalWidth = this.toEvenDimension(width);
+        const finalHeight = this.toEvenDimension(height);
+
+        return {
+            width: finalWidth,
+            height: finalHeight,
+            ratio: finalWidth / finalHeight,
+        };
+    }
+
+    getContainDrawRect(sourceWidth, sourceHeight, targetWidth, targetHeight) {
+        const ratio = Math.min(targetWidth / sourceWidth, targetHeight / sourceHeight);
+        const drawWidth = Math.floor(sourceWidth * ratio);
+        const drawHeight = Math.floor(sourceHeight * ratio);
+
+        return {
+            drawWidth,
+            drawHeight,
+            startX: Math.floor((targetWidth - drawWidth) / 2),
+            startY: Math.floor((targetHeight - drawHeight) / 2),
+        };
+    }
+
+    revokeTypeObjectURL(type) {
+        const key = `${type}ObjectURL`;
+        if (this[key]) {
+            URL.revokeObjectURL(this[key]);
+            this[key] = null;
+        }
+    }
+
+    async onFileSelected(file, type) {
         if (!file) {
             return;
         }
@@ -409,7 +541,10 @@ export default class Camera extends OverlayPlugin {
             fileNameElement.innerText = file.name;
         }
 
+        await this.stopFileStream(type);
+
         const url = URL.createObjectURL(file);
+        this[`${type}ObjectURL`] = url;
         this.startFileStream(type, url, file);
     }
 
@@ -425,6 +560,8 @@ export default class Camera extends OverlayPlugin {
         const loader = type === 'front' ? this.frontLoader : this.backLoader;
         const uploader = type === 'front' ? this.frontUploader : this.backUploader;
         const fileInfo = type === 'front' ? this.frontFileInfo : this.backFileInfo;
+        const imagePreview = type === 'front' ? this.frontImagePreview : this.backImagePreview;
+        const videoPreview = type === 'front' ? this.frontVideo : this.backVideo;
 
         // Generate a unique ID for this loading request to handle race conditions
         const requestId = Date.now();
@@ -501,26 +638,49 @@ export default class Camera extends OverlayPlugin {
             const sourceWidth = isImage ? mediaElement.naturalWidth : mediaElement.videoWidth;
             const sourceHeight = isImage ? mediaElement.naturalHeight : mediaElement.videoHeight;
 
-            // Fixed target resolution (16:9) to ensure stability and standard aspect ratio
-            const targetWidth = 1280;
-            const targetHeight = 720;
+            let targetSize = this.getTargetStreamSize();
+            let targetWidth = targetSize.width;
+            let targetHeight = targetSize.height;
 
             const canvas = document.createElement('canvas');
             canvas.width = targetWidth;
             canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
 
-            // Fill black background for letterboxing
-            ctx.fillRect(0, 0, targetWidth, targetHeight);
+            let drawRect = this.getContainDrawRect(sourceWidth, sourceHeight, targetWidth, targetHeight);
+            let lastTargetRefresh = 0;
 
-            // Calculate scaling to fit (contain) while preserving aspect ratio
-            const ratio = Math.min(targetWidth / sourceWidth, targetHeight / sourceHeight);
-            const drawWidth = Math.floor(sourceWidth * ratio);
-            const drawHeight = Math.floor(sourceHeight * ratio);
+            const maybeRefreshTargetSize = (now = 0) => {
+                const refreshEveryMs = 500;
+                const ts = now || Date.now();
+                if (ts - lastTargetRefresh < refreshEveryMs) {
+                    return;
+                }
 
-            // Center the video in the canvas
-            const startX = (targetWidth - drawWidth) / 2;
-            const startY = (targetHeight - drawHeight) / 2;
+                lastTargetRefresh = ts;
+                const nextTarget = this.getTargetStreamSize();
+                if (nextTarget.width !== targetWidth || nextTarget.height !== targetHeight) {
+                    targetSize = nextTarget;
+                    targetWidth = targetSize.width;
+                    targetHeight = targetSize.height;
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    drawRect = this.getContainDrawRect(sourceWidth, sourceHeight, targetWidth, targetHeight);
+                }
+            };
+
+            const drawMediaFrame = () => {
+                ctx.fillRect(0, 0, targetWidth, targetHeight);
+                if (drawRect.drawWidth && drawRect.drawHeight) {
+                    ctx.drawImage(
+                        mediaElement,
+                        drawRect.startX,
+                        drawRect.startY,
+                        drawRect.drawWidth,
+                        drawRect.drawHeight,
+                    );
+                }
+            };
 
             let audioTrack = null;
             /*
@@ -529,7 +689,7 @@ export default class Camera extends OverlayPlugin {
              */
             if (this.instance.options.microphone && !isImage) {
                 try {
-                    if (!this.audioContext) {
+                    if (!this.audioContext || this.audioContext.state === 'closed') {
                         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     }
                     if (this.audioContext.state === 'suspended') {
@@ -558,11 +718,17 @@ export default class Camera extends OverlayPlugin {
             let finalStream;
             /*
              * The final stream is composed of:
-             * 1. The video track from the canvas (captured at 30fps)
+             * 1. The video track from the canvas (captured at 30fps for video, 5fps for static images)
              * 2. The audio track extracted from the file (if available and enabled by options)
              */
-            const canvasStream = canvas.captureStream(30);
+            const canvasStream = canvas.captureStream(isImage ? 5 : 30);
             const videoTrack = canvasStream.getVideoTracks()[0];
+
+            /*
+             * Always store the canvasStream separately so its video track can be stopped during cleanup,
+             * even when finalStream is a new MediaStream composed of canvasStream's video + an audio track.
+             */
+            this[`${type}CanvasStream`] = canvasStream;
 
             if (audioTrack) {
                 finalStream = new MediaStream([videoTrack, audioTrack]);
@@ -592,7 +758,13 @@ export default class Camera extends OverlayPlugin {
                  * of the *new* currently active request (if any).
                  */
                 if (mediaElement) {
+                    if (typeof mediaElement.pause === 'function') {
+                        mediaElement.pause();
+                    }
                     mediaElement.src = '';
+                    if (typeof mediaElement.load === 'function') {
+                        mediaElement.load();
+                    }
                     if (mediaElement.parentNode) {
                         mediaElement.parentNode.removeChild(mediaElement);
                     }
@@ -602,9 +774,7 @@ export default class Camera extends OverlayPlugin {
 
             if (isImage) {
                 // Optimization: Draw image once, no loop needed
-                if (drawWidth && drawHeight) {
-                    ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
-                }
+                drawMediaFrame();
 
                 // Force initial frames to avoid staying on a black first frame on remote side
                 if (videoTrack && typeof videoTrack.requestFrame === 'function') {
@@ -613,12 +783,13 @@ export default class Camera extends OverlayPlugin {
 
                 // Keep static image stream refreshed at low frequency for encoder stability and device rotation
                 this[type + 'ImageRefreshId'] = setInterval(() => {
-                    if (!this[type + 'LoadingId']) {
+                    if (this[type + 'LoadingId'] !== requestId) {
                         return;
                     }
-                    if (drawWidth && drawHeight) {
-                        ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
-                    }
+
+                    maybeRefreshTargetSize();
+                    drawMediaFrame();
+
                     if (videoTrack && typeof videoTrack.requestFrame === 'function') {
                         videoTrack.requestFrame();
                     }
@@ -633,22 +804,21 @@ export default class Camera extends OverlayPlugin {
 
                 const drawLoop = (now) => {
                     // Stop if the stream has been cancelled (ID check)
-                    if (!this[type + 'LoadingId']) {
+                    if (this[type + 'LoadingId'] !== requestId) {
                         return;
                     }
 
+                    // Keep outbound stream aligned with device orientation without restarting preview.
+                    maybeRefreshTargetSize(now);
+
                     if (this[type + 'UseVideoFrameCallback']) {
-                        if (drawWidth && drawHeight) {
-                            ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
-                        }
+                        drawMediaFrame();
                         this[type + 'AnimationId'] = mediaElement.requestVideoFrameCallback(drawLoop);
                     } else {
                         // Throttling logic for rAF
                         if (!lastTime || now - lastTime >= throttleInterval) {
                             lastTime = now;
-                            if (drawWidth && drawHeight) {
-                                ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
-                            }
+                            drawMediaFrame();
                         }
                         this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
                     }
@@ -665,23 +835,44 @@ export default class Camera extends OverlayPlugin {
             // Hide loader
             loader.classList.add('hidden');
 
-            if (type === 'front') {
-                this.frontStream = finalStream;
-                this.frontVideo.srcObject = finalStream;
-                this.frontVideo.classList.remove('hidden');
-                this.frontPlaceholder.classList.add('hidden');
-                this.frontUploader.classList.add('hidden');
-                this.frontFileInfo.classList.remove('hidden');
-                await this.instance.mediaManager.startVideoStreaming(finalStream, 'front');
-            } else if (type === 'back') {
-                this.backStream = finalStream;
-                this.backVideo.srcObject = finalStream;
-                this.backVideo.classList.remove('hidden');
-                this.backPlaceholder.classList.add('hidden');
-                this.backUploader.classList.add('hidden');
-                this.backFileInfo.classList.remove('hidden');
-                await this.instance.mediaManager.startVideoStreaming(finalStream, 'back');
+            this[`${type}Stream`] = finalStream;
+            this[`${type}SourceType`] = 'file';
+
+            const placeholder = type === 'front' ? this.frontPlaceholder : this.backPlaceholder;
+
+            if (isImage) {
+                videoPreview.classList.add('hidden');
+                videoPreview.srcObject = null;
+                videoPreview.src = '';
+                if (imagePreview) {
+                    imagePreview.src = url;
+                    imagePreview.classList.remove('hidden');
+                }
+            } else {
+                if (imagePreview) {
+                    imagePreview.classList.add('hidden');
+                    imagePreview.src = '';
+                }
+
+                videoPreview.srcObject = null;
+                videoPreview.src = url;
+                videoPreview.loop = true;
+                videoPreview.muted = true;
+                videoPreview.playsInline = true;
+
+                try {
+                    await videoPreview.play();
+                } catch (e) {
+                    log.warn('[Camera] Preview video play failed:', e);
+                }
+
+                videoPreview.classList.remove('hidden');
             }
+
+            placeholder.classList.add('hidden');
+            uploader.classList.add('hidden');
+            fileInfo.classList.remove('hidden');
+            await this.instance.mediaManager.startVideoStreaming(finalStream, type);
 
             this.toolbarBtn.setIndicator('active');
         } catch (e) {
@@ -689,14 +880,21 @@ export default class Camera extends OverlayPlugin {
             loader.classList.add('hidden');
             uploader.classList.remove('hidden');
             fileInfo.classList.add('hidden');
+            if (imagePreview) {
+                imagePreview.classList.add('hidden');
+                imagePreview.src = '';
+            }
+            this.revokeTypeObjectURL(type);
         }
     }
 
-    stopFileStream(type) {
+    async stopFileStream(type) {
         log.debug(`stopFileStream called for ${type}`);
 
         // Invalidate any pending loading request
         this[type + 'LoadingId'] = null;
+
+        this.revokeTypeObjectURL(type);
 
         // Stop static-image refresh loop
         if (this[type + 'ImageRefreshId']) {
@@ -723,6 +921,18 @@ export default class Camera extends OverlayPlugin {
             loader.classList.add('hidden');
         }
 
+        const previewStream = type === 'front' ? this.frontPreviewStream : this.backPreviewStream;
+        if (previewStream) {
+            previewStream.getTracks().forEach((track) => {
+                track.stop();
+            });
+            if (type === 'front') {
+                this.frontPreviewStream = null;
+            } else {
+                this.backPreviewStream = null;
+            }
+        }
+
         if (this.audioNodes) {
             this.audioNodes.forEach((node) => {
                 if (node.type === type) {
@@ -736,7 +946,9 @@ export default class Camera extends OverlayPlugin {
             this.audioNodes = this.audioNodes.filter((node) => node.type !== type);
 
             if (this.audioNodes.length === 0 && this.audioContext) {
-                this.audioContext.close();
+                if (this.audioContext.state !== 'closed') {
+                    await this.audioContext.close();
+                }
                 this.audioContext = null;
             }
         }
@@ -772,21 +984,52 @@ export default class Camera extends OverlayPlugin {
             });
             if (type === 'front') {
                 this.frontStream = null;
+                this.frontSourceType = null;
             } else {
                 this.backStream = null;
+                this.backSourceType = null;
+            }
+        }
+
+        /*
+         * Stop the canvas captureStream tracks separately.
+         * When an audio track is present, finalStream is a *new* MediaStream that does not include the
+         * canvasStream itself, so the canvas video track would never be stopped by the block above.
+         */
+        const canvasStream = type === 'front' ? this.frontCanvasStream : this.backCanvasStream;
+        if (canvasStream) {
+            canvasStream.getTracks().forEach((t) => {
+                t.stop();
+            });
+            if (type === 'front') {
+                this.frontCanvasStream = null;
+            } else {
+                this.backCanvasStream = null;
             }
         }
 
         const video = type === 'front' ? this.frontVideo : this.backVideo;
+        const imagePreview = type === 'front' ? this.frontImagePreview : this.backImagePreview;
         const fileInfo = type === 'front' ? this.frontFileInfo : this.backFileInfo;
         const uploader = type === 'front' ? this.frontUploader : this.backUploader;
 
         video.classList.add('hidden');
+        if (typeof video.pause === 'function') {
+            video.pause();
+        }
         video.srcObject = null;
+        video.src = '';
+        if (typeof video.load === 'function') {
+            video.load();
+        }
+        if (imagePreview) {
+            imagePreview.classList.add('hidden');
+            imagePreview.src = '';
+        }
         fileInfo.classList.add('hidden');
         uploader.classList.remove('hidden');
 
-        this.instance.mediaManager.stopVideoStreaming(type);
+        await this.instance.mediaManager.stopVideoStreaming(type);
 
         if (!this.frontStream && !this.backStream) {
             this.toolbarBtn.setIndicator('');
@@ -796,28 +1039,25 @@ export default class Camera extends OverlayPlugin {
     async onDeviceSelected(type, deviceId) {
         log.debug(`onDeviceSelected called: type=${type}, deviceId=${deviceId}`);
 
-        // Stop existing stream for this type
-        if (type === 'front' && this.frontStream) {
-            this.frontStream.getTracks().forEach((t) => {
-                t.stop();
-            });
-            this.frontStream = null;
+        if (deviceId !== 'file' && deviceId !== 'none') {
+            this.selectedVideoDevice = deviceId;
         }
-        if (type === 'back' && this.backStream) {
-            this.backStream.getTracks().forEach((t) => {
-                t.stop();
-            });
-            this.backStream = null;
-        }
+
+        await this.stopFileStream(type);
 
         // Reset UI states
         const video = type === 'front' ? this.frontVideo : this.backVideo;
+        const imagePreview = type === 'front' ? this.frontImagePreview : this.backImagePreview;
         const placeholder = type === 'front' ? this.frontPlaceholder : this.backPlaceholder;
         const uploader = type === 'front' ? this.frontUploader : this.backUploader;
         const fileInfo = type === 'front' ? this.frontFileInfo : this.backFileInfo;
 
         video.classList.add('hidden');
         video.srcObject = null;
+        if (imagePreview) {
+            imagePreview.classList.add('hidden');
+            imagePreview.src = '';
+        }
         placeholder.classList.add('hidden');
         uploader.classList.add('hidden');
         if (fileInfo) {
@@ -837,20 +1077,194 @@ export default class Camera extends OverlayPlugin {
         }
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {deviceId: {exact: deviceId}},
+            const requestId = Date.now();
+            this[type + 'LoadingId'] = requestId;
+
+            const previewStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    deviceId: {exact: deviceId},
+                },
                 audio: this.instance.options.microphone,
             });
 
-            if (type === 'front') {
-                this.frontStream = stream;
-            } else {
-                this.backStream = stream;
+            /*
+             * Guard: if the request was cancelled or superseded while awaiting getUserMedia, stop the
+             * newly acquired stream immediately to avoid leaking webcam tracks.
+             */
+            if (this[type + 'LoadingId'] !== requestId) {
+                previewStream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+                return;
             }
-            video.srcObject = stream;
+
+            const processingVideo = document.createElement('video');
+            processingVideo.autoplay = true;
+            processingVideo.muted = true;
+            processingVideo.playsInline = true;
+            processingVideo.srcObject = previewStream;
+
+            processingVideo.style.position = 'absolute';
+            processingVideo.style.opacity = '0';
+            processingVideo.style.pointerEvents = 'none';
+            processingVideo.style.zIndex = '-1';
+            processingVideo.style.top = '0';
+            processingVideo.style.left = '0';
+            processingVideo.style.width = '1px';
+            processingVideo.style.height = '1px';
+
+            // Keep processing element outside the widget tree so closing the modal does not stop webcam injection.
+            const processingHost = this.instance.root || document.body;
+            processingHost.appendChild(processingVideo);
+
+            this[`${type}MediaElement`] = processingVideo;
+
+            await new Promise((resolve) => {
+                if (
+                    processingVideo.readyState >= HTMLMediaElement.HAVE_METADATA &&
+                    processingVideo.videoWidth &&
+                    processingVideo.videoHeight
+                ) {
+                    resolve();
+                } else {
+                    processingVideo.addEventListener('loadedmetadata', () => resolve(), {once: true});
+                }
+            });
+
+            if (this[type + 'LoadingId'] !== requestId) {
+                /*
+                 * If cancelled (e.g. stopFileStream was called), this[`${type}MediaElement`]
+                 * has been removed from DOM by stopFileStream. We just need to stop tracks.
+                 */
+                previewStream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+                if (typeof processingVideo.load === 'function') {
+                    processingVideo.load();
+                }
+                return;
+            }
+
+            const sourceWidth = processingVideo.videoWidth;
+            const sourceHeight = processingVideo.videoHeight;
+            let targetSize = this.getTargetStreamSize();
+            let targetWidth = targetSize.width;
+            let targetHeight = targetSize.height;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+
+            let drawRect = this.getContainDrawRect(sourceWidth, sourceHeight, targetWidth, targetHeight);
+            let lastTargetRefresh = 0;
+
+            const maybeRefreshTargetSize = (now = 0) => {
+                const refreshEveryMs = 500;
+                const ts = now || Date.now();
+                if (ts - lastTargetRefresh < refreshEveryMs) {
+                    return;
+                }
+
+                lastTargetRefresh = ts;
+                const nextTarget = this.getTargetStreamSize();
+                if (nextTarget.width !== targetWidth || nextTarget.height !== targetHeight) {
+                    targetSize = nextTarget;
+                    targetWidth = targetSize.width;
+                    targetHeight = targetSize.height;
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    drawRect = this.getContainDrawRect(sourceWidth, sourceHeight, targetWidth, targetHeight);
+                }
+            };
+
+            const drawFrame = () => {
+                ctx.fillRect(0, 0, targetWidth, targetHeight);
+                if (drawRect.drawWidth && drawRect.drawHeight) {
+                    ctx.drawImage(
+                        processingVideo,
+                        drawRect.startX,
+                        drawRect.startY,
+                        drawRect.drawWidth,
+                        drawRect.drawHeight,
+                    );
+                }
+            };
+
+            const canvasStream = canvas.captureStream(30);
+            const videoTrack = canvasStream.getVideoTracks()[0];
+            const audioTracks = previewStream.getAudioTracks();
+
+            /*
+             * Always store the canvasStream separately so its video track can be stopped during cleanup,
+             * even when finalStream is a new MediaStream composed of canvasStream's video + an audio track.
+             */
+            this[`${type}CanvasStream`] = canvasStream;
+
+            let finalStream;
+            if (audioTracks.length > 0) {
+                finalStream = new MediaStream([videoTrack, audioTracks[0]]);
+            } else {
+                finalStream = canvasStream;
+            }
+
+            // Optimization: Video draw loop, use requestVideoFrameCallback if available for efficient sync, otherwise fallback to throttled rAF
+            this[type + 'UseVideoFrameCallback'] = 'requestVideoFrameCallback' in processingVideo;
+            let lastTime = 0;
+
+            // Target 30fps for the fallback throttle
+            const throttleInterval = 1000 / 30;
+
+            const drawLoop = (now) => {
+                if (this[type + 'LoadingId'] !== requestId) {
+                    return;
+                }
+
+                // Keep outbound stream aligned with device orientation without restarting preview.
+                maybeRefreshTargetSize(now);
+
+                if (this[type + 'UseVideoFrameCallback']) {
+                    drawFrame();
+                    this[type + 'AnimationId'] = processingVideo.requestVideoFrameCallback(drawLoop);
+                } else {
+                    // Throttling logic for rAF
+                    if (!lastTime || now - lastTime >= throttleInterval) {
+                        lastTime = now;
+                        drawFrame();
+                    }
+                    this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
+                }
+            };
+
+            if (this[type + 'UseVideoFrameCallback']) {
+                this[type + 'AnimationId'] = processingVideo.requestVideoFrameCallback(drawLoop);
+            } else {
+                this[type + 'AnimationId'] = requestAnimationFrame(drawLoop);
+            }
+
+            this[`${type}PreviewStream`] = previewStream;
+            this[`${type}Stream`] = finalStream;
+            this[`${type}SourceType`] = 'device';
+
+            video.src = '';
+            video.srcObject = previewStream;
+            video.muted = true;
             video.classList.remove('hidden');
 
-            await this.instance.mediaManager.startVideoStreaming(stream, type);
+            if (imagePreview) {
+                imagePreview.classList.add('hidden');
+                imagePreview.src = '';
+            }
+
+            if (typeof video.play === 'function') {
+                try {
+                    await video.play();
+                } catch (e) {
+                    log.warn('[Camera] Webcam preview play failed:', e);
+                }
+            }
+
+            await this.instance.mediaManager.startVideoStreaming(finalStream, type);
             this.toolbarBtn.setIndicator('active');
         } catch (error) {
             log.error(`Error starting ${type} video:`, error);

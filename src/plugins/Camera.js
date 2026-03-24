@@ -498,8 +498,8 @@ export default class Camera extends OverlayPlugin {
                 });
             }
 
-            const sourceWidth = isImage ? mediaElement.width : mediaElement.videoWidth;
-            const sourceHeight = isImage ? mediaElement.height : mediaElement.videoHeight;
+            const sourceWidth = isImage ? mediaElement.naturalWidth : mediaElement.videoWidth;
+            const sourceHeight = isImage ? mediaElement.naturalHeight : mediaElement.videoHeight;
 
             // Fixed target resolution (16:9) to ensure stability and standard aspect ratio
             const targetWidth = 1280;
@@ -605,6 +605,24 @@ export default class Camera extends OverlayPlugin {
                 if (drawWidth && drawHeight) {
                     ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
                 }
+
+                // Force initial frames to avoid staying on a black first frame on remote side
+                if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                    videoTrack.requestFrame();
+                }
+
+                // Keep static image stream refreshed at low frequency for encoder stability and device rotation
+                this[type + 'ImageRefreshId'] = setInterval(() => {
+                    if (!this[type + 'LoadingId']) {
+                        return;
+                    }
+                    if (drawWidth && drawHeight) {
+                        ctx.drawImage(mediaElement, startX, startY, drawWidth, drawHeight);
+                    }
+                    if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                        videoTrack.requestFrame();
+                    }
+                }, 500);
             } else {
                 // Optimization: Video draw loop, use requestVideoFrameCallback if available for efficient sync, otherwise fallback to throttled rAF
                 this[type + 'UseVideoFrameCallback'] = 'requestVideoFrameCallback' in mediaElement;
@@ -679,6 +697,12 @@ export default class Camera extends OverlayPlugin {
 
         // Invalidate any pending loading request
         this[type + 'LoadingId'] = null;
+
+        // Stop static-image refresh loop
+        if (this[type + 'ImageRefreshId']) {
+            clearInterval(this[type + 'ImageRefreshId']);
+            this[type + 'ImageRefreshId'] = null;
+        }
 
         // Cancel any running animation
         if (this[type + 'AnimationId']) {

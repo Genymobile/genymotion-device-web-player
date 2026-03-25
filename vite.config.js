@@ -65,6 +65,19 @@ export default defineConfig(({ mode }) => {
                 },
             },
             {
+                name: 'dev-redirect',
+                configureServer(server) {
+                    server.middlewares.use((req, res, next) => {
+                        if (req.url === '/') {
+                            res.writeHead(302, { Location: '/example/geny-window.html' });
+                            res.end();
+                            return;
+                        }
+                        next();
+                    });
+                },
+            },
+            {
                 name: 'copy-assets',
                 closeBundle() {
                     if (mode === 'production') {
@@ -112,6 +125,7 @@ export default defineConfig(({ mode }) => {
             },
         },
         server: {
+            strictPort: true,
             port: 8000,
             open: '/example/geny-window.html',
         },

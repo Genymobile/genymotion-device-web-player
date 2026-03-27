@@ -302,87 +302,38 @@
     }
 
     .gm-wrapper {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
+        --phone-border-color: #242424;
+        --phone-outline-color: #cbcecb;
+        --button-color: #a8b0ad;
+        --loader-size: 40%;
 
+        position: absolute;
+        inset: 0;
         display: flex;
 
         > * {
-            transition: opacity 0.5s;
+            transition: opacity 0.5s ease;
         }
 
+        /**
+        * STATE: Waiting for Stream
+        * Displays a loader via mask-image and hides all children.
+        */
         &.waitingForStream {
-            pointer-events: none;
-            mask-image: url('../../assets/images/loader.svg');
-            -webkit-mask-image: url('../../assets/images/loader.svg');
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-            background-size: 40%;
-            background-color: var(--gm-on-background-color);
             width: 100%;
+            pointer-events: none;
+            background-color: var(--gm-on-background-color);
+            background-size: var(--loader-size);
+            
+            mask: url('../../assets/images/loader.svg') center / contain no-repeat;
+            -webkit-mask: url('../../assets/images/loader.svg') center / contain no-repeat;
 
-            > * {
-                opacity: 0;
-            }
+            > * { opacity: 0; }
         }
 
-        &.phoneBorder {
-            .gm-video-wrapper {
-                position: relative;
-                z-index: 1;
-
-                .gm-phone-border {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    border: 8px solid #cbcecb;
-                    border-radius: 27px;
-                    outline: 7px solid #242424;
-                    outline-offset: -13px;
-                    z-index: 3;
-                    pointer-events: none;
-                }
-
-                .gm-phone-button {
-                    position: absolute;
-                    right: -12px;
-                    top: 10%;
-                    height: 90%;
-                    z-index: 1;
-                    margin: 0;
-                    pointer-events: none;
-
-                    &:before {
-                        content: ' ';
-                        display: block;
-                        width: 8px;
-                        height: clamp(33px, 70px, 10%);
-                        background: #a8b0ad;
-                        border-radius: 6px;
-                        margin-bottom: 10px;
-                    }
-
-                    &:after {
-                        content: ' ';
-                        display: block;
-                        width: 8px;
-                        height: clamp(50px, 87px, 15%);
-                        background: #a8b0ad;
-                        border-radius: 3px;
-                    }
-                }
-            }
-        }
-
+        /**
+        * Layout structure for the player UI components.
+        */
         .player-screen-wrapper {
             display: flex;
             flex-direction: column;
@@ -393,23 +344,64 @@
             &:not(:has(.floatingBarDisplayed)) {
                 padding-bottom: 25px;
             }
+        }
 
-            .gm-video-wrapper {
-                display: flex;
-                justify-content: center;
-                min-height: 0;
+        /**
+        * Video container responsible for centering and scaling.
+        */
+        .gm-video-wrapper {
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            min-height: 0;
+            max-height: 100%;
+            margin: auto 30px;
+            position: relative;
+
+            .gm-video {
+                max-width: 100%;
                 max-height: 100%;
-                margin: auto 30px;
+                height: 100%;
+                outline: none;
+                align-self: center;
+                border-radius: 6px;
+            }
+        }
 
-                // Calculate aspect ratio of the video with js
-                aspect-ratio: 0;
+        /**
+        * MODIFIER: Phone Border
+        * Adds a physical device aesthetic with external buttons (Power/Volume).
+        */
+        &.phoneBorder {
+            .gm-video-wrapper {
+                z-index: 1;
+                width: fit-content;
+                border: 8px solid var(--phone-border-color);
+                border-radius: 16px;
+                outline: 7px solid var(--phone-outline-color);
 
-                .gm-video {
-                    max-width: 100%;
-                    max-height: 100%;
-                    align-self: center;
-                    height: 100%;
-                    outline: none;
+                .gm-video { object-fit: fill; }
+
+                // Common styles for physical side-buttons
+                &:before, &:after {
+                    content: '';
+                    position: absolute;
+                    background: var(--button-color);
+                    border-radius: 6px;
+                    z-index: -1;
+                    display: block;
+                }
+
+                // Top-mounted buttons (Landscape Phone / Portrait Tablet)
+                &.landscape.phone, &.portrait.tablet {
+                    &:before { height: 10px; width: 10%; top: -20px; left: 5%; }
+                    &:after  { height: 10px; width: 15%; top: -20px; left: 20%; }
+                }
+
+                // Side-mounted buttons (Portrait Phone / Landscape Tablet)
+                &.portrait.phone, &.landscape.tablet {
+                    &:before { width: 10px; height: 10%; right: -20px; top: 5%; }
+                    &:after  { width: 10px; height: 15%; right: -20px; top: 20%; }
                 }
             }
         }

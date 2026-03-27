@@ -29,9 +29,52 @@ export default class ButtonsEvents {
 
         // Register plugin
         this.instance.buttonsEvents = this;
+        this.videoResizeObserver = null;
+
+        this.rotationX = null;
+        this.rotationY = null;
 
         if (this.instance.options.rotation) {
             this.registerToolbarButton('ROTATE', ROTATE_KEYCODE, 'gm-rotation', i18n.BUTTONS_ROTATE || 'Rotate', false);
+
+            // animate orientation change based on video dim change
+            let lastMode = null;
+            let lastWidth = null;
+            let firstRun = true;
+            this.videoResizeObserver = new ResizeObserver(async (entries) => {
+                const video = entries[0].target;
+                if (!video) {
+                    return;
+                }
+                const mode = video.videoWidth > video.videoHeight ? 'landscape' : 'portrait';
+                const formFactor = (mode === 'landscape' && this.rotationX > this.rotationY) ||
+                    (mode === 'portrait' && this.rotationX < this.rotationY) ? 'phone' : 'tablet';
+
+                if (mode !== lastMode && this.rotationX !== null && this.rotationY !== null) {
+                    this.instance.videoWrapper.classList.remove('portrait');
+                    this.instance.videoWrapper.classList.remove('landscape');
+                    this.instance.videoWrapper.classList.remove('tablet');
+                    this.instance.videoWrapper.classList.remove('phone');
+
+                    lastMode = mode;
+                    this.instance.videoWrapper.classList.add(mode);
+                    this.instance.videoWrapper.classList.add(formFactor);
+
+                    const scale = lastWidth / this.instance.video.offsetHeight;
+                    lastWidth = this.instance.video.offsetWidth;
+
+                    // Only trigger the animation on actual orientation changes, not on the initial size detection
+                    if (!firstRun) {
+                        await this.triggerOrientationAnimation(mode, formFactor, scale);
+                    } else {
+                        firstRun = false;
+                    }
+                } else {
+                    lastWidth = this.instance.video.offsetWidth;
+                }
+            });
+
+            this.videoResizeObserver.observe(this.instance.video);
         }
 
         if (this.instance.options.volume) {
@@ -66,6 +109,18 @@ export default class ButtonsEvents {
         if (this.instance.options.power) {
             this.registerToolbarButton('POWER', POWER_KEYCODE, 'gm-power', i18n.BUTTONS_POWER || 'Power', true);
         }
+
+        this.instance.registerEventCallback('sensors', (message) => {
+            const values = message.split(' ');
+            // Message format: "state accelerometer x:y:z"
+            if (values.length !== 3 || values[1] !== 'accelerometer') {
+                return;
+            }
+            const [x, y] = values[2].split(':');
+
+            this.rotationX = parseFloat(x);
+            this.rotationY = parseFloat(y);
+        });
     }
 
     /**
@@ -184,5 +239,65 @@ export default class ButtonsEvents {
             onMousedown: this.mouseButtonPressEvent.bind(this),
             onMouseup: this.mouseButtonReleaseEvent.bind(this),
         });
+    }
+
+    async triggerOrientationAnimation(mode, formFactor, scale) {
+        const container = this.instance.videoWrapper;
+        const playerScreenWrapper = this.instance.playerScreenWrapper;
+
+        const originalTransition = container.style.transition;
+        const originalTransform = container.style.transform;
+        const originalOverflow = playerScreenWrapper.style.overflow;
+
+        // Avoid any scrollbar display during the animation by hiding overflow on the wrapper
+        playerScreenWrapper.style.overflow = 'hidden';
+
+        /**
+         * The video stream changes orientation instantly when the device rotates.
+         * To prevent a jarring visual jump, we immediately apply an inverse CSS rotation
+         * to match the previous state, then animate the return to 0 degrees.
+         */
+
+        // Reset transition to prepare for the immediate "counter-rotation"
+        container.style.transition = 'none';
+        container.style.transform ='';
+
+        if (mode === 'portrait' && formFactor === 'phone' || mode === 'landscape' && formFactor === 'tablet') {
+            container.style.transform = 'rotate(-90deg) scale('+scale+')';
+        } else {
+            container.style.transform = 'rotate(90deg) scale('+scale+')';
+        }
+
+        // Force a synchronous layout reflow to ensure the 'transition: none' and initial transform are applied before the animation starts.
+        void container.offsetHeight;
+
+        // Re-enable transition and animate the return to the natural layout
+        container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.transform = 'rotate(0deg) scale(1)';
+
+        return new Promise((resolve) => {
+            const onTransitionEnd = (event) => {
+                // Ensure the event is for the transform property and for the target container
+                if (event && event.target) {
+                    if (event.target !== container || event.propertyName !== 'transform') {
+                        return;
+                    };
+                }
+
+                // Clean up styles
+                container.style.transition = originalTransition;
+                container.style.transform = originalTransform;
+                playerScreenWrapper.style.overflow = originalOverflow;
+
+                resolve();
+            };
+
+            container.addEventListener('transitionend', onTransitionEnd, { once: true });
+        });
+    }
+
+    destroy() {
+        this.videoResizeObserver?.disconnect();
+        this.videoResizeObserver = null;
     }
 }

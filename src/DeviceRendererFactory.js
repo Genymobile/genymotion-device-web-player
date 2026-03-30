@@ -45,6 +45,7 @@ const defaultOptions = {
     clipboard: true,
     battery: true,
     gps: true,
+    mapId: 'DEMO_MAP_ID',
     capture: true,
     identifiers: true,
     network: true,
@@ -109,6 +110,7 @@ export default class DeviceRendererFactory {
      * @param  {boolean}            options.clipboard              Clipboard forwarding support activated. Default: true.
      * @param  {boolean}            options.battery                Battery support activated. Default: true.
      * @param  {boolean}            options.gps                    GPS support activated. Default: true.
+     * @param  {string}             options.mapId                  Google Application mapId. Default: 'DEMO_MAP_ID'.
      * @param  {boolean}            options.capture                Screen capture support activated. Default: true.
      * @param  {boolean}            options.identifiers            Identifiers (IMEI, etc...) support activated. Default: true.
      * @param  {boolean}            options.network                Network throttling support activated. Default: true.

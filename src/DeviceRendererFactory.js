@@ -190,11 +190,6 @@ export default class DeviceRendererFactory {
             <div class="player-screen-wrapper">
                 <div class="gm-video-wrapper">
                     <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
-                    ${
-                        options.showPhoneBorder
-                            ? '<div class="gm-phone-button"></div><div class="gm-phone-border"></div>'
-                            : ''
-                    }
                 </div>
                 <div class="gm-floating-toolbar-wrapper 
                     ${!options.floatingToolbar ? 'hidden' : 'floatingBarDisplayed'}">

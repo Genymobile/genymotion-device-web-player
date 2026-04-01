@@ -795,9 +795,9 @@ export default class GPS extends OverlayPlugin {
      */
     clearMarkers() {
         this.markers.forEach((marker) => {
-            if (this.isLegacyMode) {
+            if (marker && typeof marker.setMap === 'function') {
                 marker.setMap(null);
-            } else {
+            } else if (marker && 'map' in marker) {
                 marker.map = null;
             }
         });

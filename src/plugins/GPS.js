@@ -41,6 +41,10 @@ export default class GPS extends OverlayPlugin {
 
         this.inputComponents.speed = null;
 
+        // Listener references
+        this.removePermissionStatusListener = null;
+        this.removeMapClickListener = null;
+
         // Map references
         this.map = null;
         this.elevationService = null;
@@ -497,7 +501,7 @@ export default class GPS extends OverlayPlugin {
              * this is bugged in Firefox, change is never triggered,
              * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
              */
-            this.instance.addListener(this.permissionStatus, 'change', () => {
+            this.removePermissionStatusListener = this.instance.addListener(this.permissionStatus, 'change', () => {
                 if (this.permissionStatus.state === 'granted') {
                     this.setToMyPositionBtn.disabled = false;
                 } else {
@@ -690,7 +694,7 @@ export default class GPS extends OverlayPlugin {
         this.addMapMarker(info.latitude, info.longitude);
 
         // Listen for new location
-        this.map.addListener('click', (event) => {
+        this.removeMapClickListener = this.map.addListener('click', (event) => {
             this.clearMarkers();
             // Add new marker / capture coords for click location
             this.addMapMarker(event.latLng.lat(), event.latLng.lng(), true);
@@ -810,8 +814,14 @@ export default class GPS extends OverlayPlugin {
             this.map = null;
         }
 
-        if (this.permissionStatus) {
-            this.instance.removeListener(this.permissionStatus, 'change');
+        if (this.removePermissionStatusListener) {
+            this.removePermissionStatusListener();
+            this.removePermissionStatusListener = null;
+        }
+
+        if (this.removeMapClickListener) {
+            this.removeMapClickListener();
+            this.removeMapClickListener = null;
         }
 
         if (this.container && this.container.parentNode) {

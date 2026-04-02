@@ -41,14 +41,24 @@ export default class GPS extends OverlayPlugin {
 
         this.inputComponents.speed = null;
 
+        // Listener references
+        this.removePermissionStatusListener = null;
+        this.removeMapClickListener = null;
+
         // Map references
         this.map = null;
-        if (typeof google !== 'undefined') {
-            this.elevationService = new google.maps.ElevationService();
-        } else {
-            this.elevationService = false;
-        }
+        this.elevationService = null;
         this.markers = [];
+
+        /*
+         * Google Maps API mode
+         * If google.maps.importLibrary is not available, we are in legacy mode
+         */
+        this.isLegacyMode = typeof google !== 'undefined' && !google.maps.importLibrary;
+
+        if (this.isLegacyMode) {
+            this.elevationService = new google.maps.ElevationService();
+        }
 
         // Let's use Dalvik as default value
         this.mapLat = 65.9667;
@@ -485,17 +495,13 @@ export default class GPS extends OverlayPlugin {
     async checkLocationPermission() {
         try {
             this.permissionStatus = await navigator.permissions.query({name: 'geolocation'});
-            if (this.permissionStatus.state === 'denied') {
-                this.setToMyPositionBtn.disabled = true;
-            } else {
-                this.setToMyPositionBtn.disabled = false;
-            }
+            this.setToMyPositionBtn.disabled = this.permissionStatus.state === 'denied';
 
             /*
              * this is bugged in Firefox, change is never triggered,
              * so in ff button will never be enabled after permission was denied and an error.code === 1 is thrown
              */
-            this.instance.addListener(this.permissionStatus, 'change', () => {
+            this.removePermissionStatusListener = this.instance.addListener(this.permissionStatus, 'change', () => {
                 if (this.permissionStatus.state === 'granted') {
                     this.setToMyPositionBtn.disabled = false;
                 } else {
@@ -547,7 +553,7 @@ export default class GPS extends OverlayPlugin {
             this.setToMyPositionBtn.classList.add('gm-gps-setToMyPosition-loading');
             this.setToMyPositionBtn.disabled = true;
             const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
+                navigator.geolocation.getCurrentPosition(resolve, reject, {enableHighAccuracy: true, timeout: 10000});
             });
             this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
             this.setToMyPositionBtn.disabled = false;
@@ -569,16 +575,36 @@ export default class GPS extends OverlayPlugin {
                 position.coords.latitude &&
                 position.coords.longitude
             ) {
-                const location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                const results = await this.elevationService.getElevationForLocations({
-                    locations: [location],
-                });
-                if (results.status === 'OK' && results[0]) {
-                    this.setFieldValue('altitude', results[0].elevation);
+                const LatLngClass = this.isLegacyMode ? google.maps.LatLng : (this.LatLng || google.maps.LatLng);
+                const location = new LatLngClass(position.coords.latitude, position.coords.longitude);
+                const request = { locations: [location] };
+
+                let elevationResults = null;
+
+                if (!this.isLegacyMode) {
+                    try {
+                        const response = await this.elevationService.getElevationForLocations(request);
+                        elevationResults = response.results;
+                    } catch (e) {
+                        log.error('Modern elevation request failed', e);
+                    }
+                } else {
+                    elevationResults = await new Promise((resolve) => {
+                        this.elevationService.getElevationForLocations(request, (results, status) => {
+                            if (status === 'OK' && results && results[0]) {
+                                resolve(results);
+                            } else {
+                                resolve(null);
+                            }
+                        });
+                    });
+                }
+
+                if (elevationResults && elevationResults[0]) {
+                    this.setFieldValue('altitude', elevationResults[0].elevation);
                 }
             }
 
-            // Update map
             if (this.map) {
                 this.clearMarkers();
                 this.addMapMarker(position.coords.latitude, position.coords.longitude, true);
@@ -588,8 +614,8 @@ export default class GPS extends OverlayPlugin {
             // if permission was denied, disable the button
             if (error.code === 1) {
                 this.setToMyPositionBtn.disabled = true;
-                this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
             }
+            this.setToMyPositionBtn.classList.remove('gm-gps-setToMyPosition-loading');
             log.error('Error getting location:', error);
         }
     }
@@ -597,36 +623,82 @@ export default class GPS extends OverlayPlugin {
     /**
      * Load map, if available.
      */
-    loadMap() {
+    async loadMap() {
         // Get form info
         const info = this.getLocationInfo();
 
-        // Render map
         if (typeof google === 'undefined') {
             this.mapview.classList.add('gmaps-disabled');
             this.mapview.innerHTML = 'Enable Google Maps with a valid API key to view the map.';
+            return;
         }
-        if (typeof google !== 'undefined') {
-            this.map = new google.maps.Map(this.mapview, {
-                center: {
-                    lat: info.latitude,
-                    lng: info.longitude,
-                },
-                zoom: this.minimumZoomLevel,
-                streetViewControl: false,
-                mapTypeControl: false,
-            });
 
-            // Add initial marker for selection from form
-            this.addMapMarker(info.latitude, info.longitude);
+        let MapConstructor = google.maps.Map;
+        let LatLngConstructor = google.maps.LatLng;
+        let ElevationServiceConstructor = google.maps.ElevationService;
 
-            // Listen for new location
-            this.map.addListener('click', (event) => {
-                this.clearMarkers();
-                // Add new marker / capture coords for click location
-                this.addMapMarker(event.latLng.lat(), event.latLng.lng(), true);
-            });
+        const options = {
+            center: {
+                lat: info.latitude,
+                lng: info.longitude,
+            },
+            zoom: this.minimumZoomLevel,
+            streetViewControl: false,
+            mapTypeControl: false,
+        };
+
+        if (!this.isLegacyMode) {
+            options.mapId = this.instance.options.mapId || 'DEMO_MAP_ID';
+            try {
+                // Initialize imports map
+                const imports = {};
+                // Helper to load and store lib
+                const loadLib = async (name) => {
+                    try {
+                        imports[name] = await google.maps.importLibrary(name);
+                    } catch (e) {
+                        // Library might not be available or needed
+                        log.warn(`Google Maps library "${name}" failed to load or is not available.`, e);
+                    }
+                };
+
+                await Promise.all(['maps', 'core', 'elevation', 'marker'].map(loadLib));
+
+                if (imports.maps && imports.maps.Map) {
+                    MapConstructor = imports.maps.Map;
+                }
+
+                if (imports.core && imports.core.LatLng) {
+                    LatLngConstructor = imports.core.LatLng;
+                }
+                if (imports.elevation && imports.elevation.ElevationService) {
+                    ElevationServiceConstructor = imports.elevation.ElevationService;
+                }
+                if (imports.marker) {
+                    this.AdvancedMarkerElement = imports.marker.AdvancedMarkerElement;
+                    this.PinElement = imports.marker.PinElement;
+                }
+            } catch (e) {
+                log.warn('Failed to load Google Maps libraries dynamically', e);
+            }
         }
+
+        this.LatLng = LatLngConstructor;
+        if (ElevationServiceConstructor && !this.elevationService) {
+            this.elevationService = new ElevationServiceConstructor();
+        }
+
+        this.map = new MapConstructor(this.mapview, options);
+
+        // Add initial marker for selection from form
+        this.addMapMarker(info.latitude, info.longitude);
+
+        // Listen for new location
+        this.removeMapClickListener = this.map.addListener('click', (event) => {
+            this.clearMarkers();
+            // Add new marker / capture coords for click location
+            this.addMapMarker(event.latLng.lat(), event.latLng.lng(), true);
+        });
     }
 
     /**
@@ -636,24 +708,30 @@ export default class GPS extends OverlayPlugin {
      * @param {number} lng Longitude of the marker.
      * @param {boolean} setAltitudeAuto Retrieve and set altitude from gmaps.
      */
-    addMapMarker(lat, lng, setAltitudeAuto = false) {
+    async addMapMarker(lat, lng, setAltitudeAuto = false) {
         if (typeof google === 'undefined') {
             return;
         }
 
-        // Convert values to numbers once
         const numLat = Number(lat);
         const numLng = Number(lng);
         const currentNumLat = Number(this.inputComponents.latitude.value);
         const currentNumLng = Number(this.inputComponents.longitude.value);
 
-        const marker = new google.maps.Marker({
-            position: {
-                lat: numLat,
-                lng: numLng,
-            },
-            map: this.map,
-        });
+        let marker;
+        if (!this.isLegacyMode && this.AdvancedMarkerElement) {
+            const pinElement = this.PinElement ? new this.PinElement() : null;
+            marker = new this.AdvancedMarkerElement({
+                position: {lat: numLat, lng: numLng},
+                map: this.map,
+                content: pinElement ? pinElement.element : null,
+            });
+        } else {
+            marker = new google.maps.Marker({
+                position: { lat: numLat, lng: numLng },
+                map: this.map,
+            });
+        }
         this.markers.push(marker);
 
         // Update form fields only if the value changed
@@ -666,27 +744,46 @@ export default class GPS extends OverlayPlugin {
 
         // Get elevation if service is available
         if (this.elevationService && setAltitudeAuto) {
-            const location = new google.maps.LatLng(numLat, numLng);
-            this.elevationService.getElevationForLocations(
-                {
-                    locations: [location],
-                },
-                (results, status) => {
-                    if (status === 'OK' && results && results[0]) {
-                        const currentAltitude = Number(this.inputComponents.altitude.value);
-                        const newElevation = Number(results[0].elevation);
-                        if (currentAltitude !== newElevation) {
-                            this.setFieldValue('altitude', newElevation);
+            const LatLngClass = this.isLegacyMode ? google.maps.LatLng : (this.LatLng || google.maps.LatLng);
+            const location = new LatLngClass(numLat, numLng);
+            const request = { locations: [location] };
+
+            let elevationResults = null;
+
+            if (!this.isLegacyMode) {
+                try {
+                    const response = await this.elevationService.getElevationForLocations(request);
+                    elevationResults = response.results;
+                } catch (e) {
+                    log.error('Modern elevation request failed', e);
+                }
+            } else {
+                elevationResults = await new Promise((resolve) => {
+                    this.elevationService.getElevationForLocations(request, (results, status) => {
+                        if (status === 'OK' && results && results[0]) {
+                            resolve(results);
+                        } else {
+                            resolve(null);
                         }
-                    }
-                },
-            );
+                    });
+                });
+            }
+
+            if (elevationResults && elevationResults[0]) {
+                const currentAltitude = Number(this.inputComponents.altitude.value);
+                const newElevation = Number(elevationResults[0].elevation);
+                if (currentAltitude !== newElevation) {
+                    this.setFieldValue('altitude', newElevation);
+                }
+            }
         }
 
         // Center map on the new marker and zoom if needed
         if (this.map) {
             const currentZoom = this.map.getZoom();
-            this.map.setCenter(marker.getPosition()); // Always center on the marker
+            const position =
+                (!this.isLegacyMode && this.AdvancedMarkerElement) ? marker.position : marker.getPosition();
+            this.map.setCenter(position); // Always center on the marker
             if (currentZoom < this.minimumZoomLevel) {
                 this.map.setZoom(this.minimumZoomLevel);
             }
@@ -698,8 +795,41 @@ export default class GPS extends OverlayPlugin {
      */
     clearMarkers() {
         this.markers.forEach((marker) => {
-            marker.setMap(null);
+            if (marker && typeof marker.setMap === 'function') {
+                marker.setMap(null);
+            } else if (marker && 'map' in marker) {
+                marker.map = null;
+            }
         });
         this.markers = [];
+    }
+    /**
+     * Clean up the plugin and remove listeners.
+     */
+    destroy() {
+        this.clearMarkers();
+
+        if (this.map) {
+            google.maps.event.clearInstanceListeners(this.map);
+            this.map = null;
+        }
+
+        if (this.removePermissionStatusListener) {
+            this.removePermissionStatusListener();
+            this.removePermissionStatusListener = null;
+        }
+
+        if (this.removeMapClickListener) {
+            this.removeMapClickListener();
+            this.removeMapClickListener = null;
+        }
+
+        if (this.container && this.container.parentNode) {
+            this.container.parentNode.removeChild(this.container);
+        }
+
+        delete this.instance.gps;
+
+        super.destroy();
     }
 }

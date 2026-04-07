@@ -121,12 +121,14 @@ export default class ToolbarManager {
             isInfloatingBar,
         });
 
-        this.instance.tooltipManager.setTooltip(
-            button,
-            title,
-            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
-            'toolbarTitleWidget',
-        );
+        if (title) {
+            this.instance.tooltipManager.setTooltip(
+                button,
+                title,
+                isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
+                'toolbarTitleWidget',
+            );
+        }
     }
 
     /**
@@ -221,6 +223,34 @@ export default class ToolbarManager {
         }
 
         buttonData.buttonIcon.classList.remove(className);
+    }
+
+    /**
+     * Show button.
+     * @param {string} id - The ID of the button.
+     */
+    showButton(id) {
+        const buttonData = this.buttonRegistry.get(id);
+        if (!buttonData || !buttonData.button) {
+            log.warn(`No rendered button found with ID "${id}".`);
+            return;
+        }
+
+        buttonData.button.classList.remove('hidden');
+    }
+
+    /**
+     * Hide button.
+     * @param {string} id - The ID of the button.
+     */
+    hideButton(id) {
+        const buttonData = this.buttonRegistry.get(id);
+        if (!buttonData || !buttonData.button) {
+            log.warn(`No rendered button found with ID "${id}".`);
+            return;
+        }
+
+        buttonData.button.classList.add('hidden');
     }
 
     /**

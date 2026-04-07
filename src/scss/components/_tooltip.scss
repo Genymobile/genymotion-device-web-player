@@ -55,7 +55,7 @@
     margin-bottom: -1 * $spacing-xs;
     .gm-tooltip-arrow {
         top: -8px;
-        left: 50%;
+        left: var(--gm-tooltip-arrow-left, 50%);
         transform: translateX(-50%) rotate(45deg);
     }
 }
@@ -63,7 +63,7 @@
     margin-top: -1 * $spacing-xs;
     .gm-tooltip-arrow {
         bottom: -8px;
-        left: 50%;
+        left: var(--gm-tooltip-arrow-left, 50%);
         transform: translateX(-50%) rotate(45deg);
     }
 }
@@ -71,7 +71,7 @@
     margin-left: -1 * $spacing-xs;
     .gm-tooltip-arrow {
         right: -8px;
-        top: 50%;
+        top: var(--gm-tooltip-arrow-top, 50%);
         transform: translateY(-50%) rotate(45deg);
     }
 }
@@ -79,7 +79,7 @@
     margin-right: -1 * $spacing-xs;
     .gm-tooltip-arrow {
         left: -8px;
-        top: 50%;
+        top: var(--gm-tooltip-arrow-top, 50%);
         transform: translateY(-50%) rotate(45deg);
     }
 }

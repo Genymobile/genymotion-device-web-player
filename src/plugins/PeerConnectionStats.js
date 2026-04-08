@@ -73,44 +73,38 @@ export default class PeerConnectionStats {
      * Creates & display the default turn warning.
      */
     displayDefaultTurnWarning() {
-        // TODO look at this button and see if it can be improved
-        let message = '<h1><span>&#9888;</span> Using a default TURN</h1>Performance is not optimal.';
-        const li = document.createElement('li');
-        const warning = document.createElement('div');
-        warning.classList.add('gm-default-turn-button');
-        warning.classList.add('gm-icon-button');
-        const hover = document.createElement('div');
-        hover.className = 'gm-default-turn-used gm-hidden';
-        if (this.instance.options.connectionFailedURL) {
-            message = message + '<br>Click on the icon to learn more.';
-            warning.href = this.instance.options.connectionFailedURL;
-            warning.target = '_blank';
+        const turnButtonWarning = this.instance.toolbarManager.registerButton({
+            id: 'default-turn-warning',
+            iconClass: 'gm-default-turn-button gm-active',
+            onClick: () => {
+                if (this.instance.options.connectionFailedURL) {
+                    window.open(this.instance.options.connectionFailedURL, '_blank');
+                }
+            }
+        });
+
+        if (turnButtonWarning) {
+            this.instance.toolbarManager.renderButton('default-turn-warning');
+            let tooltipMsg = '⚠️ <b>Using a default TURN server. Performance is not optimal.</b>';
+            if (this.instance.options.connectionFailedURL) {
+                tooltipMsg = tooltipMsg + '<br><i>Click on the icon to learn more.</i>';
+            }
+            this.instance.tooltipManager.setTooltip(
+                turnButtonWarning.htmlElement,
+                tooltipMsg,
+                this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
+                null,
+                true
+            );
         }
-        hover.innerHTML = message;
-        li.appendChild(hover);
-        li.appendChild(warning);
-
-        warning.onmouseenter = () => {
-            hover.classList.remove('gm-hidden');
-            const {top} = warning.getBoundingClientRect();
-            hover.style.top = `${top - hover.offsetHeight + hover.parentElement.offsetHeight / 2 + 10}px`;
-        };
-        warning.onmouseleave = () => {
-            hover.classList.add('gm-hidden');
-        };
-
-        const toolbar = this.instance.root.querySelector('.gm-toolbar ul');
-        toolbar.appendChild(li);
+        this.instance.toolbarManager.showButton('default-turn-warning');
     }
 
     /**
      * Hide the default turn warning.
      */
     hideDefaultTurnWarning() {
-        const element = this.instance.getChildByClass(this.instance.root, 'gm-default-turn-button');
-        if (element) {
-            element.remove();
-        }
+        this.instance.toolbarManager.hideButton('default-turn-warning');
     }
 
     /**

@@ -198,7 +198,7 @@ export default class DeviceRendererFactory {
                     <div class="gm-floating-toolbar"><ul></ul></div>
                 </div>
             </div>
-            <div class="gm-toolbar-wrapper" ${!options.floatingToolbar ? 'hidden' : ''}>
+            <div class="gm-toolbar-wrapper ${!options.floatingToolbar ? 'hidden' : ''}">
                 <div class="gm-toolbar">
                     <ul></ul>
                 </div>

@@ -819,7 +819,7 @@ export default class GPS extends OverlayPlugin {
             this.removePermissionStatusListener = null;
         }
 
-        if (this.removeMapClickListener) {
+        if (this.removeMapClickListener && this.removeMapClickListener === 'function') {
             this.removeMapClickListener();
             this.removeMapClickListener = null;
         }
@@ -829,7 +829,5 @@ export default class GPS extends OverlayPlugin {
         }
 
         delete this.instance.gps;
-
-        super.destroy();
     }
 }

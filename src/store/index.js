@@ -9,6 +9,7 @@ const initialState = {
         widgetsOpened: [],
     },
     isKeyboardEventsEnabled: false,
+    isAutoPasteActive: false,
     isMouseEventsEnabled: false,
     isDragAndDropForUploadFileEnabled: true,
     trackedEvents: {
@@ -117,6 +118,9 @@ const reducer = (state, action) => {
             break;
         case 'KEYBOARD_EVENTS_ENABLED':
             state.isKeyboardEventsEnabled = action.payload;
+            break;
+        case 'AUTO_PASTE_ACTIVE':
+            state.isAutoPasteActive = action.payload;
             break;
         case 'MOUSE_EVENTS_ENABLED':
             state.isMouseEventsEnabled = action.payload;

@@ -134,6 +134,15 @@ describe('Clipboard Plugin', () => {
     });
 
     describe('auto clipboard', () => {
+        const createPasteEvent = (modifiers = {}) => ({
+            key: 'v',
+            ctrlKey: false,
+            metaKey: false,
+            preventDefault: vi.fn(),
+            stopPropagation: vi.fn(),
+            ...modifiers,
+        });
+
         test('activates auto clipboard listener on init', () => {
             expect(instance.addListener).toHaveBeenCalledWith(instance.video, 'keydown', expect.any(Function));
         });
@@ -148,7 +157,7 @@ describe('Clipboard Plugin', () => {
             )[2];
 
             // Trigger Ctrl+V
-            const event = {ctrlKey: true, key: 'v'};
+            const event = createPasteEvent({ctrlKey: true});
             await keydownListener(event);
 
             expect(readTextSpy).toHaveBeenCalled();
@@ -168,7 +177,7 @@ describe('Clipboard Plugin', () => {
             )[2];
 
             // Trigger Meta+V
-            const event = {metaKey: true, key: 'v'};
+            const event = createPasteEvent({metaKey: true});
             await keydownListener(event);
 
             expect(readTextSpy).toHaveBeenCalled();
@@ -186,7 +195,7 @@ describe('Clipboard Plugin', () => {
                 (call) => call[0] === instance.video && call[1] === 'keydown',
             )[2];
 
-            await keydownListener({ctrlKey: true, key: 'v'});
+            await keydownListener(createPasteEvent({ctrlKey: true}));
 
             expect(sendEventSpy).not.toHaveBeenCalled();
         });

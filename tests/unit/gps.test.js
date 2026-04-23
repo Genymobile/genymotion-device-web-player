@@ -181,4 +181,49 @@ describe('GPS Plugin', () => {
             });
         });
     });
+
+    describe('destroy', () => {
+        test('does not throw and cleans up when removeMapClickListener is a listener handle', () => {
+            const previousGoogle = window.google;
+            const clearInstanceListeners = vi.fn();
+            const removeListener = vi.fn();
+            window.google = {
+                maps: {
+                    event: {
+                        clearInstanceListeners,
+                        removeListener,
+                    },
+                },
+            };
+
+            const clearMarkersSpy = vi.spyOn(gps, 'clearMarkers').mockImplementation(() => {});
+            const removePermissionStatusListener = vi.fn();
+            const removeMapClickListenerRemove = vi.fn();
+
+            gps.map = {};
+            gps.removePermissionStatusListener = removePermissionStatusListener;
+            gps.removeMapClickListener = {remove: removeMapClickListenerRemove};
+
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+            gps.container = container;
+
+            expect(() => gps.destroy()).not.toThrow();
+
+            expect(clearMarkersSpy).toHaveBeenCalledTimes(1);
+            expect(clearInstanceListeners).toHaveBeenCalledTimes(1);
+            expect(removePermissionStatusListener).toHaveBeenCalledTimes(1);
+            expect(removeMapClickListenerRemove).toHaveBeenCalledTimes(1);
+            expect(removeListener).toHaveBeenCalledTimes(0);
+
+            expect(gps.map).toBeNull();
+            expect(gps.removePermissionStatusListener).toBeNull();
+            expect(gps.removeMapClickListener).toBeNull();
+            expect(container.parentNode).toBeNull();
+            expect(instance.gps).toBeUndefined();
+
+            clearMarkersSpy.mockRestore();
+            window.google = previousGoogle;
+        });
+    });
 });

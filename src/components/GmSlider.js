@@ -7,6 +7,10 @@ export class GmSlider extends HTMLElement {
     #max = 100;
     #value = 50;
 
+    #clampValue(val) {
+        return Math.min(this.#max, Math.max(this.#min, val));
+    }
+
     static get observedAttributes() {
         return ['min', 'max', 'value', 'disabled'];
     }
@@ -63,12 +67,20 @@ export class GmSlider extends HTMLElement {
                     this.input.max = this.#max;
                 }
                 break;
-            case 'value':
-                this.#value = val;
+            case 'value': {
+                const clamped = this.#clampValue(val);
+
+                if (clamped !== val) {
+                    this.setAttribute('value', clamped);
+                    return;
+                }
+
+                this.#value = clamped;
                 if (this.input) {
-                    this.input.value = this.#value;
+                    this.input.value = String(this.#value);
                 }
                 break;
+            }
             case 'disabled': {
                 const input = this.querySelector('input');
                 if (input) {
@@ -209,7 +221,11 @@ export class GmSlider extends HTMLElement {
     }
 
     set value(newValue) {
-        this.setAttribute('value', newValue);
+        const val = parseFloat(newValue);
+        if (isNaN(val)) {
+            return;
+        }
+        this.setAttribute('value', this.#clampValue(val));
     }
 }
 

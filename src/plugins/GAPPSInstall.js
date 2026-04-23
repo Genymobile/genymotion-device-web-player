@@ -415,8 +415,8 @@ class InitialView {
         text.className = 'gm-gapps-text';
         text.innerHTML =
             this.i18n.GAPPS_TEXT ||
-            'You can install <b>Open GApps</b> to access <b>Google Play Store services</b> ' +
-                ', or <b>APK files</b> to sideload any apps and alternate stores.';
+            'You can install <b>Open GApps</b> to access <b>Google Play Store services</b>,' +
+                ' or <b>APK files</b> to sideload any apps and alternate stores.';
         introSection.appendChild(text);
 
         const separator1 = document.createElement('div');

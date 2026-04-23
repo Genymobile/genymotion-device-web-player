@@ -1,4 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
+import {CTRL_SHORTCUT_KEYS} from './util/qt-keycodes';
 import '@/components/GmChip.js';
 
 import log from 'loglevel';
@@ -19,7 +20,7 @@ const utf8ToB64 = (str) => {
     );
 };
 
-const QT_PASTE_KEYCODE = parseInt('0x010000e2', 16);
+const QT_PASTE_KEYCODE = parseInt(CTRL_SHORTCUT_KEYS.v, 16);
 
 /**
  * Instance clipboard plugin.
@@ -189,7 +190,8 @@ export default class Clipboard extends OverlayPlugin {
         }
 
         this.removeKeyboardListener = this.instance.addListener(this.instance.video, 'keydown', async (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v') {
+            const key = (event.key || '').toLowerCase();
+            if ((event.ctrlKey || event.metaKey) && key === 'v') {
                 event.preventDefault();
                 event.stopPropagation();
 

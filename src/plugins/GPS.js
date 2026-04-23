@@ -833,8 +833,14 @@ export default class GPS extends OverlayPlugin {
             this.removePermissionStatusListener = null;
         }
 
-        if (this.removeMapClickListener && this.removeMapClickListener === 'function') {
-            this.removeMapClickListener();
+        if (this.removeMapClickListener) {
+            if (typeof this.removeMapClickListener.remove === 'function') {
+                this.removeMapClickListener.remove();
+            } else if (typeof google !== 'undefined' && google.maps?.event?.removeListener) {
+                google.maps.event.removeListener(this.removeMapClickListener);
+            } else if (typeof this.removeMapClickListener === 'function') {
+                this.removeMapClickListener();
+            }
             this.removeMapClickListener = null;
         }
 

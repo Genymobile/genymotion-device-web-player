@@ -83,6 +83,16 @@ export default class GPS extends OverlayPlugin {
             const values = message.split(' ');
             if (Object.keys(this.inputComponents).includes(values[0]) && values.length >= 2) {
                 this.setFieldValue(values[0], values[1]);
+                // Sync map marker with updated coordinates
+                if ((values[0] === 'latitude' || values[0] === 'longitude') && this.map) {
+                    const lat = Number(this.inputComponents.latitude.value);
+                    const lng = Number(this.inputComponents.longitude.value);
+
+                    if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+                        this.clearMarkers();
+                        this.addMapMarker(lat, lng);
+                    }
+                }
             }
             this.container.classList.add('gm-gps-saved');
             if (this.appliedTag) {
@@ -171,6 +181,7 @@ export default class GPS extends OverlayPlugin {
             } else {
                 this.inputComponents.latitude.setErrorMessage('');
             }
+            this.submitBtn.disabled = false;
             this.checkErrors();
             this.clearMarkers();
             this.addMapMarker(this.inputComponents.latitude.value, this.inputComponents.longitude.value);
@@ -198,6 +209,7 @@ export default class GPS extends OverlayPlugin {
             } else {
                 this.inputComponents.longitude.setErrorMessage('');
             }
+            this.submitBtn.disabled = false;
             this.checkErrors();
             this.clearMarkers();
             this.addMapMarker(this.inputComponents.latitude.value, this.inputComponents.longitude.value);
@@ -275,6 +287,7 @@ export default class GPS extends OverlayPlugin {
         this.inputComponents.accuracy.setAttribute('unit-text', 'm');
         this.inputComponents.accuracy.setAttribute('min', '0');
         this.inputComponents.accuracy.setAttribute('max', '200');
+        this.inputComponents.accuracy.setAttribute('step', 'any');
         this.inputComponents.accuracy.setAttribute('strict-range', '');
 
         this.inputComponents.accuracy.addEventListener('gm-text-input-input', (e) => {
@@ -412,7 +425,7 @@ export default class GPS extends OverlayPlugin {
         this.submitBtn.innerHTML = this.i18n.GPS_APPLY || 'Apply';
         this.submitBtn.className = 'gm-btn gm-gps-update';
         this.submitBtn.onclick = this.sendDataToInstance.bind(this);
-        this.submitBtn.disabled = true;
+        this.submitBtn.disabled = false;
         actionsDiv.appendChild(this.submitBtn);
 
         // Build final layout
@@ -606,6 +619,7 @@ export default class GPS extends OverlayPlugin {
             }
 
             if (this.map) {
+                this.submitBtn.disabled = false;
                 this.clearMarkers();
                 this.addMapMarker(position.coords.latitude, position.coords.longitude, true);
                 this.map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
@@ -820,7 +834,13 @@ export default class GPS extends OverlayPlugin {
         }
 
         if (this.removeMapClickListener) {
-            this.removeMapClickListener();
+            if (typeof this.removeMapClickListener.remove === 'function') {
+                this.removeMapClickListener.remove();
+            } else if (typeof google !== 'undefined' && google.maps?.event?.removeListener) {
+                google.maps.event.removeListener(this.removeMapClickListener);
+            } else if (typeof this.removeMapClickListener === 'function') {
+                this.removeMapClickListener();
+            }
             this.removeMapClickListener = null;
         }
 
@@ -829,7 +849,5 @@ export default class GPS extends OverlayPlugin {
         }
 
         delete this.instance.gps;
-
-        super.destroy();
     }
 }

@@ -1,4 +1,5 @@
 import OverlayPlugin from './util/OverlayPlugin';
+import {CTRL_SHORTCUT_KEYS} from './util/qt-keycodes';
 import '@/components/GmChip.js';
 
 import log from 'loglevel';
@@ -18,6 +19,8 @@ const utf8ToB64 = (str) => {
         ).join(''),
     );
 };
+
+const QT_PASTE_KEYCODE = parseInt(CTRL_SHORTCUT_KEYS.v, 16);
 
 /**
  * Instance clipboard plugin.
@@ -66,12 +69,13 @@ export default class Clipboard extends OverlayPlugin {
                 }
                 this.clipboardInput.value = this.clipboard;
                 // Write to system clipboard if the message is from the instance
-                navigator.clipboard.writeText(this.clipboard);
+                this.writeToSystemClipboard(this.clipboard);
             } catch (error) {
                 log.warn('Malformed clipboard content');
             }
         });
 
+        this.instance.store.dispatch({type: 'AUTO_PASTE_ACTIVE', payload: true});
         this.activeAutoClipboard();
     }
 
@@ -166,22 +170,52 @@ export default class Clipboard extends OverlayPlugin {
         this.instance.sendEvent(json);
     }
 
+    writeToSystemClipboard(text) {
+        if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+            return;
+        }
+
+        navigator.clipboard.writeText(text).catch((error) => {
+            if (error?.name === 'NotAllowedError') {
+                log.debug('Clipboard write denied by browser permissions policy');
+                return;
+            }
+            log.warn('Failed to write clipboard:', error);
+        });
+    }
+
     activeAutoClipboard() {
         if (!this.instance.video) {
             return;
         }
 
         this.removeKeyboardListener = this.instance.addListener(this.instance.video, 'keydown', async (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+            const key = (event.key || '').toLowerCase();
+            if ((event.ctrlKey || event.metaKey) && key === 'v') {
+                event.preventDefault();
+                event.stopPropagation();
+
                 try {
                     const text = await navigator.clipboard.readText();
-
                     if (text) {
                         const json = {
                             channel: 'framework',
                             messages: ['set_device_clipboard ' + utf8ToB64(text)],
                         };
                         this.instance.sendEvent(json);
+                        // Send the corresponding key events to trigger paste in the instance and release
+                        let keyboardEvent = {
+                            type: 'KEYBOARD_PRESS',
+                            keychar: '',
+                            keycode: QT_PASTE_KEYCODE,
+                        };
+                        this.instance.sendEvent(keyboardEvent);
+                        keyboardEvent = {
+                            type: 'KEYBOARD_RELEASE',
+                            keychar: '',
+                            keycode: QT_PASTE_KEYCODE,
+                        };
+                        this.instance.sendEvent(keyboardEvent);
                     }
                 } catch (error) {
                     log.warn('Failed to read clipboard:', error);
@@ -194,5 +228,6 @@ export default class Clipboard extends OverlayPlugin {
         if (this.removeKeyboardListener) {
             this.removeKeyboardListener();
         }
+        this.instance.store.dispatch({type: 'AUTO_PASTE_ACTIVE', payload: false});
     }
 }

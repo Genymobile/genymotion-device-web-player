@@ -1,40 +1,4 @@
-/**
- * List of invisible key that can be pressed.
- * For values, see http://doc.qt.io/qt-4.8/qt.html & https://github.com/ccampbell/mousetrap/blob/master/mousetrap.js
- */
-const INVISIBLE_KEYS = {
-    8: '0x01000003', // backspace
-    9: '0x01000001', // tab
-    13: '0x01000005', // enter
-    16: '0x01000020', // shift
-    17: '0x01000021', // ctrl
-    18: '0x01000023', // alt
-    20: '0x01000024', // capslock
-    27: '0x01000000', // escape
-    32: '0x20', // space
-    33: '0x01000016', // pageup
-    34: '0x01000017', // pagedown
-    35: '0x01000011', // end
-    36: '0x01000010', // home
-    37: '0x01000012', // left
-    38: '0x01000013', // up
-    39: '0x01000014', // right
-    40: '0x01000015', // down
-    45: '0x01000006', // ins
-    46: '0x01000007', // del
-    /**
-     * Do not propagate Meta to Android. It disables copy/cut/paste special keys when pressed
-     *    91: '0x01000022', // meta
-     *    93: '0x01000022', // meta
-     *    224: '0x01000022', // meta
-     */
-};
-
-const CTRL_SHORTCUT_KEYS = {
-    67: '0x010000cf', // Copy
-    86: '0x010000e2', // Paste
-    88: '0x010000d0', // Cut
-};
+import {CTRL_SHORTCUT_KEYS, INVISIBLE_KEYS} from './util/qt-keycodes';
 
 /**
  * Instance keyboard plugin.
@@ -58,6 +22,7 @@ export default class KeyboardEvents {
         this.instance.keyboardEvents = this;
 
         this.isListenerAdded = false;
+        this.isAutoPasteActive = false;
         this.currentlyPressedKeys = new Map();
 
         this.instance.store.subscribe(
@@ -69,6 +34,14 @@ export default class KeyboardEvents {
                 }
             },
             ['isKeyboardEventsEnabled'],
+        );
+
+        this.isAutoPasteActive = this.instance.store.state.isAutoPasteActive;
+        this.instance.store.subscribe(
+            ({isAutoPasteActive}) => {
+                this.isAutoPasteActive = isAutoPasteActive;
+            },
+            ['isAutoPasteActive'],
         );
 
         // activate the plugin listening
@@ -94,81 +67,98 @@ export default class KeyboardEvents {
     }
 
     /**
-     * Called when the user press a writable key (A-Z + 0-9 + symbols), send event to instance.
-     *
-     * @param {Event} event Event.
-     */
-    onKeyPress(event) {
-        const key = event.charCode;
-        let text = event.key || String.fromCharCode(key);
-        if (text === 'Spacebar') {
-            text = ' ';
-        }
-        let json = {
-            type: 'KEYBOARD_PRESS',
-            keychar: text,
-            keycode: key,
-        };
-        this.instance.sendEvent(json);
-        json = {
-            type: 'KEYBOARD_RELEASE',
-            keychar: text,
-            keycode: key,
-        };
-        this.instance.sendEvent(json);
-    }
-
-    /**
      * Called when the user press a key. Handle special events like backspace.
      *
      * @param  {Event}   event Event.
      * @return {boolean}       Whether or not the event must continue propagation.
      */
     onKeyDown(event) {
-        let key;
+        const normalizedKey = (event.key || '').toLowerCase();
+        const eventsToSend = [];
+        let pressedKeyToTrack = null;
+
+        // Auto-paste is handled by Clipboard plugin, skip keyboard mapping for Ctrl/Cmd+V.
+        if (this.isAutoPasteActive && normalizedKey === 'v' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+
         /**
          * Convert invisible key or shortcut keys when ctrl/meta are pressed
          * to Qt keycode in Base-16.
          * We only handle shortcut keys (c,x,v) up when ctrl or meta are pressed:
          * for OSX, onKeyUp() is never fired when meta is pressed so we need to emulate it.
          */
-        if (CTRL_SHORTCUT_KEYS[event.keyCode] && event.ctrlKey) {
-            key = parseInt(CTRL_SHORTCUT_KEYS[event.keyCode], 16);
-        } else if (CTRL_SHORTCUT_KEYS[event.keyCode] && event.metaKey) {
-            key = parseInt(CTRL_SHORTCUT_KEYS[event.keyCode], 16);
-            let json = {
-                type: 'KEYBOARD_PRESS',
-                keychar: '',
-                keycode: key,
-            };
-            this.instance.sendEvent(json);
-            json = {
-                type: 'KEYBOARD_RELEASE',
-                keychar: '',
-                keycode: key,
-            };
-            this.instance.sendEvent(json);
-            // No need to propagate event or the character will also be send
-            event.preventDefault();
-            event.stopPropagation();
-            event.returnValue = false;
-            return false;
-        } else if (INVISIBLE_KEYS[event.keyCode]) {
-            key = parseInt(INVISIBLE_KEYS[event.keyCode], 16);
-        } else {
-            return true;
+        switch (true) {
+            // Ctrl + C/V/X: map shortcut key to matching Qt keycode.
+            case Boolean(CTRL_SHORTCUT_KEYS[normalizedKey] && event.ctrlKey): {
+                const key = parseInt(CTRL_SHORTCUT_KEYS[normalizedKey], 16);
+                eventsToSend.push({
+                    type: 'KEYBOARD_PRESS',
+                    keychar: '',
+                    keycode: key,
+                });
+                pressedKeyToTrack = key;
+                break;
+            }
+            // Meta (Cmd on macOS) + C/V/X: emulate press+release in keydown because keyup may not fire.
+            case Boolean(CTRL_SHORTCUT_KEYS[normalizedKey] && event.metaKey): {
+                const key = parseInt(CTRL_SHORTCUT_KEYS[normalizedKey], 16);
+                eventsToSend.push({
+                    type: 'KEYBOARD_PRESS',
+                    keychar: '',
+                    keycode: key,
+                });
+                eventsToSend.push({
+                    type: 'KEYBOARD_RELEASE',
+                    keychar: '',
+                    keycode: key,
+                });
+                break;
+            }
+            // Non printable/special keys (Enter, Backspace, arrows, ...).
+            case Boolean(INVISIBLE_KEYS[event.key]): {
+                const key = parseInt(INVISIBLE_KEYS[event.key], 16);
+                eventsToSend.push({
+                    type: 'KEYBOARD_PRESS',
+                    keychar: '',
+                    keycode: key,
+                });
+                pressedKeyToTrack = key;
+                break;
+            }
+            // Printable characters without modifiers: send press+release immediately.
+            case Boolean(event.key && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey): {
+                const text = event.key;
+                const charCode = text.charCodeAt(0);
+                eventsToSend.push({
+                    type: 'KEYBOARD_PRESS',
+                    keychar: text,
+                    keycode: charCode,
+                });
+                eventsToSend.push({
+                    type: 'KEYBOARD_RELEASE',
+                    keychar: text,
+                    keycode: charCode,
+                });
+                break;
+            }
+            // Unhandled key combination: let browser/default listeners process it.
+            default:
+                return true;
         }
 
-        const json = {
-            type: 'KEYBOARD_PRESS',
-            keychar: '',
-            keycode: key,
-        };
-        this.instance.sendEvent(json);
-        this.currentlyPressedKeys.set(key, key);
+        eventsToSend.forEach((json) => {
+            this.instance.sendEvent(json);
+        });
+
+        if (pressedKeyToTrack !== null) {
+            this.currentlyPressedKeys.set(pressedKeyToTrack, pressedKeyToTrack);
+        }
+
         event.preventDefault();
         event.stopPropagation();
-        event.returnValue = false;
         return false;
     }
 
@@ -179,7 +169,17 @@ export default class KeyboardEvents {
      * @return {boolean}       Whether or not the event must continue propagation.
      */
     onKeyUp(event) {
-        let key;
+        const normalizedKey = (event.key || '').toLowerCase();
+        const eventsToSend = [];
+        let releasedKeyToUntrack = null;
+
+        // Auto-paste is handled by Clipboard plugin, skip keyboard mapping for Ctrl/Cmd+V.
+        if (this.isAutoPasteActive && normalizedKey === 'v' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+
         /**
          * Convert invisible key or shortcut keys when ctrl/meta are pressed
          * to Qt keycode in Base-16.
@@ -187,24 +187,44 @@ export default class KeyboardEvents {
          * for OSX, onKeyUp() is never fired when meta is pressed so no need
          * to handle the case here since we emulate a down up in onKeyDown() in this case.
          */
-        if (CTRL_SHORTCUT_KEYS[event.keyCode] && event.ctrlKey) {
-            key = parseInt(CTRL_SHORTCUT_KEYS[event.keyCode], 16);
-        } else if (INVISIBLE_KEYS[event.keyCode]) {
-            key = parseInt(INVISIBLE_KEYS[event.keyCode], 16);
-        } else {
-            return true;
+        switch (true) {
+            // Ctrl + C/V/X: release the mapped Qt shortcut key.
+            case Boolean(CTRL_SHORTCUT_KEYS[normalizedKey] && event.ctrlKey): {
+                const key = parseInt(CTRL_SHORTCUT_KEYS[normalizedKey], 16);
+                eventsToSend.push({
+                    type: 'KEYBOARD_RELEASE',
+                    keychar: '',
+                    keycode: key,
+                });
+                releasedKeyToUntrack = key;
+                break;
+            }
+            // Non printable/special keys: release mapped key.
+            case Boolean(INVISIBLE_KEYS[event.key]): {
+                const key = parseInt(INVISIBLE_KEYS[event.key], 16);
+                eventsToSend.push({
+                    type: 'KEYBOARD_RELEASE',
+                    keychar: '',
+                    keycode: key,
+                });
+                releasedKeyToUntrack = key;
+                break;
+            }
+            // Nothing to release for other keys here.
+            default:
+                return true;
         }
 
-        const json = {
-            type: 'KEYBOARD_RELEASE',
-            keychar: '',
-            keycode: key,
-        };
-        this.instance.sendEvent(json);
-        this.currentlyPressedKeys.delete(key);
+        eventsToSend.forEach((json) => {
+            this.instance.sendEvent(json);
+        });
+
+        if (releasedKeyToUntrack !== null) {
+            this.currentlyPressedKeys.delete(releasedKeyToUntrack);
+        }
+
         event.preventDefault();
         event.stopPropagation();
-        event.returnValue = false;
         return false;
     }
 
@@ -218,7 +238,6 @@ export default class KeyboardEvents {
 
             if (!this.keyboardCallbacks) {
                 this.keyboardCallbacks = [
-                    {event: 'keypress', handler: this.onKeyPress.bind(this), removeListener: null},
                     {event: 'keydown', handler: this.onKeyDown.bind(this), removeListener: null},
                     {event: 'keyup', handler: this.onKeyUp.bind(this), removeListener: null},
                     {

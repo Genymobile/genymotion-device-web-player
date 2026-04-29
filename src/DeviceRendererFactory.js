@@ -26,6 +26,7 @@ const defaultOptions = {
         'ButtonsEvents_POWER',
     ],
     toolbarPosition: 'right',
+    displayToolbar: true,
     floatingToolbar: true,
     touch: true,
     mouse: true,
@@ -44,6 +45,7 @@ const defaultOptions = {
     clipboard: true,
     battery: true,
     gps: true,
+    mapId: 'DEMO_MAP_ID',
     capture: true,
     identifiers: true,
     network: true,
@@ -88,6 +90,7 @@ export default class DeviceRendererFactory {
      * @param  {Object}             options                        Various configuration options.
      * @param  {boolean}            options.showPhoneBorder        Show phone border. Default: false.
      * @param  {string}             options.toolbarPosition        Toolbar position. Default: 'right'. Available values: 'left', 'right'.
+     * @param  {boolean}            options.displayToolbar         Show toolbar. Default: true.
      * @param  {boolean}            options.toolbarOrder           Toolbar buttons order. Default: see defaultOptions.
      * @param  {boolean}            options.touch                  Touch support activated. Default: true.
      * @param  {boolean}            options.mouse                  Mouse support activated. Default: true.
@@ -107,6 +110,7 @@ export default class DeviceRendererFactory {
      * @param  {boolean}            options.clipboard              Clipboard forwarding support activated. Default: true.
      * @param  {boolean}            options.battery                Battery support activated. Default: true.
      * @param  {boolean}            options.gps                    GPS support activated. Default: true.
+     * @param  {string}             options.mapId                  Google Application mapId. Default: 'DEMO_MAP_ID'.
      * @param  {boolean}            options.capture                Screen capture support activated. Default: true.
      * @param  {boolean}            options.identifiers            Identifiers (IMEI, etc...) support activated. Default: true.
      * @param  {boolean}            options.network                Network throttling support activated. Default: true.
@@ -184,25 +188,17 @@ export default class DeviceRendererFactory {
     loadTemplate(dom, options) {
         dom.innerHTML = `
         <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''} 
-        ${options.floatingToolbar ? 'floatingBarDisplayed' : ''}
         toolbarPosition-${options.toolbarPosition}">
             <div class="player-screen-wrapper">
                 <div class="gm-video-wrapper">
                     <video class="gm-video" autoplay preload="none">Your browser does not support the VIDEO tag</video>
-                    ${
-                        options.showPhoneBorder
-                            ? '<div class="gm-phone-button"></div><div class="gm-phone-border"></div>'
-                            : ''
-                    }
                 </div>
-                ${
-                    options.floatingToolbar
-                        ? // eslint-disable-next-line max-len
-                          '<div class="gm-floating-toolbar-wrapper"><div class="gm-floating-toolbar"><ul></ul></div></div>'
-                        : ''
-                }
+                <div class="gm-floating-toolbar-wrapper 
+                    ${!options.floatingToolbar ? 'hidden' : 'floatingBarDisplayed'}">
+                    <div class="gm-floating-toolbar"><ul></ul></div>
+                </div>
             </div>
-            <div class="gm-toolbar-wrapper">
+            <div class="gm-toolbar-wrapper ${!options.floatingToolbar ? 'hidden' : ''}">
                 <div class="gm-toolbar">
                     <ul></ul>
                 </div>
@@ -308,11 +304,8 @@ export default class DeviceRendererFactory {
         if (floatingToolbar) {
             const floatingToolbarOrder = [
                 'ButtonsEvents_ROTATE',
-                'separator',
                 'Screenshot',
-                'separator',
                 'Screenrecord',
-                'separator',
                 'Fullscreen',
             ];
 
@@ -321,11 +314,8 @@ export default class DeviceRendererFactory {
             sortedToolbarItems.length = 0;
             sortedToolbarItems.push(...filteredToolbarItems);
             floatingToolbarOrder.forEach((name) => {
-                if (name === 'separator') {
-                    instance.toolbarManager.renderSeparator(true);
-                } else {
-                    instance.toolbarManager.renderButton(name, true);
-                }
+                // For floatingBar, separators are automatically added after each button, so we don't need to handle them here
+                instance.toolbarManager.renderButton(name, true);
             });
         }
         sortedToolbarItems.forEach(({key, value}) => {
@@ -335,5 +325,9 @@ export default class DeviceRendererFactory {
                 instance.toolbarManager.renderButton(key);
             }
         });
+
+        // Hide toolbars if requested or empty
+        const {displayToolbar} = instance.options;
+        instance.toolbarManager.updateToolbarVisibility(displayToolbar, floatingToolbar);
     }
 }

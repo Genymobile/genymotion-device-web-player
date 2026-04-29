@@ -19,6 +19,24 @@ describe('ButtonsEvents Plugin', () => {
         test('exposes a high level constructor', () => {
             expect(typeof ButtonsEvents).toBe('function');
         });
+
+        test('cleans resize observer on destroy', () => {
+            const localInstance = new Instance({
+                rotation: true,
+                volume: false,
+                navbar: false,
+                power: false,
+            });
+            const plugin = new ButtonsEvents(localInstance, {});
+            const disconnectSpy = vi.spyOn(plugin.videoResizeObserver, 'disconnect');
+
+            expect(plugin.videoResizeObserver).toBeTruthy();
+
+            plugin.destroy();
+
+            expect(disconnectSpy).toHaveBeenCalledTimes(1);
+            expect(plugin.videoResizeObserver).toBeNull();
+        });
     });
 
     describe('UI', () => {

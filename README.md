@@ -101,8 +101,9 @@ See the example below or explore our [detailed example](https://github.com/Genym
 **Note:** The device screen might not show up if the container element height is not defined. Use CSS to set a meaningful height (e.g., `height: 100vh`).
 
 ```html
-<!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature
-<script src="https://maps.googleapis.com/maps/api/js?key=xxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyy"></script>
+<!-- OPTIONAL: Import google maps library with your API key to enable map positioning feature.
+     The Player supports both Classical (script tag) and Dynamic (importLibrary) loading methods.
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY" async defer></script>
 -->
 
 <div id="genymotion"></div>
@@ -482,7 +483,15 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Type:** `Boolean`
 - **Default:** `true`
 - **Details:**
-  When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display.
+  When enabled, plugin controls (e.g. rotate, fullscreen, record, etc...) are displayed in a floating toolbar below the virtual device display, the toolbar is visible only if it contains at least one item.
+
+#### `mapId`
+
+- **Type:** `String`
+- **Default:** `'DEMO_MAP_ID'`
+- **Compatibility:** `PaaS`, `SaaS`
+- **Details:**
+  Google Maps ID. This is required when using the modern Google Maps API (Dynamic Library Import) to enable Advanced Markers in the GPS widget. If not provided, it defaults to `'DEMO_MAP_ID'`, which may have limitations or warning encrustations in production.
 
 #### `connectionFailedURL`
 
@@ -609,6 +618,14 @@ A device renderer instance can be configured using the `options` argument (objec
 - **Compatibility:** `PaaS`, `SaaS`
 - **Details:**
   Enable or disable the diskIO widget. This widget can be used to modify Disk IO (throttling) of the Android virtual device.
+
+#### displayToolbar
+
+- **Type:** `Boolean`
+- **Default:** `true`
+- **Compatibility:** `PaaS`, `SaaS`
+- **Details:**
+  Enable or disable the side toolbar visibility. If set to `true`, the toolbar is visible only if it contains at least one item.
 
 #### fileUpload <img align="right" src="./doc/assets/ic_installation.svg">
 

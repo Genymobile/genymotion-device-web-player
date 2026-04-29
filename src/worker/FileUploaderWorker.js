@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = function () {
+export default function () {
     const self = this;
     this.socket = null;
     this.token = null;
@@ -178,4 +176,4 @@ module.exports = function () {
                 break;
         }
     };
-};
+}

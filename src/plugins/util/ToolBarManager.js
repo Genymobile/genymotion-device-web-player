@@ -1,6 +1,5 @@
-'use strict';
-const log = require('loglevel');
-class ToolbarManager {
+import log from 'loglevel';
+export default class ToolbarManager {
     /**
      * Initialize ToolbarManager
      * @param {Object} instance - The instance to be managed.
@@ -71,7 +70,7 @@ class ToolbarManager {
             dataAttributes,
             isDisabled,
             button,
-            buttonIcon
+            buttonIcon,
         });
 
         // Return control functions for future manipulation
@@ -83,7 +82,7 @@ class ToolbarManager {
             setActive: (isActive = true) => this.setButtonActive(id, isActive),
             setIndicator: (typeOfIndicator) => this.setButtonIndicator(id, typeOfIndicator),
             getIndicator: () => this.getButtonIndicator(id),
-            htmlElement: button
+            htmlElement: button,
         };
     }
 
@@ -117,8 +116,8 @@ class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             title,
-            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left':'right',
-            'toolbarTitleWidget'
+            isInfloatingBar ? 'top' : this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
+            'toolbarTitleWidget',
         );
     }
 
@@ -144,7 +143,7 @@ class ToolbarManager {
         this.instance.tooltipManager.setTooltip(
             button,
             this.instance.options.i18n.NOT_SUPPORTED || 'Not currently supported',
-            this.instance.options.toolbarPosition === 'right' ? 'left':'right'
+            this.instance.options.toolbarPosition === 'right' ? 'left' : 'right',
         );
         buttonIcon.classList.add('gm-disabled-icon-button');
 
@@ -302,5 +301,3 @@ class ToolbarManager {
         }
     }
 }
-
-module.exports = ToolbarManager;

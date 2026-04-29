@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Instance mouse plugin.
  * Forward touch events to instance.
  */
-module.exports = class MouseEvents {
+export default class MouseEvents {
     static get name() {
         return 'MouseEvents';
     }
@@ -51,9 +49,11 @@ module.exports = class MouseEvents {
     onMousePressEvent(event) {
         /**
          * At launch the sound is muted until a click is performed on the <video>
-         * `this.instance.mediaManager.isMuted` is necessary to force the sound to be muted even if the user clicked on the video
+         * `this.instance.video.isForceMuted` is a flag set to true / false by apiManager
+         * if `this.instance.video.isForceMuted` is undefined then unmuted the video sound when user click onto video
          */
-        this.instance.video.muted = !this.instance.mediaManager.isMuted ? this.instance.video.muted : false;
+        // eslint-disable-next-line no-undefined
+        this.instance.video.muted = this.instance.video.isForceMuted === undefined ? false : this.instance.video.muted;
         if (event.button !== 0) {
             return;
         }
@@ -238,4 +238,4 @@ module.exports = class MouseEvents {
 
         return pixels;
     }
-};
+}

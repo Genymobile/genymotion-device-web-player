@@ -1,6 +1,4 @@
-'use strict';
-
-const Instance = require('../mocks/DeviceRenderer');
+import Instance from '../mocks/DeviceRenderer.js';
 
 describe('Floating Toolbar', () => {
     describe('when floatingToolbar is true', () => {

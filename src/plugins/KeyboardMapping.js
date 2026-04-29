@@ -1,6 +1,4 @@
-'use strict';
-
-const {generateUID} = require('../utils/helpers');
+import {generateUID} from '../utils/helpers';
 
 /**
  * This plugin sends touch events to the instance when mapped keys are pressed.
@@ -96,7 +94,7 @@ const {generateUID} = require('../utils/helpers');
  *
  */
 
-module.exports = class KeyboardMapping {
+export default class KeyboardMapping {
     static get name() {
         return 'KeyboardMapping';
     }
@@ -763,4 +761,4 @@ module.exports = class KeyboardMapping {
             });
         }
     }
-};
+}

@@ -2,12 +2,15 @@
     .dropdown {
         position: relative;
         font-family: Arial, sans-serif;
+
         &.open {
             .dropdown-menu {
                 display: block;
             }
+
             .dropdown-selected {
                 border-color: var(--gm-primary-color);
+
                 &::after {
                     transform: rotate(-45deg);
                 }
@@ -19,6 +22,7 @@
                 pointer-events: none;
                 border-color: var(--gm-tertiary-color);
                 color: var(--gm-tertiary-color);
+
                 &::after {
                     border-color: var(--gm-tertiary-color);
                 }
@@ -94,10 +98,11 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+
                 .dropdown-checkmark {
                     background-color: var(--gm-on-secondary-color);
-                    mask-image: url('../assets/images/ic_check.svg');
-                    -webkit-mask-image: url('../assets/images/ic_check.svg');
+                    mask-image: url('../../assets/images/ic_check.svg');
+                    -webkit-mask-image: url('../../assets/images/ic_check.svg');
                     -webkit-mask-size: contain;
                     mask-size: contain;
                     -webkit-mask-repeat: no-repeat;

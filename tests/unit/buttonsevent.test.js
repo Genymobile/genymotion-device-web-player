@@ -1,7 +1,6 @@
-'use strict';
-
-const ButtonsEvents = require('../../src/plugins/ButtonsEvents');
-const Instance = require('../mocks/DeviceRenderer');
+import {vi} from 'vitest';
+import ButtonsEvents from '../../src/plugins/ButtonsEvents.js';
+import Instance from '../mocks/DeviceRenderer.js';
 
 let instance;
 
@@ -118,7 +117,7 @@ describe('ButtonsEvents Plugin', () => {
         let sendEventSpy;
 
         beforeEach(() => {
-            sendEventSpy = jest.spyOn(instance, 'sendEvent');
+            sendEventSpy = vi.spyOn(instance, 'sendEvent');
         });
 
         afterEach(() => {

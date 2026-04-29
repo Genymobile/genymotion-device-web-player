@@ -1,8 +1,6 @@
-'use strict';
-
-const OverlayPlugin = require('./util/OverlayPlugin');
-const {switchButton} = require('./util/components');
-const log = require('loglevel');
+import OverlayPlugin from './util/OverlayPlugin';
+import '@/components/GmSwitch';
+import log from 'loglevel';
 log.setDefaultLevel('debug');
 
 /**
@@ -34,7 +32,7 @@ const FINGERPRINT_MESSAGES = {
         AUTO_RECOGNIZE_TRUE: 'auto_recognize true',
     },
 };
-module.exports = class FingerPrint extends OverlayPlugin {
+export default class FingerPrint extends OverlayPlugin {
     static get name() {
         return 'FingerPrint';
     }
@@ -116,7 +114,7 @@ module.exports = class FingerPrint extends OverlayPlugin {
                             }
 
                             // update switch
-                            this.recognizedFPByDefaultStatus.setState(value);
+                            this.recognizedFPByDefaultStatus.checked = value;
                             break;
                         default:
                             break;
@@ -195,15 +193,14 @@ module.exports = class FingerPrint extends OverlayPlugin {
         recognizedFPByDefaultText.innerHTML =
             this.i18n.FINGERPRINT_AUTOMATIC_BIOMETRIC_AUTHENTICATION || 'Automatic biometric authentication';
 
-        this.recognizedFPByDefaultStatus = switchButton.createSwitch({
-            classes: 'autoValidationSwitch',
-            onChange: (value) => {
-                this.state.isRecognizedFPByDefault = value;
-            },
+        this.recognizedFPByDefaultStatus = document.createElement('gm-switch');
+        this.recognizedFPByDefaultStatus.className = 'autoValidationSwitch';
+        this.recognizedFPByDefaultStatus.addEventListener('gm-switch-change', (e) => {
+            this.state.isRecognizedFPByDefault = e.detail.checked;
         });
 
         recognizedFPByDefaultDiv.appendChild(recognizedFPByDefaultText);
-        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus.element);
+        recognizedFPByDefaultDiv.appendChild(this.recognizedFPByDefaultStatus);
 
         headerDiv.appendChild(authRequiredDiv);
         headerDiv.appendChild(recognizedFPByDefaultDiv);
@@ -350,4 +347,4 @@ module.exports = class FingerPrint extends OverlayPlugin {
         };
         this.instance.sendEvent(json);
     }
-};
+}

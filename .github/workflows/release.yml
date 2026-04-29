@@ -36,6 +36,6 @@ jobs:
                 draft: false
                 prerelease: false
             - name: NPM Release
-              run: yarn publish --access public --non-interactive
+              run: npm publish --access public
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

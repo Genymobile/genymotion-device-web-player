@@ -967,6 +967,15 @@ export default class DeviceRenderer {
             this.store.destroy();
         }
 
+        if (this.fileUploadWorker) {
+            this.fileUploadWorker.terminate();
+            this.fileUploadWorker = null;
+        }
+        if (this.fileUploadClients) {
+            this.fileUploadClients.clear();
+        }
+        this.activeFileUploadClient = null;
+
         if (this.fileUploaderWorkerBlobSRC) {
             URL.revokeObjectURL(this.fileUploaderWorkerBlobSRC);
             this.fileUploaderWorkerBlobSRC = null;
@@ -984,7 +993,10 @@ export default class DeviceRenderer {
         delete this.root;
     }
 
-    // Get an instance of upload worker and handle connect / close
+    // Get a client handle to the shared upload worker.
+    // A single Worker (and therefore a single WSS connection to fileUploadUrl)
+    // is created lazily and shared across all callers to avoid opening multiple
+    // sockets when several plugins (FileUpload, GAPPSInstall, ...) need uploads.
     createFileUploadWorker() {
         if (!this.fileUploaderWorkerBlobSRC || !this.options.fileUploadUrl?.length) {
             let msgError = null;
@@ -996,33 +1008,101 @@ export default class DeviceRenderer {
             }
             throw new Error("Worker can't be created, error:", msgError);
         }
-        const worker = new Worker(this.fileUploaderWorkerBlobSRC);
+
+        this.ensureSharedFileUploadWorker();
+
+        // Fan-out codes go to every registered client; per-upload codes only to the active one.
+        const FANOUT_CODES = new Set(['SOCKET_SUCCESS', 'SOCKET_FAIL']);
+        const ACTIVE_ONLY_CODES = new Set(['PROGRESS', 'SUCCESS', 'FAIL', 'CANCELED']);
+        const clients = this.fileUploadClients;
+
+        const client = {
+            _onmessage: null,
+            postMessage: (msg) => {
+                if (msg && (msg.type === 'upload' || msg.type === 'cancel')) {
+                    this.activeFileUploadClient = client;
+                }
+                this.fileUploadWorker.postMessage(msg);
+            },
+            set onmessage(fn) {
+                this._onmessage = fn;
+            },
+            get onmessage() {
+                return this._onmessage;
+            },
+            dispose: () => {
+                clients.delete(client);
+                if (this.activeFileUploadClient === client) {
+                    this.activeFileUploadClient = null;
+                }
+            },
+            _deliver: (event) => {
+                if (typeof client._onmessage === 'function') {
+                    client._onmessage(event);
+                }
+            },
+            _shouldReceive: (msg) => {
+                if (!msg) {
+                    return false;
+                }
+                if (FANOUT_CODES.has(msg.code)) {
+                    return true;
+                }
+                if (ACTIVE_ONLY_CODES.has(msg.code)) {
+                    return this.activeFileUploadClient === client;
+                }
+                return this.activeFileUploadClient === client;
+            },
+        };
+
+        clients.add(client);
+        return client;
+    }
+
+    // Lazily create the singleton Worker and wire connection lifecycle + routing.
+    ensureSharedFileUploadWorker() {
+        if (this.fileUploadWorker) {
+            return;
+        }
+
+        this.fileUploadClients = this.fileUploadClients || new Set();
+        this.activeFileUploadClient = this.activeFileUploadClient || null;
+
+        this.fileUploadWorker = new Worker(this.fileUploaderWorkerBlobSRC);
+        this.fileUploadWorker.onmessage = (event) => {
+            const msg = event && event.data;
+            for (const client of this.fileUploadClients) {
+                if (client._shouldReceive(msg)) {
+                    client._deliver(event);
+                }
+            }
+            // Terminal upload states release the active slot so the next upload
+            // (from any plugin) can claim it.
+            if (msg && (msg.code === 'SUCCESS' || msg.code === 'FAIL' || msg.code === 'CANCELED')) {
+                this.activeFileUploadClient = null;
+            }
+        };
 
         if (this.store.state.isWebRTCConnectionReady) {
-            const msg = {
+            this.fileUploadWorker.postMessage({
                 type: 'address',
                 fileUploadAddress: this.options.fileUploadUrl,
                 token: this.options.token,
-            };
-            worker.postMessage(msg);
+            });
         }
         this.store.subscribe(
             ({isWebRTCConnectionReady}) => {
                 if (isWebRTCConnectionReady) {
-                    const msg = {
+                    this.fileUploadWorker.postMessage({
                         type: 'address',
                         fileUploadAddress: this.options.fileUploadUrl,
                         token: this.options.token,
-                    };
-                    worker.postMessage(msg);
+                    });
                 } else {
-                    const msg = {type: 'close'};
-                    worker.postMessage(msg);
+                    this.fileUploadWorker.postMessage({type: 'close'});
                 }
             },
             ['isWebRTCConnectionReady'],
         );
-
-        return worker;
     }
 }

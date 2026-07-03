@@ -201,4 +201,10 @@ export default class FileUpload extends OverlayPlugin {
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
     }
+
+    destroy() {
+        this.removeListenerOnRoot();
+        this.fileUploadWorker?.dispose?.();
+        this.fileUploadWorker = null;
+    }
 }

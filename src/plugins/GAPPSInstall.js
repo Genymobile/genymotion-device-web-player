@@ -580,6 +580,12 @@ class InitialView {
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
     }
+
+    destroy() {
+        this.removeListenerOnRoot();
+        this.fileUploadWorker?.dispose?.();
+        this.fileUploadWorker = null;
+    }
 }
 
 // Plugin main class
@@ -763,5 +769,12 @@ export default class GAPPSInstall extends OverlayPlugin {
             this.setView(this.viewAtNextopening);
         }
         super.toggleWidget();
+    }
+
+    destroy() {
+        this.instanciatedViews.forEach((view) => {
+            view?.destroy?.();
+        });
+        this.instanciatedViews.clear();
     }
 }

@@ -87,6 +87,10 @@ export default class DeviceRenderer {
 
         // file upload src worker
         this.fileUploaderWorkerBlobSRC = null;
+        this.sharedFileUploadWorker = null;
+        this.sharedFileUploadWorkerClients = new Map();
+        this.sharedFileUploadWorkerStoreUnsubscribe = null;
+        this.activeFileUploadWorkerClientID = null;
 
         // Prepare source for the upload worker
         if (window.Worker) {
@@ -967,6 +971,8 @@ export default class DeviceRenderer {
             this.store.destroy();
         }
 
+        this.disposeSharedFileUploadWorker();
+
         if (this.fileUploaderWorkerBlobSRC) {
             URL.revokeObjectURL(this.fileUploaderWorkerBlobSRC);
             this.fileUploaderWorkerBlobSRC = null;
@@ -984,6 +990,83 @@ export default class DeviceRenderer {
         delete this.root;
     }
 
+    createSharedFileUploadWorker() {
+        const worker = new Worker(this.fileUploaderWorkerBlobSRC);
+
+        worker.onmessage = (event) => {
+            const msg = event?.data;
+            const targetedCodes = ['PROGRESS', 'SUCCESS', 'FAIL', 'CANCELED'];
+
+            if (targetedCodes.includes(msg?.code) && this.activeFileUploadWorkerClientID) {
+                const listener = this.sharedFileUploadWorkerClients.get(this.activeFileUploadWorkerClientID);
+                if (listener) {
+                    try {
+                        listener(event);
+                    } catch (error) {
+                        log.error(error);
+                    }
+                }
+
+                if (['SUCCESS', 'FAIL', 'CANCELED'].includes(msg?.code)) {
+                    this.activeFileUploadWorkerClientID = null;
+                }
+                return;
+            }
+
+            this.sharedFileUploadWorkerClients.forEach((listener) => {
+                try {
+                    listener(event);
+                } catch (error) {
+                    log.error(error);
+                }
+            });
+        };
+
+        if (this.store.state.isWebRTCConnectionReady) {
+            worker.postMessage({
+                type: 'address',
+                fileUploadAddress: this.options.fileUploadUrl,
+                token: this.options.token,
+            });
+        }
+
+        this.sharedFileUploadWorkerStoreUnsubscribe = this.store.subscribe(
+            ({isWebRTCConnectionReady}) => {
+                if (!this.sharedFileUploadWorker) {
+                    return;
+                }
+
+                if (isWebRTCConnectionReady) {
+                    this.sharedFileUploadWorker.postMessage({
+                        type: 'address',
+                        fileUploadAddress: this.options.fileUploadUrl,
+                        token: this.options.token,
+                    });
+                } else {
+                    this.sharedFileUploadWorker.postMessage({type: 'close'});
+                    this.activeFileUploadWorkerClientID = null;
+                }
+            },
+            ['isWebRTCConnectionReady'],
+        );
+
+        return worker;
+    }
+
+    disposeSharedFileUploadWorker() {
+        this.sharedFileUploadWorkerStoreUnsubscribe?.();
+        this.sharedFileUploadWorkerStoreUnsubscribe = null;
+
+        if (this.sharedFileUploadWorker) {
+            this.sharedFileUploadWorker.postMessage({type: 'close'});
+            this.sharedFileUploadWorker.terminate();
+            this.sharedFileUploadWorker = null;
+        }
+
+        this.sharedFileUploadWorkerClients.clear();
+        this.activeFileUploadWorkerClientID = null;
+    }
+
     // Get an instance of upload worker and handle connect / close
     createFileUploadWorker() {
         if (!this.fileUploaderWorkerBlobSRC || !this.options.fileUploadUrl?.length) {
@@ -996,33 +1079,47 @@ export default class DeviceRenderer {
             }
             throw new Error("Worker can't be created, error:", msgError);
         }
-        const worker = new Worker(this.fileUploaderWorkerBlobSRC);
 
-        if (this.store.state.isWebRTCConnectionReady) {
-            const msg = {
-                type: 'address',
-                fileUploadAddress: this.options.fileUploadUrl,
-                token: this.options.token,
-            };
-            worker.postMessage(msg);
+        if (!this.sharedFileUploadWorker) {
+            this.sharedFileUploadWorker = this.createSharedFileUploadWorker();
         }
-        this.store.subscribe(
-            ({isWebRTCConnectionReady}) => {
-                if (isWebRTCConnectionReady) {
-                    const msg = {
-                        type: 'address',
-                        fileUploadAddress: this.options.fileUploadUrl,
-                        token: this.options.token,
-                    };
-                    worker.postMessage(msg);
-                } else {
-                    const msg = {type: 'close'};
-                    worker.postMessage(msg);
+
+        const clientID = generateUID();
+        let listener = null;
+        const subscribeListener = (callback) => {
+            listener = typeof callback === 'function' ? callback : null;
+            if (listener) {
+                this.sharedFileUploadWorkerClients.set(clientID, listener);
+            } else {
+                this.sharedFileUploadWorkerClients.delete(clientID);
+            }
+        };
+
+        return {
+            postMessage: (msg) => {
+                if (msg?.type === 'upload') {
+                    this.activeFileUploadWorkerClientID = clientID;
+                }
+                if (msg?.type === 'cancel' && this.activeFileUploadWorkerClientID === clientID) {
+                    this.activeFileUploadWorkerClientID = null;
+                }
+                this.sharedFileUploadWorker?.postMessage(msg);
+            },
+            setOnMessage: (callback) => {
+                subscribeListener(callback);
+            },
+            dispose: () => {
+                this.sharedFileUploadWorkerClients.delete(clientID);
+                if (this.activeFileUploadWorkerClientID === clientID) {
+                    this.activeFileUploadWorkerClientID = null;
                 }
             },
-            ['isWebRTCConnectionReady'],
-        );
-
-        return worker;
+            get onmessage() {
+                return listener;
+            },
+            set onmessage(callback) {
+                subscribeListener(callback);
+            },
+        };
     }
 }

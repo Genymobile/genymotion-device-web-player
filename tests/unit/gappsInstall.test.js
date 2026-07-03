@@ -5,8 +5,16 @@ vi.mock('loglevel');
 // window.Worker mock
 const mockWorker = {
     postMessage: vi.fn(),
-    onmessage: null,
+    setOnMessage: vi.fn(),
+    dispose: vi.fn(),
+    _onMessage: null,
+    emitMessage(data) {
+        this._onMessage?.({data});
+    },
 };
+mockWorker.setOnMessage.mockImplementation((callback) => {
+    mockWorker._onMessage = callback;
+});
 
 const mockBlobUrl = 'blob:mock-url-123';
 global.URL.createObjectURL = vi.fn().mockReturnValue(mockBlobUrl);
@@ -25,6 +33,9 @@ describe('GAPPSInstall Plugin', () => {
     beforeEach(() => {
         // Reset mocks before each test
         mockWorker.postMessage.mockClear();
+        mockWorker.setOnMessage.mockClear();
+        mockWorker.dispose.mockClear();
+        mockWorker._onMessage = null;
         global.Worker.mockClear();
         global.URL.createObjectURL.mockClear();
         global.URL.revokeObjectURL.mockClear();
@@ -205,7 +216,7 @@ describe('GAPPSInstall Plugin', () => {
             initialView.handleFileUpload(file);
 
             const event = {data: {type: 'FILE_UPLOAD', code: 'FAIL'}};
-            mockWorker.onmessage(event);
+            mockWorker.emitMessage(event.data);
 
             expect(instance.root.classList.contains('gm-uploading-in-progess')).toBe(false);
             expect(document.getElementsByClassName('gm-error-text')[0].innerHTML).toEqual(
@@ -226,7 +237,7 @@ describe('GAPPSInstall Plugin', () => {
                     fileSize: '900.00',
                 },
             };
-            mockWorker.onmessage(event);
+            mockWorker.emitMessage(event.data);
             expect(initialView.fileUploaderComponent.element.querySelector('.gm-progress-bar').style.width).toBe('50%');
             expect(initialView.fileUploaderComponent.element.querySelector('.gm-size-text').innerHTML).toBe(
                 '(450.00 of 900.00Mo)',

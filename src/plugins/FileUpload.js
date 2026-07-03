@@ -23,7 +23,7 @@ export default class FileUpload extends OverlayPlugin {
 
         try {
             this.fileUploadWorker = this.instance.createFileUploadWorker();
-            this.fileUploadWorker.onmessage = (event) => {
+            this.fileUploadWorker.setOnMessage((event) => {
                 const msg = event.data;
                 switch (msg.code) {
                     case 'SUCCESS':
@@ -61,7 +61,7 @@ export default class FileUpload extends OverlayPlugin {
                     default:
                         break;
                 }
-            };
+            });
         } catch (error) {
             log.error(error, this.toolbarBtn);
             this.toolbarBtn.disable();
@@ -200,5 +200,11 @@ export default class FileUpload extends OverlayPlugin {
         this.removeListenerDragAndDropOver?.();
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
+    }
+
+    destroy() {
+        this.removeListenerOnRoot();
+        this.fileUploadWorker?.dispose?.();
+        this.fileUploadWorker = null;
     }
 }

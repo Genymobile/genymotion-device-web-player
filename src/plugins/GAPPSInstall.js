@@ -356,7 +356,7 @@ class InitialView {
         if (this.plugin.instance.options.fileUploadUrl) {
             try {
                 this.fileUploadWorker = this.plugin.instance.createFileUploadWorker();
-                this.fileUploadWorker.onmessage = (event) => {
+                this.fileUploadWorker.setOnMessage((event) => {
                     const msg = event.data;
                     switch (msg.code) {
                         case 'SUCCESS':
@@ -394,7 +394,7 @@ class InitialView {
                         default:
                             break;
                     }
-                };
+                });
             } catch (error) {
                 log.error(error);
                 this.plugin.instance.store.dispatch({type: 'DRAG_AND_DROP_UPLOAD_FILE_ENABLED', payload: false});
@@ -580,6 +580,12 @@ class InitialView {
         this.removeListenerDragAndDropDrop?.();
         this.removeListenerDragAndDropLeave?.();
     }
+
+    destroy() {
+        this.removeListenerOnRoot();
+        this.fileUploadWorker?.dispose?.();
+        this.fileUploadWorker = null;
+    }
 }
 
 // Plugin main class
@@ -763,5 +769,14 @@ export default class GAPPSInstall extends OverlayPlugin {
             this.setView(this.viewAtNextopening);
         }
         super.toggleWidget();
+    }
+
+    destroy() {
+        this.instanciatedViews.forEach((view) => {
+            if (view && typeof view.destroy === 'function') {
+                view.destroy();
+            }
+        });
+        this.instanciatedViews.clear();
     }
 }

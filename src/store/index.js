@@ -4,6 +4,7 @@ log.setDefaultLevel('debug');
 
 const initialState = {
     isWebRTCConnectionReady: false,
+    isWebRTCSessionStable: false,
     overlay: {
         isOpen: false,
         widgetsOpened: [],
@@ -115,6 +116,9 @@ const reducer = (state, action) => {
     switch (action.type) {
         case 'WEBRTC_CONNECTION_READY':
             state.isWebRTCConnectionReady = action.payload;
+            break;
+        case 'WEBRTC_SESSION_STABLE':
+            state.isWebRTCSessionStable = action.payload;
             break;
         case 'KEYBOARD_EVENTS_ENABLED':
             state.isKeyboardEventsEnabled = action.payload;

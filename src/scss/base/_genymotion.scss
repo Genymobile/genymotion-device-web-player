@@ -349,7 +349,7 @@
         * Video container responsible for centering and scaling.
         */
         .gm-video-wrapper {
-            display: flex;
+            display: inline-block;
             justify-content: center;
             align-self: center;
             min-height: 0;
@@ -362,7 +362,7 @@
                 max-height: 100%;
                 height: 100%;
                 outline: none;
-                align-self: center;
+                display: block;
                 border-radius: 6px;
             }
         }

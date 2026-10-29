@@ -55,12 +55,7 @@ export default class Camera extends OverlayPlugin {
     }
 
     enable() {
-        const videoCapabilities = RTCRtpSender.getCapabilities('video');
-        if (videoCapabilities.codecs.some((codec) => codec.mimeType === 'video/H264')) {
-            super.enable();
-        } else {
-            this.toolbarBtn.disable();
-        }
+        super.enable();
     }
 
     /**

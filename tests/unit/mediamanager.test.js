@@ -202,5 +202,52 @@ describe('Camera Plugin', () => {
 
             await audioStreamRemoved;
         });
+
+        it('preserves injected local video streams during a transient peer connection reset', async () => {
+            const frontStream = {getVideoTracks: () => [{kind: 'video'}], getAudioTracks: () => []};
+            const backStream = {getVideoTracks: () => [{kind: 'video'}], getAudioTracks: () => []};
+            mediaManager.localFrontVideoStream = frontStream;
+            mediaManager.localBackVideoStream = backStream;
+            mediaManager.frontCameraSender = {replaceTrack: vi.fn(), setStreams: vi.fn()};
+            mediaManager.backCameraSender = {replaceTrack: vi.fn(), setStreams: vi.fn()};
+
+            mediaManager.addVideoStream = vi.fn().mockResolvedValue(true);
+
+            instance.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: true});
+            instance.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: false});
+
+            expect(mediaManager.localFrontVideoStream).toBe(frontStream);
+            expect(mediaManager.localBackVideoStream).toBe(backStream);
+            expect(mediaManager.frontCameraSender).toBeNull();
+            expect(mediaManager.backCameraSender).toBeNull();
+
+            instance.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: true});
+
+            await Promise.resolve();
+
+            expect(mediaManager.addVideoStream).toHaveBeenCalledTimes(2);
+            expect(mediaManager.addVideoStream).toHaveBeenNthCalledWith(1, frontStream, 'front');
+            expect(mediaManager.addVideoStream).toHaveBeenNthCalledWith(2, backStream, 'back');
+            expect(mediaManager.frontCameraSender).toBeNull(frontStream);
+            expect(mediaManager.backCameraSender).toBeNull(backStream);
+        });
+
+        it('flushes active media on a legitimate disconnect', () => {
+            const stopAudioTrack = vi.fn();
+            const stopFrontTrack = vi.fn();
+            const stopBackTrack = vi.fn();
+            mediaManager.localAudioStream = {getTracks: () => [{stop: stopAudioTrack}]};
+            mediaManager.localFrontVideoStream = {getTracks: () => [{stop: stopFrontTrack}]};
+            mediaManager.localBackVideoStream = {getTracks: () => [{stop: stopBackTrack}]};
+
+            mediaManager.releaseLocalMedia();
+
+            expect(stopAudioTrack).toHaveBeenCalledTimes(1);
+            expect(stopFrontTrack).toHaveBeenCalledTimes(1);
+            expect(stopBackTrack).toHaveBeenCalledTimes(1);
+            expect(mediaManager.localAudioStream).toBeNull();
+            expect(mediaManager.localFrontVideoStream).toBeNull();
+            expect(mediaManager.localBackVideoStream).toBeNull();
+        });
     });
 });

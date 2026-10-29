@@ -14,6 +14,8 @@ export default class MediaManager {
     constructor(instance, videoWithMicrophone = instance.options.microphone, videoWidth = 1280, videoHeight = 720) {
         this.instance = instance;
         this.instance.mediaManager = this;
+        this.shouldRestoreMediaAfterReconnect = false;
+        this.isRestoringMedia = false;
 
         if (!navigator.mediaDevices) {
             log.error("MediaDevices API unsupported: camera and microphone won't be available.");
@@ -26,6 +28,62 @@ export default class MediaManager {
         this.videoWidth = videoWidth;
         this.videoHeight = videoHeight;
         this.videoWithMicrophone = videoWithMicrophone;
+
+        this.unsubscribeWebRTCSessionStable = this.instance.store?.subscribe(
+            this.onWebRTCSessionStableChange.bind(this),
+            ['isWebRTCSessionStable'],
+        );
+    }
+
+    onWebRTCSessionStableChange({isWebRTCSessionStable}, previousState = {}) {
+        if (!isWebRTCSessionStable) {
+            this.shouldRestoreMediaAfterReconnect = this.hasActiveLocalStreams();
+            this.resetSenders();
+            return;
+        }
+
+        if (!previousState.isWebRTCSessionStable && this.shouldRestoreMediaAfterReconnect && !this.isRestoringMedia) {
+            this.isRestoringMedia = true;
+            this.restoreActiveStreams()
+                .catch((error) => {
+                    log.error('Failed to restore active media streams after reconnect:', error);
+                })
+                .finally(() => {
+                    this.isRestoringMedia = false;
+                    this.shouldRestoreMediaAfterReconnect = false;
+                });
+        }
+    }
+
+    hasActiveLocalStreams() {
+        return Boolean(
+            (this.localAudioStream && this.localAudioStream.getAudioTracks().length > 0) ||
+                (this.localFrontVideoStream && this.localFrontVideoStream.getVideoTracks().length > 0) ||
+                (this.localBackVideoStream && this.localBackVideoStream.getVideoTracks().length > 0),
+        );
+    }
+
+    resetSenders() {
+        this.frontCameraSender = null;
+        this.backCameraSender = null;
+        this.microphoneSender = null;
+    }
+
+    releaseLocalMedia() {
+        this.shouldRestoreMediaAfterReconnect = false;
+        this.resetSenders();
+
+        [this.localAudioStream, this.localFrontVideoStream, this.localBackVideoStream]
+            .filter(Boolean)
+            .forEach((stream) => {
+                stream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+            });
+
+        this.localAudioStream = null;
+        this.localFrontVideoStream = null;
+        this.localBackVideoStream = null;
     }
 
     /**
@@ -299,6 +357,7 @@ export default class MediaManager {
                 );
 
                 if (reusableTransceiver) {
+                    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait a bit to avoid "replaceTrack() called with a track that is already in use" error
                     log.debug(`Reusing existing video transceiver for ${type}`);
                     await reusableTransceiver.sender.replaceTrack(stream.getVideoTracks()[0]);
                     reusableTransceiver.direction = 'sendrecv';
@@ -392,6 +451,39 @@ export default class MediaManager {
     }
 
     /**
+     * Re-attach all streams that were active before a transient WebRTC reconnect.
+     * This is used when the peer connection is rebuilt but the local media stream should survive the reset.
+     *
+     * @returns {Promise<boolean>} true when all active streams were restored successfully.
+     */
+    async restoreActiveStreams() {
+        if (this.instance.options.microphone
+            && this.localAudioStream
+            && this.localAudioStream.getAudioTracks().length > 0) {
+            const result = await this.addAudioStream(this.localAudioStream);
+            if (result === false) {
+                return false;
+            }
+        }
+
+        if (this.localFrontVideoStream && this.localFrontVideoStream.getVideoTracks().length > 0) {
+            const result = await this.addVideoStream(this.localFrontVideoStream, 'front');
+            if (result === false) {
+                return false;
+            }
+        }
+
+        if (this.localBackVideoStream && this.localBackVideoStream.getVideoTracks().length > 0) {
+            const result = await this.addVideoStream(this.localBackVideoStream, 'back');
+            if (result === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Remove a local video stream and stop sending it through SDP renegotiation.
      *
      * See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/removeTrack
@@ -435,21 +527,8 @@ export default class MediaManager {
         return false;
     }
 
-    /**
-     * Stop the audio & video streaming
-     */
-    disconnect() {
-        if (this.localAudioStream) {
-            this.stopAudioStreaming();
-        }
-        if (this.localFrontVideoStream) {
-            this.stopVideoStreaming('front');
-        }
-        if (this.localBackVideoStream) {
-            this.stopVideoStreaming('back');
-        }
-        this.frontCameraSender = null;
-        this.backCameraSender = null;
-        this.microphoneSender = null;
+    destroy() {
+        this.unsubscribeWebRTCSessionStable?.();
+        this.releaseLocalMedia();
     }
 }

@@ -246,9 +246,10 @@ export default class DeviceRenderer {
      * Open WebSocket and WebRTC connection.
      */
     openWebRTCConnection() {
+        this.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: false});
         if (this.webRTCWebsocket) {
-            this.disconnect();
             this.reconnecting = true;
+            this.disconnect({preserveMedia: true});
         }
 
         this.webRTCWebsocket = new WebSocket(this.options.webRTCUrl, this.webRTCWebsocketName);
@@ -278,6 +279,7 @@ export default class DeviceRenderer {
 
         this.webRTCWebsocket.onclose = (event) => {
             store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
+            store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: false});
             this.initialized = false;
             log.debug('Error! Maybe your VM is not available yet? (' + event.code + ') ' + event.reason);
 
@@ -350,11 +352,19 @@ export default class DeviceRenderer {
 
     /**
      * Disconnect the current instance, closing any open data channels.
+     *
+     * @param {boolean} [options.preserveMedia=false] Keep local media sources alive for a reconnect.
      */
-    disconnect() {
-        this.initialized = false;
+    disconnect({preserveMedia = false} = {}) {
+        this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
+        this.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: false});
 
-        this.mediaManager?.disconnect();
+        if (!preserveMedia) {
+            this.mediaManager?.releaseLocalMedia?.();
+        }
+
+        this.initialized = false;
+        this.store.dispatch({type: 'WEBRTC_CONNECTION_READY', payload: false});
 
         if (this.webRTCWebsocket) {
             this.webRTCWebsocket.close();
@@ -752,6 +762,7 @@ export default class DeviceRenderer {
         }
 
         this.initialized = true;
+        this.store.dispatch({type: 'WEBRTC_SESSION_STABLE', payload: true});
         if (this.reconnecting) {
             this.reconnecting = false;
         } else {

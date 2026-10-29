@@ -11,6 +11,10 @@ import TooltipManager from './plugins/util/TooltipManager';
 import log from 'loglevel';
 log.setDefaultLevel('debug');
 
+const isSafariBrowser = (userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent || '') => {
+    return /Safari/i.test(userAgent) && !/Chrome|CriOS|Chromium|Android/i.test(userAgent);
+};
+
 // Default options
 const defaultOptions = {
     toolbarOrder: [
@@ -186,6 +190,10 @@ export default class DeviceRendererFactory {
      * @param  {Object}             options   Various configuration options.
      */
     loadTemplate(dom, options) {
+        if (isSafariBrowser()) {
+            options.showPhoneBorder = false;
+        }
+
         dom.innerHTML = `
         <div class="gm-wrapper waitingForStream ${options.showPhoneBorder ? 'phoneBorder' : ''} 
         toolbarPosition-${options.toolbarPosition}">

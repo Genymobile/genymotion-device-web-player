@@ -354,6 +354,7 @@
             align-self: center;
             min-height: 0;
             max-height: 100%;
+            width: fit-content;
             margin: auto 30px;
             position: relative;
 
@@ -374,7 +375,6 @@
         &.phoneBorder {
             .gm-video-wrapper {
                 z-index: 1;
-                width: fit-content;
                 border: 8px solid var(--phone-border-color);
                 border-radius: 16px;
                 outline: 7px solid var(--phone-outline-color);

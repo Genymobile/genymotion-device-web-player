@@ -257,6 +257,7 @@ export default class DeviceRenderer {
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.binaryType = 'arraybuffer';
+        this.kickPendingWebSocket(this.webRTCWebsocket);
 
         /**
          * In case of unexpected close of the WebSocket connection, the handler will retry n times before dying
@@ -267,6 +268,43 @@ export default class DeviceRenderer {
         } else {
             log.error('Unable to establish connection to your instance.');
         }
+    }
+
+    /**
+     * Safari 26.2 (macOS Tahoe) workaround: a wss:// connection to a raw IP address can stay
+     * in CONNECTING for tens of seconds to minutes without any packet being sent, and a socket
+     * stuck in CONNECTING never fires onclose, so the retry logic above never runs. Opening any
+     * other HTTP connection to the same host releases the pending socket immediately. While the
+     * socket is still CONNECTING, issue a tiny no-cache GET to the host every couple of seconds.
+     *
+     * @param {WebSocket} webSocket The socket that was just created.
+     */
+    kickPendingWebSocket(webSocket) {
+        if (typeof fetch !== 'function') {
+            return;
+        }
+        const firstKickMs = 1500;
+        const kickIntervalMs = 2000;
+        const maxKicks = 30;
+        let kicks = 0;
+        const kick = () => {
+            if (webSocket.readyState !== WebSocket.CONNECTING || kicks >= maxKicks) {
+                return;
+            }
+            kicks++;
+            try {
+                const url = new URL(this.options.webRTCUrl, window.location.href);
+                url.protocol = url.protocol === 'ws:' ? 'http:' : 'https:';
+                url.pathname = '/';
+                url.search = '?ws-kick=' + Date.now();
+                url.hash = '';
+                fetch(url.toString(), {cache: 'no-store', mode: 'no-cors', credentials: 'include'}).catch(() => {});
+            } catch (error) {
+                return;
+            }
+            this.timeoutCallbacks.push(setTimeout(kick, kickIntervalMs));
+        };
+        this.timeoutCallbacks.push(setTimeout(kick, firstKickMs));
     }
 
     /**

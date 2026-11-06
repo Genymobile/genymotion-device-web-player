@@ -451,12 +451,13 @@ export default class DeviceRenderer {
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
     async renegotiateWebRTCConnection() {
-        // For safari we add audio & video before sending SDP to avoid empty SDP
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        if (isSafari) {
-            this.peerConnection.addTransceiver('audio');
-            this.peerConnection.addTransceiver('video');
-        }
+        /*
+         * No Safari-specific transceivers here: createPeerConnection() already adds the recvonly
+         * audio and video transceivers every browser needs for a non-empty offer. The extra
+         * sendrecv pair that used to be added for Safari doubled its m-lines (and grew them on
+         * every renegotiation), and Safari gathers mDNS candidates per m-line, which delayed
+         * its ICE candidates by several seconds.
+         */
         // creating SDP offer
         try {
             const description = await this.peerConnection.createOffer();
@@ -495,7 +496,12 @@ export default class DeviceRenderer {
 
         const config = {
             iceServers: iceServers,
-            bundlePolicy: 'max-compat',
+            /*
+             * One transport for audio, video and data: candidates are gathered once instead of
+             * once per m-line. Safari in particular took ~4.5 s to produce its mDNS candidates
+             * for five separate transports with 'max-compat'. The device side (libwebrtc) bundles.
+             */
+            bundlePolicy: 'max-bundle',
         };
 
         if (!this.peerConnection) {

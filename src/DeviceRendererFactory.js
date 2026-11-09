@@ -61,15 +61,11 @@ const defaultOptions = {
     i18n: {},
     stun: {
         urls: [
-            // TODO: remove what we don't have
-            'stun:stun-eu.genymotion.com:80',
-            'stun:stun-eu.genymotion.com:443',
+            // Only 3478 answers STUN on these hosts (probed 2026-11-09); 80, 443 and 5349 are closed.
             'stun:stun-eu.genymotion.com:3478',
-            'stun:stun-eu.genymotion.com:5349',
-            'stun:stun-na.genymotion.com:80',
-            'stun:stun-na.genymotion.com:443',
             'stun:stun-na.genymotion.com:3478',
-            'stun:stun-na.genymotion.com:5349',
+            'stun:stun-as.genymotion.com:3478',
+            'stun:stun-oc.genymotion.com:3478',
         ],
     },
     connectionFailedURL: '',

@@ -2,6 +2,7 @@
 
 import DeviceRenderer from './DeviceRenderer';
 import {defaultsDeep} from 'lodash';
+import {isSafariBrowser} from './utils/helpers';
 
 import store from './store';
 import APIManager from './APIManager';
@@ -10,10 +11,6 @@ import TooltipManager from './plugins/util/TooltipManager';
 
 import log from 'loglevel';
 log.setDefaultLevel('debug');
-
-const isSafariBrowser = (userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent || '') => {
-    return /Safari/i.test(userAgent) && !/Chrome|CriOS|Chromium|Android/i.test(userAgent);
-};
 
 // Default options
 const defaultOptions = {

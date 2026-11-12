@@ -26,7 +26,7 @@ import GamepadManager from './plugins/GamepadManager';
 import FingerPrint from './plugins/FingerPrint';
 import MediaManager from './plugins/MediaManager';
 
-import {generateUID} from './utils/helpers';
+import {generateUID, isSafariBrowser} from './utils/helpers';
 import log from 'loglevel';
 import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
@@ -280,7 +280,8 @@ export default class DeviceRenderer {
      * @param {WebSocket} webSocket The socket that was just created.
      */
     kickPendingWebSocket(webSocket) {
-        if (typeof fetch !== 'function') {
+        // Safari-only: other browsers open the signaling socket normally, so skip the workaround.
+        if (typeof fetch !== 'function' || !isSafariBrowser()) {
             return;
         }
         const firstKickMs = 1500;

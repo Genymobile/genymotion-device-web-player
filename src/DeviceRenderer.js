@@ -26,7 +26,7 @@ import GamepadManager from './plugins/GamepadManager';
 import FingerPrint from './plugins/FingerPrint';
 import MediaManager from './plugins/MediaManager';
 
-import {generateUID} from './utils/helpers';
+import {generateUID, isSafariBrowser} from './utils/helpers';
 import log from 'loglevel';
 import fileUploaderWorkerBlob from './worker/FileUploaderWorker';
 
@@ -257,6 +257,7 @@ export default class DeviceRenderer {
         this.webRTCWebsocket.onmessage = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.onerror = this.onWebSocketMessage.bind(this);
         this.webRTCWebsocket.binaryType = 'arraybuffer';
+        this.kickPendingWebSocket(this.webRTCWebsocket);
 
         /**
          * In case of unexpected close of the WebSocket connection, the handler will retry n times before dying
@@ -267,6 +268,44 @@ export default class DeviceRenderer {
         } else {
             log.error('Unable to establish connection to your instance.');
         }
+    }
+
+    /**
+     * Safari 26.2 (macOS Tahoe) workaround: a wss:// connection to a raw IP address can stay
+     * in CONNECTING for tens of seconds to minutes without any packet being sent, and a socket
+     * stuck in CONNECTING never fires onclose, so the retry logic above never runs. Opening any
+     * other HTTP connection to the same host releases the pending socket immediately. While the
+     * socket is still CONNECTING, issue a tiny no-cache GET to the host every couple of seconds.
+     *
+     * @param {WebSocket} webSocket The socket that was just created.
+     */
+    kickPendingWebSocket(webSocket) {
+        // Safari-only: other browsers open the signaling socket normally, so skip the workaround.
+        if (typeof fetch !== 'function' || !isSafariBrowser()) {
+            return;
+        }
+        const firstKickMs = 1500;
+        const kickIntervalMs = 2000;
+        const maxKicks = 30;
+        let kicks = 0;
+        const kick = () => {
+            if (webSocket.readyState !== WebSocket.CONNECTING || kicks >= maxKicks) {
+                return;
+            }
+            kicks++;
+            try {
+                const url = new URL(this.options.webRTCUrl, window.location.href);
+                url.protocol = url.protocol === 'ws:' ? 'http:' : 'https:';
+                url.pathname = '/';
+                url.search = '?ws-kick=' + Date.now();
+                url.hash = '';
+                fetch(url.toString(), {cache: 'no-store', mode: 'no-cors', credentials: 'include'}).catch(() => {});
+            } catch (error) {
+                return;
+            }
+            this.timeoutCallbacks.push(setTimeout(kick, kickIntervalMs));
+        };
+        this.timeoutCallbacks.push(setTimeout(kick, firstKickMs));
     }
 
     /**
@@ -413,12 +452,13 @@ export default class DeviceRenderer {
      * @returns {Promise<boolean>} A promise that always resolves, with true on success and false on fail
      */
     async renegotiateWebRTCConnection() {
-        // For safari we add audio & video before sending SDP to avoid empty SDP
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        if (isSafari) {
-            this.peerConnection.addTransceiver('audio');
-            this.peerConnection.addTransceiver('video');
-        }
+        /*
+         * No Safari-specific transceivers here: createPeerConnection() already adds the recvonly
+         * audio and video transceivers every browser needs for a non-empty offer. The extra
+         * sendrecv pair that used to be added for Safari doubled its m-lines (and grew them on
+         * every renegotiation), and Safari gathers mDNS candidates per m-line, which delayed
+         * its ICE candidates by several seconds.
+         */
         // creating SDP offer
         try {
             const description = await this.peerConnection.createOffer();
@@ -457,7 +497,12 @@ export default class DeviceRenderer {
 
         const config = {
             iceServers: iceServers,
-            bundlePolicy: 'max-compat',
+            /*
+             * One transport for audio, video and data: candidates are gathered once instead of
+             * once per m-line. Safari in particular took ~4.5 s to produce its mDNS candidates
+             * for five separate transports with 'max-compat'. The device side (libwebrtc) bundles.
+             */
+            bundlePolicy: 'max-bundle',
         };
 
         if (!this.peerConnection) {
